@@ -1,0 +1,69 @@
+{
+  "" : {
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheck-primary.dia",
+    "emit-module-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheck-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheck-primary-emit-module.dia",
+    "pch" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheck-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheck-primary.swiftdeps"
+  },
+  "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/NightCheck/DashboardView.swift" : {
+    "const-values" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/DashboardView.swiftconstvalues",
+    "dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/DashboardView.d",
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/DashboardView.dia",
+    "index-unit-output-path" : "/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/DashboardView.o",
+    "llvm-bc" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/DashboardView.bc",
+    "object" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/DashboardView.o",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/DashboardView.swiftdeps",
+    "swiftmodule" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/DashboardView~partial.swiftmodule"
+  },
+  "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/NightCheck/LiquidGlass.swift" : {
+    "const-values" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LiquidGlass.swiftconstvalues",
+    "dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LiquidGlass.d",
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LiquidGlass.dia",
+    "index-unit-output-path" : "/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LiquidGlass.o",
+    "llvm-bc" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LiquidGlass.bc",
+    "object" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LiquidGlass.o",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LiquidGlass.swiftdeps",
+    "swiftmodule" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LiquidGlass~partial.swiftmodule"
+  },
+  "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/NightCheck/LogNightSheet.swift" : {
+    "const-values" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LogNightSheet.swiftconstvalues",
+    "dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LogNightSheet.d",
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LogNightSheet.dia",
+    "index-unit-output-path" : "/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LogNightSheet.o",
+    "llvm-bc" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LogNightSheet.bc",
+    "object" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LogNightSheet.o",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LogNightSheet.swiftdeps",
+    "swiftmodule" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/LogNightSheet~partial.swiftmodule"
+  },
+  "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/NightCheck/NightCheckApp.swift" : {
+    "const-values" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheckApp.swiftconstvalues",
+    "dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheckApp.d",
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheckApp.dia",
+    "index-unit-output-path" : "/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheckApp.o",
+    "llvm-bc" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheckApp.bc",
+    "object" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheckApp.o",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheckApp.swiftdeps",
+    "swiftmodule" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightCheckApp~partial.swiftmodule"
+  },
+  "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/NightCheck/NightEntry.swift" : {
+    "const-values" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightEntry.swiftconstvalues",
+    "dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightEntry.d",
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightEntry.dia",
+    "index-unit-output-path" : "/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightEntry.o",
+    "llvm-bc" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightEntry.bc",
+    "object" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightEntry.o",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightEntry.swiftdeps",
+    "swiftmodule" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/NightEntry~partial.swiftmodule"
+  },
+  "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/NightCheck/Substance.swift" : {
+    "const-values" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/Substance.swiftconstvalues",
+    "dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/Substance.d",
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/Substance.dia",
+    "index-unit-output-path" : "/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/Substance.o",
+    "llvm-bc" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/Substance.bc",
+    "object" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/Substance.o",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/Substance.swiftdeps",
+    "swiftmodule" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/DerivedDataDevice/Build/Intermediates.noindex/NightCheck.build/Debug-iphoneos/NightCheck.build/Objects-normal/arm64/Substance~partial.swiftmodule"
+  }
+}

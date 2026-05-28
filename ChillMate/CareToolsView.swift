@@ -1,0 +1,6371 @@
+import Foundation
+import PhotosUI
+import MapKit
+import SwiftData
+import SwiftUI
+import UIKit
+
+enum CareToolPage: String, Identifiable {
+    case safetyAutopilot
+    case saferPlanning
+    case stdTests
+    case drugTimers
+    case emergency
+    case panicSupport
+    case drugInfo
+    case aftercare
+    case combinationRisk
+    case consentBoundaries
+    case recoveryMode
+    case privateInsights
+    case helperBridge
+    case drugChecking
+
+    var id: String { rawValue }
+}
+
+struct CareToolsSection: View {
+    let open: (CareToolPage) -> Void
+
+    private let tools: [(CareToolPage, String, String, String, Color)] = [
+        (.safetyAutopilot, "Safety autopilot", "Next best action", "sparkles.rectangle.stack.fill", Color.chillVisibleBlue),
+        (.emergency, "Emergency Information", "112, trusted contact, and location message", "sos.circle.fill", .red),
+        (.panicSupport, "Panic support", "Breathing, contact, and grounding", "lungs.fill", Color.chillVisiblePurple),
+        (.saferPlanning, "Plan", "Before-Chill checklist", "checkmark.shield.fill", Color.chillVisibleMint),
+        (.drugTimers, "Timers", "Track effect windows", "timer", Color.chillVisibleAmber),
+        (.aftercare, "Aftercare", "Check in tomorrow", "heart.text.square.fill", Color.chillVisiblePink),
+        (.stdTests, "STI tests", "Dates and results", "cross.case.fill", Color.chillVisibleTeal),
+        (.recoveryMode, "Recovery mode", "Goals and cravings", "figure.mind.and.body", Color.chillVisibleMint)
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            CareSectionTitle(title: "Care tools", symbol: "heart.text.square.fill")
+
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                ForEach(tools, id: \.0.id) { tool in
+                    CareToolCard(tool: tool, open: open)
+                }
+            }
+        }
+    }
+}
+
+struct InsightsToolsSection: View {
+    let open: (CareToolPage) -> Void
+
+    private let tools: [(CareToolPage, String, String, String, Color)] = [
+        (.combinationRisk, "Risk checker", "Mixing and timing", "exclamationmark.shield.fill", Color.chillVisibleOrange),
+        (.drugInfo, "Drug info", "Quick reference", "pills.fill", Color.chillVisiblePurple),
+        (.consentBoundaries, "Boundaries", "Consent and exit plan", "hand.raised.fill", Color.chillVisibleTeal),
+        (.privateInsights, "Insights", "Private patterns", "chart.xyaxis.line", Color.chillVisibleBlue),
+        (.helperBridge, "Helper summary", "Share talking points", "doc.text.magnifyingglass", Color.chillVisibleMint),
+        (.drugChecking, "Drug checking", "Safer-use reminders", "checkmark.seal.text.page.fill", Color.chillVisibleAmber)
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            CareSectionTitle(title: "Insights", symbol: "chart.xyaxis.line")
+
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                ForEach(tools, id: \.0.id) { tool in
+                    CareToolCard(tool: tool, open: open)
+                }
+            }
+        }
+    }
+}
+
+private struct CareToolCard: View {
+    let tool: (CareToolPage, String, String, String, Color)
+    let open: (CareToolPage) -> Void
+
+    var body: some View {
+        Button {
+            open(tool.0)
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Image(systemName: tool.3)
+                    .font(.system(size: 18, weight: .black))
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [tool.4, tool.4.opacity(0.70)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 34, height: 34)
+                    .background(tool.4.opacity(0.18), in: Circle())
+                    .overlay {
+                        Circle()
+                            .stroke(.white.opacity(0.45), lineWidth: 1)
+                    }
+                    .shadow(color: tool.4.opacity(0.24), radius: 8, x: 0, y: 4)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(tool.1)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.68)
+                    Text(tool.2)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.76)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 86, maxHeight: 86, alignment: .topLeading)
+            .padding(10)
+        }
+        .buttonStyle(.plain)
+        .glassSurface(radius: 20, tint: tool.4.opacity(0.11), interactive: true)
+    }
+}
+
+struct STDTestsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var tests: [STDTestRecord]
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+
+    @State private var testDate = Date.now
+    @State private var oralResult: STDResultStatus = .pending
+    @State private var genitalResult: STDResultStatus = .pending
+    @State private var analResult: STDResultStatus = .pending
+    @State private var foundSTIs: [String] = []
+    @State private var selectedSTI = STIOption.chlamydia.rawValue
+    @State private var customSTIName = ""
+    @State private var notes = ""
+    @State private var isShowingDiscardWarning = false
+
+    private var hasPositiveSelection: Bool {
+        oralResult == .positive || genitalResult == .positive || analResult == .positive
+    }
+
+    private var hasUnsavedChanges: Bool {
+        !Calendar.current.isDate(testDate, inSameDayAs: .now) ||
+        oralResult != .pending ||
+        genitalResult != .pending ||
+        analResult != .pending ||
+        !foundSTIs.isEmpty ||
+        !customSTIName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "STI tests",
+                            subtitle: "Record test dates and fill in oral, genital, and anal results when they arrive. Save the test date now, then add results later; positive results can generate partner warning messages.",
+                            symbol: "cross.case.fill",
+                            tint: Color.chillVisibleMint
+                        )
+
+                        STIExposureGuideCard()
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            DatePicker("Test date", selection: $testDate, displayedComponents: [.date])
+                                .font(.headline)
+                                .foregroundStyle(Color.chillText)
+                                .tint(Color.chillVisibleMint)
+
+                            ResultPickerRow(title: "Oral", result: $oralResult)
+                            ResultPickerRow(title: "Genital", result: $genitalResult)
+                            ResultPickerRow(title: "Anal", result: $analResult)
+
+                            if hasPositiveSelection {
+                                PositiveSTIDetailsDisclosure(
+                                    foundSTIs: $foundSTIs,
+                                    selectedSTI: $selectedSTI,
+                                    customSTIName: $customSTIName
+                                )
+                            }
+
+                            TextField("Notes, clinic, or reference", text: $notes, axis: .vertical)
+                                .lineLimit(2...4)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            GlassActionButton(prominent: true, action: saveTest) {
+                                Label("Save test", systemImage: "checkmark.circle.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            CareSectionTitle(title: "Current and past STI tests", symbol: "list.bullet.rectangle")
+
+                            if tests.isEmpty {
+                                CareEmptyState(text: "No STI tests saved yet.")
+                            } else {
+                                LazyVStack(spacing: 12) {
+                                    ForEach(tests) { test in
+                                        STDTestCard(test: test, contacts: warningContacts(for: test))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton {
+                        attemptDismiss()
+                    }
+                }
+            }
+            .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
+                dismiss()
+            }
+            .edgeSwipeBack(attemptDismiss)
+            .endEditingOnTap()
+        }
+    }
+
+    private func attemptDismiss() {
+        if hasUnsavedChanges {
+            isShowingDiscardWarning = true
+        } else {
+            dismiss()
+        }
+    }
+
+    private func saveTest() {
+        let record = STDTestRecord(
+            testDate: testDate,
+            oralResult: oralResult,
+            genitalResult: genitalResult,
+            analResult: analResult,
+            foundSTIs: hasPositiveSelection ? foundSTIs : [],
+            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        modelContext.insert(record)
+        try? modelContext.save()
+
+        Task {
+            if (try? await NotificationService.shared.requestAuthorization()) == true {
+                NotificationService.shared.scheduleSTDResultReminder(testID: record.id, dueDate: record.resultsDueDate)
+            }
+        }
+
+        notes = ""
+        foundSTIs = []
+        selectedSTI = STIOption.chlamydia.rawValue
+        customSTIName = ""
+        oralResult = .pending
+        genitalResult = .pending
+        analResult = .pending
+        testDate = .now
+    }
+
+    private func warningContacts(for test: STDTestRecord) -> [SexPartnerRecord] {
+        let lowerBound = Calendar.current.date(byAdding: .month, value: -6, to: test.testDate) ?? .distantPast
+        var seenNumbers: Set<String> = []
+
+        return entries
+            .filter { $0.date >= lowerBound && $0.date <= test.testDate }
+            .flatMap(\.partnerDetails)
+            .filter { !$0.normalizedPhoneNumber.isEmpty }
+            .filter { partner in
+                let key = partner.normalizedPhoneNumber
+                guard !seenNumbers.contains(key) else {
+                    return false
+                }
+                seenNumbers.insert(key)
+                return true
+            }
+    }
+}
+
+private struct STDTestCard: View {
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.openURL) private var openURL
+    @Bindable var test: STDTestRecord
+    let contacts: [SexPartnerRecord]
+    @State private var selectedSTI = STIOption.chlamydia.rawValue
+    @State private var customSTIName = ""
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(test.testDate.formatted(date: .abbreviated, time: .omitted))
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+                    Text("Reminder: \(test.resultsDueDate.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                }
+
+                Spacer()
+
+                Button(role: .destructive) {
+                    RecentlyDeletedStore.record(
+                        kind: "STI test",
+                        title: "STI test",
+                        detail: test.testDate.formatted(date: .abbreviated, time: .omitted)
+                    )
+                    modelContext.delete(test)
+                    try? modelContext.save()
+                } label: {
+                    Image(systemName: "trash.fill")
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.chillSecondary)
+            }
+
+            ResultPickerRow(title: "Oral", result: resultBinding(\.oralResult))
+            ResultPickerRow(title: "Genital", result: resultBinding(\.genitalResult))
+            ResultPickerRow(title: "Anal", result: resultBinding(\.analResult))
+
+            if test.hasPositiveResult {
+                PositiveSTIDetailsDisclosure(
+                    foundSTIs: foundSTIsBinding,
+                    selectedSTI: $selectedSTI,
+                    customSTIName: $customSTIName
+                )
+
+                STIWarningMessagePanel(
+                    test: test,
+                    contacts: contacts,
+                    openMessage: { contact in
+                        if let url = warningMessageURL(for: contact) {
+                            openURL(url)
+                        }
+                    }
+                )
+            }
+
+            if !test.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text(test.notes)
+                    .font(.footnote)
+                    .foregroundStyle(Color.chillSecondary)
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 24, tint: .black.opacity(0.04))
+    }
+
+    private var foundSTIsBinding: Binding<[String]> {
+        Binding {
+            test.foundSTIs
+        } set: { newValue in
+            test.foundSTIs = newValue
+            try? modelContext.save()
+        }
+    }
+
+    private func resultBinding(_ keyPath: ReferenceWritableKeyPath<STDTestRecord, String>) -> Binding<STDResultStatus> {
+        Binding {
+            STDResultStatus(rawValue: test[keyPath: keyPath]) ?? .pending
+        } set: { newValue in
+            test[keyPath: keyPath] = newValue.rawValue
+            try? modelContext.save()
+        }
+    }
+
+    private func warningMessageURL(for contact: SexPartnerRecord) -> URL? {
+        var components = URLComponents()
+        components.scheme = "sms"
+        components.path = contact.normalizedPhoneNumber
+        components.queryItems = [
+            URLQueryItem(name: "body", value: warningMessage(for: contact))
+        ]
+        return components.url
+    }
+
+    private func warningMessage(for contact: SexPartnerRecord) -> String {
+        let found = test.foundSTIs.isEmpty ? "an STI" : test.foundSTIs.joined(separator: ", ")
+        let areas = positiveAreas
+        let areaText = areas.isEmpty ? "" : " The positive result was marked for: \(areas.joined(separator: ", "))."
+        return "Hi \(contact.displayName), I wanted to let you know that I recently had an STI test with a positive result for \(found).\(areaText) It may be a good idea to get tested and contact your GP, GGD, or sexual health clinic. This is a private heads-up from ChillMate."
+    }
+
+    private var positiveAreas: [String] {
+        [
+            test.oralResult == STDResultStatus.positive.rawValue ? "oral" : nil,
+            test.genitalResult == STDResultStatus.positive.rawValue ? "genital" : nil,
+            test.analResult == STDResultStatus.positive.rawValue ? "anal" : nil
+        ].compactMap(\.self)
+    }
+}
+
+private enum STIOption: String, CaseIterable, Identifiable {
+    case chlamydia = "Chlamydia"
+    case gonorrhea = "Gonorrhea"
+    case syphilis = "Syphilis"
+    case hiv = "HIV"
+    case hepatitisB = "Hepatitis B"
+    case hepatitisC = "Hepatitis C"
+    case herpes = "Herpes"
+    case hpv = "HPV"
+    case mycoplasma = "Mycoplasma genitalium"
+    case trichomoniasis = "Trichomoniasis"
+    case other = "Other"
+
+    var id: String { rawValue }
+}
+
+private struct PositiveSTIDetailsDisclosure: View {
+    @Binding var foundSTIs: [String]
+    @Binding var selectedSTI: String
+    @Binding var customSTIName: String
+
+    private var canAdd: Bool {
+        let candidate = candidateName
+        return !candidate.isEmpty && !foundSTIs.contains(candidate)
+    }
+
+    private var candidateName: String {
+        if selectedSTI == STIOption.other.rawValue {
+            return customSTIName.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+        return selectedSTI
+    }
+
+    var body: some View {
+        DisclosureGroup {
+            VStack(alignment: .leading, spacing: 12) {
+                Picker("STI", selection: $selectedSTI) {
+                    ForEach(STIOption.allCases) { option in
+                        Text(option.rawValue).tag(option.rawValue)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(.red)
+
+                if selectedSTI == STIOption.other.rawValue {
+                    TextField("Name the STI", text: $customSTIName)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(Color.chillText)
+                        .padding(14)
+                        .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+                }
+
+                GlassActionButton(prominent: false, action: addSTI) {
+                    Label("Add STI", systemImage: "plus.circle.fill")
+                        .font(.subheadline.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                }
+                .disabled(!canAdd)
+                .opacity(canAdd ? 1 : 0.55)
+
+                if foundSTIs.isEmpty {
+                    Text("Add one or more positive findings if you want them included in warning messages.")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                } else {
+                    FlowLayout(spacing: 8) {
+                        ForEach(foundSTIs, id: \.self) { sti in
+                            Button {
+                                foundSTIs.removeAll { $0 == sti }
+                            } label: {
+                                Label(sti, systemImage: "xmark.circle.fill")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(Color.chillText)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .glassSurface(radius: 14, tint: .red.opacity(0.12))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            .padding(.top, 8)
+        } label: {
+            Label("Positive STI details", systemImage: "cross.case.circle.fill")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+        }
+        .padding(12)
+        .glassSurface(radius: 18, tint: .red.opacity(0.08), interactive: true)
+    }
+
+    private func addSTI() {
+        let candidate = candidateName
+        guard !candidate.isEmpty, !foundSTIs.contains(candidate) else {
+            return
+        }
+
+        foundSTIs.append(candidate)
+        if selectedSTI == STIOption.other.rawValue {
+            customSTIName = ""
+        }
+    }
+}
+
+private struct STIWarningMessagePanel: View {
+    let test: STDTestRecord
+    let contacts: [SexPartnerRecord]
+    let openMessage: (SexPartnerRecord) -> Void
+
+    var body: some View {
+        DisclosureGroup {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Sending a warning is voluntary. Review and edit every message before it leaves Messages. A GP, GGD, or sexual-health clinic can also help with partner notification.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if contacts.isEmpty {
+                    Text("No partner phone numbers are saved in recent logs. Add phone numbers in a log to generate message shortcuts here.")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    ForEach(contacts) { contact in
+                        Button {
+                            openMessage(contact)
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: "message.fill")
+                                    .foregroundStyle(Color.chillVisibleMint)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Message \(contact.displayName)")
+                                        .font(.subheadline.weight(.bold))
+                                        .foregroundStyle(Color.chillText)
+                                    Text(contact.phoneNumber)
+                                        .font(.caption)
+                                        .foregroundStyle(Color.chillSecondary)
+                                }
+                                Spacer()
+                            }
+                            .padding(10)
+                            .glassSurface(radius: 16, tint: Color.chillMint.opacity(0.08), interactive: true)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .padding(.top, 8)
+        } label: {
+            Label("Generate iMessage warning", systemImage: "message.badge.waveform.fill")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+        }
+        .padding(12)
+        .glassSurface(radius: 18, tint: Color.chillMint.opacity(0.08), interactive: true)
+    }
+}
+
+private struct STIExposureGuideCard: View {
+    private let rows = [
+        ("Oral", "Ask whether throat testing is included when oral exposure matters.", "May miss infections if only genital samples are tested."),
+        ("Genital", "Covers genital swabs or urine samples depending on the clinic/test type.", "Does not automatically cover throat or rectal exposure."),
+        ("Anal", "Ask for rectal testing when anal exposure matters.", "May be missed by urine-only or genital-only testing.")
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CareSectionTitle(title: "What tests cover", symbol: "cross.case.circle.fill")
+
+            Text("Use oral, genital, and anal fields to match where testing was done. If you are unsure, mark pending and ask the clinic what samples were included.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(rows, id: \.0) { row in
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(row.0)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                    Text(row.1)
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                    Text(row.2)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillVisibleOrange)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .glassSurface(radius: 18, tint: Color.chillVisibleMint.opacity(0.06))
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillVisibleMint.opacity(0.08))
+    }
+}
+
+private struct ResultPickerRow: View {
+    let title: String
+    @Binding var result: STDResultStatus
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+
+            Spacer()
+
+            Picker(title, selection: $result) {
+                ForEach(STDResultStatus.allCases) { status in
+                    Text(status.rawValue).tag(status)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(result == .positive ? .red : Color.chillVisibleMint)
+        }
+        .padding(12)
+        .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+    }
+}
+
+struct SaferSessionPlanView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \SaferSessionPlan.createdAt, order: .reverse) private var plans: [SaferSessionPlan]
+
+    @AppStorage("trustedContactName") private var trustedContactName = ""
+    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
+
+    @State private var plannedDate = Date.now
+    @State private var sleepChecked = false
+    @State private var hydrationChecked = false
+    @State private var medicationInteractionChecked = false
+    @State private var medicationNotes = ""
+    @State private var plannedSubstanceLimits = ""
+    @State private var emergencyContactReady = false
+    @State private var transportPlanned = false
+    @State private var transportPlan = ""
+    @State private var condomsPacked = false
+    @State private var lubePacked = false
+    @State private var prepTaken = false
+    @State private var prepRemindersEnabled = false
+    @State private var dontMixAcknowledged = false
+    @State private var partnerModeEnabled = false
+    @State private var sharedSafetyPlan = ""
+    @State private var agreedBoundaries = ""
+    @State private var groupMemberName = ""
+    @State private var groupMemberNames: [String] = []
+    @State private var groupCheckInMinutes = 90
+    @State private var aftercareReminderForEveryone = false
+    @State private var endingDate = Calendar.current.date(byAdding: .hour, value: 4, to: Date.now) ?? Date.now.addingTimeInterval(4 * 60 * 60)
+    @State private var isShowingDiscardWarning = false
+
+    private var riskAssessment: SaferPlanRiskAssessment {
+        SaferPlanRiskAssessment(
+            sleepChecked: sleepChecked,
+            hydrationChecked: hydrationChecked,
+            medicationInteractionChecked: medicationInteractionChecked,
+            plannedSubstanceLimits: plannedSubstanceLimits,
+            emergencyContactReady: emergencyContactReady,
+            transportPlanned: transportPlanned,
+            transportPlan: transportPlan,
+            condomsPacked: condomsPacked,
+            lubePacked: lubePacked,
+            prepTaken: prepTaken,
+            dontMixAcknowledged: dontMixAcknowledged,
+            partnerModeEnabled: partnerModeEnabled,
+            agreedBoundaries: agreedBoundaries,
+            plannedDate: plannedDate,
+            endingDate: endingDate
+        )
+    }
+
+    private var completedCount: Int {
+        [
+            sleepChecked,
+            hydrationChecked,
+            medicationInteractionChecked,
+            emergencyContactReady,
+            transportPlanned,
+            condomsPacked,
+            lubePacked,
+            prepTaken,
+            dontMixAcknowledged
+        ].filter { $0 }.count
+    }
+
+    private var canSavePlan: Bool {
+        dontMixAcknowledged &&
+        endingDate > plannedDate &&
+        (!transportPlanned || !transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
+
+    private var hasUnsavedChanges: Bool {
+        !Calendar.current.isDate(plannedDate, equalTo: .now, toGranularity: .minute) ||
+        abs(endingDate.timeIntervalSince(Date.now.addingTimeInterval(4 * 60 * 60))) > 60 ||
+        sleepChecked ||
+        hydrationChecked ||
+        medicationInteractionChecked ||
+        !medicationNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !plannedSubstanceLimits.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        emergencyContactReady ||
+        transportPlanned ||
+        !transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        condomsPacked ||
+        lubePacked ||
+        prepTaken ||
+        prepRemindersEnabled ||
+        dontMixAcknowledged ||
+        partnerModeEnabled ||
+        !sharedSafetyPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !agreedBoundaries.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !groupMemberNames.isEmpty ||
+        groupCheckInMinutes != 90 ||
+        aftercareReminderForEveryone
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Safer plan",
+                            subtitle: "Set the basics before a Chill starts: rest, water, limits, travel, contacts, condoms, lube, and combinations to avoid. Use the checks as a practical stop point; saving can schedule ending-time reminders and PrEP prompts.",
+                            symbol: "checkmark.shield.fill",
+                            tint: Color.chillVisibleMint
+                        )
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            HStack {
+                                CareSectionTitle(title: "This Chill", symbol: "calendar.badge.clock")
+                                Spacer()
+                                Text("\(completedCount)/9")
+                                    .font(.headline.monospacedDigit())
+                                    .foregroundStyle(Color.chillVisibleMint)
+                            }
+
+                            DatePicker("Planned time", selection: $plannedDate, displayedComponents: [.date, .hourAndMinute])
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Color.chillText)
+                                .tint(.green)
+
+                            DatePicker("Ending time", selection: $endingDate, displayedComponents: [.date, .hourAndMinute])
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Color.chillText)
+                                .tint(.green)
+
+                            SaferPlanToggle(title: "Sleep check", subtitle: "I have enough rest or a realistic plan to stop.", symbol: "bed.double.fill", isOn: $sleepChecked)
+                            SaferPlanToggle(title: "Hydration check", subtitle: "Water or electrolytes are ready before leaving.", symbol: "drop.fill", isOn: $hydrationChecked)
+                            SaferPlanToggle(title: "Medication interaction check", subtitle: "Current meds and substances have been checked.", symbol: "pills.fill", isOn: $medicationInteractionChecked)
+
+                            TextField("Current meds or interaction notes", text: $medicationNotes, axis: .vertical)
+                                .lineLimit(2...4)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            TextField("Planned substance limits", text: $plannedSubstanceLimits, axis: .vertical)
+                                .lineLimit(2...4)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: .green.opacity(0.10), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            CareSectionTitle(title: "Support and supplies", symbol: "bag.fill")
+
+                            SaferPlanToggle(title: "Emergency contact", subtitle: contactSubtitle, symbol: "person.crop.circle.badge.checkmark", isOn: $emergencyContactReady)
+                            SaferPlanToggle(title: "Transport", subtitle: "A way home is planned before the Chill starts.", symbol: "car.fill", isOn: $transportPlanned)
+                            if transportPlanned {
+                                TextField("What is the transport plan?", text: $transportPlan, axis: .vertical)
+                                    .lineLimit(1...3)
+                                    .textFieldStyle(.plain)
+                                    .foregroundStyle(Color.chillText)
+                                    .padding(14)
+                                    .glassSurface(radius: 18, tint: transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .red.opacity(0.08) : .black.opacity(0.04), interactive: true)
+
+                                if transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    Text("Add the plan before saving.")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.red)
+                                }
+                            }
+                            SaferPlanToggle(title: "Condoms", subtitle: "Condoms are packed or available.", symbol: "checkmark.seal.fill", isOn: $condomsPacked)
+                            SaferPlanToggle(title: "Lube", subtitle: "Lube is packed or available.", symbol: "drop.circle.fill", isOn: $lubePacked)
+                            SaferPlanToggle(title: "PrEP taken", subtitle: "I have taken PrEP as planned.", symbol: "cross.case.fill", isOn: $prepTaken)
+                            SaferPlanToggle(title: "PrEP reminders", subtitle: "Schedule around-sex PrEP reminders for this plan.", symbol: "bell.badge.fill", isOn: $prepRemindersEnabled)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: Color.chillVisibleMint.opacity(0.10), interactive: true)
+
+                        PrepGuideCard()
+
+                        DontMixWarningCard(isAcknowledged: $dontMixAcknowledged)
+
+                        SaferPlanRiskCard(assessment: riskAssessment)
+
+                        PartnerSessionModeCard(
+                            isEnabled: $partnerModeEnabled,
+                            sharedSafetyPlan: $sharedSafetyPlan,
+                            agreedBoundaries: $agreedBoundaries,
+                            groupMemberName: $groupMemberName,
+                            groupMemberNames: $groupMemberNames,
+                            groupCheckInMinutes: $groupCheckInMinutes,
+                            aftercareReminderForEveryone: $aftercareReminderForEveryone
+                        )
+
+                        GlassActionButton(prominent: true, action: savePlan) {
+                            Label("Save plan", systemImage: "checkmark.circle.fill")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .disabled(!canSavePlan)
+                        .opacity(canSavePlan ? 1 : 0.55)
+
+                        if !plans.isEmpty {
+                            VStack(alignment: .leading, spacing: 12) {
+                                CareSectionTitle(title: "Current and past plans", symbol: "clock.arrow.circlepath")
+
+                                LazyVStack(spacing: 12) {
+                                    ForEach(plans) { plan in
+                                        SaferPlanCard(plan: plan)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton {
+                        attemptDismiss()
+                    }
+                }
+            }
+            .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
+                dismiss()
+            }
+            .onChange(of: plannedDate) { _, newDate in
+                if endingDate <= newDate {
+                    endingDate = Calendar.current.date(byAdding: .hour, value: 4, to: newDate) ?? newDate.addingTimeInterval(4 * 60 * 60)
+                }
+            }
+            .edgeSwipeBack(attemptDismiss)
+            .endEditingOnTap()
+        }
+    }
+
+    private func attemptDismiss() {
+        if hasUnsavedChanges {
+            isShowingDiscardWarning = true
+        } else {
+            dismiss()
+        }
+    }
+
+    private var contactSubtitle: String {
+        if trustedContactName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "Add a trusted contact in Emergency Information."
+        }
+
+        if trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return "\(trustedContactName) is selected; add a phone number when possible."
+        }
+
+        return "\(trustedContactName) is ready."
+    }
+
+    private func savePlan() {
+        let plan = SaferSessionPlan(
+            plannedDate: plannedDate,
+            endingDate: endingDate,
+            sleepChecked: sleepChecked,
+            hydrationChecked: hydrationChecked,
+            medicationInteractionChecked: medicationInteractionChecked,
+            medicationNotes: medicationNotes.trimmingCharacters(in: .whitespacesAndNewlines),
+            plannedSubstanceLimits: plannedSubstanceLimits.trimmingCharacters(in: .whitespacesAndNewlines),
+            emergencyContactReady: emergencyContactReady,
+            transportPlanned: transportPlanned,
+            transportPlan: transportPlan.trimmingCharacters(in: .whitespacesAndNewlines),
+            condomsPacked: condomsPacked,
+            lubePacked: lubePacked,
+            prepTaken: prepTaken,
+            dontMixAcknowledged: dontMixAcknowledged,
+            partnerModeEnabled: partnerModeEnabled,
+            sharedSafetyPlan: sharedSafetyPlan.trimmingCharacters(in: .whitespacesAndNewlines),
+            agreedBoundaries: agreedBoundaries.trimmingCharacters(in: .whitespacesAndNewlines),
+            groupMemberNames: groupMemberNames,
+            groupCheckInMinutes: groupCheckInMinutes,
+            aftercareReminderForEveryone: aftercareReminderForEveryone
+        )
+        modelContext.insert(plan)
+        try? modelContext.save()
+
+        Task {
+            if (try? await NotificationService.shared.requestAuthorization()) == true {
+                NotificationService.shared.scheduleSaferPlanReminders(planID: plan.id, endingAt: plan.endingDate)
+                NotificationService.shared.scheduleSessionCheckIns(
+                    id: plan.id,
+                    startsAt: plan.plannedDate,
+                    endsAt: plan.endingDate,
+                    destination: .saferPlan
+                )
+                if prepRemindersEnabled {
+                    NotificationService.shared.schedulePrepReminders(planID: plan.id, plannedSexAt: plan.plannedDate)
+                }
+            }
+        }
+
+        plannedDate = .now
+        endingDate = Calendar.current.date(byAdding: .hour, value: 4, to: plannedDate) ?? plannedDate.addingTimeInterval(4 * 60 * 60)
+        sleepChecked = false
+        hydrationChecked = false
+        medicationInteractionChecked = false
+        medicationNotes = ""
+        plannedSubstanceLimits = ""
+        emergencyContactReady = false
+        transportPlanned = false
+        transportPlan = ""
+        condomsPacked = false
+        lubePacked = false
+        prepTaken = false
+        prepRemindersEnabled = false
+        dontMixAcknowledged = false
+        partnerModeEnabled = false
+        sharedSafetyPlan = ""
+        agreedBoundaries = ""
+        groupMemberName = ""
+        groupMemberNames = []
+        groupCheckInMinutes = 90
+        aftercareReminderForEveryone = false
+    }
+}
+
+private struct SaferPlanToggle: View {
+    let title: String
+    let subtitle: String
+    let symbol: String
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Toggle(isOn: $isOn) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: symbol)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(isOn ? .green : Color.chillSecondary)
+                    .frame(width: 32, height: 32)
+                    .glassSurface(radius: 16, tint: (isOn ? Color.green : Color.black).opacity(0.08))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .toggleStyle(.switch)
+        .tint(.green)
+    }
+}
+
+private struct DontMixWarningCard: View {
+    @Binding var isAcknowledged: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Do not mix these", systemImage: "exclamationmark.triangle.fill")
+                .font(.headline)
+                .foregroundStyle(.orange)
+
+            VStack(alignment: .leading, spacing: 8) {
+                WarningLine(text: "GHB or GBL with alcohol, benzos, opioids, or ketamine")
+                WarningLine(text: "Multiple stimulants such as cocaine, 3MMC, and MDMA")
+                WarningLine(text: "Poppers with Viagra, Kamagra, or other erectile dysfunction medication")
+                WarningLine(text: "Slamming or injecting drugs; do not combine this with unknown doses, sharing equipment, or redosing pressure")
+                WarningLine(text: "Unknown substances with anything else")
+            }
+
+            Toggle("I have read this warning", isOn: $isAcknowledged)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+                .tint(.orange)
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: .orange.opacity(0.12), interactive: true)
+    }
+}
+
+private struct SaferPlanRiskAssessment {
+    let score: Int
+
+    init(
+        sleepChecked: Bool,
+        hydrationChecked: Bool,
+        medicationInteractionChecked: Bool,
+        plannedSubstanceLimits: String,
+        emergencyContactReady: Bool,
+        transportPlanned: Bool,
+        transportPlan: String,
+        condomsPacked: Bool,
+        lubePacked: Bool,
+        prepTaken: Bool,
+        dontMixAcknowledged: Bool,
+        partnerModeEnabled: Bool,
+        agreedBoundaries: String,
+        plannedDate: Date,
+        endingDate: Date
+    ) {
+        var score = 0
+        if !sleepChecked { score += 1 }
+        if !hydrationChecked { score += 1 }
+        if !medicationInteractionChecked { score += 2 }
+        if plannedSubstanceLimits.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 2 }
+        if !emergencyContactReady { score += 1 }
+        if !transportPlanned || transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 1 }
+        if !condomsPacked { score += 1 }
+        if !lubePacked { score += 1 }
+        if !prepTaken { score += 1 }
+        if !dontMixAcknowledged { score += 3 }
+        if partnerModeEnabled && agreedBoundaries.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { score += 1 }
+        if endingDate.timeIntervalSince(plannedDate) > 8 * 60 * 60 { score += 1 }
+        self.score = score
+    }
+
+    var level: String {
+        switch score {
+        case 0...2:
+            "Low"
+        case 3...6:
+            "Caution"
+        default:
+            "High-risk"
+        }
+    }
+
+    var color: Color {
+        switch score {
+        case 0...2:
+            .green
+        case 3...6:
+            .orange
+        default:
+            .red
+        }
+    }
+
+    var advice: String {
+        switch score {
+        case 0...2:
+            "Your plan has the basics covered. Keep it simple, check in with yourself, and leave room to stop early."
+        case 3...6:
+            "A few supports are missing. Consider adding limits, water, transport, and a person you can call before you start."
+        default:
+            "This plan has several risk points. Slow down, remove unknowns, avoid mixing, and consider postponing or talking to someone you trust."
+        }
+    }
+}
+
+private struct SaferPlanRiskCard: View {
+    let assessment: SaferPlanRiskAssessment
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                Image(systemName: "gauge.with.dots.needle.67percent")
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(assessment.color)
+                    .frame(width: 38, height: 38)
+                    .glassSurface(radius: 19, tint: assessment.color.opacity(0.14))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Plan risk: \(assessment.level)")
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+                    Text("Score \(assessment.score)")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(assessment.color)
+                }
+            }
+
+            Text(assessment.advice)
+                .font(.callout)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: assessment.color.opacity(0.10), interactive: true)
+    }
+}
+
+private struct PartnerSessionModeCard: View {
+    @Binding var isEnabled: Bool
+    @Binding var sharedSafetyPlan: String
+    @Binding var agreedBoundaries: String
+    @Binding var groupMemberName: String
+    @Binding var groupMemberNames: [String]
+    @Binding var groupCheckInMinutes: Int
+    @Binding var aftercareReminderForEveryone: Bool
+
+    private var canAddMember: Bool {
+        !groupMemberName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var body: some View {
+        DisclosureGroup {
+            VStack(alignment: .leading, spacing: 12) {
+                Toggle("Use partner / group session mode", isOn: $isEnabled)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(Color.chillText)
+                    .tint(Color.chillPrimary)
+
+                if isEnabled {
+                    TextField("Shared safety plan", text: $sharedSafetyPlan, axis: .vertical)
+                        .lineLimit(2...4)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(Color.chillText)
+                        .padding(14)
+                        .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                    TextField("Agreed boundaries", text: $agreedBoundaries, axis: .vertical)
+                        .lineLimit(2...4)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(Color.chillText)
+                        .padding(14)
+                        .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                    Stepper(value: $groupCheckInMinutes, in: 30...180, step: 15) {
+                        Text("Check-in every \(groupCheckInMinutes) min")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.chillText)
+                    }
+                    .tint(Color.chillPrimary)
+
+                    Toggle("Aftercare reminders for everyone", isOn: $aftercareReminderForEveryone)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.chillText)
+                        .tint(Color.chillPrimary)
+
+                    HStack(spacing: 10) {
+                        TextField("Add person", text: $groupMemberName)
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(Color.chillText)
+                            .padding(12)
+                            .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
+
+                        Button(action: addMember) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title3)
+                                .frame(width: 38, height: 38)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(canAddMember ? Color.chillPrimary : Color.chillTertiary)
+                        .disabled(!canAddMember)
+                    }
+
+                    FlowLayout(spacing: 8) {
+                        ForEach(groupMemberNames, id: \.self) { name in
+                            Button {
+                                groupMemberNames.removeAll { $0 == name }
+                            } label: {
+                                Label(name, systemImage: "xmark.circle.fill")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(Color.chillText)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .glassSurface(radius: 14, tint: Color.chillPrimary.opacity(0.12))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            .padding(.top, 8)
+        } label: {
+            Label("Partner / group session mode", systemImage: "person.3.fill")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+    }
+
+    private func addMember() {
+        let name = groupMemberName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else {
+            return
+        }
+
+        if !groupMemberNames.contains(where: { $0.caseInsensitiveCompare(name) == .orderedSame }) {
+            groupMemberNames.append(name)
+        }
+        groupMemberName = ""
+    }
+}
+
+private struct PrepGuideCard: View {
+    private let steps = [
+        "Before sex: take 2 pills at least 2 hours before sex. Earlier is allowed, but not more than 24 hours in advance.",
+        "After sex: take 1 pill the day after sex at the same time as the first pills.",
+        "Next day: take 1 more pill at the same time.",
+        "If sex continues over several days, keep taking 1 pill each day. Stop after you have taken 2 pills after the last sex in that run."
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CareSectionTitle(title: "Around-sex PrEP guide", symbol: "cross.case.fill")
+
+            Text("This guide is intended for around-sex PrEP use when PrEP is not taken daily. Use it only if PrEP has been prescribed to you and your clinician has told you this schedule fits your body and sex type.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
+                HStack(alignment: .top, spacing: 10) {
+                    Text("\(index + 1)")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 24, height: 24)
+                        .background(Circle().fill(Color.chillVisibleMint))
+
+                    Text(step)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillVisibleMint.opacity(0.08))
+    }
+}
+
+private struct WarningLine: View {
+    let text: String
+
+    var body: some View {
+        Label(text, systemImage: "xmark.octagon.fill")
+            .font(.callout)
+            .foregroundStyle(Color.chillSecondary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+}
+
+private struct SaferPlanCard: View {
+    @Environment(\.modelContext) private var modelContext
+    let plan: SaferSessionPlan
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: "checkmark.shield.fill")
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Color.chillVisibleMint)
+                .frame(width: 42, height: 42)
+                .glassSurface(radius: 21, tint: Color.chillVisibleMint.opacity(0.10))
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(plan.plannedDate.formatted(date: .abbreviated, time: .shortened))
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+
+                Text("Ends \(plan.endingDate.formatted(date: .abbreviated, time: .shortened))")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+
+                Text("\(plan.completedCount)/9 checks done")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillVisibleMint)
+
+                if plan.transportPlanned, !plan.transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text("Transport: \(plan.transportPlan)")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .lineLimit(2)
+                }
+
+                if !plan.plannedSubstanceLimits.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text(plan.plannedSubstanceLimits)
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .lineLimit(2)
+                }
+            }
+
+            Spacer()
+
+            Button(role: .destructive) {
+                RecentlyDeletedStore.record(
+                    kind: "Plan",
+                    title: "Before-Chill plan",
+                    detail: plan.plannedDate.formatted(date: .abbreviated, time: .shortened)
+                )
+                modelContext.delete(plan)
+                try? modelContext.save()
+            } label: {
+                Image(systemName: "trash.fill")
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.chillSecondary)
+        }
+        .padding(16)
+        .glassSurface(radius: 24, tint: .black.opacity(0.04))
+    }
+}
+
+struct DrugTimerView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @AppStorage("drugTimerTrackedPeople") private var trackedPeopleData = Data("[]".utf8)
+    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+
+    @State private var selectedSubstance: Substance = .cannabis
+    @State private var timerScope: TimerScope = .myself
+    @State private var selectedAdministrationRoute: AdministrationRoute?
+    @State private var selectedTrackedPerson = ""
+    @State private var newTrackedPerson = ""
+    @State private var startedAt = Date.now
+    @State private var doseNote = ""
+    @State private var isShowingDiscardWarning = false
+
+    private let timerSubstances = Substance.allCases.filter { $0 != .unknown && $0 != .other }
+
+    private var adjustedDefaultDuration: Double {
+        guard let profile = profiles.first else {
+            return selectedSubstance.defaultTimerHours
+        }
+
+        return selectedSubstance.adjustedTimerHours(weightKg: profile.weightKg, heightCm: profile.heightCm)
+    }
+
+    private var profileAdjustmentCaption: String {
+        guard let profile = profiles.first else {
+            return "Add height and weight in Profile to personalize the background estimate."
+        }
+
+        return "Personalized from \(Int(profile.weightKg.rounded())) kg and \(Int(profile.heightCm.rounded())) cm."
+    }
+
+    private var trackedPeople: [String] {
+        (try? JSONDecoder().decode([String].self, from: trackedPeopleData)) ?? []
+    }
+
+    private var visibleTimers: [DrugDoseTimerRecord] {
+        timers.filter { timer in
+            let isOther = !timer.personName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            return timerScope == .myself ? !isOther : isOther
+        }
+    }
+
+    private var canStartTimer: Bool {
+        selectedAdministrationRoute != nil &&
+        (timerScope == .myself || !selectedTrackedPerson.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+    }
+
+    private var hasUnsavedChanges: Bool {
+        selectedSubstance != .cannabis ||
+        timerScope != .myself ||
+        selectedAdministrationRoute != nil ||
+        !selectedTrackedPerson.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !newTrackedPerson.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !Calendar.current.isDate(startedAt, equalTo: .now, toGranularity: .minute) ||
+        !doseNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Dosage timers",
+                            subtitle: "Track when something was taken, how it was taken, and the approximate effect window. This is timing support only, not dosing advice.",
+                            symbol: "timer",
+                            tint: Color.chillSecondaryBlue
+                        )
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            Picker("Timer type", selection: $timerScope) {
+                                ForEach(TimerScope.allCases) { scope in
+                                    Text(scope.rawValue).tag(scope)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                            .padding(4)
+                            .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            if timerScope == .others {
+                                TimerPeopleManager(
+                                    people: trackedPeople,
+                                    selectedPerson: $selectedTrackedPerson,
+                                    newPerson: $newTrackedPerson,
+                                    addPerson: addTrackedPerson,
+                                    removePerson: removeTrackedPerson
+                                )
+                            }
+
+                            Picker("Drug", selection: $selectedSubstance) {
+                                ForEach(timerSubstances) { substance in
+                                    Text(substance.rawValue).tag(substance)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                            .tint(Color.chillSecondaryBlue)
+
+                            AdministrationRoutePicker(selectedRoute: $selectedAdministrationRoute)
+
+                            DatePicker("Taken at", selection: $startedAt, displayedComponents: [.date, .hourAndMinute])
+                                .tint(Color.chillSecondaryBlue)
+
+                            StaticEffectWindowSummary(
+                                substance: selectedSubstance,
+                                adjustedDuration: adjustedDefaultDuration,
+                                profileCaption: profileAdjustmentCaption
+                            )
+
+                            TextField("Amount or note, optional", text: $doseNote)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            GlassActionButton(prominent: true, action: startTimer) {
+                                Label("Start timer", systemImage: "timer.circle.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .disabled(!canStartTimer)
+                            .opacity(canStartTimer ? 1 : 0.55)
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.chillText)
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.10), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            CareSectionTitle(title: "Current and old timers", symbol: "clock.arrow.circlepath")
+
+                            let activeTimers = visibleTimers.filter { $0.endsAt > .now }
+                            let pastTimers = visibleTimers.filter { $0.endsAt <= .now }
+
+                            if visibleTimers.isEmpty {
+                                CareEmptyState(text: "No timers yet.")
+                            } else {
+                                if !activeTimers.isEmpty {
+                                    TimelineView(.periodic(from: .now, by: 60)) { context in
+                                        LazyVStack(spacing: 12) {
+                                            ForEach(activeTimers) { timer in
+                                                DrugTimerCard(timer: timer, now: context.date)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if !pastTimers.isEmpty {
+                                    LazyVStack(spacing: 12) {
+                                        ForEach(pastTimers) { timer in
+                                            DrugTimerCard(timer: timer, now: .now)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton {
+                        attemptDismiss()
+                    }
+                }
+            }
+            .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
+                dismiss()
+            }
+            .edgeSwipeBack(attemptDismiss)
+            .endEditingOnTap()
+        }
+    }
+
+    private func attemptDismiss() {
+        if hasUnsavedChanges {
+            isShowingDiscardWarning = true
+        } else {
+            dismiss()
+        }
+    }
+
+    private func startTimer() {
+        guard let route = selectedAdministrationRoute else {
+            return
+        }
+
+        let timer = DrugDoseTimerRecord(
+            substanceName: selectedSubstance.rawValue,
+            startedAt: startedAt,
+            durationHours: adjustedDefaultDuration,
+            administrationRoute: route,
+            personName: timerScope == .others ? selectedTrackedPerson.trimmingCharacters(in: .whitespacesAndNewlines) : "",
+            doseNote: doseNote.trimmingCharacters(in: .whitespacesAndNewlines)
+        )
+        modelContext.insert(timer)
+        try? modelContext.save()
+        DrugTimerLiveActivityController.start(for: timer)
+        try? modelContext.save()
+
+        Task {
+            if (try? await NotificationService.shared.requestAuthorization()) == true {
+                NotificationService.shared.scheduleSessionCheckIns(
+                    id: timer.id,
+                    startsAt: timer.startedAt,
+                    endsAt: timer.endsAt,
+                    destination: .timers
+                )
+            }
+        }
+
+        selectedSubstance = .cannabis
+        selectedAdministrationRoute = nil
+        startedAt = .now
+        doseNote = ""
+    }
+
+    private func addTrackedPerson() {
+        let name = newTrackedPerson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else {
+            return
+        }
+
+        var people = trackedPeople
+        if !people.contains(where: { $0.caseInsensitiveCompare(name) == .orderedSame }) {
+            people.append(name)
+            saveTrackedPeople(people)
+        }
+        selectedTrackedPerson = name
+        newTrackedPerson = ""
+    }
+
+    private func removeTrackedPerson(_ name: String) {
+        let people = trackedPeople.filter { $0 != name }
+        saveTrackedPeople(people)
+        if selectedTrackedPerson == name {
+            selectedTrackedPerson = people.first ?? ""
+        }
+    }
+
+    private func saveTrackedPeople(_ people: [String]) {
+        trackedPeopleData = (try? JSONEncoder().encode(people)) ?? Data("[]".utf8)
+    }
+}
+
+private enum TimerScope: String, CaseIterable, Identifiable {
+    case myself = "Myself"
+    case others = "Others"
+
+    var id: String { rawValue }
+}
+
+private struct TimerPeopleManager: View {
+    let people: [String]
+    @Binding var selectedPerson: String
+    @Binding var newPerson: String
+    let addPerson: () -> Void
+    let removePerson: (String) -> Void
+
+    private var canAdd: Bool {
+        !newPerson.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("People you track", systemImage: "person.2.badge.gearshape.fill")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+
+            HStack(spacing: 10) {
+                TextField("Add a name", text: $newPerson)
+                    .textFieldStyle(.plain)
+                    .foregroundStyle(Color.chillText)
+                    .padding(12)
+                    .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
+
+                Button(action: addPerson) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .frame(width: 38, height: 38)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(canAdd ? Color.chillSecondaryBlue : Color.chillTertiary)
+                .disabled(!canAdd)
+            }
+
+            if people.isEmpty {
+                Text("Add someone before starting an \"Others\" timer.")
+                    .font(.caption)
+                    .foregroundStyle(Color.chillSecondary)
+            } else {
+                Picker("Person", selection: $selectedPerson) {
+                    Text("Choose person").tag("")
+                    ForEach(people, id: \.self) { person in
+                        Text(person).tag(person)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(Color.chillSecondaryBlue)
+
+                FlowLayout(spacing: 8) {
+                    ForEach(people, id: \.self) { person in
+                        Button {
+                            selectedPerson = person
+                        } label: {
+                            HStack(spacing: 6) {
+                                Text(person)
+                                Image(systemName: selectedPerson == person ? "checkmark.circle.fill" : "circle")
+                                Image(systemName: "xmark.circle.fill")
+                                    .onTapGesture {
+                                        removePerson(person)
+                                    }
+                            }
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.chillText)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .glassSurface(radius: 14, tint: (selectedPerson == person ? Color.chillSecondaryBlue : Color.black).opacity(0.10), interactive: true)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .padding(14)
+        .glassSurface(radius: 22, tint: Color.chillSecondaryBlue.opacity(0.08), interactive: true)
+    }
+}
+
+private struct AdministrationRoutePicker: View {
+    @Binding var selectedRoute: AdministrationRoute?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 6) {
+                Label("How it was taken", systemImage: "checklist")
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+                Text("Required")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillVisibleBlue)
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 120), spacing: 8)], spacing: 8) {
+                ForEach(AdministrationRoute.allCases) { route in
+                    Button {
+                        selectedRoute = route
+                    } label: {
+                        Label(route.rawValue, systemImage: route.symbolName)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Color.chillText)
+                            .frame(maxWidth: .infinity, minHeight: 38)
+                    }
+                    .buttonStyle(.plain)
+                    .glassSurface(
+                        radius: 18,
+                        tint: selectedRoute == route ? Color.chillSecondaryBlue.opacity(0.22) : Color.black.opacity(0.04),
+                        interactive: true
+                    )
+                }
+            }
+        }
+    }
+}
+
+private struct StaticEffectWindowSummary: View {
+    let substance: Substance
+    let adjustedDuration: Double
+    let profileCaption: String
+
+    private var normalizedPosition: Double {
+        let range = substance.effectWindow
+        let span = max(0.1, range.upperBound - range.lowerBound)
+        return min(1, max(0, (adjustedDuration - range.lowerBound) / span))
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Estimated effect window: \(adjustedDuration.formatted(.number.precision(.fractionLength(1)))) h")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(Color.chillSecondaryBlue.opacity(0.16))
+                    Capsule()
+                        .fill(Color.chillSecondaryBlue.opacity(0.82))
+                        .frame(width: max(10, proxy.size.width * normalizedPosition))
+                }
+            }
+            .frame(height: 10)
+
+            Text("Typical reference for \(substance.rawValue): \(substance.durationLabel). This is calculated from the drug window plus the profile height and weight.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(profileCaption)
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+        }
+        .padding(12)
+        .glassSurface(radius: 18, tint: Color.chillSecondaryBlue.opacity(0.08))
+    }
+}
+
+private struct DrugTimerCard: View {
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var timer: DrugDoseTimerRecord
+    let now: Date
+
+    private var isActive: Bool {
+        timer.endsAt > now
+    }
+
+    private var progress: Double {
+        let total = max(60, timer.endsAt.timeIntervalSince(timer.startedAt))
+        let elapsed = max(0, now.timeIntervalSince(timer.startedAt))
+        return min(1, elapsed / total)
+    }
+
+    private var redoseDecision: RedoseDecision {
+        RedoseDecision(rawValue: timer.redoseDecision) ?? .undecided
+    }
+
+    private var shouldShowRedoseNudge: Bool {
+        timer.redoseNudgeIsActive(at: now) && redoseDecision == .undecided
+    }
+
+    private var remainingText: String {
+        let interval = max(0, timer.endsAt.timeIntervalSince(now))
+        let hours = Int(interval / 3600)
+        let minutes = Int((interval.truncatingRemainder(dividingBy: 3600)) / 60)
+        if hours > 0 {
+            return "\(hours) h \(minutes) min left"
+        }
+        return "\(minutes) min left"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "timer")
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(isActive ? Color.chillSecondaryBlue : Color.chillSecondary)
+                    .frame(width: 42, height: 42)
+                    .glassSurface(radius: 21, tint: (isActive ? Color.chillSecondaryBlue : Color.black).opacity(0.10))
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(timer.substanceName)
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+                    Text(isActive ? remainingText : "Window ended")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(isActive ? Color.chillSecondaryBlue : Color.chillSecondary)
+                    Text("Ends \(timer.endsAt.formatted(date: .omitted, time: .shortened))")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                    if !timer.doseNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Text(timer.doseNote)
+                            .font(.footnote)
+                            .foregroundStyle(Color.chillSecondary)
+                            .lineLimit(2)
+                    }
+
+                    if redoseDecision != .undecided {
+                        Text(redoseDecision.rawValue)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(redoseDecision == .avoided ? Color.chillMint : .orange)
+                    }
+                }
+
+                Spacer()
+
+                Button(role: .destructive) {
+                    Task {
+                        await DrugTimerLiveActivityController.end(timer)
+                    }
+                    RecentlyDeletedStore.record(
+                        kind: "Timer",
+                        title: "\(timer.substanceName) timer",
+                        detail: timer.startedAt.formatted(date: .abbreviated, time: .shortened)
+                    )
+                    modelContext.delete(timer)
+                    try? modelContext.save()
+                } label: {
+                    Image(systemName: "trash.fill")
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.chillSecondary)
+            }
+
+            if isActive {
+                ProgressView(value: progress)
+                    .tint(progress >= 0.4 ? .orange : Color.chillSecondaryBlue)
+            }
+
+            if shouldShowRedoseNudge {
+                RedoseNudgeCard(
+                    progress: progress,
+                    previousDoseText: "\(timer.substanceName) at \(timer.startedAt.formatted(date: .omitted, time: .shortened))",
+                    avoid: { saveRedoseDecision(.avoided) },
+                    redose: { saveRedoseDecision(.redosed) }
+                )
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 24, tint: .black.opacity(0.04))
+        .task(id: Int(now.timeIntervalSinceReferenceDate / 60)) {
+            guard isActive else {
+                return
+            }
+            await DrugTimerLiveActivityController.update(timer, now: now)
+        }
+    }
+
+    private func saveRedoseDecision(_ decision: RedoseDecision) {
+        timer.redoseDecision = decision.rawValue
+        timer.redoseDecisionAt = .now
+        try? modelContext.save()
+        Task {
+            await DrugTimerLiveActivityController.update(timer, now: now)
+        }
+    }
+}
+
+private struct RedoseNudgeCard: View {
+    let progress: Double
+    let previousDoseText: String
+    let avoid: () -> Void
+    let redose: () -> Void
+    @State private var isConfirmingRedose = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Avoid redosing now", systemImage: "hand.raised.fill")
+                .font(.headline)
+                .foregroundStyle(.orange)
+
+            Text("This is the part of the window where the urge to redose can feel louder than your body. Pause, drink water, and check how you feel first.")
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("Previous dose: \(previousDoseText)")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.chillText)
+
+            Text("Current effect window: \(Int((progress * 100).rounded()))%")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.orange)
+
+            if isConfirmingRedose {
+                ProgressView("Pause for 5 seconds")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillSecondary)
+            }
+
+            HStack(spacing: 10) {
+                Button(action: avoid) {
+                    Label("Not redosing", systemImage: "checkmark.circle.fill")
+                        .font(.caption.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(Color.chillMint)
+
+                Button(action: delayedRedose) {
+                    Text("Still redosed")
+                        .font(.caption.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.orange)
+                .disabled(isConfirmingRedose)
+            }
+        }
+        .padding(14)
+        .glassSurface(radius: 20, tint: .orange.opacity(0.10), interactive: true)
+    }
+
+    private func delayedRedose() {
+        guard !isConfirmingRedose else { return }
+        isConfirmingRedose = true
+        Task {
+            try? await Task.sleep(for: .seconds(5))
+            await MainActor.run {
+                isConfirmingRedose = false
+                redose()
+            }
+        }
+    }
+}
+
+struct CombinationRiskCheckerView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \RiskCheckRecord.createdAt, order: .reverse) private var riskChecks: [RiskCheckRecord]
+    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+
+    @State private var selectedSubstances: Set<Substance> = []
+    @State private var medicationText = ""
+    @State private var medicationDosage = ""
+    @State private var medicationTakenAt = Date.now
+    @State private var medicationEffectHours = 8.0
+    @State private var timing: CombinationTiming = .sameSession
+    @State private var isShowingDiscardWarning = false
+
+    private var assessment: CombinationAssessment {
+        CombinationAssessment(
+            substances: Array(selectedSubstances),
+            medicationText: medicationText,
+            timing: timing
+        )
+    }
+
+    private var hasUnsavedChanges: Bool {
+        !selectedSubstances.isEmpty ||
+        !medicationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !medicationDosage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        !Calendar.current.isDate(medicationTakenAt, equalTo: .now, toGranularity: .minute) ||
+        medicationEffectHours != 8 ||
+        timing != .sameSession
+    }
+
+    private var medicationSuggestions: [MedicationSuggestion] {
+        MedicationSuggestionDatabase.suggestions(
+            for: medicationText,
+            savedMedications: profiles.first?.medications ?? []
+        )
+    }
+
+    private var medicationSummaryForSaving: String {
+        let name = medicationText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !name.isEmpty else { return "" }
+
+        var parts = [name]
+        let dose = medicationDosage.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !dose.isEmpty { parts.append("dose \(dose)") }
+        parts.append("last taken \(medicationTakenAt.formatted(date: .abbreviated, time: .shortened))")
+        parts.append("works \(medicationEffectHours.formatted(.number.precision(.fractionLength(0...1)))) h")
+        return parts.joined(separator: " • ")
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Risk checker",
+                            subtitle: "Select current medication, substances, and timing to spot common combination risks. Warnings update locally on-device while inputs change.",
+                            symbol: "exclamationmark.shield.fill",
+                            tint: .orange
+                        )
+
+                        Text("This is not medical advice.")
+                            .font(.callout.bold())
+                            .foregroundStyle(Color.chillText)
+                            .padding(12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .glassSurface(radius: 20, tint: .orange.opacity(0.08))
+
+                        ClinicalReviewNoticeCard()
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            CareSectionTitle(title: "Current meds", symbol: "pills.circle.fill")
+
+                            TextField("Medication name, optional", text: $medicationText, axis: .vertical)
+                                .lineLimit(2...4)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            if !medicationSuggestions.isEmpty {
+                                FlowLayout(spacing: 8) {
+                                    ForEach(medicationSuggestions) { suggestion in
+                                        Button {
+                                            medicationText = suggestion.name
+                                            if let dosage = suggestion.dosage, !dosage.isEmpty {
+                                                medicationDosage = dosage
+                                            }
+                                            if let effectiveHours = suggestion.effectiveHours {
+                                                medicationEffectHours = effectiveHours
+                                            }
+                                        } label: {
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text(suggestion.name)
+                                                    .font(.caption.weight(.bold))
+                                                if !suggestion.detail.isEmpty {
+                                                    Text(suggestion.detail)
+                                                        .font(.caption2.weight(.semibold))
+                                                }
+                                            }
+                                            .foregroundStyle(Color.chillText)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 7)
+                                            .glassSurface(radius: 14, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                            }
+
+                            TextField("Dosage, for example 20 mg", text: $medicationDosage)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            DatePicker("Last taken", selection: $medicationTakenAt, displayedComponents: [.date, .hourAndMinute])
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Color.chillText)
+                                .tint(.orange)
+
+                            Stepper(value: $medicationEffectHours, in: 0.5...72, step: 0.5) {
+                                HStack {
+                                    Text("Works for")
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(Color.chillText)
+                                    Spacer()
+                                    Text("\(medicationEffectHours.formatted(.number.precision(.fractionLength(0...1)))) h")
+                                        .font(.subheadline.weight(.bold))
+                                        .foregroundStyle(Color.chillSecondary)
+                                }
+                            }
+                            .tint(.orange)
+
+                            Text("Checks update automatically while you type. Common medication groups are matched locally on-device.")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Picker("Timing", selection: $timing) {
+                                ForEach(CombinationTiming.allCases) { timing in
+                                    Text(timing.rawValue).tag(timing)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: .orange.opacity(0.10), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            CareSectionTitle(title: "Substances", symbol: "square.grid.2x2.fill")
+
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 118), spacing: 10)], spacing: 10) {
+                                ForEach(Substance.allCases.filter { $0 != .unknown && $0 != .other }) { substance in
+                                    Button {
+                                        toggle(substance)
+                                    } label: {
+                                        Label(substance.rawValue, systemImage: substance.symbolName)
+                                            .font(.caption.weight(.bold))
+                                            .lineLimit(1)
+                                            .minimumScaleFactor(0.75)
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 10)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .foregroundStyle(selectedSubstances.contains(substance) ? .white : Color.chillText)
+                                    .background {
+                                        Capsule()
+                                            .fill(selectedSubstances.contains(substance) ? substance.tint : .white.opacity(0.45))
+                                    }
+                                }
+                            }
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
+
+                        RiskAssessmentPanel(assessment: assessment)
+
+                        GlassActionButton(prominent: true, action: saveRiskCheck) {
+                            Label("Save risk check", systemImage: "checkmark.shield.fill")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .disabled(selectedSubstances.isEmpty && medicationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .opacity((selectedSubstances.isEmpty && medicationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty) ? 0.55 : 1)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            CareSectionTitle(title: "Current and past checks", symbol: "clock.arrow.circlepath")
+
+                            if riskChecks.isEmpty {
+                                CareEmptyState(text: "No saved risk checks yet.")
+                            } else {
+                                LazyVStack(spacing: 12) {
+                                    ForEach(riskChecks) { record in
+                                        RiskCheckRecordCard(record: record)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton {
+                        attemptDismiss()
+                    }
+                }
+            }
+            .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
+                dismiss()
+            }
+            .edgeSwipeBack(attemptDismiss)
+            .endEditingOnTap()
+        }
+    }
+
+    private func attemptDismiss() {
+        if hasUnsavedChanges {
+            isShowingDiscardWarning = true
+        } else {
+            dismiss()
+        }
+    }
+
+    private func toggle(_ substance: Substance) {
+        if selectedSubstances.contains(substance) {
+            selectedSubstances.remove(substance)
+        } else {
+            selectedSubstances.insert(substance)
+        }
+    }
+
+    private func saveRiskCheck() {
+        let record = RiskCheckRecord(
+            medicationText: medicationSummaryForSaving,
+            timing: timing,
+            substanceNames: selectedSubstances.map(\.rawValue).sorted(),
+            serotoninLevel: assessment.serotoninRisk.label,
+            dehydrationLevel: assessment.dehydrationRisk.label,
+            stimulantLevel: assessment.stimulantOverloadRisk.label,
+            warnings: assessment.interactionWarnings
+        )
+        modelContext.insert(record)
+        try? modelContext.save()
+        selectedSubstances = []
+        medicationText = ""
+        medicationDosage = ""
+        medicationTakenAt = .now
+        medicationEffectHours = 8
+        timing = .sameSession
+    }
+}
+
+private struct RiskCheckRecordCard: View {
+    @Environment(\.modelContext) private var modelContext
+    let record: RiskCheckRecord
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(record.createdAt.formatted(date: .abbreviated, time: .shortened))
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+                    Text(record.substanceNames.isEmpty ? "Medication only" : record.substanceNames.joined(separator: ", "))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer()
+
+                Button(role: .destructive) {
+                    RecentlyDeletedStore.record(
+                        kind: "Risk check",
+                        title: record.substanceNames.isEmpty ? "Medication risk check" : record.substanceNames.joined(separator: ", "),
+                        detail: record.createdAt.formatted(date: .abbreviated, time: .shortened)
+                    )
+                    modelContext.delete(record)
+                    try? modelContext.save()
+                } label: {
+                    Image(systemName: "trash.fill")
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.chillSecondary)
+            }
+
+            HStack(spacing: 8) {
+                RiskPill(title: "Serotonin", value: record.serotoninLevel)
+                RiskPill(title: "Hydration", value: record.dehydrationLevel)
+                RiskPill(title: "Stimulant", value: record.stimulantLevel)
+            }
+
+            ForEach(record.warnings.prefix(3), id: \.self) { warning in
+                Label(warning, systemImage: "exclamationmark.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 24, tint: .orange.opacity(0.08))
+    }
+}
+
+private struct RiskPill: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text(title)
+                .font(.caption2.weight(.bold))
+            Text(value)
+                .font(.caption.weight(.bold))
+        }
+        .foregroundStyle(Color.chillText)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(.white.opacity(0.42), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+}
+
+private struct RiskAssessmentPanel: View {
+    let assessment: CombinationAssessment
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            CareSectionTitle(title: "Assessment", symbol: "waveform.path.ecg")
+
+            if assessment.substances.isEmpty && assessment.medicationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                CareEmptyState(text: "Select at least one substance or add medication to see a risk check.")
+            } else {
+                VStack(spacing: 10) {
+                    RiskLevelRow(title: "Serotonin syndrome", level: assessment.serotoninRisk, detail: assessment.serotoninDetail)
+                    RiskLevelRow(title: "Dehydration", level: assessment.dehydrationRisk, detail: assessment.dehydrationDetail)
+                    RiskLevelRow(title: "Stimulant overload", level: assessment.stimulantOverloadRisk, detail: assessment.stimulantDetail)
+                }
+
+                if !assessment.matchedMedicationSummary.isEmpty {
+                    Label("Matched medication groups: \(assessment.matchedMedicationSummary)", systemImage: "checkmark.seal.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .glassSurface(radius: 18, tint: Color.chillVisibleBlue.opacity(0.07))
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Interaction warnings")
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+
+                    ForEach(assessment.interactionWarnings, id: \.self) { warning in
+                        RiskWarningLine(warning: warning)
+                    }
+
+                    Text("If someone is unconscious, very confused, overheating, having chest pain, breathing oddly, or cannot be woken: call 112.")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.red)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(14)
+                .glassSurface(radius: 20, tint: .orange.opacity(0.08))
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: .orange.opacity(0.10), interactive: true)
+    }
+}
+
+private struct RiskLevelRow: View {
+    let title: String
+    let level: RiskLevel
+    let detail: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(level.label)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: 72)
+                .padding(.vertical, 8)
+                .background(Capsule().fill(level.tint))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .glassSurface(radius: 20, tint: level.tint.opacity(0.08))
+    }
+}
+
+enum CombinationTiming: String, CaseIterable, Identifiable {
+    case sameSession = "Same session"
+    case withinSixHours = "6 h"
+    case withinDay = "24 h"
+
+    var id: String { rawValue }
+}
+
+enum RiskLevel {
+    case lower
+    case caution
+    case high
+
+    var label: String {
+        switch self {
+        case .lower:
+            "No known"
+        case .caution:
+            "Caution"
+        case .high:
+            "High"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .lower:
+            Color.chillVisibleMint
+        case .caution:
+            .orange
+        case .high:
+            .red
+        }
+    }
+}
+
+private enum EvidenceTier: String {
+    case known = "Known interaction"
+    case likely = "Likely risk"
+    case limited = "Limited evidence"
+    case unknown = "Unknown"
+
+    var tint: Color {
+        switch self {
+        case .known:
+            .red
+        case .likely:
+            .orange
+        case .limited:
+            Color.chillVisibleBlue
+        case .unknown:
+            Color.chillSecondary
+        }
+    }
+}
+
+private struct RiskWarningLine: View {
+    let warning: String
+
+    private var tier: EvidenceTier {
+        let lower = warning.lowercased()
+        if lower.contains("do not combine") || lower.contains("avoid") || lower.contains("dangerous") {
+            return .known
+        }
+        if lower.contains("can") || lower.contains("increase") || lower.contains("raise") {
+            return .likely
+        }
+        if lower.contains("unknown") || lower.contains("no known") {
+            return .unknown
+        }
+        return .limited
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(tier.rawValue)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Capsule().fill(tier.tint))
+
+            Label(warning, systemImage: "exclamationmark.circle.fill")
+                .font(.callout)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+private extension RiskLevel {
+    var severity: Int {
+        switch self {
+        case .lower:
+            0
+        case .caution:
+            1
+        case .high:
+            2
+        }
+    }
+
+    static func highest(_ levels: RiskLevel...) -> RiskLevel {
+        levels.max { $0.severity < $1.severity } ?? .lower
+    }
+}
+
+private struct CombinationAssessment {
+    let substances: [Substance]
+    let medicationText: String
+    let timing: CombinationTiming
+
+    private var substanceSet: Set<Substance> {
+        Set(substances)
+    }
+
+    var medicationMatches: [MedicationRiskMatch] {
+        MedicationRiskDatabase.matches(in: medicationText)
+    }
+
+    var matchedMedicationSummary: String {
+        medicationMatches
+            .map { "\($0.category.label) (\($0.matchedTerm))" }
+            .joined(separator: ", ")
+    }
+
+    private var serotonergicSubstances: [Substance] {
+        substances.filter { [.mdma, .threeMMC, .cocaine, .psychedelics].contains($0) }
+    }
+
+    private var stimulants: [Substance] {
+        substances.filter { [.mdma, .threeMMC, .cocaine].contains($0) }
+    }
+
+    private var hasGHBLike: Bool {
+        substanceSet.contains(.ghb) || substanceSet.contains(.gbl)
+    }
+
+    private var hasErectileMedication: Bool {
+        substanceSet.contains(.viagra) || substanceSet.contains(.kamagra)
+    }
+
+    private func hasMedicationCategory(_ category: MedicationRiskCategory) -> Bool {
+        medicationMatches.contains { $0.category == category }
+    }
+
+    var serotoninRisk: RiskLevel {
+        if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
+            return .high
+        }
+
+        if hasMedicationCategory(.serotonergic) && serotonergicSubstances.count >= 2 {
+            return .high
+        }
+
+        if hasMedicationCategory(.serotonergic) && !serotonergicSubstances.isEmpty {
+            return .caution
+        }
+
+        return serotonergicSubstances.count >= 2 ? .high : (!serotonergicSubstances.isEmpty ? .caution : .lower)
+    }
+
+    var dehydrationRisk: RiskLevel {
+        let stimulantLevel: RiskLevel = stimulants.isEmpty ? .lower : (timing == .withinDay ? .caution : .high)
+        let alcoholLevel: RiskLevel = substanceSet.contains(.alcohol) ? .caution : .lower
+        let combinationLevel: RiskLevel = substanceSet.contains(.alcohol) && !stimulants.isEmpty ? .high : .lower
+        return RiskLevel.highest(stimulantLevel, alcoholLevel, combinationLevel)
+    }
+
+    var stimulantOverloadRisk: RiskLevel {
+        let stimulantMedicationCount = hasMedicationCategory(.stimulantMedication) ? 1 : 0
+        let totalStimulants = stimulants.count + stimulantMedicationCount
+
+        if totalStimulants >= 2 {
+            return .high
+        }
+
+        if totalStimulants == 1 {
+            return timing == .sameSession ? .caution : .lower
+        }
+
+        return .lower
+    }
+
+    var serotoninDetail: String {
+        switch serotoninRisk {
+        case .high:
+            "A serotonergic medication, MAOI, or multiple serotonergic substances are selected. Watch for confusion, fever, agitation, tremor, sweating, or diarrhea."
+        case .caution:
+            "One serotonergic substance or medication match is selected. Risk rises with redosing, heat, dehydration, or medication interactions."
+        case .lower:
+            "No clear serotonergic combination is selected."
+        }
+    }
+
+    var dehydrationDetail: String {
+        switch dehydrationRisk {
+        case .high:
+            "Stimulants, alcohol, heat, dancing, and long sessions can push dehydration and overheating risk up."
+        case .caution:
+            "Hydration and cooling matter, especially if sleep, food, or breaks have been limited."
+        case .lower:
+            "No strong dehydration pattern is selected, but check water, food, temperature, and rest."
+        }
+    }
+
+    var stimulantDetail: String {
+        switch stimulantOverloadRisk {
+        case .high:
+            "More than one stimulant pattern is selected, including possible prescribed stimulant medication. Heart rate, anxiety, jaw tension, overheating, and redosing urges can stack."
+        case .caution:
+            "A stimulant is selected in the current timing window. Avoid redosing and give your body time."
+        case .lower:
+            "No obvious stimulant stacking is selected."
+        }
+    }
+
+    var interactionWarnings: [String] {
+        var warnings: [String] = []
+
+        if hasMedicationCategory(.nitrateLike) && (hasErectileMedication || substanceSet.contains(.poppers)) {
+            warnings.append("Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine.")
+        }
+
+        if hasMedicationCategory(.alphaBlocker) && hasErectileMedication {
+            warnings.append("Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining.")
+        }
+
+        if hasGHBLike {
+            if substanceSet.contains(.alcohol) || substanceSet.contains(.ketamine) || hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid) {
+                warnings.append("GHB/GBL with alcohol, ketamine, sedatives, or opioids can cause unconsciousness or breathing problems.")
+            } else {
+                warnings.append("GHB/GBL has a narrow safety margin; timing and amount matter a lot.")
+            }
+        }
+
+        if substanceSet.contains(.poppers) {
+            if substanceSet.contains(.viagra) || substanceSet.contains(.kamagra) {
+                warnings.append("Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination.")
+            } else {
+                warnings.append("Poppers can drop blood pressure sharply, especially with erectile dysfunction medication.")
+            }
+        }
+
+        if (hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)) &&
+            (substanceSet.contains(.alcohol) || substanceSet.contains(.ketamine) || substanceSet.contains(.cannabis) || hasGHBLike) {
+            warnings.append("Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse.")
+        }
+
+        if stimulants.count >= 2 {
+            warnings.append("Multiple stimulants can stack heart strain, anxiety, and overheating.")
+        }
+
+        if hasMedicationCategory(.stimulantMedication) && !stimulants.isEmpty {
+            warnings.append("Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk.")
+        }
+
+        if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
+            warnings.append("MAOIs with MDMA, 3MMC, cocaine, or psychedelics can be dangerous. Avoid and get professional advice.")
+        } else if hasMedicationCategory(.serotonergic) && !serotonergicSubstances.isEmpty {
+            warnings.append("Some antidepressants or serotonergic medication can interact with MDMA, 3MMC, cocaine, or psychedelics.")
+        }
+
+        if hasMedicationCategory(.ritonavirBooster) && (hasErectileMedication || substanceSet.contains(.mdma) || substanceSet.contains(.threeMMC)) {
+            warnings.append("Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Start with medical guidance.")
+        }
+
+        if substanceSet.contains(.alcohol) && substanceSet.contains(.cocaine) {
+            warnings.append("Alcohol and cocaine together can increase strain on the heart and reduce judgment.")
+        }
+
+        if warnings.isEmpty {
+            warnings.append("No known major preset warning matched. Unknown dose, purity, health conditions, and medication changes can still matter.")
+        }
+
+        return warnings
+    }
+}
+
+private struct MedicationRiskMatch: Hashable {
+    let category: MedicationRiskCategory
+    let matchedTerm: String
+}
+
+private enum MedicationRiskCategory: String, CaseIterable {
+    case serotonergic
+    case maoi
+    case sedative
+    case opioid
+    case nitrateLike
+    case alphaBlocker
+    case stimulantMedication
+    case ritonavirBooster
+
+    var label: String {
+        switch self {
+        case .serotonergic:
+            "Serotonergic"
+        case .maoi:
+            "MAOI"
+        case .sedative:
+            "Sedative"
+        case .opioid:
+            "Opioid"
+        case .nitrateLike:
+            "Nitrate-like"
+        case .alphaBlocker:
+            "Alpha blocker"
+        case .stimulantMedication:
+            "Stimulant medication"
+        case .ritonavirBooster:
+            "Ritonavir/cobicistat"
+        }
+    }
+
+    var aliases: [String] {
+        switch self {
+        case .serotonergic:
+            [
+                "ssri", "snri", "tramadol", "lithium", "linezolid", "mirtazapine", "venlafaxine",
+                "fluoxetine", "sertraline", "citalopram", "escitalopram", "paroxetine", "duloxetine",
+                "vortioxetine", "dextromethorphan", "sumatriptan", "triptan", "st johns wort"
+            ]
+        case .maoi:
+            ["maoi", "phenelzine", "tranylcypromine", "moclobemide", "selegiline"]
+        case .sedative:
+            [
+                "benzodiazepine", "benzo", "diazepam", "alprazolam", "lorazepam", "oxazepam",
+                "temazepam", "zolpidem", "zopiclone", "pregabalin", "gabapentin", "baclofen", "quetiapine"
+            ]
+        case .opioid:
+            ["opioid", "opiate", "oxycodone", "morphine", "fentanyl", "codeine", "methadone", "buprenorphine", "tramadol"]
+        case .nitrateLike:
+            ["nitrate", "nitroglycerin", "glyceryl trinitrate", "isosorbide", "mononitrate", "dinitrate", "nicorandil", "riociguat"]
+        case .alphaBlocker:
+            ["alpha blocker", "tamsulosin", "doxazosin", "alfuzosin", "prazosin", "terazosin"]
+        case .stimulantMedication:
+            [
+                "methylphenidate", "ritalin", "concerta", "dexamfetamine", "dexamphetamine",
+                "lisdexamfetamine", "vyvanse", "elvanse", "adderall", "modafinil", "bupropion"
+            ]
+        case .ritonavirBooster:
+            ["ritonavir", "cobicistat"]
+        }
+    }
+}
+
+private enum MedicationRiskDatabase {
+    static func matches(in text: String) -> [MedicationRiskMatch] {
+        let normalizedText = normalized(text)
+        guard !normalizedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return []
+        }
+
+        var matches: [MedicationRiskMatch] = []
+
+        for category in MedicationRiskCategory.allCases {
+            for alias in category.aliases {
+                let normalizedAlias = normalized(alias)
+                if contains(normalizedAlias, in: normalizedText) {
+                    matches.append(MedicationRiskMatch(category: category, matchedTerm: alias))
+                    break
+                }
+            }
+        }
+
+        return matches
+    }
+
+    private static func normalized(_ value: String) -> String {
+        value
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil)
+            .lowercased()
+            .replacingOccurrences(of: "[^a-z0-9]+", with: " ", options: .regularExpression)
+    }
+
+    private static func contains(_ alias: String, in text: String) -> Bool {
+        let paddedText = " \(text) "
+        let paddedAlias = " \(alias) "
+        return paddedText.contains(paddedAlias)
+    }
+}
+
+private struct MedicationSuggestion: Identifiable {
+    let id: String
+    let name: String
+    let detail: String
+    let dosage: String?
+    let effectiveHours: Double?
+}
+
+private enum MedicationSuggestionDatabase {
+    static func suggestions(for query: String, savedMedications: [ProfileMedication]) -> [MedicationSuggestion] {
+        let normalizedQuery = normalized(query)
+        guard normalizedQuery.count >= 2 else {
+            return []
+        }
+
+        var suggestions: [MedicationSuggestion] = []
+
+        for medication in savedMedications where matches(medication.name, query: normalizedQuery) {
+            suggestions.append(
+                MedicationSuggestion(
+                    id: "saved-\(medication.id.uuidString)",
+                    name: medication.name,
+                    detail: medication.timingSummary,
+                    dosage: medication.dosage,
+                    effectiveHours: medication.effectiveHours
+                )
+            )
+        }
+
+        let knownNames = MedicationRiskCategory.allCases
+            .flatMap(\.aliases)
+            .map { $0.capitalized }
+            .sorted()
+
+        for name in knownNames where matches(name, query: normalizedQuery) {
+            let id = "known-\(normalized(name))"
+            guard !suggestions.contains(where: { $0.id == id || normalized($0.name) == normalized(name) }) else {
+                continue
+            }
+            suggestions.append(
+                MedicationSuggestion(
+                    id: id,
+                    name: name,
+                    detail: "Common interaction category",
+                    dosage: nil,
+                    effectiveHours: nil
+                )
+            )
+        }
+
+        return Array(suggestions.prefix(6))
+    }
+
+    private static func matches(_ value: String, query: String) -> Bool {
+        normalized(value).contains(query)
+    }
+
+    private static func normalized(_ value: String) -> String {
+        value
+            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil)
+            .lowercased()
+            .replacingOccurrences(of: "[^a-z0-9]+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+struct DrugInfoView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Drug info",
+                            subtitle: "Quick harm-reduction reference for drugs available in the log. Open a substance for a short summary and source link; this does not replace professional advice.",
+                            symbol: "pills.fill",
+                            tint: Color.chillPrimary
+                        )
+
+                        ClinicalReviewNoticeCard()
+
+                        ForEach(Substance.allCases.filter { $0 != .unknown && $0 != .other }) { substance in
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: substance.symbolName)
+                                        .font(.system(size: 18, weight: .bold))
+                                        .foregroundStyle(substance.tint)
+                                        .frame(width: 38, height: 38)
+                                        .glassSurface(radius: 19, tint: substance.tint.opacity(0.14))
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(substance.rawValue)
+                                            .font(.headline)
+                                            .foregroundStyle(Color.chillText)
+                                        Text("Approx effect: \(substance.durationLabel)")
+                                            .font(.caption.weight(.bold))
+                                            .foregroundStyle(Color.chillSecondary)
+                                    }
+                                }
+
+                                Text(substance.informationSummary)
+                                    .font(.callout)
+                                    .foregroundStyle(Color.chillSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+
+                                DrugInfoMiniSection(title: "Main risks", rows: substance.mainRisks, tint: substance.tint)
+                                DrugInfoMiniSection(title: "Mixing risks", rows: substance.mixingRisks, tint: .orange)
+                                DrugInfoMiniSection(title: "Seek help now if", rows: substance.seekHelpSigns, tint: .red)
+
+                                if let referenceURL = substance.referenceURL {
+                                    Button {
+                                        openURL(referenceURL)
+                                    } label: {
+                                        Label(substance.referenceLabel, systemImage: "link")
+                                            .font(.caption.weight(.bold))
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .tint(substance.tint)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(16)
+                            .glassSurface(radius: 24, tint: substance.tint.opacity(0.08))
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton {
+                        dismiss()
+                    }
+                }
+            }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct DrugInfoMiniSection: View {
+    let title: String
+    let rows: [String]
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.chillText)
+
+            ForEach(rows, id: \.self) { row in
+                Label(row, systemImage: "smallcircle.filled.circle.fill")
+                    .font(.caption)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .glassSurface(radius: 18, tint: tint.opacity(0.06))
+    }
+}
+
+struct EmergencyNetherlandsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+
+    @AppStorage("trustedContactName") private var trustedContactName = ""
+    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
+    @AppStorage("trustedContactMessage") private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
+
+    @State private var isFetchingLocation = false
+    @State private var locationMessage: String?
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Emergency Information",
+                            subtitle: "Fast support information for people in the Netherlands. Use 112 for immediate danger; trusted contact actions are for getting help quickly when you can still choose.",
+                            symbol: "sos.circle.fill",
+                            tint: .red
+                        )
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text("Call 112 for immediate danger, urgent medical help, fire, or a crime in progress. Say where you are and what happened.")
+                                .font(.callout)
+                                .foregroundStyle(Color.chillText)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Button(role: .destructive) {
+                                call("112")
+                            } label: {
+                                Label("Call 112", systemImage: "phone.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.red)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: .red.opacity(0.10), interactive: true)
+
+                        EmergencyRedFlagCard()
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            CareSectionTitle(title: "Trusted contact", symbol: "person.crop.circle.badge.checkmark")
+
+                            TextField("Name", text: $trustedContactName)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            TextField("Phone number", text: $trustedContactPhone)
+                                .keyboardType(.phonePad)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            Button {
+                                call(trustedContactPhone)
+                            } label: {
+                                Label(trustedContactName.isEmpty ? "Call trusted contact" : "Call \(trustedContactName)", systemImage: "phone.circle.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color.chillMint)
+                            .disabled(cleanedPhone(trustedContactPhone).isEmpty)
+
+                            TextField("Message", text: $trustedContactMessage, axis: .vertical)
+                                .lineLimit(2...4)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            Button {
+                                sendLocationMessage()
+                            } label: {
+                                HStack {
+                                    if isFetchingLocation {
+                                        ProgressView()
+                                    }
+                                    Label("Send current location", systemImage: "message.fill")
+                                        .font(.headline)
+                                }
+                                .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.blue)
+                            .disabled(cleanedPhone(trustedContactPhone).isEmpty || isFetchingLocation)
+
+                            if let locationMessage {
+                                Text(locationMessage)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(Color.chillSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            CareSectionTitle(title: "Non-urgent sexual health", symbol: "cross.case.fill")
+                            Text("For STI testing, sexual health questions, or treatment that is not an emergency, contact your GP, a huisartsenpost outside office hours, or your local GGD sexual health service.")
+                                .font(.callout)
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: .black.opacity(0.04))
+
+                        NetherlandsHarmReductionResourcesCard()
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton {
+                        dismiss()
+                    }
+                }
+            }
+            .edgeSwipeToDismiss()
+            .endEditingOnTap()
+        }
+    }
+
+    private func call(_ number: String) {
+        guard let url = URL(string: "tel://\(cleanedPhone(number))") else {
+            return
+        }
+        openURL(url)
+    }
+
+    private func cleanedPhone(_ number: String) -> String {
+        number.filter { $0.isNumber || $0 == "+" }
+    }
+
+    private func sendLocationMessage() {
+        guard !isFetchingLocation else {
+            return
+        }
+
+        isFetchingLocation = true
+        locationMessage = nil
+
+        Task {
+            do {
+                let location = try await LocationLookupService.shared.currentLoggedLocation()
+                await MainActor.run {
+                    openMessageComposer(location: location)
+                    locationMessage = "Prepared iMessage with your current location."
+                    isFetchingLocation = false
+                }
+            } catch {
+                await MainActor.run {
+                    locationMessage = error.localizedDescription
+                    isFetchingLocation = false
+                }
+            }
+        }
+    }
+
+    private func openMessageComposer(location: LoggedLocation) {
+        var components = URLComponents()
+        components.scheme = "sms"
+        components.path = cleanedPhone(trustedContactPhone)
+        components.queryItems = [
+            URLQueryItem(name: "body", value: emergencyMessage(location: location))
+        ]
+
+        guard let url = components.url else {
+            return
+        }
+
+        openURL(url)
+    }
+
+    private func emergencyMessage(location: LoggedLocation) -> String {
+        let trimmed = trustedContactMessage.trimmingCharacters(in: .whitespacesAndNewlines)
+        let baseMessage = trimmed.isEmpty ? "Please come get me, I’m not okay at this moment." : trimmed
+        return "\(baseMessage)\nMy location: https://maps.apple.com/?ll=\(location.latitude),\(location.longitude)"
+    }
+}
+
+private struct NetherlandsHarmReductionResourcesCard: View {
+    private let links: [(String, String)] = [
+        ("GGD sexual health", "https://www.ggd.nl"),
+        ("Drugsinfo substance information", "https://www.drugsinfo.nl"),
+        ("Jellinek alcohol and drugs support", "https://www.jellinek.nl"),
+        ("Government.nl emergency number 112", "https://www.government.nl/topics/emergency-number-112")
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CareSectionTitle(title: "Netherlands support links", symbol: "mappin.and.ellipse")
+
+            Text("Use these for non-urgent sexual health, substance information, and harm-reduction support. For immediate danger, use 112.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(links, id: \.0) { link in
+                if let url = URL(string: link.1) {
+                    Link(destination: url) {
+                        HStack(spacing: 10) {
+                            Image(systemName: "link.circle.fill")
+                                .foregroundStyle(Color.chillVisibleBlue)
+                            Text(link.0)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Color.chillText)
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Color.chillSecondary)
+                        }
+                        .padding(12)
+                        .glassSurface(radius: 18, tint: Color.chillVisibleBlue.opacity(0.06), interactive: true)
+                    }
+                }
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08))
+    }
+}
+
+struct AftercareView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+
+    private var trackedEntries: [NightEntry] {
+        entries.filter { $0.hadSex && !$0.skippedNight }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Aftercare",
+                            subtitle: "A softer next-day check-in for sleep, feelings, and emotional care. Start with sleep, water, food, and symptoms; add what feels useful and skip what does not.",
+                            symbol: "heart.text.square.fill",
+                            tint: Color.chillAccentTeal
+                        )
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Tiny care plan")
+                                .font(.headline)
+                                .foregroundStyle(Color.chillText)
+                            Text("Drink water, eat something gentle, rest, and avoid judging yourself while your body settles. If something feels unsafe or too heavy, reach out to someone you trust or a professional helper.")
+                                .font(.callout)
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: Color.chillAccentTeal.opacity(0.10))
+
+                        PrepGuideCard()
+
+                        if trackedEntries.isEmpty {
+                            CareEmptyState(text: "No tracked Chills available for aftercare.")
+                        } else {
+                            ForEach(trackedEntries.prefix(12)) { entry in
+                                AftercareEntryCard(entry: entry)
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton {
+                        dismiss()
+                    }
+                }
+            }
+            .edgeSwipeToDismiss()
+            .endEditingOnTap()
+        }
+    }
+}
+
+private struct AftercareEntryCard: View {
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var entry: NightEntry
+    @State private var isImportingSleep = false
+    @State private var sleepImportMessage = ""
+
+    private var moodBinding: Binding<AftercareMood> {
+        Binding {
+            AftercareMood(rawValue: entry.aftercareMood) ?? .okay
+        } set: { mood in
+            entry.aftercareMood = mood.rawValue
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(entry.date.formatted(date: .abbreviated, time: .omitted))
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+                    Text(entry.aftercareCompletedAt == nil ? "Open check-in" : "Completed")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(entry.aftercareCompletedAt == nil ? Color.chillAccentTeal : Color.chillMint)
+                }
+
+                Spacer()
+
+                Text((AftercareMood(rawValue: entry.aftercareMood) ?? .okay).emoji)
+                    .font(.largeTitle)
+            }
+
+            Toggle("Record sleep now", isOn: $entry.aftercareSleepRecorded)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+                .tint(Color.chillMint)
+
+            if entry.aftercareSleepRecorded {
+                HStack {
+                    Text("\(entry.aftercareSleepHours.formatted(.number.precision(.fractionLength(0...1)))) h")
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+                        .frame(width: 72, alignment: .leading)
+                    Slider(value: $entry.aftercareSleepHours, in: 0...12, step: 0.5)
+                        .tint(Color.chillMint)
+                }
+            }
+
+            Button {
+                importSleepFromHealth()
+            } label: {
+                Label(isImportingSleep ? "Reading Apple Health" : "Import sleep from Apple Health", systemImage: "heart.text.square.fill")
+                    .font(.subheadline.weight(.bold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(Color.chillMint)
+            .disabled(isImportingSleep)
+
+            if !sleepImportMessage.isEmpty {
+                Text(sleepImportMessage)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Toggle("Drank water", isOn: $entry.aftercareDrankWater)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+                .tint(Color.chillSecondaryBlue)
+
+            Toggle("Ate something", isOn: $entry.aftercareAteFood)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+                .tint(.orange)
+
+            if entry.aftercareAteFood {
+                TextField("What did you eat? Optional", text: $entry.aftercareFoodNote, axis: .vertical)
+                    .lineLimit(1...3)
+                    .textFieldStyle(.plain)
+                    .foregroundStyle(Color.chillText)
+                    .padding(14)
+                    .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+            }
+
+            Picker("Mood", selection: moodBinding) {
+                ForEach(AftercareMood.allCases) { mood in
+                    Text("\(mood.emoji) \(mood.rawValue)").tag(mood)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(Color.chillAccentTeal)
+
+            VStack(alignment: .leading, spacing: 10) {
+                CareSectionTitle(title: "Symptoms", symbol: "heart.text.clipboard.fill")
+
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 126), spacing: 10)], spacing: 10) {
+                    ForEach(AftercareSymptom.allCases) { symptom in
+                        Button {
+                            toggleSymptom(symptom)
+                        } label: {
+                            Text(symptom.rawValue)
+                                .font(.caption.weight(.bold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.75)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                        }
+                        .buttonStyle(.plain)
+                        .foregroundStyle(entry.aftercareSymptoms.contains(symptom) ? .white : Color.chillText)
+                        .background {
+                            Capsule()
+                                .fill(entry.aftercareSymptoms.contains(symptom) ? Color.chillAccentTeal : Color.white.opacity(0.45))
+                        }
+                    }
+                }
+
+                if !entry.aftercareSymptoms.isEmpty {
+                    SymptomInsightCard(symptoms: entry.aftercareSymptoms)
+                }
+            }
+
+            TextField("How do you feel about last Chill?", text: $entry.aftercareFeeling, axis: .vertical)
+                .lineLimit(2...5)
+                .textFieldStyle(.plain)
+                .foregroundStyle(Color.chillText)
+                .padding(14)
+                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+            GlassActionButton(prominent: true) {
+                entry.aftercareCompletedAt = .now
+                if entry.aftercareSleepRecorded {
+                    entry.sleptYet = true
+                    entry.sleepHours = entry.aftercareSleepHours
+                }
+                try? modelContext.save()
+            } label: {
+                Label("Save aftercare", systemImage: "checkmark.heart.fill")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillAccentTeal.opacity(0.08), interactive: true)
+    }
+
+    private func toggleSymptom(_ symptom: AftercareSymptom) {
+        var symptoms = entry.aftercareSymptoms
+        if symptoms.contains(symptom) {
+            symptoms.removeAll { $0 == symptom }
+        } else {
+            symptoms.append(symptom)
+        }
+        entry.aftercareSymptoms = symptoms
+    }
+
+    private func importSleepFromHealth() {
+        isImportingSleep = true
+        sleepImportMessage = ""
+
+        Task {
+            do {
+                let end = Calendar.current.date(byAdding: .hour, value: 18, to: entry.endDate) ?? entry.endDate.addingTimeInterval(18 * 60 * 60)
+                let hours = try await HealthKitService.shared.sleepHours(from: entry.endDate, to: end)
+                entry.aftercareSleepRecorded = true
+                entry.aftercareSleepHours = hours
+                entry.sleptYet = true
+                entry.sleepHours = hours
+                try? modelContext.save()
+
+                if hours >= 6, (try? await NotificationService.shared.requestAuthorization()) == true {
+                    NotificationService.shared.schedulePositiveSleepNotification(hours: hours)
+                }
+
+                sleepImportMessage = "Apple Health sleep: \(hours.formatted(.number.precision(.fractionLength(0...1)))) h."
+            } catch {
+                sleepImportMessage = error.localizedDescription
+            }
+
+            isImportingSleep = false
+        }
+    }
+}
+
+private struct SymptomInsightCard: View {
+    let symptoms: [AftercareSymptom]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Most likely causes")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+
+            ForEach(symptoms) { symptom in
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(symptom.rawValue)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color.chillVisibleMint)
+                    Text(symptom.likelyCause)
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .glassSurface(radius: 20, tint: Color.chillAccentTeal.opacity(0.09))
+    }
+}
+
+struct PageHeader: View {
+    @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
+    let title: String
+    let subtitle: String
+    let symbol: String
+    let tint: Color
+
+    private var palette: DailyScorePalette {
+        DailyScorePalette(score: lastDailyRecoveryScore)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(palette.heroText)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(subtitle)
+                    .font(.callout)
+                    .lineSpacing(3)
+                    .foregroundStyle(palette.heroSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
+struct EmergencyRedFlagCard: View {
+    @State private var checkedFlags: Set<String> = []
+
+    private let flags = [
+        "Chest pain or severe pressure",
+        "Fainting, seizure, or cannot be woken",
+        "Blue lips, slow breathing, or gasping",
+        "Very confused, overheating, or rigid muscles",
+        "Severe panic that does not settle"
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                CareSectionTitle(title: "Emergency red flags", symbol: "exclamationmark.triangle.fill")
+
+                Spacer()
+
+                if !checkedFlags.isEmpty {
+                    Button("Renew") {
+                        checkedFlags.removeAll()
+                    }
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.red)
+                }
+            }
+
+            Text("If any of these are happening, do not wait for the app. Call 112 in the Netherlands or your local emergency number.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(flags, id: \.self) { flag in
+                Button {
+                    if checkedFlags.contains(flag) {
+                        checkedFlags.remove(flag)
+                    } else {
+                        checkedFlags.insert(flag)
+                    }
+                } label: {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: checkedFlags.contains(flag) ? "checkmark.circle.fill" : "circle")
+                            .font(.headline)
+                            .foregroundStyle(checkedFlags.contains(flag) ? .red : Color.chillSecondary)
+
+                        Text(flag)
+                            .font(.callout.weight(.semibold))
+                            .foregroundStyle(Color.chillText)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(12)
+                    .glassSurface(radius: 18, tint: (checkedFlags.contains(flag) ? Color.red : Color.black).opacity(0.06), interactive: true)
+                }
+                .buttonStyle(.plain)
+            }
+
+            Button(role: .destructive) {
+                guard let url = URL(string: "tel://112") else { return }
+                UIApplication.shared.open(url)
+            } label: {
+                Label("Call 112", systemImage: "phone.fill")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: .red.opacity(0.08), interactive: true)
+        .accessibilityElement(children: .contain)
+    }
+}
+
+struct ClinicalReviewNoticeCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Clinical review note", systemImage: "checkmark.seal.text.page.fill")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+
+            Text("ChillMate avoids calling combinations safe. It gives risk signals and source links, but public release should still be reviewed by a clinician or harm-reduction professional.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(16)
+        .glassSurface(radius: 24, tint: Color.chillVisibleMint.opacity(0.08))
+    }
+}
+
+private struct CareSectionTitle: View {
+    let title: String
+    let symbol: String
+
+    var body: some View {
+        Label(title, systemImage: symbol)
+            .font(.headline)
+            .foregroundStyle(Color.chillText)
+    }
+}
+
+private struct CareEmptyState: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.callout)
+            .foregroundStyle(Color.chillSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(18)
+            .glassSurface(radius: 24, tint: .black.opacity(0.04))
+    }
+}
+
+struct PanicSupportView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("trustedContactName") private var trustedContactName = ""
+    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
+    @State private var isBreathing = false
+    @State private var breathStep = 0
+    @State private var completedGroundingSteps: Set<Int> = []
+
+    private let breathingSteps = ["Breathe in", "Hold gently", "Breathe out", "Rest"]
+    private let groundingSteps = [
+        "Name 5 things you can see.",
+        "Touch 4 things and notice texture.",
+        "Listen for 3 sounds.",
+        "Notice 2 smells, or name 2 safe places.",
+        "Notice 1 taste, or take one slow sip of water."
+    ]
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Panic support",
+                            subtitle: "A low-stimulation space for anxiety, panic, or feeling unwell. Start the breathing timer, check off grounding steps, then call help if you need another person.",
+                            symbol: "lungs.fill",
+                            tint: Color.chillPrimary
+                        )
+
+                        VStack(spacing: 18) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color.chillPrimary.opacity(0.18))
+                                    .frame(width: isBreathing ? 174 : 118, height: isBreathing ? 174 : 118)
+
+                                Circle()
+                                    .stroke(Color.chillMint.opacity(0.70), lineWidth: 8)
+                                    .frame(width: 150, height: 150)
+
+                                VStack(spacing: 6) {
+                                    Text(isBreathing ? breathingSteps[breathStep] : "Ready")
+                                        .font(.title3.bold())
+                                        .foregroundStyle(Color.chillText)
+                                    Text("You’re safe right now")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(Color.chillSecondary)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
+
+                            Button(isBreathing ? "Stop breathing timer" : "Start breathing timer") {
+                                toggleBreathing()
+                            }
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color.chillPrimary)
+                        }
+                        .padding(18)
+                        .glassSurface(radius: 30, tint: .white.opacity(0.18), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            CareSectionTitle(title: "Fast actions", symbol: "phone.fill")
+
+                            Button(action: callTrustedContact) {
+                                Label(trustedContactName.isEmpty ? "Call trusted contact" : "Call \(trustedContactName)", systemImage: "person.crop.circle.badge.checkmark")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color.chillMint)
+                            .disabled(trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                            .opacity(trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.55 : 1)
+
+                            Button(role: .destructive, action: callEmergencyServices) {
+                                Label("Call emergency services 112", systemImage: "sos.circle.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.red)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: .white.opacity(0.18), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                CareSectionTitle(title: "Grounding steps", symbol: "hand.raised.fill")
+
+                                Spacer()
+
+                                Button("Renew") {
+                                    completedGroundingSteps.removeAll()
+                                }
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Color.chillPrimary)
+                                .disabled(completedGroundingSteps.isEmpty)
+                                .opacity(completedGroundingSteps.isEmpty ? 0.45 : 1)
+                            }
+
+                            ForEach(Array(groundingSteps.enumerated()), id: \.offset) { index, step in
+                                Button {
+                                    if completedGroundingSteps.contains(index) {
+                                        completedGroundingSteps.remove(index)
+                                    } else {
+                                        completedGroundingSteps.insert(index)
+                                    }
+                                } label: {
+                                    HStack(alignment: .top, spacing: 10) {
+                                        Image(systemName: completedGroundingSteps.contains(index) ? "checkmark.circle.fill" : "circle")
+                                            .font(.headline)
+                                            .foregroundStyle(completedGroundingSteps.contains(index) ? Color.chillVisibleMint : Color.chillSecondary)
+
+                                        Text(step)
+                                            .font(.callout.weight(.semibold))
+                                            .foregroundStyle(completedGroundingSteps.contains(index) ? Color.chillSecondary : Color.chillText)
+                                            .fixedSize(horizontal: false, vertical: true)
+
+                                        Spacer(minLength: 0)
+                                    }
+                                    .padding(12)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .glassSurface(radius: 18, tint: (completedGroundingSteps.contains(index) ? Color.chillVisibleMint : Color.chillPrimary).opacity(0.08), interactive: true)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: .white.opacity(0.16), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("References")
+                                .font(.headline)
+                                .foregroundStyle(Color.chillText)
+                            Link("Mind: panic attacks and grounding", destination: URL(string: "https://www.mind.org.uk/information-support/types-of-mental-health-problems/anxiety-and-panic-attacks/panic-attacks")!)
+                            Link("NHS: breathing exercises for stress", destination: URL(string: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/")!)
+                            Link("Government.nl: emergency number 112", destination: URL(string: "https://www.government.nl/topics/emergency-number-112")!)
+                        }
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillPrimary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .glassSurface(radius: 24, tint: .black.opacity(0.04))
+
+                        EmergencyRedFlagCard()
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton {
+                        dismiss()
+                    }
+                }
+            }
+            .edgeSwipeToDismiss()
+        }
+    }
+
+    private func toggleBreathing() {
+        isBreathing.toggle()
+        if isBreathing {
+            Task {
+                while isBreathing {
+                    await MainActor.run {
+                        breathStep = (breathStep + 1) % breathingSteps.count
+                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                    }
+                    try? await Task.sleep(for: .seconds(4))
+                }
+            }
+        }
+    }
+
+    private func callTrustedContact() {
+        let phone = trustedContactPhone.filter { $0.isNumber || $0 == "+" }
+        guard let url = URL(string: "tel://\(phone)") else { return }
+        UIApplication.shared.open(url)
+    }
+
+    private func callEmergencyServices() {
+        guard let url = URL(string: "tel://112") else { return }
+        UIApplication.shared.open(url)
+    }
+}
+
+struct SafeRouteHomeView: View {
+    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
+    @AppStorage("trustedContactMessage") private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
+    @State private var destination = ""
+    @State private var selectedRouteMode: RouteTransportMode = .transit
+    @State private var routeSuggestions: [RouteSuggestion] = []
+    @State private var selectedSuggestion: RouteSuggestion?
+    @State private var routeSearchTask: Task<Void, Never>?
+    @State private var currentLocation: LoggedLocation?
+    @State private var message: String?
+    @State private var isFetchingLocation = false
+
+    private var savedHomeAddress: String {
+        profiles.first?.homeAddress.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Safe route home",
+                            subtitle: "Plan transport, share where you are, or open a get-me-home flow quickly. Search an address, choose transit, driving, or cycling, then open Maps or message your trusted contact.",
+                            symbol: "location.fill",
+                            tint: Color.chillVisibleMint
+                        )
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            CareSectionTitle(title: "Destination", symbol: "map.fill")
+
+                            TextField("Where do you want to go?", text: $destination)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color.chillText)
+                                .padding(14)
+                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                            if !savedHomeAddress.isEmpty {
+                                Button {
+                                    selectedSuggestion = nil
+                                    routeSuggestions = []
+                                    destination = savedHomeAddress
+                                } label: {
+                                    Label("Use saved home address", systemImage: "house.fill")
+                                        .font(.subheadline.weight(.bold))
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(Color.chillVisibleMint)
+                            }
+
+                            if !routeSuggestions.isEmpty {
+                                VStack(spacing: 8) {
+                                    ForEach(routeSuggestions) { suggestion in
+                                        Button {
+                                            selectedSuggestion = suggestion
+                                            destination = suggestion.title
+                                            routeSuggestions = []
+                                        } label: {
+                                            HStack(spacing: 10) {
+                                                Image(systemName: "mappin.circle.fill")
+                                                    .foregroundStyle(Color.chillVisibleMint)
+
+                                                VStack(alignment: .leading, spacing: 2) {
+                                                    Text(suggestion.title)
+                                                        .font(.subheadline.weight(.semibold))
+                                                        .foregroundStyle(Color.chillText)
+                                                    if !suggestion.subtitle.isEmpty {
+                                                        Text(suggestion.subtitle)
+                                                            .font(.caption)
+                                                            .foregroundStyle(Color.chillSecondary)
+                                                            .lineLimit(2)
+                                                    }
+                                                }
+
+                                                Spacer(minLength: 0)
+                                            }
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .padding(12)
+                                            .glassSurface(radius: 18, tint: Color.chillVisibleMint.opacity(0.07), interactive: true)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                            }
+
+                            Picker("Route type", selection: $selectedRouteMode) {
+                                ForEach(RouteTransportMode.allCases) { mode in
+                                    Label(mode.title, systemImage: mode.symbolName).tag(mode)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+
+                            Button(action: openDirections) {
+                                Label("Start \(selectedRouteMode.title.lowercased())", systemImage: selectedRouteMode.symbolName)
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color.chillVisibleMint)
+
+                            HStack(spacing: 10) {
+                                Button(action: openUber) {
+                                    Label("Uber", systemImage: "car.fill")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(Color.chillText)
+
+                                Button(action: openBolt) {
+                                    Label("Bolt", systemImage: "bolt.car.fill")
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(Color.chillText)
+                            }
+                            .font(.headline)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            CareSectionTitle(title: "Share location", symbol: "location.circle.fill")
+
+                            if let currentLocation {
+                                Text(currentLocation.locationMessage)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(Color.chillSecondary)
+                            }
+
+                            if let message {
+                                Text(message)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(Color.chillSecondary)
+                            }
+
+                            Button(action: shareLocationNow) {
+                                Label(isFetchingLocation ? "Getting location" : "Send location to trusted contact", systemImage: "message.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color.chillPrimary)
+                            .disabled(isFetchingLocation || trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.10), interactive: true)
+
+                        Button(role: .destructive, action: getMeHomeEmergencyFlow) {
+                            Label("Get me home now", systemImage: "exclamationmark.triangle.fill")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .endEditingOnTap()
+            .onChange(of: destination) { _, newValue in
+                searchDestinationSuggestions(for: newValue)
+            }
+        }
+    }
+
+    private func searchDestinationSuggestions(for query: String) {
+        selectedSuggestion = nil
+        routeSearchTask?.cancel()
+
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count >= 3 else {
+            routeSuggestions = []
+            return
+        }
+
+        routeSearchTask = Task {
+            try? await Task.sleep(for: .milliseconds(280))
+            guard !Task.isCancelled else { return }
+
+            let suggestions = await RouteSearchService.suggestions(for: trimmed)
+            guard !Task.isCancelled else { return }
+
+            await MainActor.run {
+                routeSuggestions = suggestions
+            }
+        }
+    }
+
+    private func openDirections() {
+        if let selectedSuggestion {
+            if selectedRouteMode == .cycling {
+                let coordinate = selectedSuggestion.mapItem.location.coordinate
+                openMapsURL(destination: "\(coordinate.latitude),\(coordinate.longitude)")
+                return
+            }
+
+            selectedSuggestion.mapItem.openInMaps(launchOptions: [
+                MKLaunchOptionsDirectionsModeKey: selectedRouteMode.mapKitDirectionsMode
+            ])
+            return
+        }
+
+        let trimmedDestination = destination.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmedDestination.isEmpty {
+            guard !savedHomeAddress.isEmpty else {
+                message = "Add a home address in Profile first, or type a destination here."
+                return
+            }
+            destination = savedHomeAddress
+            openMapsURL(destination: savedHomeAddress)
+            return
+        }
+
+        openMapsURL(destination: trimmedDestination)
+    }
+
+    private func openMapsURL(destination: String) {
+        let encoded = destination.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        guard let url = URL(string: "maps://?daddr=\(encoded)&dirflg=\(selectedRouteMode.urlDirectionFlag)") else { return }
+        UIApplication.shared.open(url)
+    }
+
+    private func openUber() {
+        UIApplication.shared.open(URL(string: "https://m.uber.com/ul/")!)
+    }
+
+    private func openBolt() {
+        UIApplication.shared.open(URL(string: "https://bolt.eu/")!)
+    }
+
+    private func shareLocationNow() {
+        isFetchingLocation = true
+        message = nil
+
+        Task {
+            do {
+                let location = try await LocationLookupService.shared.currentLoggedLocation()
+                await MainActor.run {
+                    currentLocation = location
+                    isFetchingLocation = false
+                    openSMS(body: "\(trustedContactMessage)\n\nMy location: https://maps.apple.com/?ll=\(location.latitude),\(location.longitude)")
+                }
+            } catch {
+                await MainActor.run {
+                    isFetchingLocation = false
+                    message = error.localizedDescription
+                }
+            }
+        }
+    }
+
+    private func getMeHomeEmergencyFlow() {
+        guard !savedHomeAddress.isEmpty else {
+            message = "Add a home address in Profile first so Get me home knows where to navigate."
+            shareLocationNow()
+            return
+        }
+
+        selectedSuggestion = nil
+        routeSuggestions = []
+        destination = savedHomeAddress
+        shareLocationNow()
+        openMapsURL(destination: savedHomeAddress)
+    }
+
+    private func openSMS(body: String) {
+        let phone = trustedContactPhone.filter { $0.isNumber || $0 == "+" }
+        let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        guard let url = URL(string: "sms:\(phone)&body=\(encodedBody)") else { return }
+        UIApplication.shared.open(url)
+    }
+}
+
+private enum RouteTransportMode: String, CaseIterable, Identifiable {
+    case transit = "Transit"
+    case driving = "Driving"
+    case cycling = "Cycling"
+
+    var id: String { rawValue }
+
+    var title: String { rawValue }
+
+    var symbolName: String {
+        switch self {
+        case .transit:
+            "tram.fill"
+        case .driving:
+            "car.fill"
+        case .cycling:
+            "bicycle"
+        }
+    }
+
+    var mapKitDirectionsMode: String {
+        switch self {
+        case .transit:
+            MKLaunchOptionsDirectionsModeTransit
+        case .driving:
+            MKLaunchOptionsDirectionsModeDriving
+        case .cycling:
+            MKLaunchOptionsDirectionsModeDefault
+        }
+    }
+
+    var urlDirectionFlag: String {
+        switch self {
+        case .transit:
+            "r"
+        case .driving:
+            "d"
+        case .cycling:
+            "b"
+        }
+    }
+}
+
+private struct RouteSuggestion: Identifiable {
+    let id = UUID()
+    let title: String
+    let subtitle: String
+    let mapItem: MKMapItem
+}
+
+private enum RouteSearchService {
+    @MainActor
+    static func suggestions(for query: String) async -> [RouteSuggestion] {
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = query
+        request.resultTypes = [.address, .pointOfInterest]
+
+        do {
+            let response = try await MKLocalSearch(request: request).start()
+            return response.mapItems.prefix(5).map { item in
+                RouteSuggestion(
+                    title: item.name ?? query,
+                    subtitle: item.addressRepresentations?.fullAddress(includingRegion: true, singleLine: true) ?? item.address?.fullAddress ?? "",
+                    mapItem: item
+                )
+            }
+        } catch {
+            return []
+        }
+    }
+}
+
+private extension LoggedLocation {
+    var locationMessage: String {
+        "\(name.isEmpty ? "Current location" : name) • \(coordinateSummary)"
+    }
+}
+
+struct JournalView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
+
+    @State private var date = Date.now
+    @State private var rememberClearly = ""
+    @State private var uncomfortableMoments = ""
+    @State private var consentConcerns = ""
+    @State private var regrets = ""
+    @State private var feelsGoodAbout = ""
+    @State private var selectedPhotos: [PhotosPickerItem] = []
+    @State private var photoData: [Data] = []
+    @State private var isShowingMorePrompts = false
+
+    private var selectedJournalEntry: JournalEntry? {
+        journalEntries.first { Calendar.current.isDate($0.date, inSameDayAs: date) }
+    }
+
+    var body: some View {
+        let photoCount = photoData.count
+        let photoPickerTitle = photoCount == 0 ? "Add photos" : "\(photoCount) photo\(photoCount == 1 ? "" : "s")"
+
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Journal",
+                            subtitle: "Pick a day, write the few things you want to remember, and come back anytime to edit.",
+                            symbol: "book.closed.fill",
+                            tint: Color.chillPrimary
+                        )
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            JournalWeekStrip(selectedDate: $date, entries: journalEntries)
+
+                            HStack(spacing: 10) {
+                                DatePicker("Date", selection: $date, displayedComponents: [.date])
+                                    .font(.headline)
+                                    .foregroundStyle(Color.chillText)
+                                    .tint(Color.chillPrimary)
+
+                                Spacer(minLength: 0)
+
+                                JournalStatusPill(isEditing: selectedJournalEntry != nil)
+                            }
+
+                            JournalPromptField(title: "What do you remember?", text: $rememberClearly)
+                            JournalPromptField(title: "How do you feel about it now?", text: $feelsGoodAbout)
+                            JournalPromptField(title: "Any safety or consent concerns?", text: $consentConcerns)
+
+                            DisclosureGroup(isExpanded: $isShowingMorePrompts) {
+                                VStack(spacing: 10) {
+                                    JournalPromptField(title: "Any uncomfortable moments?", text: $uncomfortableMoments)
+                                    JournalPromptField(title: "Regrets or loose ends", text: $regrets)
+                                }
+                                .padding(.top, 8)
+                            } label: {
+                                Label("More prompts", systemImage: "chevron.down.circle.fill")
+                                    .font(.subheadline.weight(.bold))
+                                    .foregroundStyle(Color.chillText)
+                            }
+                            .tint(Color.chillPrimary)
+                            .padding(12)
+                            .background(.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+                            HStack(spacing: 10) {
+                                PhotosPicker(selection: $selectedPhotos, maxSelectionCount: 6, matching: .images) {
+                                    Label(photoPickerTitle, systemImage: "photo.on.rectangle.angled")
+                                        .font(.subheadline.weight(.bold))
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(Color.chillPrimary)
+                                .onChange(of: selectedPhotos) { _, items in
+                                    loadPhotos(items)
+                                }
+                            }
+
+                            GlassActionButton(prominent: true, action: saveJournalEntry) {
+                                Label(selectedJournalEntry == nil ? "Save journal" : "Update journal", systemImage: "checkmark.circle.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+
+                        if !journalEntries.isEmpty {
+                            JournalRecentEntriesStrip(entries: Array(journalEntries.prefix(10)), selectedDate: $date)
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .endEditingOnTap()
+            .onAppear(perform: loadSelectedJournalEntry)
+            .onChange(of: date) { _, _ in
+                loadSelectedJournalEntry()
+            }
+        }
+    }
+
+    private func loadPhotos(_ items: [PhotosPickerItem]) {
+        Task {
+            var loaded: [Data] = []
+            for item in items {
+                if let data = try? await item.loadTransferable(type: Data.self) {
+                    let optimizedData = await Task.detached(priority: .utility) {
+                        ChillImageOptimizer.downsampledJPEGData(from: data, maxPixelSize: 1200, compressionQuality: 0.80)
+                    }.value
+                    loaded.append(optimizedData)
+                }
+            }
+            await MainActor.run {
+                photoData = loaded
+            }
+        }
+    }
+
+    private func saveJournalEntry() {
+        if let entry = selectedJournalEntry {
+            entry.rememberClearly = rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines)
+            entry.uncomfortableMoments = uncomfortableMoments.trimmingCharacters(in: .whitespacesAndNewlines)
+            entry.consentConcerns = consentConcerns.trimmingCharacters(in: .whitespacesAndNewlines)
+            entry.regrets = regrets.trimmingCharacters(in: .whitespacesAndNewlines)
+            entry.feelsGoodAbout = feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines)
+            entry.photos = photoData
+        } else {
+            let entry = JournalEntry(
+                date: date,
+                rememberClearly: rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines),
+                uncomfortableMoments: uncomfortableMoments.trimmingCharacters(in: .whitespacesAndNewlines),
+                consentConcerns: consentConcerns.trimmingCharacters(in: .whitespacesAndNewlines),
+                regrets: regrets.trimmingCharacters(in: .whitespacesAndNewlines),
+                feelsGoodAbout: feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines),
+                photos: photoData
+            )
+            modelContext.insert(entry)
+        }
+
+        try? modelContext.save()
+    }
+
+    private func loadSelectedJournalEntry() {
+        guard let entry = selectedJournalEntry else {
+            rememberClearly = ""
+            uncomfortableMoments = ""
+            consentConcerns = ""
+            regrets = ""
+            feelsGoodAbout = ""
+            selectedPhotos = []
+            photoData = []
+            return
+        }
+
+        rememberClearly = entry.rememberClearly
+        uncomfortableMoments = entry.uncomfortableMoments
+        consentConcerns = entry.consentConcerns
+        regrets = entry.regrets
+        feelsGoodAbout = entry.feelsGoodAbout
+        selectedPhotos = []
+        photoData = entry.photos
+    }
+}
+
+private struct JournalWeekStrip: View {
+    @Binding var selectedDate: Date
+    let entries: [JournalEntry]
+
+    private var calendar: Calendar { .current }
+
+    private var days: [Date] {
+        let interval = calendar.dateInterval(of: .weekOfYear, for: selectedDate)
+        let start = interval?.start ?? calendar.startOfDay(for: selectedDate)
+        return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(days, id: \.self) { day in
+                let isSelected = calendar.isDate(day, inSameDayAs: selectedDate)
+                let hasEntry = entries.contains { calendar.isDate($0.date, inSameDayAs: day) }
+
+                Button {
+                    selectedDate = day
+                } label: {
+                    VStack(spacing: 5) {
+                        Text(day.formatted(.dateTime.weekday(.abbreviated)))
+                            .font(.caption2.weight(.bold))
+                        Text(day.formatted(.dateTime.day()))
+                            .font(.headline.weight(.bold))
+                            .monospacedDigit()
+                        Circle()
+                            .fill(hasEntry ? Color.chillVisibleMint : .clear)
+                            .frame(width: 5, height: 5)
+                    }
+                    .foregroundStyle(isSelected ? .white : Color.chillText)
+                    .frame(maxWidth: .infinity, minHeight: 62)
+                    .background(
+                        isSelected ? Color.chillPrimary : Color.black.opacity(0.04),
+                        in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(day.formatted(date: .abbreviated, time: .omitted))\(hasEntry ? ", journal entry saved" : "")")
+            }
+        }
+    }
+}
+
+private struct JournalStatusPill: View {
+    let isEditing: Bool
+
+    var body: some View {
+        Label(isEditing ? "Editing" : "New", systemImage: isEditing ? "pencil.circle.fill" : "plus.circle.fill")
+            .font(.caption.weight(.bold))
+            .foregroundStyle(isEditing ? Color.chillVisibleMint : Color.chillVisibleBlue)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background((isEditing ? Color.chillVisibleMint : Color.chillVisibleBlue).opacity(0.10), in: Capsule())
+    }
+}
+
+private struct JournalRecentEntriesStrip: View {
+    let entries: [JournalEntry]
+    @Binding var selectedDate: Date
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            CareSectionTitle(title: "Recent entries", symbol: "clock.arrow.circlepath")
+
+            ScrollView(.horizontal) {
+                HStack(spacing: 10) {
+                    ForEach(entries) { entry in
+                        Button {
+                            selectedDate = entry.date
+                        } label: {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(entry.date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated)))
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(Color.chillText)
+                                Text(previewText(for: entry))
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(Color.chillSecondary)
+                                    .lineLimit(2)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .frame(width: 126, alignment: .topLeading)
+                            .frame(minHeight: 74, alignment: .topLeading)
+                            .padding(12)
+                            .glassSurface(radius: 20, tint: Color.chillPrimary.opacity(0.07), interactive: true)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+            .scrollIndicators(.hidden)
+        }
+    }
+
+    private func previewText(for entry: JournalEntry) -> String {
+        [
+            entry.rememberClearly,
+            entry.feelsGoodAbout,
+            entry.consentConcerns,
+            entry.uncomfortableMoments,
+            entry.regrets
+        ]
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty } ?? "Saved entry"
+    }
+}
+
+private struct JournalPromptField: View {
+    let title: String
+    @Binding var text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.chillSecondary)
+
+            TextField(title, text: $text, axis: .vertical)
+                .lineLimit(1...3)
+                .textFieldStyle(.plain)
+                .foregroundStyle(Color.chillText)
+                .padding(12)
+                .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
+        }
+    }
+}
+
+private struct JournalEntryCard: View {
+    @Environment(\.modelContext) private var modelContext
+    let entry: JournalEntry
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(entry.date.formatted(date: .abbreviated, time: .omitted))
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+
+                Spacer()
+
+                Button(role: .destructive) {
+                    RecentlyDeletedStore.record(
+                        kind: "Journal",
+                        title: "Journal entry",
+                        detail: entry.date.formatted(date: .abbreviated, time: .omitted)
+                    )
+                    modelContext.delete(entry)
+                    try? modelContext.save()
+                } label: {
+                    Image(systemName: "trash.fill")
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.chillSecondary)
+            }
+
+            JournalLine(title: "Clear memory", value: entry.rememberClearly)
+            JournalLine(title: "Uncomfortable", value: entry.uncomfortableMoments)
+            JournalLine(title: "Consent", value: entry.consentConcerns)
+            JournalLine(title: "Regrets", value: entry.regrets)
+            JournalLine(title: "Good", value: entry.feelsGoodAbout)
+
+            if !entry.photos.isEmpty {
+                Text("\(entry.photos.count) picture\(entry.photos.count == 1 ? "" : "s")")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillPrimary)
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 24, tint: .black.opacity(0.04))
+    }
+}
+
+private struct JournalLine: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        if !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillSecondary)
+                Text(value)
+                    .font(.caption)
+                    .foregroundStyle(Color.chillText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
+struct EmergencyCardView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @AppStorage("trustedContactName") private var trustedContactName = ""
+    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
+    @AppStorage("emergencyAllergies") private var emergencyAllergies = ""
+    @AppStorage("emergencyInstructions") private var emergencyInstructions = "If I seem confused, overheated, unconscious, or cannot be woken, call 112."
+
+    private var profile: UserProfile? { profiles.first }
+
+    private var activeSubstances: [String] {
+        let now = Date.now
+        let timerNames = timers
+            .filter { $0.endsAt > now }
+            .map { "\($0.substanceName) (\($0.administrationRoute.lowercased()))" }
+        if !timerNames.isEmpty {
+            return Array(timerNames.prefix(5))
+        }
+        return Array((entries.first?.substances ?? []).prefix(5))
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        PageHeader(
+                            title: "Emergency card",
+                            subtitle: "A simple card for urgent moments. Keep it readable and only include what you are comfortable showing.",
+                            symbol: "staroflife.fill",
+                            tint: .red
+                        )
+
+                        VStack(alignment: .leading, spacing: 14) {
+                            EmergencyCardLine(title: "Name", value: profile?.name ?? "Not set", symbol: "person.fill")
+                            EmergencyCardLine(title: "Medication", value: medicationText, symbol: "pills.fill")
+                            EmergencyCardLine(title: "Current substances", value: activeSubstances.isEmpty ? "None currently tracked" : activeSubstances.joined(separator: ", "), symbol: "timer")
+                            EmergencyCardLine(title: "Trusted contact", value: trustedContactText, symbol: "phone.fill")
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Allergies", systemImage: "allergens.fill")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(Color.chillSecondary)
+                                TextField("Known allergies", text: $emergencyAllergies, axis: .vertical)
+                                    .lineLimit(2...4)
+                                    .textFieldStyle(.plain)
+                                    .foregroundStyle(Color.chillText)
+                                    .padding(12)
+                                    .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
+                            }
+
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Emergency instructions", systemImage: "exclamationmark.triangle.fill")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(Color.chillSecondary)
+                                TextField("Emergency instructions", text: $emergencyInstructions, axis: .vertical)
+                                    .lineLimit(3...6)
+                                    .textFieldStyle(.plain)
+                                    .foregroundStyle(Color.chillText)
+                                    .padding(12)
+                                    .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
+                            }
+                        }
+                        .padding(18)
+                        .glassSurface(radius: 30, tint: .white.opacity(0.24), interactive: true)
+
+                        HStack(spacing: 10) {
+                            Link(destination: URL(string: "tel://112")!) {
+                                Label("Call 112", systemImage: "phone.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.red)
+
+                            if let url = trustedContactCallURL {
+                                Link(destination: url) {
+                                    Label("Trusted contact", systemImage: "person.crop.circle.badge.checkmark")
+                                        .font(.headline)
+                                        .frame(maxWidth: .infinity)
+                                }
+                                .buttonStyle(.bordered)
+                                .tint(Color.chillVisibleBlue)
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+            .endEditingOnTap()
+        }
+    }
+
+    private var medicationText: String {
+        guard let profile, !profile.medications.isEmpty else {
+            return "No medication saved"
+        }
+        return profile.medications.prefix(4).map { "\($0.name) \($0.dosage)" }.joined(separator: ", ")
+    }
+
+    private var trustedContactText: String {
+        let name = trustedContactName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let phone = trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines)
+        if name.isEmpty && phone.isEmpty { return "Not set" }
+        if phone.isEmpty { return name }
+        return name.isEmpty ? phone : "\(name), \(phone)"
+    }
+
+    private var trustedContactCallURL: URL? {
+        let phone = trustedContactPhone.filter { $0.isNumber || $0 == "+" }
+        guard !phone.isEmpty else { return nil }
+        return URL(string: "tel://\(phone)")
+    }
+}
+
+private struct EmergencyCardLine: View {
+    let title: String
+    let value: String
+    let symbol: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(Color.chillText)
+                .frame(width: 34, height: 34)
+                .glassSurface(radius: 17, tint: .black.opacity(0.08))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillSecondary)
+                Text(value)
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(Color.chillText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
+struct NetherlandsSupportDirectoryView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var query = ""
+
+    private var filteredResources: [SupportResource] {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return SupportResource.all
+        }
+        return SupportResource.all.filter {
+            $0.title.localizedCaseInsensitiveContains(trimmed) ||
+            $0.detail.localizedCaseInsensitiveContains(trimmed) ||
+            $0.tags.contains { $0.localizedCaseInsensitiveContains(trimmed) }
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        PageHeader(
+                            title: "Support",
+                            subtitle: "Search offline Netherlands support options for crisis help, sexual health, drugs, LGBTQ+ support, and practical care.",
+                            symbol: "list.bullet.clipboard.fill",
+                            tint: Color.chillVisibleBlue
+                        )
+
+                        TextField("Search support", text: $query)
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(Color.chillText)
+                            .padding(14)
+                            .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                        LazyVStack(spacing: 12) {
+                            ForEach(filteredResources) { resource in
+                                SupportResourceCard(resource: resource)
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+            .endEditingOnTap()
+        }
+    }
+}
+
+private struct SupportResource: Identifiable {
+    let id = UUID()
+    let title: String
+    let detail: String
+    let action: String
+    let url: URL?
+    let tags: [String]
+
+    static let all: [SupportResource] = [
+        SupportResource(title: "112 emergency", detail: "Immediate danger, unconsciousness, seizure, blue lips, chest pain, severe overheating, or cannot be woken.", action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "113 Zelfmoordpreventie", detail: "If you might hurt yourself or cannot stay safe. Call 113 or 0800-0113 in the Netherlands.", action: "Open 113.nl", url: URL(string: "https://www.113.nl"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "GGD sexual health", detail: "STI testing, PrEP, PEP questions, vaccination, and sexual health support.", action: "Open ggd.nl", url: URL(string: "https://www.ggd.nl"), tags: ["sti", "pep", "prep", "ggd"]),
+        SupportResource(title: "Huisarts / GP", detail: "Medication interactions, sleep, mental health, substance use, referrals, and urgent medical questions.", action: "Call your GP", url: nil, tags: ["doctor", "huisarts", "medication"]),
+        SupportResource(title: "Drugs Infolijn", detail: "Dutch drug information and harm-reduction support from Trimbos.", action: "Open drugsinfo.nl", url: URL(string: "https://www.drugsinfo.nl"), tags: ["drugs", "harm reduction", "trimbos"]),
+        SupportResource(title: "Centrum Seksueel Geweld", detail: "Support after sexual assault, coercion, or a consent concern.", action: "Open centrumseksueelgeweld.nl", url: URL(string: "https://centrumseksueelgeweld.nl"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "Jellinek", detail: "Dutch addiction care and information about alcohol, drugs, and chemsex patterns.", action: "Open jellinek.nl", url: URL(string: "https://www.jellinek.nl"), tags: ["addiction", "chemsex", "drugs"]),
+        SupportResource(title: "Switchboard LGBT+", detail: "LGBTQ+ listening ear, information, and referral support.", action: "Open switchboard.nl", url: URL(string: "https://switchboard.nl"), tags: ["lgbtq", "queer", "support"])
+    ]
+}
+
+private struct SupportResourceCard: View {
+    let resource: SupportResource
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(resource.title)
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+            Text(resource.detail)
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+            if let url = resource.url {
+                Link(destination: url) {
+                    Label(resource.action, systemImage: resource.action.lowercased().contains("call") ? "phone.fill" : "arrow.up.right.square.fill")
+                        .font(.caption.weight(.bold))
+                }
+                .buttonStyle(.bordered)
+                .tint(Color.chillVisibleBlue)
+            } else {
+                Text(resource.action)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillVisibleBlue)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .glassSurface(radius: 24, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+    }
+}
+
+struct CravingDelayView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @State private var startedAt: Date?
+    @State private var isShowingTimer = false
+
+    private var latestTimer: DrugDoseTimerRecord? {
+        timers.first
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        PageHeader(
+                            title: "Craving delay",
+                            subtitle: "A 10 minute pause before deciding. If you already used and still choose to continue, log the dosage instead of relying on memory.",
+                            symbol: "pause.circle.fill",
+                            tint: Color.chillPrimary
+                        )
+
+                        if let latestTimer {
+                            LatestDoseReminder(timer: latestTimer)
+                        }
+
+                        DelayOrb(startedAt: startedAt)
+
+                        HStack(spacing: 10) {
+                            GlassActionButton(prominent: true) {
+                                startedAt = .now
+                            } label: {
+                                Label(startedAt == nil ? "Start 10 min pause" : "Restart pause", systemImage: "timer")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+
+                            Button {
+                                isShowingTimer = true
+                            } label: {
+                                Label("Add dosage", systemImage: "plus.circle.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(Color.chillVisibleBlue)
+                        }
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("During the pause")
+                                .font(.headline)
+                                .foregroundStyle(Color.chillText)
+                            Text("Breathe slowly, drink water if safe, check your body, remember the previous dose, and ask whether waiting would protect tomorrow-you.")
+                                .font(.callout)
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(16)
+                        .glassSurface(radius: 24, tint: Color.chillPrimary.opacity(0.08))
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .fullScreenCover(isPresented: $isShowingTimer) {
+                DrugTimerView()
+            }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct LatestDoseReminder: View {
+    let timer: DrugDoseTimerRecord
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Previous dose reminder", systemImage: "clock.arrow.circlepath")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+            Text("\(timer.substanceName) was logged at \(timer.startedAt.formatted(date: .abbreviated, time: .shortened)). Current effect estimate: \(Int(timer.effectProgress(at: .now) * 100))%.")
+                .font(.callout)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(16)
+        .glassSurface(radius: 24, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+    }
+}
+
+private struct DelayOrb: View {
+    let startedAt: Date?
+
+    var body: some View {
+        Group {
+            if startedAt == nil {
+                orbContent(remaining: 10 * 60)
+            } else {
+                TimelineView(.periodic(from: .now, by: 1)) { context in
+                    orbContent(remaining: remainingSeconds(now: context.date))
+                }
+            }
+        }
+    }
+
+    private func orbContent(remaining: Int) -> some View {
+        VStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(LinearGradient(colors: [Color.chillPrimary.opacity(0.55), Color.chillMint.opacity(0.65)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .frame(width: 156, height: 156)
+                    .scaleEffect(startedAt == nil ? 0.92 : 1.0)
+                Text(timeText(remaining))
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
+            }
+            Text(remaining == 0 && startedAt != nil ? "Pause complete. Decide slowly." : "Let the first urge pass before choosing.")
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(20)
+        .glassSurface(radius: 32, tint: Color.chillPrimary.opacity(0.08))
+    }
+
+    private func remainingSeconds(now: Date) -> Int {
+        guard let startedAt else { return 10 * 60 }
+        return max(0, Int(startedAt.addingTimeInterval(10 * 60).timeIntervalSince(now)))
+    }
+
+    private func timeText(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainder = seconds % 60
+        return "\(minutes.twoDigitPadded):\(remainder.twoDigitPadded)"
+    }
+}
+
+private extension Int {
+    var twoDigitPadded: String {
+        self < 10 ? "0\(self)" : "\(self)"
+    }
+}
+
+struct SafetyAutopilotView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @Query(sort: \SaferSessionPlan.plannedDate, order: .reverse) private var plans: [SaferSessionPlan]
+    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var stiTests: [STDTestRecord]
+    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+
+    private var context: SafetyAutopilotContext {
+        SafetyAutopilotContext(
+            entries: entries,
+            timers: timers,
+            plans: plans,
+            stiTests: stiTests,
+            profile: profiles.first
+        )
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Safety autopilot",
+                            subtitle: "A calm place to see what might help next. It looks at your saved logs, timers, plans, sleep, symptoms, STI/PEP timing, and trusted contact.",
+                            symbol: "sparkles.rectangle.stack.fill",
+                            tint: Color.chillVisibleBlue
+                        )
+
+                        SafetyAutopilotStatusCard(context: context)
+
+                        VStack(alignment: .leading, spacing: 12) {
+                            CareSectionTitle(title: "Do next", symbol: "arrow.right.circle.fill")
+
+                            ForEach(context.actions) { action in
+                                SafetyAutopilotActionCard(action: action)
+                            }
+                        }
+
+                        ConsentMiniCard()
+                        EvidenceSourcesSection(title: "Why these suggestions?", sources: EvidenceLibrary.coreSafety)
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct SafetyAutopilotContext {
+    let entries: [NightEntry]
+    let timers: [DrugDoseTimerRecord]
+    let plans: [SaferSessionPlan]
+    let stiTests: [STDTestRecord]
+    let profile: UserProfile?
+
+    private var now: Date { .now }
+
+    var latestEntry: NightEntry? {
+        entries.first
+    }
+
+    var activeTimer: DrugDoseTimerRecord? {
+        timers.first { $0.endsAt > now }
+    }
+
+    var latestPEPEntry: NightEntry? {
+        entries.first { $0.suggestsPEPConcern && $0.pepDeadline > now }
+    }
+
+    var recoveryStreakDays: Int {
+        ChillInsightCalculator.recoveryStreakDays(entries: entries)
+    }
+
+    var riskTrend: (recent: Int, previous: Int) {
+        ChillInsightCalculator.riskyLogTrend(entries: entries)
+    }
+
+    var actions: [SafetyAutopilotAction] {
+        var result: [SafetyAutopilotAction] = []
+
+        if let pep = latestPEPEntry {
+            let hours = max(0, Int(pep.pepDeadline.timeIntervalSince(now) / 3600))
+            result.append(SafetyAutopilotAction(
+                priority: .urgent,
+                title: "PEP window is active",
+                detail: "It has been less than 72 hours since a log that may include HIV exposure. Contact GGD, your doctor, huisartsenpost, or a hospital now. About \(hours) hours remain.",
+                symbol: "cross.case.circle.fill"
+            ))
+        }
+
+        if let timer = activeTimer {
+            let progress = Int((timer.effectProgress(at: now) * 100).rounded())
+            result.append(SafetyAutopilotAction(
+                priority: timer.redoseNudgeIsActive(at: now) ? .caution : .support,
+                title: timer.redoseNudgeIsActive(at: now) ? "Pause before redosing" : "Timer is active",
+                detail: "\(timer.substanceName) is around \(progress)% through its expected window. Check water, food, body temperature, and whether you still feel safe.",
+                symbol: "timer.circle.fill"
+            ))
+        }
+
+        if let entry = latestEntry, entry.reportedMemoryGap {
+            result.append(SafetyAutopilotAction(
+                priority: entry.memoryNeedsHelp || entry.memoryConsentConcern || entry.memoryInjuries ? .urgent : .caution,
+                title: "Memory gap protocol",
+                detail: "Keep it simple: are you safe now, hurt, missing anything, worried about consent, or needing help? If yes, contact someone you trust or professional support.",
+                symbol: "brain.head.profile"
+            ))
+        }
+
+        if let entry = latestEntry, !entry.skippedNight {
+            if entry.sleptYet && entry.sleepHours < 3 {
+                result.append(SafetyAutopilotAction(
+                    priority: .caution,
+                    title: "Low sleep recovery",
+                    detail: "Less than 3 hours of sleep was logged. Keep today simple: water, food, rest, and avoid stacking stimulants.",
+                    symbol: "bed.double.fill"
+                ))
+            }
+
+            if !entry.aftercareDrankWater || !entry.aftercareAteFood {
+                result.append(SafetyAutopilotAction(
+                    priority: .support,
+                    title: "Body basics",
+                    detail: "Aftercare is incomplete. Drink water slowly and eat something gentle if you can.",
+                    symbol: "drop.fill"
+                ))
+            }
+        }
+
+        if plans.first(where: { $0.plannedDate > now && $0.plannedDate < now.addingTimeInterval(36 * 60 * 60) }) == nil {
+            result.append(SafetyAutopilotAction(
+                priority: .support,
+                title: "Plan before the next Chill",
+                detail: "A short plan helps: ending time, transport, medication check, substance limits, condoms/lube, emergency contact, and boundaries.",
+                symbol: "checkmark.shield.fill"
+            ))
+        }
+
+        if riskTrend.recent >= 3 && riskTrend.recent > riskTrend.previous {
+            result.append(SafetyAutopilotAction(
+                priority: .caution,
+                title: "Something may have changed",
+                detail: "Risky logs increased from \(riskTrend.previous) to \(riskTrend.recent). Look at stress, loneliness, money, housing, conflict, boredom, or breakup patterns.",
+                symbol: "waveform.path.ecg"
+            ))
+        }
+
+        if result.isEmpty {
+            result.append(SafetyAutopilotAction(
+                priority: .good,
+                title: "No urgent action right now",
+                detail: "Your recent logs do not show an urgent window right now. Keep your lock on, plan ahead, and use the pause tool if cravings show up.",
+                symbol: "checkmark.seal.fill"
+            ))
+        }
+
+        return Array(result.prefix(5))
+    }
+}
+
+private struct SafetyAutopilotAction: Identifiable {
+    let id = UUID()
+    let priority: SafetyAutopilotPriority
+    let title: String
+    let detail: String
+    let symbol: String
+}
+
+private enum SafetyAutopilotPriority {
+    case urgent
+    case caution
+    case support
+    case good
+
+    var label: String {
+        switch self {
+        case .urgent: "Urgent"
+        case .caution: "Caution"
+        case .support: "Support"
+        case .good: "Steady"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .urgent: .red
+        case .caution: .orange
+        case .support: Color.chillVisibleBlue
+        case .good: Color.chillVisibleMint
+        }
+    }
+}
+
+private struct SafetyAutopilotStatusCard: View {
+    let context: SafetyAutopilotContext
+
+    var body: some View {
+        HStack(spacing: 12) {
+            SafetyStatusMetric(title: "Streak", value: "\(context.recoveryStreakDays)d", symbol: "leaf.circle.fill", tint: Color.chillVisibleMint)
+            SafetyStatusMetric(title: "Risk trend", value: "\(context.riskTrend.recent)/3w", symbol: "chart.line.uptrend.xyaxis", tint: context.riskTrend.recent > context.riskTrend.previous ? .orange : Color.chillVisibleBlue)
+            SafetyStatusMetric(title: "Timer", value: context.activeTimer == nil ? "None" : "Active", symbol: "timer", tint: context.activeTimer == nil ? Color.chillSecondary : Color.chillVisibleBlue)
+        }
+        .padding(14)
+        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08))
+    }
+}
+
+private struct SafetyStatusMetric: View {
+    let title: String
+    let value: String
+    let symbol: String
+    let tint: Color
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: symbol)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(tint)
+            Text(value)
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(title)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(Color.chillSecondary)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(minHeight: 74)
+    }
+}
+
+private struct SafetyAutopilotActionCard: View {
+    let action: SafetyAutopilotAction
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: action.symbol)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(action.priority.tint)
+                .frame(width: 42, height: 42)
+                .glassSurface(radius: 21, tint: action.priority.tint.opacity(0.12))
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(action.priority.label.uppercased())
+                    .font(.caption2.weight(.black))
+                    .foregroundStyle(action.priority.tint)
+                Text(action.title)
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+                Text(action.detail)
+                    .font(.callout)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 142, alignment: .topLeading)
+        .padding(16)
+        .glassSurface(radius: 26, tint: action.priority.tint.opacity(0.08), interactive: true)
+    }
+}
+
+struct ConsentBoundariesView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("consentBoundaryWant") private var want = ""
+    @AppStorage("consentBoundaryNo") private var no = ""
+    @AppStorage("consentCheckInPhrase") private var checkInPhrase = ""
+    @AppStorage("consentExitPlan") private var exitPlan = ""
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Boundaries",
+                            subtitle: "Write down what you want, what is off-limits, how someone should check in, and how you can leave. This stays on-device.",
+                            symbol: "hand.raised.fill",
+                            tint: Color.chillVisibleMint
+                        )
+
+                        ConsentMiniCard()
+
+                        BoundaryPromptField(title: "What I want tonight", placeholder: "Examples: slower pace, condoms, checking in, staying with friends", text: $want)
+                        BoundaryPromptField(title: "Hard no", placeholder: "Examples: no filming, no slamming, no certain acts, no pressure to redose", text: $no)
+                        BoundaryPromptField(title: "Check-in phrase", placeholder: "Example: ask me 'green, yellow, or red?'", text: $checkInPhrase)
+                        BoundaryPromptField(title: "Exit plan", placeholder: "Example: I can call my trusted contact, order a ride, or leave with a friend", text: $exitPlan)
+
+                        Text("Consent can be changed or withdrawn at any time. If a memory gap or consent concern appears later, use panic support, trusted contact, GGD, CSG, or emergency help.")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(16)
+                            .glassSurface(radius: 24, tint: Color.chillVisibleMint.opacity(0.08))
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+            .endEditingOnTap()
+        }
+    }
+}
+
+private struct ConsentMiniCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            CareSectionTitle(title: "Consent basics", symbol: "checkmark.shield.fill")
+            ForEach([
+                "Clear is better than assumed.",
+                "Pressure, fear, blackout, or being unable to respond means stop.",
+                "A simple check-in phrase can make boundaries easier to protect."
+            ], id: \.self) { line in
+                Label(line, systemImage: "checkmark.circle.fill")
+                    .font(.callout)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 26, tint: Color.chillVisibleMint.opacity(0.08))
+    }
+}
+
+private struct BoundaryPromptField: View {
+    let title: String
+    let placeholder: String
+    @Binding var text: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+            TextField(placeholder, text: $text, axis: .vertical)
+                .lineLimit(3...6)
+                .textFieldStyle(.plain)
+                .foregroundStyle(Color.chillText)
+                .padding(14)
+                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+        }
+        .padding(16)
+        .glassSurface(radius: 26, tint: .white.opacity(0.28), interactive: true)
+    }
+}
+
+struct RecoveryModeView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @AppStorage("recoveryGoal") private var recoveryGoal = ""
+    @AppStorage("recoverySupportPerson") private var supportPerson = ""
+    @AppStorage("recoveryCommitment") private var recoveryCommitment = ""
+    @State private var isShowingCravingDelay = false
+
+    private var streakDays: Int {
+        ChillInsightCalculator.recoveryStreakDays(entries: entries)
+    }
+
+    private var topTriggers: [TrendCount] {
+        ChillInsightCalculator.triggerCounts(entries: entries).prefix(4).map { $0 }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Recovery mode",
+                            subtitle: "A no-shame place for reducing, stopping, or simply taking a quieter stretch. A reset is information, not failure.",
+                            symbol: "figure.mind.and.body",
+                            tint: Color.chillPrimary
+                        )
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("\(streakDays)")
+                                .font(.system(size: 54, weight: .black, design: .rounded))
+                                .foregroundStyle(Color.chillText)
+                            Text("days since logged drug use")
+                                .font(.headline)
+                                .foregroundStyle(Color.chillSecondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(20)
+                        .glassSurface(radius: 32, tint: Color.chillPrimary.opacity(0.10))
+
+                        BoundaryPromptField(title: "My goal", placeholder: "Example: no stimulant redosing for two weeks", text: $recoveryGoal)
+                        BoundaryPromptField(title: "Who can I contact?", placeholder: "Name or plan for someone safe", text: $supportPerson)
+                        BoundaryPromptField(title: "What helped last time?", placeholder: "Example: leave earlier, eat first, avoid app dates after midnight", text: $recoveryCommitment)
+
+                        Button {
+                            isShowingCravingDelay = true
+                        } label: {
+                            Label("Start 10-minute craving delay", systemImage: "pause.circle.fill")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color.chillPrimary)
+
+                        TrendListCard(title: "Common triggers", emptyText: "Trigger tags from logs will appear here.", counts: Array(topTriggers), tint: Color.chillPrimary)
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .fullScreenCover(isPresented: $isShowingCravingDelay) {
+                CravingDelayView()
+            }
+            .edgeSwipeToDismiss()
+            .endEditingOnTap()
+        }
+    }
+}
+
+struct PrivateInsightsView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @Query(sort: \JournalEntry.date, order: .reverse) private var journals: [JournalEntry]
+
+    private var recentEntries: [NightEntry] {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: .now) ?? .distantPast
+        return entries.filter { $0.date >= cutoff }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Private insights",
+                            subtitle: "Patterns are shown as neutral signals, never as judgment. Everything here is calculated locally from your logs.",
+                            symbol: "chart.xyaxis.line",
+                            tint: Color.chillVisibleBlue
+                        )
+
+                        InsightMetricGrid(entries: recentEntries, timers: timers, journals: journals)
+                        TrendListCard(title: "Trigger map", emptyText: "Add trigger tags in logs to build this map.", counts: ChillInsightCalculator.triggerCounts(entries: recentEntries), tint: Color.chillVisibleBlue)
+                        TrendListCard(title: "What changed?", emptyText: "When risky logs increase, reasons you tag will appear here.", counts: ChillInsightCalculator.changeReasonCounts(entries: recentEntries), tint: .orange)
+                        TrendListCard(title: "Substances", emptyText: "No substances logged in the selected window.", counts: ChillInsightCalculator.substanceCounts(entries: recentEntries), tint: Color.chillPrimary)
+                        PersonalBaselineCard(entries: recentEntries, timers: timers)
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct InsightMetricGrid: View {
+    let entries: [NightEntry]
+    let timers: [DrugDoseTimerRecord]
+    let journals: [JournalEntry]
+
+    var body: some View {
+        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+            InsightMetric(title: "Chills", value: "\(entries.filter { !$0.skippedNight }.count)", symbol: "moon.stars.fill", tint: Color.chillVisibleBlue)
+            InsightMetric(title: "Risky logs", value: "\(ChillInsightCalculator.riskyLogTrend(entries: entries).recent)", symbol: "exclamationmark.triangle.fill", tint: .orange)
+            InsightMetric(title: "Redoses", value: "\(timers.filter { $0.redoseDecision == RedoseDecision.redosed.rawValue }.count)", symbol: "arrow.clockwise.circle.fill", tint: .red)
+            InsightMetric(title: "Journal", value: "\(journals.count)", symbol: "book.closed.fill", tint: Color.chillVisibleMint)
+        }
+    }
+}
+
+private struct InsightMetric: View {
+    let title: String
+    let value: String
+    let symbol: String
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Image(systemName: symbol)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(tint)
+            Text(value)
+                .font(.title.bold())
+                .foregroundStyle(Color.chillText)
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.chillSecondary)
+        }
+        .frame(maxWidth: .infinity, minHeight: 102, alignment: .topLeading)
+        .padding(14)
+        .glassSurface(radius: 24, tint: tint.opacity(0.08))
+    }
+}
+
+private struct PersonalBaselineCard: View {
+    let entries: [NightEntry]
+    let timers: [DrugDoseTimerRecord]
+
+    private var averageSleep: Double {
+        let values = entries.filter(\.sleptYet).map(\.sleepHours)
+        guard !values.isEmpty else { return 0 }
+        return values.reduce(0, +) / Double(values.count)
+    }
+
+    private var lateTimers: Int {
+        timers.filter { Calendar.current.component(.hour, from: $0.startedAt) >= 2 && Calendar.current.component(.hour, from: $0.startedAt) <= 6 }.count
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            CareSectionTitle(title: "Your baseline", symbol: "person.text.rectangle.fill")
+            InsightLine(title: "Average logged sleep", value: averageSleep == 0 ? "Not enough data" : "\(averageSleep.formatted(.number.precision(.fractionLength(1)))) h")
+            InsightLine(title: "Late timer starts", value: "\(lateTimers)")
+            InsightLine(title: "Memory gaps", value: "\(entries.filter(\.reportedMemoryGap).count)")
+            Text("Baseline means “usual for you,” not “good” or “bad.” The app uses this to show when something changes.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08))
+    }
+}
+
+private struct InsightLine: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+            Spacer()
+            Text(value)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Color.chillSecondary)
+        }
+    }
+}
+
+private struct TrendListCard: View {
+    let title: String
+    let emptyText: String
+    let counts: [TrendCount]
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CareSectionTitle(title: title, symbol: "chart.bar.fill")
+
+            if counts.isEmpty {
+                CareEmptyState(text: emptyText)
+            } else {
+                ForEach(counts.prefix(6)) { item in
+                    HStack(spacing: 10) {
+                        Text(item.label)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.chillText)
+                        Spacer()
+                        Text("\(item.count)")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(tint)
+                    }
+                    .padding(12)
+                    .glassSurface(radius: 18, tint: tint.opacity(0.06))
+                }
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: tint.opacity(0.08))
+    }
+}
+
+struct ProfessionalHelperBridgeView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var stiTests: [STDTestRecord]
+    @Query(sort: \RiskCheckRecord.createdAt, order: .reverse) private var riskChecks: [RiskCheckRecord]
+
+    private var summary: String {
+        HelperSummaryBuilder.summary(
+            profile: profiles.first,
+            entries: entries,
+            timers: timers,
+            stiTests: stiTests,
+            riskChecks: riskChecks
+        )
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Helper summary",
+                            subtitle: "Prepare private talking points for a GP, GGD, therapist, addiction-care worker, or trusted professional. You decide whether to share it.",
+                            symbol: "doc.text.magnifyingglass",
+                            tint: Color.chillVisibleMint
+                        )
+
+                        ClinicalReviewNoticeCard()
+
+                        Text(summary)
+                            .font(.callout.monospaced())
+                            .foregroundStyle(Color.chillText)
+                            .textSelection(.enabled)
+                            .padding(16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .glassSurface(radius: 26, tint: .white.opacity(0.32))
+
+                        ShareLink(item: summary) {
+                            Label("Share private summary", systemImage: "square.and.arrow.up.fill")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color.chillVisibleMint)
+
+                        EvidenceSourcesSection(title: "Helpful professional routes", sources: EvidenceLibrary.netherlandsSupport)
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+struct DrugCheckingEducationView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Drug checking",
+                            subtitle: "Neutral safer-use reminders for the Netherlands. Test results and online information reduce uncertainty, but they cannot make use risk-free.",
+                            symbol: "checkmark.seal.text.page.fill",
+                            tint: Color.chillVisibleBlue
+                        )
+
+                        DrugCheckingPrincipleCard(
+                            title: "Assume strength can vary",
+                            detail: "Dose, purity, and contents can differ between batches. Redosing because the first dose “doesn’t feel strong yet” can become risky when effects rise later.",
+                            symbol: "waveform.path.ecg"
+                        )
+                        DrugCheckingPrincipleCard(
+                            title: "Do not mix to compensate",
+                            detail: "Mixing stimulants, depressants, poppers with erection medication, or unknown substances can change risk faster than expected.",
+                            symbol: "exclamationmark.triangle.fill"
+                        )
+                        DrugCheckingPrincipleCard(
+                            title: "Use the app as a pause point",
+                            detail: "Timers, craving delay, risk checker, and the plan page are meant to slow decisions down, not approve a substance or dose.",
+                            symbol: "pause.circle.fill"
+                        )
+
+                        EvidenceSourcesSection(title: "Dutch information sources", sources: EvidenceLibrary.drugChecking)
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct DrugCheckingPrincipleCard: View {
+    let title: String
+    let detail: String
+    let symbol: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundStyle(Color.chillVisibleBlue)
+                .frame(width: 42, height: 42)
+                .glassSurface(radius: 21, tint: Color.chillVisibleBlue.opacity(0.12))
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+                Text(detail)
+                    .font(.callout)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 26, tint: Color.chillVisibleBlue.opacity(0.08))
+    }
+}
+
+struct PrivacyReceiptView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("requiresFaceID") private var requiresFaceID = false
+    @AppStorage("requiresPIN") private var requiresPIN = false
+    @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
+    @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
+    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @AppStorage("discreetNotifications") private var discreetNotifications = true
+    @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        PageHeader(
+                            title: "Privacy",
+                            subtitle: "A simple view of what ChillMate keeps on this iPhone and which protections are turned on.",
+                            symbol: "lock.shield.fill",
+                            tint: Color.chillPrimary
+                        )
+
+                        PrivacyReceiptRow(title: "Saved on this iPhone", detail: "Profile, logs, timers, STI tests, plans, risk checks, journal entries, trusted contact, and preferences.", symbol: "iphone", isEnabled: true)
+                        PrivacyReceiptRow(title: "Encrypted files", detail: "Strong iPhone file protection is \(localEncryptionEnabled ? "on" : "available but off in settings").", symbol: "lock.doc.fill", isEnabled: localEncryptionEnabled)
+                        PrivacyReceiptRow(title: "App lock", detail: "Face ID: \(requiresFaceID ? "on" : "off"). PIN: \(requiresPIN ? "on" : "off").", symbol: "faceid", isEnabled: requiresFaceID || requiresPIN)
+                        PrivacyReceiptRow(title: "Apple Health", detail: healthKitAutoSync ? "ChillMate can read and write only the Health categories you allowed." : "Apple Health sync is off.", symbol: "heart.text.square.fill", isEnabled: healthKitAutoSync)
+                        PrivacyReceiptRow(title: "Notifications", detail: notificationsEnabled ? "Notifications are on. Discreet lock-screen wording is \(discreetNotifications ? "on" : "off")." : "Notifications are off.", symbol: "bell.badge.fill", isEnabled: notificationsEnabled)
+                        PrivacyReceiptRow(title: "iCloud backup", detail: iCloudBackupEnabled ? "Encrypted backup files can be saved to iCloud Drive." : "iCloud backup is off. Local encrypted recovery stays on this iPhone.", symbol: "icloud.fill", isEnabled: iCloudBackupEnabled)
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct PrivacyReceiptRow: View {
+    let title: String
+    let detail: String
+    let symbol: String
+    let isEnabled: Bool
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 10) {
+            Image(systemName: symbol)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(isEnabled ? Color.chillPrimary : Color.chillSecondary)
+                .frame(width: 34, height: 34)
+                .glassSurface(radius: 17, tint: (isEnabled ? Color.chillPrimary : Color.black).opacity(0.10))
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(Color.chillText)
+                Text(detail)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .glassSurface(radius: 22, tint: .white.opacity(0.28))
+    }
+}
+
+private struct EvidenceSource: Identifiable {
+    let id = UUID()
+    let title: String
+    let note: String
+    let url: URL
+}
+
+private enum EvidenceLibrary {
+    static let coreSafety = [
+        EvidenceSource(title: "Soa Aids Nederland", note: "PEP/PrEP and sexual-health guidance.", url: URL(string: "https://www.soaaids.nl")!),
+        EvidenceSource(title: "GGD", note: "Dutch sexual-health services, STI testing, and local support.", url: URL(string: "https://www.ggd.nl")!),
+        EvidenceSource(title: "Drugsinfo", note: "Substance information from Trimbos.", url: URL(string: "https://www.drugsinfo.nl")!)
+    ]
+
+    static let netherlandsSupport = [
+        EvidenceSource(title: "GGD", note: "Sexual health, STI, PrEP, and PEP routes.", url: URL(string: "https://www.ggd.nl")!),
+        EvidenceSource(title: "113 Zelfmoordpreventie", note: "Crisis support in the Netherlands.", url: URL(string: "https://www.113.nl")!),
+        EvidenceSource(title: "Centrum Seksueel Geweld", note: "Support after sexual assault or consent concerns.", url: URL(string: "https://centrumseksueelgeweld.nl")!),
+        EvidenceSource(title: "Drugs Infolijn", note: "Questions about drugs and harm reduction.", url: URL(string: "https://www.drugsinfo.nl/drugs/contact-met-de-drugs-infolijn/")!)
+    ]
+
+    static let drugChecking = [
+        EvidenceSource(title: "Drugsinfo", note: "General substance information from Trimbos.", url: URL(string: "https://www.drugsinfo.nl")!),
+        EvidenceSource(title: "Trimbos drugs knowledge", note: "Monitoring, prevention, and harm-reduction information.", url: URL(string: "https://www.trimbos.nl/kennis/drugs/")!),
+        EvidenceSource(title: "Rijksoverheid drugs prevention", note: "Dutch government prevention information and official links.", url: URL(string: "https://www.rijksoverheid.nl/onderwerpen/drugs/drugsgebruik-voorkomen")!)
+    ]
+
+    static let privacy = [
+        EvidenceSource(title: "Apple HealthKit HIG", note: "HealthKit requires user permission for health information.", url: URL(string: "https://developer.apple.com/design/human-interface-guidelines/healthkit/")!),
+        EvidenceSource(title: "Apple HealthKit privacy", note: "Apple guidance for protecting health-related data.", url: URL(string: "https://developer.apple.com/documentation/healthkit/protecting_user_privacy")!),
+        EvidenceSource(title: "Configure HealthKit access", note: "HealthKit entitlements and usage descriptions.", url: URL(string: "https://developer.apple.com/documentation/xcode/configuring-healthkit-access")!)
+    ]
+}
+
+private struct EvidenceSourcesSection: View {
+    let title: String
+    let sources: [EvidenceSource]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CareSectionTitle(title: title, symbol: "link.circle.fill")
+
+            ForEach(sources) { source in
+                Link(destination: source.url) {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "arrow.up.right.circle.fill")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundStyle(Color.chillVisibleBlue)
+                            .frame(width: 34, height: 34)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(source.title)
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(Color.chillText)
+                            Text(source.note)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .glassSurface(radius: 18, tint: Color.chillVisibleBlue.opacity(0.06), interactive: true)
+                }
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08))
+    }
+}
+
+private struct TrendCount: Identifiable {
+    let id = UUID()
+    let label: String
+    let count: Int
+}
+
+private enum ChillInsightCalculator {
+    static func recoveryStreakDays(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
+        guard let latestUse = entries
+            .filter({ !$0.substances.isEmpty })
+            .map(\.date)
+            .max()
+        else {
+            return 0
+        }
+
+        return max(0, calendar.dateComponents([.day], from: calendar.startOfDay(for: latestUse), to: calendar.startOfDay(for: now)).day ?? 0)
+    }
+
+    static func riskyLogTrend(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> (recent: Int, previous: Int) {
+        let recentCutoff = calendar.date(byAdding: .day, value: -21, to: now) ?? now
+        let previousCutoff = calendar.date(byAdding: .day, value: -42, to: now) ?? now
+        var recent = 0
+        var previous = 0
+
+        for entry in entries where !entry.skippedNight && entry.hadSex && !entry.substances.isEmpty {
+            if entry.date >= recentCutoff {
+                recent += 1
+            } else if entry.date >= previousCutoff {
+                previous += 1
+            }
+        }
+
+        return (recent, previous)
+    }
+
+    static func triggerCounts(entries: [NightEntry]) -> [TrendCount] {
+        sortedCounts(entries.flatMap { $0.triggerTags.map(\.rawValue) })
+    }
+
+    static func changeReasonCounts(entries: [NightEntry]) -> [TrendCount] {
+        sortedCounts(entries.flatMap { $0.changeReasons.map(\.rawValue) })
+    }
+
+    static func substanceCounts(entries: [NightEntry]) -> [TrendCount] {
+        sortedCounts(entries.flatMap(\.substances))
+    }
+
+    private static func sortedCounts(_ values: [String]) -> [TrendCount] {
+        Dictionary(grouping: values, by: { $0 })
+            .map { TrendCount(label: $0.key, count: $0.value.count) }
+            .sorted {
+                if $0.count == $1.count {
+                    return $0.label < $1.label
+                }
+                return $0.count > $1.count
+            }
+    }
+}
+
+struct UnifiedTimelineView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
+    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @Query(sort: \SaferSessionPlan.plannedDate, order: .reverse) private var plans: [SaferSessionPlan]
+    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var tests: [STDTestRecord]
+
+    private var events: [UnifiedTimelineEvent] {
+        var result: [UnifiedTimelineEvent] = []
+        result += entries.map {
+            UnifiedTimelineEvent(
+                date: $0.date,
+                title: $0.skippedNight ? "Skipped Chill check" : "Chill log",
+                detail: $0.skippedNight ? "Marked as skipped" : "\($0.partnerSummary), \($0.substances.isEmpty ? "no substances" : $0.substances.joined(separator: ", "))",
+                symbol: $0.skippedNight ? "moon.zzz.fill" : "heart.text.square.fill",
+                tint: $0.skippedNight ? Color.chillVisiblePurple : Color.chillVisiblePink
+            )
+        }
+        result += journalEntries.map {
+            UnifiedTimelineEvent(date: $0.date, title: "Journal", detail: $0.rememberClearly.isEmpty ? "Saved reflection" : $0.rememberClearly, symbol: "book.closed.fill", tint: Color.chillVisiblePurple)
+        }
+        result += timers.map {
+            UnifiedTimelineEvent(date: $0.startedAt, title: "\($0.substanceName) timer", detail: "\($0.administrationRoute), \($0.durationHours.formatted(.number.precision(.fractionLength(0...1)))) h window", symbol: "timer", tint: Color.chillVisibleAmber)
+        }
+        result += plans.map {
+            UnifiedTimelineEvent(date: $0.plannedDate, title: "Before-Chill plan", detail: $0.transportPlan.isEmpty ? "Ends \($0.endingDate.formatted(date: .omitted, time: .shortened))" : $0.transportPlan, symbol: "checkmark.shield.fill", tint: Color.chillVisibleMint)
+        }
+        result += tests.map {
+            UnifiedTimelineEvent(date: $0.testDate, title: "STI test", detail: $0.hasPositiveResult ? "Positive result saved" : "Results \($0.resultsDueDate.formatted(date: .abbreviated, time: .omitted))", symbol: "cross.case.fill", tint: Color.chillVisibleTeal)
+        }
+        return result.sorted { $0.date > $1.date }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        PageHeader(title: "Full timeline", subtitle: "One private timeline with logs, journal notes, plans, timers, and STI tests.", symbol: "timeline.selection", tint: Color.chillVisibleBlue)
+                        if events.isEmpty {
+                            Text("Nothing has been saved yet.")
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(16)
+                                .glassSurface(radius: 24, tint: .white.opacity(0.24))
+                        } else {
+                            LazyVStack(spacing: 10) {
+                                ForEach(Array(events.prefix(80))) { event in
+                                    UnifiedTimelineEventRow(event: event)
+                                }
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { BackChevronButton { dismiss() } } }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct UnifiedTimelineEvent: Identifiable {
+    let id = UUID()
+    let date: Date
+    let title: String
+    let detail: String
+    let symbol: String
+    let tint: Color
+}
+
+private struct UnifiedTimelineEventRow: View {
+    let event: UnifiedTimelineEvent
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: event.symbol)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(event.tint)
+                .frame(width: 36, height: 36)
+                .glassSurface(radius: 18, tint: event.tint.opacity(0.12))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(event.title).font(.headline).foregroundStyle(Color.chillText)
+                Text(event.detail).font(.caption.weight(.semibold)).foregroundStyle(Color.chillSecondary).lineLimit(2)
+                Text(event.date.formatted(date: .abbreviated, time: .shortened)).font(.caption2.weight(.bold)).foregroundStyle(Color.chillTertiary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .glassSurface(radius: 22, tint: event.tint.opacity(0.08))
+    }
+}
+
+struct PrivacyTimelineView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("lastICloudBackupTimestamp") private var lastICloudBackupTimestamp = 0.0
+    @AppStorage("lastICloudRestoreTimestamp") private var lastICloudRestoreTimestamp = 0.0
+    @AppStorage("lastOnDeviceRecoverySnapshotTimestamp") private var lastOnDeviceRecoverySnapshotTimestamp = 0.0
+    @AppStorage("lastOnDeviceRecoveryRestoreTimestamp") private var lastOnDeviceRecoveryRestoreTimestamp = 0.0
+    @AppStorage("lastAppUseTimestamp") private var lastAppUseTimestamp = 0.0
+    @AppStorage("lastOnDeviceRecoveryStatus") private var lastOnDeviceRecoveryStatus = ""
+    @AppStorage("lastICloudBackupStatus") private var lastICloudBackupStatus = ""
+    @AppStorage("requiresFaceID") private var requiresFaceID = false
+    @AppStorage("requiresPIN") private var requiresPIN = false
+    @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
+    @AppStorage("discreetNotifications") private var discreetNotifications = true
+
+    private var rows: [PrivacyTimelineRowModel] {
+        [
+            PrivacyTimelineRowModel(title: "iCloud backup", detail: iCloudBackupEnabled ? statusText(lastICloudBackupStatus, fallback: "Enabled") : "Off", date: date(from: lastICloudBackupTimestamp), symbol: "icloud.and.arrow.up.fill", tint: Color.chillVisibleBlue),
+            PrivacyTimelineRowModel(title: "iCloud restore", detail: "Latest restore attempt", date: date(from: lastICloudRestoreTimestamp), symbol: "icloud.and.arrow.down.fill", tint: Color.chillVisibleTeal),
+            PrivacyTimelineRowModel(title: "iPhone recovery backup", detail: statusText(lastOnDeviceRecoveryStatus, fallback: "Automatic encrypted snapshot"), date: date(from: lastOnDeviceRecoverySnapshotTimestamp), symbol: "externaldrive.fill.badge.checkmark", tint: Color.chillVisibleMint),
+            PrivacyTimelineRowModel(title: "Recovery restore", detail: "Recovered after reinstall when available", date: date(from: lastOnDeviceRecoveryRestoreTimestamp), symbol: "arrow.counterclockwise.circle.fill", tint: Color.chillVisiblePurple),
+            PrivacyTimelineRowModel(title: "App lock", detail: requiresFaceID || requiresPIN ? "Face ID or PIN is on" : "No extra app lock is on", date: nil, symbol: "lock.shield.fill", tint: Color.chillVisibleMint),
+            PrivacyTimelineRowModel(title: "Notifications", detail: discreetNotifications ? "Discreet text is on" : "Detailed text may show", date: nil, symbol: "bell.badge.fill", tint: Color.chillVisibleAmber),
+            PrivacyTimelineRowModel(title: "Last opened", detail: "Latest app activity saved locally", date: date(from: lastAppUseTimestamp), symbol: "iphone", tint: Color.chillVisibleBlue)
+        ]
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        PageHeader(title: "Privacy timeline", subtitle: "A simple history of backups, restores, lock choices, and app privacy settings.", symbol: "clock.badge.checkmark.fill", tint: Color.chillVisibleTeal)
+                        VStack(spacing: 10) {
+                            ForEach(rows) { row in PrivacyTimelineRow(row: row) }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { BackChevronButton { dismiss() } } }
+            .edgeSwipeToDismiss()
+        }
+    }
+
+    private func date(from timestamp: Double) -> Date? { timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : nil }
+    private func statusText(_ status: String, fallback: String) -> String { status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? fallback : status }
+}
+
+private struct PrivacyTimelineRowModel: Identifiable {
+    let id = UUID()
+    let title: String
+    let detail: String
+    let date: Date?
+    let symbol: String
+    let tint: Color
+}
+
+private struct PrivacyTimelineRow: View {
+    let row: PrivacyTimelineRowModel
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: row.symbol)
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(row.tint)
+                .frame(width: 36, height: 36)
+                .glassSurface(radius: 18, tint: row.tint.opacity(0.12))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(row.title).font(.headline).foregroundStyle(Color.chillText)
+                Text(row.detail).font(.caption.weight(.semibold)).foregroundStyle(Color.chillSecondary).fixedSize(horizontal: false, vertical: true)
+                if let date = row.date {
+                    Text(date.formatted(date: .abbreviated, time: .shortened)).font(.caption2.weight(.bold)).foregroundStyle(Color.chillTertiary)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .glassSurface(radius: 22, tint: row.tint.opacity(0.08))
+    }
+}
+
+struct SecurityHealthCheckView: View {
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("requiresFaceID") private var requiresFaceID = false
+    @AppStorage("requiresPIN") private var requiresPIN = false
+    @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
+    @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
+    @AppStorage("discreetNotifications") private var discreetNotifications = true
+    @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
+
+    private var checks: [SecurityCheckItem] {
+        [
+            SecurityCheckItem(title: "Local encryption", detail: "Device files use iOS data protection.", isOn: localEncryptionEnabled, symbol: "lock.fill", tint: Color.chillVisibleMint),
+            SecurityCheckItem(title: "App lock", detail: "Face ID or PIN before opening.", isOn: requiresFaceID || requiresPIN, symbol: "faceid", tint: Color.chillVisibleBlue),
+            SecurityCheckItem(title: "Encrypted backup", detail: "iCloud backup is optional and encrypted before upload.", isOn: iCloudBackupEnabled, symbol: "icloud.fill", tint: Color.chillVisibleTeal),
+            SecurityCheckItem(title: "Discreet notifications", detail: "Lock-screen text stays vague.", isOn: discreetNotifications, symbol: "bell.slash.fill", tint: Color.chillVisiblePurple),
+            SecurityCheckItem(title: "Apple Health Sync", detail: "Health reads and writes only when you allow it.", isOn: healthKitAutoSync, symbol: "heart.fill", tint: Color.chillVisiblePink)
+        ]
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        PageHeader(title: "Security check", subtitle: "\(checks.filter(\.isOn).count) of \(checks.count) protections are on. Turn on the ones that match how private you want ChillMate to be.", symbol: "checkmark.shield.fill", tint: Color.chillVisibleMint)
+                        VStack(spacing: 10) { ForEach(checks) { SecurityCheckRow(item: $0) } }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { BackChevronButton { dismiss() } } }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct SecurityCheckItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let detail: String
+    let isOn: Bool
+    let symbol: String
+    let tint: Color
+}
+
+private struct SecurityCheckRow: View {
+    let item: SecurityCheckItem
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: item.isOn ? "checkmark.circle.fill" : "circle")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(item.isOn ? item.tint : Color.chillTertiary)
+                .frame(width: 36, height: 36)
+                .glassSurface(radius: 18, tint: item.tint.opacity(0.10))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.title).font(.headline).foregroundStyle(Color.chillText)
+                Text(item.detail).font(.caption.weight(.semibold)).foregroundStyle(Color.chillSecondary).fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .glassSurface(radius: 22, tint: item.tint.opacity(item.isOn ? 0.09 : 0.04))
+    }
+}
+
+struct RecentlyDeletedView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var items = RecentlyDeletedStore.items()
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        PageHeader(title: "Recently deleted", subtitle: "This list helps you remember what was removed. To restore actual data, use an encrypted backup.", symbol: "trash.circle.fill", tint: Color.chillVisibleOrange)
+                        if items.isEmpty {
+                            Text("No deleted items have been recorded.")
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(16)
+                                .glassSurface(radius: 24, tint: .white.opacity(0.24))
+                        } else {
+                            VStack(spacing: 10) { ForEach(items) { RecentlyDeletedRow(item: $0) } }
+                            GlassActionButton(prominent: false) {
+                                RecentlyDeletedStore.clear()
+                                items = []
+                            } label: {
+                                Label("Clear this list", systemImage: "trash")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { BackChevronButton { dismiss() } } }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct RecentlyDeletedRow: View {
+    let item: RecentlyDeletedItem
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "trash.fill")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(Color.chillVisibleOrange)
+                .frame(width: 36, height: 36)
+                .glassSurface(radius: 18, tint: Color.chillVisibleOrange.opacity(0.12))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.title).font(.headline).foregroundStyle(Color.chillText)
+                Text(item.detail).font(.caption.weight(.semibold)).foregroundStyle(Color.chillSecondary).fixedSize(horizontal: false, vertical: true)
+                Text("\(item.kind) • \(item.deletedAt.formatted(date: .abbreviated, time: .shortened))").font(.caption2.weight(.bold)).foregroundStyle(Color.chillTertiary)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .glassSurface(radius: 22, tint: Color.chillVisibleOrange.opacity(0.08))
+    }
+}
+
+struct WeeklyReflectionView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
+
+    private var recentEntries: [NightEntry] {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -7, to: .now) ?? .distantPast
+        return entries.filter { $0.date >= cutoff }
+    }
+
+    private var recentJournals: [JournalEntry] {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -7, to: .now) ?? .distantPast
+        return journalEntries.filter { $0.date >= cutoff }
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        PageHeader(title: "Weekly reflection", subtitle: "A quick look at the last 7 days, made for noticing patterns without judging yourself.", symbol: "calendar.badge.clock", tint: Color.chillVisiblePurple)
+                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                            WeeklyReflectionMetric(title: "Chills", value: "\(recentEntries.filter { !$0.skippedNight }.count)", symbol: "heart.text.square.fill", tint: Color.chillVisiblePink)
+                            WeeklyReflectionMetric(title: "Drug-use logs", value: "\(recentEntries.filter { !$0.substances.isEmpty }.count)", symbol: "pills.fill", tint: Color.chillVisibleBlue)
+                            WeeklyReflectionMetric(title: "Journals", value: "\(recentJournals.count)", symbol: "book.closed.fill", tint: Color.chillVisiblePurple)
+                            WeeklyReflectionMetric(title: "Memory gaps", value: "\(recentEntries.filter(\.reportedMemoryGap).count)", symbol: "questionmark.circle.fill", tint: Color.chillVisibleOrange)
+                        }
+                        VStack(alignment: .leading, spacing: 10) {
+                            CareSectionTitle(title: "Gentle prompts", symbol: "sparkles")
+                            WeeklyPrompt(text: "What felt easier this week than expected?")
+                            WeeklyPrompt(text: "Was there a moment where you needed support sooner?")
+                            WeeklyPrompt(text: "What is one small boundary that would help next time?")
+                        }
+                        .padding(14)
+                        .glassSurface(radius: 24, tint: Color.chillVisiblePurple.opacity(0.08))
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { BackChevronButton { dismiss() } } }
+            .edgeSwipeToDismiss()
+        }
+    }
+}
+
+private struct WeeklyReflectionMetric: View {
+    let title: String
+    let value: String
+    let symbol: String
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: symbol)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(tint)
+                .frame(width: 32, height: 32)
+                .glassSurface(radius: 16, tint: tint.opacity(0.12))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(value).font(.title3.weight(.bold)).foregroundStyle(Color.chillText).monospacedDigit()
+                Text(title).font(.caption.weight(.semibold)).foregroundStyle(Color.chillSecondary).lineLimit(1)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 68, alignment: .leading)
+        .glassSurface(radius: 20, tint: tint.opacity(0.08))
+    }
+}
+
+private struct WeeklyPrompt: View {
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "circle")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.chillVisiblePurple)
+                .padding(.top, 2)
+            Text(text)
+                .font(.callout.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(.white.opacity(0.20), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+}
+
+struct RecentlyDeletedItem: Codable, Identifiable {
+    var id = UUID()
+    var kind: String
+    var title: String
+    var detail: String
+    var deletedAt: Date
+}
+
+enum RecentlyDeletedStore {
+    private static let key = "recentlyDeletedItems"
+
+    static func items() -> [RecentlyDeletedItem] {
+        guard let data = UserDefaults.standard.data(forKey: key),
+              let items = try? JSONDecoder().decode([RecentlyDeletedItem].self, from: data) else {
+            return []
+        }
+        return items.sorted { $0.deletedAt > $1.deletedAt }
+    }
+
+    static func record(kind: String, title: String, detail: String, deletedAt: Date = .now) {
+        var current = items()
+        current.insert(RecentlyDeletedItem(kind: kind, title: title, detail: detail, deletedAt: deletedAt), at: 0)
+        current = Array(current.prefix(40))
+        if let data = try? JSONEncoder().encode(current) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+
+    static func clear() {
+        UserDefaults.standard.removeObject(forKey: key)
+    }
+}
+
+private enum HelperSummaryBuilder {
+    static func summary(
+        profile: UserProfile?,
+        entries: [NightEntry],
+        timers: [DrugDoseTimerRecord],
+        stiTests: [STDTestRecord],
+        riskChecks: [RiskCheckRecord],
+        now: Date = .now
+    ) -> String {
+        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: now) ?? .distantPast
+        let recentEntries = entries.filter { $0.date >= cutoff }
+        let recentTimers = timers.filter { $0.startedAt >= cutoff }
+        let risky = recentEntries.filter { !$0.skippedNight && $0.hadSex && !$0.substances.isEmpty }
+        let memoryGaps = recentEntries.filter(\.reportedMemoryGap)
+        let positiveTests = stiTests.filter(\.hasPositiveResult)
+        let substances = ChillInsightCalculator.substanceCounts(entries: recentEntries).prefix(6).map { "\($0.label) (\($0.count))" }.joined(separator: ", ")
+        let triggers = ChillInsightCalculator.triggerCounts(entries: recentEntries).prefix(6).map { "\($0.label) (\($0.count))" }.joined(separator: ", ")
+        let medication = profile?.medications.map { "\($0.name) \($0.timingSummary)" }.joined(separator: "; ") ?? "Not set"
+
+        return """
+        ChillMate private helper summary
+        Generated: \(now.formatted(date: .abbreviated, time: .shortened))
+
+        Profile
+        Name: \(profile?.name.isEmpty == false ? profile!.name : "Not set")
+        Age: \(profile?.calculatedAge.description ?? "Not set")
+        Sex: \(profile?.sex ?? "Not set")
+        PrEP: \(profile?.isOnPrEP == true ? "Yes, \(profile?.prepSchedule ?? "")" : "No / not set")
+        Medication: \(medication.isEmpty ? "Not set" : medication)
+
+        Past 90 days
+        Chills logged: \(recentEntries.filter { !$0.skippedNight }.count)
+        Logs with sex + substances: \(risky.count)
+        Timer records: \(recentTimers.count)
+        Redose records: \(recentTimers.filter { $0.redoseDecision == RedoseDecision.redosed.rawValue }.count)
+        Memory gaps reported: \(memoryGaps.count)
+        STI tests saved: \(stiTests.count)
+        Positive STI tests: \(positiveTests.count)
+
+        Patterns
+        Substances: \(substances.isEmpty ? "Not enough data" : substances)
+        Triggers: \(triggers.isEmpty ? "Not enough data" : triggers)
+
+        Talking points
+        - I want help understanding my patterns without judgment.
+        - I want to discuss sleep, substances, sex, consent, medication interactions, PrEP/PEP/STI care, or recovery goals.
+        - I understand this export is self-reported app data and not a diagnosis.
+        """
+    }
+}

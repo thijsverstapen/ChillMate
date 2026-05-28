@@ -1,0 +1,120 @@
+{
+  "source": "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/NightCheck/LogNightSheet.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Log night",
+        "location": {
+          "startingColumn": 49,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "Mark skipped",
+        "location": {
+          "startingColumn": 63,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "Night type",
+        "location": {
+          "startingColumn": 32,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "Night",
+        "location": {
+          "startingColumn": 36,
+          "startingLine": 52
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tracked",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Skipped",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Private note",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 72
+        }
+      },
+      {
+        "comment": "",
+        "key": "Optional context",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 76
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 95
+        }
+      },
+      {
+        "comment": "",
+        "key": "Save",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 101
+        }
+      },
+      {
+        "comment": "",
+        "key": "Drugs taken",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 134
+        }
+      },
+      {
+        "comment": "",
+        "key": "Name the other substance",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 150
+        }
+      },
+      {
+        "comment": "",
+        "key": "This records the night as checked with no sex or substance tags.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 214
+        }
+      },
+      {
+        "comment": "",
+        "key": "Skipped check-in",
+        "location": {
+          "startingColumn": 19,
+          "startingLine": 210
+        }
+      }
+    ]
+  },
+  "version": 1
+}

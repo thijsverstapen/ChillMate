@@ -1,0 +1,128 @@
+{
+  "source": "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/NightCheck/DashboardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Night Check",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 91
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add night",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 99
+        }
+      },
+      {
+        "comment": "",
+        "key": "Past 3 months",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 144
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 268
+        }
+      },
+      {
+        "comment": "",
+        "key": "Collapse skipped-night check",
+        "location": {
+          "startingColumn": 54,
+          "startingLine": 313
+        }
+      },
+      {
+        "comment": "",
+        "key": "Expand skipped-night check",
+        "location": {
+          "startingColumn": 87,
+          "startingLine": 313
+        }
+      },
+      {
+        "comment": "",
+        "key": "Skip",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 373
+        }
+      },
+      {
+        "comment": "",
+        "key": "No substances recorded.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 444
+        }
+      },
+      {
+        "comment": "",
+        "key": "Skipped night",
+        "location": {
+          "startingColumn": 47,
+          "startingLine": 428
+        }
+      },
+      {
+        "comment": "",
+        "key": "Sex + substances",
+        "location": {
+          "startingColumn": 65,
+          "startingLine": 428
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete entry",
+        "location": {
+          "startingColumn": 41,
+          "startingLine": 440
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add night",
+        "location": {
+          "startingColumn": 37,
+          "startingLine": 494
+        }
+      },
+      {
+        "comment": "",
+        "key": "Local private log",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 480
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add tonight or mark a skip",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 483
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 491
+        }
+      }
+    ]
+  },
+  "version": 1
+}

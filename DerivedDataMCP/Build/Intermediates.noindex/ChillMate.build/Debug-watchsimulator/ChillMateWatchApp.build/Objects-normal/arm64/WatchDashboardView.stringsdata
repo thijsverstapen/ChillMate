@@ -1,0 +1,96 @@
+{
+  "source": "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/ChillMateWatchApp/WatchDashboardView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "ChillMate",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 54
+        }
+      },
+      {
+        "comment": "",
+        "key": "Heart-rate, stress, and temperature warnings are ready for the iPhone Health permissions and future sensor rules.",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Body signals",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Restart 90 min",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 97
+        }
+      },
+      {
+        "comment": "",
+        "key": "Timer",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 83
+        }
+      },
+      {
+        "comment": "",
+        "key": "Effect window",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 92
+        }
+      },
+      {
+        "comment": "",
+        "key": "Breathing",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 145
+        }
+      },
+      {
+        "comment": "",
+        "key": "Stop",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 148
+        }
+      },
+      {
+        "comment": "",
+        "key": "Start",
+        "location": {
+          "startingColumn": 44,
+          "startingLine": 148
+        }
+      },
+      {
+        "comment": "",
+        "key": "Breathe",
+        "location": {
+          "startingColumn": 33,
+          "startingLine": 161
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ready",
+        "location": {
+          "startingColumn": 45,
+          "startingLine": 161
+        }
+      }
+    ]
+  },
+  "version": 1
+}

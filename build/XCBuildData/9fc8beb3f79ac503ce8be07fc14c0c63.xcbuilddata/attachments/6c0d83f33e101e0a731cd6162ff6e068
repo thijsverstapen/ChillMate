@@ -1,0 +1,29 @@
+{
+  "" : {
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp-primary.dia",
+    "emit-module-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp-primary-emit-module.dia",
+    "pch" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp-primary.swiftdeps"
+  },
+  "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/ChillMateWatchApp/ChillMateWatchApp.swift" : {
+    "const-values" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp.swiftconstvalues",
+    "dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp.d",
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp.dia",
+    "index-unit-output-path" : "/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp.o",
+    "llvm-bc" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp.bc",
+    "object" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp.o",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp.swiftdeps",
+    "swiftmodule" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/ChillMateWatchApp~partial.swiftmodule"
+  },
+  "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/ChillMateWatchApp/WatchDashboardView.swift" : {
+    "const-values" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/WatchDashboardView.swiftconstvalues",
+    "dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/WatchDashboardView.d",
+    "diagnostics" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/WatchDashboardView.dia",
+    "index-unit-output-path" : "/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/WatchDashboardView.o",
+    "llvm-bc" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/WatchDashboardView.bc",
+    "object" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/WatchDashboardView.o",
+    "swift-dependencies" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/WatchDashboardView.swiftdeps",
+    "swiftmodule" : "/Users/thijsverstappen/Documents/Codex/2026-05-19/build-ios-apps-plugin-build-ios/build/ChillMate.build/Debug-watchos/ChillMateWatchApp.build/Objects-normal/arm64_32/WatchDashboardView~partial.swiftmodule"
+  }
+}
