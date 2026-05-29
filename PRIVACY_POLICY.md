@@ -21,7 +21,6 @@ ChillMate does **not**:
 - Create or require a user account
 - Send any data to external servers or the developer
 - Use analytics, crash reporting, or advertising SDKs
-- Access Apple Health or HealthKit
 - Track your location in the background
 - Share data with third parties
 - Use cookies or web tracking of any kind
