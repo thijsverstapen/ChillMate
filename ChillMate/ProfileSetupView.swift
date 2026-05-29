@@ -228,8 +228,10 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
     case weeklyReflection = "Weekly reflection"
     case emergencyCard = "Emergency card"
     case supportDirectory = "Support"
+    case privacyPolicy = "Privacy Policy"
+    case termsOfUse = "Terms"
     case cravingDelay = "Craving delay"
-    case drugChecking = "Drug checking"
+    case drugChecking = "Checking info"
 
     var id: String { rawValue }
 
@@ -238,7 +240,9 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         .settings,
         .privacyReceipt,
         .emergencyCard,
-        .supportDirectory
+        .supportDirectory,
+        .privacyPolicy,
+        .termsOfUse
     ]
 
     var subtitle: String {
@@ -271,10 +275,14 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             "Important help info in one card"
         case .supportDirectory:
             "Dutch help lines and support"
+        case .privacyPolicy:
+            "How your private information is handled"
+        case .termsOfUse:
+            "Safety, medical, and Beta boundaries"
         case .cravingDelay:
             "Pause for 10 minutes before deciding"
         case .drugChecking:
-            "Drug checking and safer-use basics"
+            "Testing and support information"
         }
     }
 
@@ -308,6 +316,10 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             "staroflife.fill"
         case .supportDirectory:
             "list.bullet.clipboard.fill"
+        case .privacyPolicy:
+            "hand.raised.square.fill"
+        case .termsOfUse:
+            "doc.text.fill"
         case .cravingDelay:
             "pause.circle.fill"
         case .drugChecking:
@@ -318,37 +330,41 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
     var tint: Color {
         switch self {
         case .settings:
-            Color.chillVisibleBlue
+            Color.chillSecondaryBlue
         case .profile:
-            Color.chillVisibleMint
+            Color.chillMint
         case .safetyAutopilot:
-            Color.chillVisibleBlue
+            Color.chillSecondaryBlue
         case .privacyReceipt:
             Color.chillPrimary
         case .privacyTimeline:
-            Color.chillVisibleTeal
+            Color.chillIconTeal
         case .securityHealth:
-            Color.chillVisibleMint
+            Color.chillMint
         case .helperBridge:
-            Color.chillVisibleMint
+            Color.chillMint
         case .recoveryMode:
             Color.chillPrimary
         case .privateInsights:
-            Color.chillVisibleBlue
+            Color.chillSecondaryBlue
         case .unifiedTimeline:
-            Color.chillVisibleBlue
+            Color.chillSecondaryBlue
         case .recentlyDeleted:
-            Color.chillVisibleOrange
+            Color.chillIconOrange
         case .weeklyReflection:
-            Color.chillVisiblePurple
+            Color.chillIconPurple
         case .emergencyCard:
-            .red
+            Color.chillIconRed
         case .supportDirectory:
-            Color.chillVisibleBlue
+            Color.chillSecondaryBlue
+        case .privacyPolicy:
+            Color.chillIconTeal
+        case .termsOfUse:
+            Color.chillIconPurple
         case .cravingDelay:
             Color.chillPrimary
         case .drugChecking:
-            Color.chillVisibleBlue
+            Color.chillIconAmber
         }
     }
 }
@@ -379,7 +395,7 @@ private struct MoreHubView: View {
                         title: "More",
                         subtitle: "The basics are here. Use search if you need something else.",
                         symbol: "ellipsis.circle.fill",
-                        tint: Color.chillVisibleBlue
+                        tint: Color.chillSecondaryBlue
                     )
 
                     TestingOnlyNoticeCard()
@@ -475,6 +491,10 @@ private struct MoreHubView: View {
                 EmergencyCardView()
             case .supportDirectory:
                 NetherlandsSupportDirectoryView()
+            case .privacyPolicy:
+                PrivacyPolicyView()
+            case .termsOfUse:
+                TermsOfUseView()
             case .cravingDelay:
                 CravingDelayView()
             case .drugChecking:
@@ -752,7 +772,7 @@ struct ProfileSetupView: View {
                                             )
                                         }
                                         .padding(16)
-                                        .glassSurface(radius: 28, tint: Color.chillVisibleMint.opacity(0.08), interactive: true)
+                                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.08), interactive: true)
                                     }
 
                                     VStack(alignment: .leading, spacing: 16) {
@@ -1237,7 +1257,7 @@ private struct ProfileSetupBackupImportCard: View {
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
-                .tint(Color.chillVisibleBlue)
+                .tint(Color.chillSecondaryBlue)
                 .disabled(isImporting || isRestoringICloud)
             }
 
@@ -1249,7 +1269,7 @@ private struct ProfileSetupBackupImportCard: View {
             }
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+        .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08), interactive: true)
     }
 }
 
@@ -1308,7 +1328,7 @@ private struct ProfileSetupMedicationSection: View {
             ProfileSetupSectionHeader(
                 eyebrow: "Medication",
                 title: "Current medication",
-                subtitle: "Turn this on only if you want ChillMate to remember medication for timers and risk checks."
+                subtitle: "Turn this on only if you want ChillMate to remember medication for check-ins and risk checks."
             )
 
             VStack(spacing: 12) {
@@ -1328,8 +1348,8 @@ private struct ProfileSetupMedicationSection: View {
                     )
 
                     ProfileSetupTextField(
-                        title: "Dosage",
-                        placeholder: "For example 50 mg",
+                        title: "Prescription amount",
+                        placeholder: "As written on your label",
                         text: $dosage,
                         systemImage: "number"
                     )
@@ -1341,7 +1361,7 @@ private struct ProfileSetupMedicationSection: View {
                     )
 
                     ProfileSetupMeasurementRow(
-                        title: "Works for",
+                        title: "Medication duration",
                         value: $effectiveHours,
                         range: 0.5...72,
                         unit: "h",
@@ -1420,57 +1440,46 @@ private struct ProfileSetupMedicationSection: View {
     }
 }
 
+private enum OnboardingSlideDirection { case forward, backward }
+
 @MainActor
 private struct ProfileIntroductionView: View {
     let continueAction: () -> Void
     @State private var activePage = 0
     @State private var isCompleting = false
-    @State private var dragOffset: CGFloat = 0
+    @State private var slideDirection: OnboardingSlideDirection = .forward
 
     private let pages = IntroPage.all
     private var currentPage: IntroPage {
-        pages.enumerated().first { $0.offset == activePage }?.element ?? IntroPage.fallback
+        guard activePage < pages.count else { return IntroPage.fallback }
+        return pages[activePage]
     }
 
     var body: some View {
         ZStack {
             IntroRootBackground(kind: currentPage.animation)
                 .ignoresSafeArea()
+                .animation(.easeInOut(duration: 0.54), value: currentPage.animation)
 
-            IntroSlideView(
+            unsafe IntroSlideView(
                 page: currentPage,
                 index: activePage,
-                isActive: true,
                 isCompleting: isCompleting
             )
             .id(activePage)
-            .offset(x: dragOffset)
-            .transition(.asymmetric(
-                insertion: .move(edge: .trailing),
-                removal: .move(edge: .leading)
-            ))
-            .gesture(
-                DragGesture(minimumDistance: 24)
-                    .onChanged { value in
-                        dragOffset = value.translation.width * 0.18
-                    }
-                    .onEnded { value in
-                        let threshold: CGFloat = 52
-                        withAnimation(.spring(response: 0.34, dampingFraction: 0.82)) {
-                            dragOffset = 0
-                        }
-
-                        if value.translation.width < -threshold {
-                            advance()
-                        } else if value.translation.width > threshold {
-                            goBack()
-                        }
-                    }
+            .transition(
+                slideDirection == .forward
+                    ? .asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity))
+                    : .asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity))
             )
             .ignoresSafeArea()
-            .scaleEffect(isCompleting ? 1.08 : 1)
-            .blur(radius: isCompleting ? 10 : 0)
-            .opacity(isCompleting ? 0.20 : 1)
+            .scaleEffect(isCompleting ? 1.09 : 1)
+            .blur(radius: isCompleting ? 12 : 0)
+            .opacity(isCompleting ? 0.12 : 1)
             .animation(.easeInOut(duration: 0.44), value: isCompleting)
 
             IntroBottomControls(
@@ -1484,31 +1493,30 @@ private struct ProfileIntroductionView: View {
             .offset(y: isCompleting ? 24 : 0)
             .animation(.easeInOut(duration: 0.28), value: isCompleting)
         }
+        .gesture(
+            DragGesture(minimumDistance: 28)
+                .onEnded { val in
+                    if val.translation.width < -60 { advance() }
+                    else if val.translation.width > 60 { goBack() }
+                }
+        )
+        .sensoryFeedback(.impact(weight: .light), trigger: activePage)
     }
 
     private func advance() {
         if activePage == pages.count - 1 {
-            withAnimation(.spring(response: 0.56, dampingFraction: 0.82)) {
-                isCompleting = true
-            }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
-                continueAction()
-            }
+            withAnimation(.spring(response: 0.56, dampingFraction: 0.82)) { isCompleting = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { continueAction() }
         } else {
-            withAnimation(.spring(response: 0.48, dampingFraction: 0.86)) {
-                activePage += 1
-            }
+            slideDirection = .forward
+            withAnimation(.spring(response: 0.44, dampingFraction: 0.88)) { activePage += 1 }
         }
     }
 
     private func goBack() {
-        guard activePage > 0 else {
-            return
-        }
-
-        withAnimation(.spring(response: 0.48, dampingFraction: 0.86)) {
-            activePage -= 1
-        }
+        guard activePage > 0 else { return }
+        slideDirection = .backward
+        withAnimation(.spring(response: 0.44, dampingFraction: 0.88)) { activePage -= 1 }
     }
 }
 
@@ -1518,41 +1526,61 @@ private struct IntroBottomControls: View {
     let isCompleting: Bool
     let actionTitle: String
     let action: () -> Void
+    @State private var shimmerPhase: CGFloat = -0.4
+    @State private var isPressed = false
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 16) {
             Spacer()
 
             OnboardingProgress(index: index, count: count)
 
-            Button(action: action) {
-                HStack(spacing: 10) {
-                    Text(actionTitle)
-                        .font(.headline.weight(.bold))
-                    Image(systemName: index == count - 1 ? "person.crop.circle.badge.checkmark" : "arrow.right")
-                        .font(.headline.weight(.bold))
+            Button {
+                withAnimation(.spring(response: 0.20, dampingFraction: 0.68)) { isPressed = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) {
+                    withAnimation(.spring(response: 0.30, dampingFraction: 0.80)) { isPressed = false }
                 }
-                .foregroundStyle(Color.chillDarkBackground)
-                .frame(maxWidth: .infinity)
-                .frame(height: 58)
-                .background(
+                action()
+            } label: {
+                ZStack {
+                    HStack(spacing: 10) {
+                        Text(actionTitle)
+                            .font(.headline.weight(.bold))
+                        Image(systemName: index == count - 1 ? "person.crop.circle.badge.checkmark" : "arrow.right")
+                            .font(.headline.weight(.bold))
+                    }
+                    .foregroundStyle(.white)
+
+                    // Shimmer sweep
                     LinearGradient(
-                        colors: [Color.chillMint, Color.chillAccentTeal, Color.chillSecondaryBlue],
+                        stops: [
+                            .init(color: .clear, location: shimmerPhase - 0.18),
+                            .init(color: .white.opacity(0.22), location: shimmerPhase),
+                            .init(color: .clear, location: shimmerPhase + 0.18),
+                        ],
                         startPoint: .leading,
                         endPoint: .trailing
-                    ),
-                    in: Capsule()
-                )
-                .overlay {
-                    Capsule()
-                        .stroke(.white.opacity(0.50), lineWidth: 1)
+                    )
+                    .blendMode(.plusLighter)
+                    .allowsHitTesting(false)
                 }
-                .shadow(color: Color.chillMint.opacity(0.35), radius: 24, x: 0, y: 14)
+                .frame(maxWidth: .infinity)
+                .frame(height: 58)
+                .background(LinearGradient.chillBrand, in: Capsule())
+                .overlay { Capsule().stroke(.white.opacity(0.36), lineWidth: 1) }
+                .shadow(color: Color.chillPrimary.opacity(0.50), radius: 24, x: 0, y: 14)
+                .scaleEffect(isPressed ? 0.96 : 1.0)
+                .animation(.spring(response: 0.22, dampingFraction: 0.74), value: isPressed)
             }
             .buttonStyle(.plain)
             .disabled(isCompleting)
             .padding(.horizontal, 22)
             .padding(.bottom, 24)
+            .onAppear {
+                withAnimation(.linear(duration: 2.6).repeatForever(autoreverses: false).delay(1.0)) {
+                    shimmerPhase = 1.4
+                }
+            }
         }
     }
 }
@@ -1564,13 +1592,26 @@ private struct OnboardingProgress: View {
     var body: some View {
         HStack(spacing: 7) {
             ForEach(0..<count, id: \.self) { item in
-                Capsule()
-                    .fill(item == index ? Color.chillMint : .white.opacity(0.30))
-                    .frame(width: item == index ? 34 : 8, height: 5)
-                    .shadow(color: item == index ? Color.chillMint.opacity(0.45) : .clear, radius: 8)
+                ZStack {
+                    if item == index {
+                        Capsule()
+                            .fill(LinearGradient.chillBrand)
+                            .frame(width: 32, height: 5)
+                        Capsule()
+                            .fill(Color.chillPrimary)
+                            .frame(width: 32, height: 5)
+                            .blur(radius: 7)
+                            .opacity(0.60)
+                    } else {
+                        Capsule()
+                            .fill(.white.opacity(0.28))
+                            .frame(width: 8, height: 5)
+                    }
+                }
+                .shadow(color: item == index ? Color.chillPrimary.opacity(0.55) : .clear, radius: 9)
             }
         }
-        .animation(.spring(response: 0.34, dampingFraction: 0.80), value: index)
+        .animation(.spring(response: 0.36, dampingFraction: 0.76), value: index)
         .accessibilityLabel("Onboarding page \(index + 1) of \(count)")
     }
 }
@@ -1593,7 +1634,7 @@ private struct IntroPage {
         IntroPage(
             eyebrow: "Daily score",
             title: "The app mood follows your day",
-            subtitle: "After your first drug-use log, ChillMate gently adapts the background to your recovery score.",
+            subtitle: "After your first substance-related log, ChillMate gently adapts the background to your recovery and wellbeing score.",
             animation: .background
         ),
         IntroPage(
@@ -1605,7 +1646,7 @@ private struct IntroPage {
         IntroPage(
             eyebrow: "Care tools",
             title: "Plan safer and recover softer",
-            subtitle: "Use plans, timers, drug info, risk checks, STI reminders, emergency shortcuts, and aftercare.",
+            subtitle: "Use plans, check-ins, safety information, STI reminders, emergency shortcuts, reflection, and aftercare.",
             animation: .care
         ),
         IntroPage(
@@ -1616,8 +1657,8 @@ private struct IntroPage {
         ),
         IntroPage(
             eyebrow: "Beta notice",
-            title: "This is a Beta",
-            subtitle: "The content has not been professionally reviewed yet. If you need real support, use Support in More.",
+            title: "Reflection, not medical advice",
+            subtitle: "ChillMate does not recommend substance use or amounts. For real support, use Support in More or emergency services.",
             animation: .notice
         ),
         IntroPage(
@@ -1650,89 +1691,69 @@ private enum IntroAnimationKind {
 private struct IntroSlideView: View {
     let page: IntroPage
     let index: Int
-    let isActive: Bool
     let isCompleting: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
     @AppStorage("chillReducedMotion") private var chillReducedMotion = false
     @State private var checkmarkInPlace = false
-    @State private var motionPhase = 0.0
+    @State private var textVisible = false
 
     var body: some View {
         GeometryReader { proxy in
-            let phase = motionPhase + Double(index)
             let topPadding = max(proxy.safeAreaInsets.top + 16, 58)
-            let heroHeight = min(max(proxy.size.height * 0.38, 292), 338)
-            let textHeight = min(max(proxy.size.height * 0.24, 188), 220)
+            let heroHeight = min(max(proxy.size.height * 0.40, 300), 358)
+            let textHeight = min(max(proxy.size.height * 0.25, 192), 228)
 
-            ZStack {
-                IntroAtmosphere(kind: page.animation, index: index, phase: phase)
-                    .ignoresSafeArea()
+            TimelineView(.animation) { ctx in
+                let rawPhase = ctx.date.timeIntervalSinceReferenceDate
+                    .truncatingRemainder(dividingBy: .pi * 2)
+                let phase = (reduceSystemMotion || chillReducedMotion) ? 0.22 : rawPhase
 
-                VStack(alignment: .leading, spacing: 0) {
-                    OnboardingTopBar(checkmarkInPlace: checkmarkInPlace || isCompleting)
-                        .padding(.horizontal, 24)
-                        .padding(.top, topPadding)
+                ZStack {
+                    IntroAtmosphere(kind: page.animation, index: index, phase: phase)
+                        .ignoresSafeArea()
 
-                    Spacer(minLength: 14)
+                    VStack(alignment: .leading, spacing: 0) {
+                        OnboardingTopBar(checkmarkInPlace: checkmarkInPlace || isCompleting)
+                            .padding(.horizontal, 24)
+                            .padding(.top, topPadding)
 
-                    IntroHeroScene(
-                        kind: page.animation,
-                        phase: phase,
-                        isActive: isActive,
-                        isCompleting: isCompleting,
-                        checkmarkInPlace: checkmarkInPlace || isCompleting
-                    )
-                    .frame(maxWidth: .infinity)
-                    .frame(height: heroHeight)
+                        Spacer(minLength: 14)
 
-                    Spacer(minLength: 0)
+                        IntroHeroScene(
+                            kind: page.animation,
+                            phase: phase,
+                            isCompleting: isCompleting,
+                            checkmarkInPlace: checkmarkInPlace || isCompleting,
+                            pageIndex: index
+                        )
+                        .frame(maxWidth: .infinity)
+                        .frame(height: heroHeight)
+                        .scaleEffect(isCompleting ? 1.16 : 1)
+                        .blur(radius: isCompleting ? 6 : 0)
+                        .animation(.spring(response: 0.56, dampingFraction: 0.76), value: isCompleting)
 
-                    IntroTextBlock(page: page)
-                        .frame(height: textHeight, alignment: .topLeading)
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, 192)
+                        Spacer(minLength: 0)
+
+                        IntroTextBlock(page: page, isVisible: textVisible)
+                            .frame(height: textHeight, alignment: .topLeading)
+                            .padding(.horizontal, 24)
+                            .padding(.bottom, 196)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .opacity(isActive ? 1 : 0.48)
-                .offset(y: isActive ? 0 : 22)
-                .scaleEffect(isActive ? 1 : 0.96)
-                .animation(.easeOut(duration: 0.34), value: isActive)
             }
         }
-        .onAppear {
-            startMotion()
-            if isActive {
-                flyCheckmarkIn()
-            }
-        }
-        .onChange(of: isActive) { _, active in
-            if active {
-                startMotion()
-                flyCheckmarkIn()
-            } else {
-                checkmarkInPlace = false
-            }
-        }
+        .onAppear { armEntrance() }
     }
 
-    private func flyCheckmarkIn() {
+    private func armEntrance() {
+        textVisible = false
         checkmarkInPlace = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) {
-            withAnimation(.spring(response: 0.70, dampingFraction: 0.62)) {
-                checkmarkInPlace = true
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+            withAnimation(.spring(response: 0.58, dampingFraction: 0.80)) { textVisible = true }
         }
-    }
-
-    private func startMotion() {
-        guard !reduceSystemMotion && !chillReducedMotion else {
-            motionPhase = 0.22
-            return
-        }
-
-        motionPhase = 0
-        withAnimation(.linear(duration: 9.0).repeatForever(autoreverses: false)) {
-            motionPhase = .pi * 2
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) {
+            withAnimation(.spring(response: 0.70, dampingFraction: 0.62)) { checkmarkInPlace = true }
         }
     }
 }
@@ -1763,13 +1784,18 @@ private struct OnboardingTopBar: View {
 
 private struct IntroTextBlock: View {
     let page: IntroPage
+    let isVisible: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(page.eyebrow.uppercased())
                 .font(.caption.weight(.heavy))
                 .tracking(2.4)
-                .foregroundStyle(Color.chillMint)
+                .foregroundStyle(LinearGradient.chillBrand)
+                .opacity(isVisible ? 1 : 0)
+                .offset(y: isVisible ? 0 : 10)
+                .blur(radius: isVisible ? 0 : 5)
+                .animation(.spring(response: 0.50, dampingFraction: 0.82), value: isVisible)
 
             Text(page.title)
                 .font(.system(size: 39, weight: .black, design: .rounded))
@@ -1777,7 +1803,11 @@ private struct IntroTextBlock: View {
                 .lineSpacing(1)
                 .minimumScaleFactor(0.74)
                 .fixedSize(horizontal: false, vertical: true)
-                .shadow(color: .black.opacity(0.26), radius: 16, x: 0, y: 8)
+                .shadow(color: .black.opacity(0.28), radius: 14, x: 0, y: 8)
+                .opacity(isVisible ? 1 : 0)
+                .offset(y: isVisible ? 0 : 18)
+                .blur(radius: isVisible ? 0 : 5)
+                .animation(.spring(response: 0.54, dampingFraction: 0.80).delay(0.06), value: isVisible)
 
             Text(page.subtitle)
                 .font(.title3.weight(.semibold))
@@ -1785,6 +1815,10 @@ private struct IntroTextBlock: View {
                 .foregroundStyle(.white.opacity(0.86))
                 .minimumScaleFactor(0.86)
                 .fixedSize(horizontal: false, vertical: true)
+                .opacity(isVisible ? 1 : 0)
+                .offset(y: isVisible ? 0 : 22)
+                .blur(radius: isVisible ? 0 : 5)
+                .animation(.spring(response: 0.58, dampingFraction: 0.78).delay(0.12), value: isVisible)
         }
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
@@ -1794,39 +1828,61 @@ private struct IntroRootBackground: View {
     let kind: IntroAnimationKind
 
     var body: some View {
-        LinearGradient(
-            colors: backgroundColors,
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
+        MeshGradient(
+            width: 3,
+            height: 3,
+            points: [
+                [0, 0], [0.5, 0], [1, 0],
+                [0, 0.5], [0.5, 0.5], [1, 0.5],
+                [0, 1], [0.5, 1], [1, 1]
+            ],
+            colors: meshColors,
+            smoothsColors: true
         )
         .overlay {
             LinearGradient(
-                colors: [.black.opacity(0.10), .black.opacity(0.24), .black.opacity(0.68)],
+                colors: [.black.opacity(0.06), .black.opacity(0.18), .black.opacity(0.64)],
                 startPoint: .top,
                 endPoint: .bottom
             )
         }
-        .animation(.easeInOut(duration: 0.42), value: kind)
+        .animation(.easeInOut(duration: 0.54), value: kind)
     }
 
-    private var backgroundColors: [Color] {
+    private var meshColors: [Color] {
         switch kind {
         case .summary:
-            [Color.chillDarkBackground, Color.chillPrimary.opacity(0.92), Color.chillMint.opacity(0.68)]
+            [Color.chillDarkBackground, Color.chillPrimary.opacity(0.88), Color.chillMint.opacity(0.66),
+             Color.chillDarkBackground, Color.chillPrimary.opacity(0.52), Color.chillMint.opacity(0.38),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .background:
-            [Color.chillDarkBackground, Color.chillPrimary.opacity(0.94), Color.chillVisibleAmber.opacity(0.72)]
+            [Color.chillDarkBackground, Color.chillPrimary.opacity(0.92), Color.chillMint.opacity(0.60),
+             Color.chillDarkBackground, Color.chillPrimary.opacity(0.54), Color.chillMint.opacity(0.32),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .log:
-            [Color.chillDarkBackground, Color.chillVisiblePink.opacity(0.66), Color.chillSecondaryBlue.opacity(0.78)]
+            [Color.chillDarkBackground, Color.chillIconPink.opacity(0.72), Color.chillSecondaryBlue.opacity(0.72),
+             Color.chillDarkBackground, Color.chillIconPink.opacity(0.36), Color.chillSecondaryBlue.opacity(0.38),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .care:
-            [Color.chillDarkBackground, Color.chillVisibleTeal.opacity(0.78), Color.chillMint.opacity(0.66)]
+            [Color.chillDarkBackground, Color.chillIconTeal.opacity(0.74), Color.chillMint.opacity(0.60),
+             Color.chillDarkBackground, Color.chillIconTeal.opacity(0.38), Color.chillMint.opacity(0.28),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .privacy:
-            [Color.chillDarkBackground, Color.chillSurfaceDark, Color.chillPrimary.opacity(0.84)]
+            [Color.chillDarkBackground, Color.chillSurfaceDark, Color.chillPrimary.opacity(0.78),
+             Color.chillDarkBackground, Color.chillSurfaceDark.opacity(0.66), Color.chillPrimary.opacity(0.40),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .notice:
-            [Color.chillDarkBackground, Color.chillVisibleOrange.opacity(0.62), Color.chillPrimary.opacity(0.76)]
+            [Color.chillDarkBackground, Color.chillIconOrange.opacity(0.70), Color.chillPrimary.opacity(0.70),
+             Color.chillDarkBackground, Color.chillIconOrange.opacity(0.32), Color.chillPrimary.opacity(0.36),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .exit:
-            [Color.chillDarkBackground, .black.opacity(0.92), Color.chillVisibleBlue.opacity(0.74)]
+            [Color.chillDarkBackground, Color.chillSurfaceDark, Color.chillPrimary.opacity(0.60),
+             Color.chillDarkBackground, Color.chillSurfaceDark.opacity(0.70), Color.chillPrimary.opacity(0.28),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .ready:
-            [Color.chillDarkBackground, Color.chillPrimary.opacity(0.94), Color.chillMint.opacity(0.76)]
+            [Color.chillDarkBackground, Color.chillPrimary.opacity(0.92), Color.chillMint.opacity(0.72),
+             Color.chillDarkBackground, Color.chillPrimary.opacity(0.54), Color.chillMint.opacity(0.36),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         }
     }
 }
@@ -1896,17 +1952,17 @@ private struct IntroAtmosphere: View {
         case .summary:
             colors = [Color.chillPrimary, Color.chillMint, Color.chillSecondaryBlue]
         case .background:
-            colors = [Color.chillPrimary, Color.chillVisibleAmber, Color.chillMint]
+            colors = [Color.chillPrimary, Color.chillSecondaryBlue, Color.chillMint]
         case .log:
-            colors = [Color.chillVisiblePink, Color.chillSecondaryBlue, Color.chillMint]
+            colors = [Color.chillSecondaryBlue, Color.chillPrimary, Color.chillMint]
         case .care:
-            colors = [Color.chillVisibleTeal, Color.chillMint, Color.chillPrimary]
+            colors = [Color.chillMint, Color.chillPrimary, Color.chillAccentTeal]
         case .privacy:
-            colors = [Color.chillSurfaceDark, Color.chillPrimary, Color.chillMint]
+            colors = [Color.chillPrimary, Color.chillSecondaryBlue, Color.chillMint]
         case .notice:
-            colors = [Color.chillVisibleOrange, Color.chillPrimary, Color.chillMint]
+            colors = [Color.chillPrimary, Color.chillSecondaryBlue, Color.chillMint]
         case .exit:
-            colors = [.red, Color.chillPrimary, Color.chillSecondaryBlue]
+            colors = [Color.chillPrimary, Color.chillSurfaceDark, Color.chillSecondaryBlue]
         case .ready:
             colors = [Color.chillPrimary, Color.chillMint, Color.chillSecondaryBlue]
         }
@@ -1986,135 +2042,195 @@ private struct ChillMateCheckmarkShape: Shape {
     }
 }
 
+@MainActor
 private struct IntroHeroScene: View {
     let kind: IntroAnimationKind
     let phase: TimeInterval
-    let isActive: Bool
     let isCompleting: Bool
     let checkmarkInPlace: Bool
+    let pageIndex: Int
+
+    @State private var appeared = false
 
     var body: some View {
         ZStack {
             switch kind {
-            case .summary:
-                summaryScene
-            case .background:
-                scoreScene
-            case .log:
-                logScene
-            case .care:
-                careScene
-            case .privacy:
-                privacyScene
-            case .notice:
-                noticeScene
-            case .exit:
-                quickExitScene
-            case .ready:
-                readyScene
+            case .summary:   summaryScene
+            case .background: scoreScene
+            case .log:       logScene
+            case .care:      careScene
+            case .privacy:   privacyScene
+            case .notice:    noticeScene
+            case .exit:      quickExitScene
+            case .ready:     readyScene
             }
         }
-        .scaleEffect(isCompleting ? 1.18 : (isActive ? 1 : 0.92))
-        .opacity(isActive || isCompleting ? 1 : 0.48)
-        .animation(.spring(response: 0.52, dampingFraction: 0.82), value: isActive)
+        .scaleEffect(isCompleting ? 1.18 : (appeared ? 1 : 0.82))
+        .opacity(appeared || isCompleting ? 1 : 0)
+        .blur(radius: appeared ? 0 : 10)
+        .animation(.spring(response: 0.62, dampingFraction: 0.76).delay(0.04), value: appeared)
         .animation(.spring(response: 0.56, dampingFraction: 0.76), value: isCompleting)
+        .onAppear {
+            appeared = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
+                withAnimation { appeared = true }
+            }
+        }
+        .onChange(of: pageIndex) { _, _ in
+            appeared = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
+                withAnimation { appeared = true }
+            }
+        }
     }
+
+    // MARK: – Summary: animated bar chart + logo
 
     private var summaryScene: some View {
         ZStack {
-            ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 130)
-                .offset(y: -58 + bob(0, amount: 5))
-
-            ScoreRing(progress: 0.74, tint: Color.chillMint)
-                .frame(width: 214, height: 214)
-                .offset(y: 54)
-
-            ForEach(0..<4, id: \.self) { item in
-                MiniMetricBubble(
-                    title: ["Chills", "Sleep", "Care", "Score"][item],
-                    value: ["12", "6h", "3", "82"][item],
-                    symbol: ["heart.fill", "bed.double.fill", "cross.case.fill", "sparkles"][item],
-                    tint: [Color.chillVisiblePink, Color.chillVisibleAmber, Color.chillVisibleTeal, Color.chillMint][item]
-                )
-                .offset(x: bubblePosition(item).x + bob(item, amount: 4), y: bubblePosition(item).y + bob(item + 1, amount: 4))
+            HStack(alignment: .bottom, spacing: 14) {
+                ForEach(0..<4, id: \.self) { i in
+                    let targetHeights: [CGFloat] = [108, 158, 80, 132]
+                    let colors: [Color] = [.chillSecondaryBlue, Color(red: 251/255, green: 146/255, blue: 60/255), .chillAccentTeal, .chillMint]
+                    let labels = ["Chills", "Sleep", "Care", "Score"]
+                    VStack(spacing: 5) {
+                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            .fill(LinearGradient(colors: [colors[i], colors[i].opacity(0.50)], startPoint: .top, endPoint: .bottom))
+                            .frame(width: 44, height: appeared ? targetHeights[i] + bob(i, amount: 5) : 4)
+                            .overlay(alignment: .top) {
+                                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                    .fill(.white.opacity(0.24))
+                                    .frame(width: 44, height: 13)
+                            }
+                            .shadow(color: colors[i].opacity(0.42), radius: 14, y: 6)
+                            .animation(.spring(response: 0.78, dampingFraction: 0.68).delay(Double(i) * 0.09), value: appeared)
+                        Text(labels[i])
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.74))
+                    }
+                }
             }
+            .offset(y: 28)
+
+            ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 90)
+                .offset(x: 0, y: -82 + bob(0, amount: 4))
+
+            ScoreRing(progress: appeared ? 0.74 : 0, tint: Color.chillMint)
+                .frame(width: 82, height: 82)
+                .offset(x: 116, y: -48 + bob(2, amount: 4))
+                .opacity(appeared ? 1 : 0)
+                .animation(.spring(response: 0.72, dampingFraction: 0.76).delay(0.20), value: appeared)
         }
     }
+
+    // MARK: – Background: score ring with animated counter
 
     private var scoreScene: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 48, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.chillDarkBackground, Color.chillPrimary, Color.chillMint, Color.chillVisibleAmber],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 248, height: 248)
-                .rotationEffect(.degrees(8 + Double(bob(2, amount: 2))))
-                .shadow(color: Color.chillPrimary.opacity(0.42), radius: 38, y: 18)
+            RoundedRectangle(cornerRadius: 52, style: .continuous)
+                .fill(LinearGradient.chillBrandDiagonal)
+                .frame(width: 240, height: 240)
+                .rotationEffect(.degrees(8 + bob(2, amount: 2.4)))
+                .shadow(color: Color.chillPrimary.opacity(0.52), radius: 40, y: 20)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 52, style: .continuous)
+                        .stroke(.white.opacity(0.22), lineWidth: 1.2)
+                }
 
-            ScoreRing(progress: 0.88, tint: Color.chillVisibleAmber)
-                .frame(width: 172, height: 172)
+            ScoreRing(progress: appeared ? 0.88 : 0, tint: Color.chillMint)
+                .frame(width: 166, height: 166)
+                .animation(.spring(response: 1.0, dampingFraction: 0.76).delay(0.14), value: appeared)
 
             VStack(spacing: 2) {
-                Text("88")
-                    .font(.system(size: 54, weight: .black, design: .rounded))
+                IntroScoreCounter(target: appeared ? 88 : 0)
                 Text("steady")
                     .font(.caption.weight(.heavy))
+                    .foregroundStyle(.white.opacity(0.76))
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.easeIn(duration: 0.30).delay(0.72), value: appeared)
             }
-            .foregroundStyle(.white)
         }
     }
+
+    // MARK: – Log: pills fly in with stagger
 
     private var logScene: some View {
         ZStack {
-            ForEach(0..<5, id: \.self) { item in
-                TimelinePill(
-                    title: ["Time", "Sleep", "Condom", "People", "Location"][item],
-                    symbol: ["clock.fill", "bed.double.fill", "checkmark.shield.fill", "person.2.fill", "location.fill"][item],
-                    tint: [Color.chillSecondaryBlue, Color.chillVisibleAmber, Color.chillMint, Color.chillVisiblePink, Color.chillVisibleTeal][item]
-                )
-                .offset(x: CGFloat(item % 2 == 0 ? -52 : 48), y: CGFloat(-128 + item * 58) + bob(item, amount: 4))
+            let titles = ["Time", "Sleep", "Condom", "People", "Location"]
+            let symbols = ["clock.fill", "bed.double.fill", "checkmark.shield.fill", "person.2.fill", "location.fill"]
+            let tints: [Color] = [.chillSecondaryBlue, Color(red: 251/255, green: 146/255, blue: 60/255), .chillMint, Color(red: 244/255, green: 114/255, blue: 182/255), .chillAccentTeal]
+
+            ForEach(0..<5, id: \.self) { i in
+                let x: CGFloat = i % 2 == 0 ? -54 : 46
+                TimelinePill(title: titles[i], symbol: symbols[i], tint: tints[i])
+                    .offset(x: x, y: appeared ? CGFloat(-124 + i * 56) + bob(i, amount: 4) : 110)
+                    .opacity(appeared ? 1 : 0)
+                    .blur(radius: appeared ? 0 : 3)
+                    .animation(.spring(response: 0.60, dampingFraction: 0.74).delay(Double(i) * 0.10), value: appeared)
             }
 
             Image(systemName: "plus")
-                .font(.system(size: 44, weight: .black))
-                .foregroundStyle(Color.chillDarkBackground)
-                .frame(width: 82, height: 82)
-                .background(Color.chillMint, in: Circle())
-                .shadow(color: Color.chillMint.opacity(0.44), radius: 28, y: 14)
-                .offset(x: 94, y: 98 + bob(1, amount: 5))
+                .font(.system(size: 42, weight: .black))
+                .foregroundStyle(.white)
+                .frame(width: 80, height: 80)
+                .background(LinearGradient.chillBrand, in: Circle())
+                .shadow(color: Color.chillPrimary.opacity(0.56), radius: 28, y: 14)
+                .scaleEffect(appeared ? 1 : 0.28)
+                .opacity(appeared ? 1 : 0)
+                .animation(.spring(response: 0.62, dampingFraction: 0.60).delay(0.52), value: appeared)
+                .offset(x: 92, y: 94 + bob(1, amount: 5))
         }
     }
+
+    // MARK: – Care: real circular orbit
 
     private var careScene: some View {
         ZStack {
-            ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 108)
-                .offset(y: bob(0, amount: 4))
-
-            ForEach(0..<6, id: \.self) { item in
-                let point = orbitPosition(item)
-                CareOrbitIcon(
-                    symbol: ["timer", "pills.fill", "checkmark.shield.fill", "cross.case.fill", "phone.fill", "figure.mind.and.body"][item],
-                    tint: [Color.chillVisibleAmber, Color.chillVisibleBlue, Color.chillMint, Color.chillVisibleTeal, Color.chillVisiblePink, Color.chillPrimary][item]
-                )
-                .offset(x: point.x + bob(item, amount: 5), y: point.y + bob(item + 2, amount: 4))
+            // Orbit track rings
+            ForEach(0..<2, id: \.self) { ring in
+                Circle()
+                    .stroke(.white.opacity(0.07 + Double(ring) * 0.04), lineWidth: 1.0)
+                    .frame(width: CGFloat(194 + ring * 46), height: CGFloat(194 + ring * 46))
             }
+
+            let orbitSymbols = ["timer", "pills.fill", "checkmark.shield.fill", "cross.case.fill", "phone.fill", "figure.mind.and.body"]
+            let orbitTints: [Color] = [
+                Color(red: 251/255, green: 146/255, blue: 60/255),  // warm orange
+                .chillSecondaryBlue,
+                .chillMint,
+                .chillAccentTeal,
+                Color(red: 244/255, green: 114/255, blue: 182/255), // bright pink
+                .chillPrimary
+            ]
+
+            // Rotating container: orbit speed ~18°/s
+            ForEach(0..<6, id: \.self) { i in
+                CareOrbitIcon(symbol: orbitSymbols[i], tint: orbitTints[i])
+                    .offset(y: -105)
+                    // Counter-rotate icon itself so it stays upright
+                    .rotationEffect(.degrees(-(phase * 18).truncatingRemainder(dividingBy: 360)))
+                    // Place icon on the orbit ring at its angle + rotate the whole ring
+                    .rotationEffect(.degrees(Double(i) * 60 + (phase * 18).truncatingRemainder(dividingBy: 360)), anchor: .center)
+                    .scaleEffect(appeared ? 1 : 0.18)
+                    .opacity(appeared ? 1 : 0)
+                    .animation(.spring(response: 0.58, dampingFraction: 0.66).delay(Double(i) * 0.07), value: appeared)
+            }
+
+            ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 104)
+                .scaleEffect(appeared ? 1 + bob(0, amount: 0.022) : 0.60)
+                .animation(.spring(response: 0.72, dampingFraction: 0.70), value: appeared)
         }
     }
+
+    // MARK: – Privacy: ping rings + face ID
 
     private var privacyScene: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 44, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color.chillSurfaceDark.opacity(0.88), Color.chillPrimary.opacity(0.32), Color.white.opacity(0.16)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(LinearGradient(
+                    colors: [Color.chillSurfaceDark.opacity(0.90), Color.chillPrimary.opacity(0.30), .white.opacity(0.14)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                ))
                 .frame(width: 238, height: 260)
                 .overlay {
                     RoundedRectangle(cornerRadius: 44, style: .continuous)
@@ -2123,8 +2239,19 @@ private struct IntroHeroScene: View {
 
             VStack(spacing: 14) {
                 ZStack {
+                    // Expanding ping rings
+                    ForEach(0..<3, id: \.self) { ring in
+                        let raw = (phase * 0.36 + Double(ring) * 0.60).truncatingRemainder(dividingBy: 1.8)
+                        let progress = raw / 1.8
+                        Circle()
+                            .stroke(
+                                LinearGradient.chillBrand.opacity(0.30 * (1 - progress)),
+                                lineWidth: 1.4
+                            )
+                            .frame(width: 72 + CGFloat(progress * 60), height: 72 + CGFloat(progress * 60))
+                    }
                     RoundedRectangle(cornerRadius: 26, style: .continuous)
-                        .fill(Color.chillDarkBackground.opacity(0.78))
+                        .fill(Color.chillDarkBackground.opacity(0.80))
                         .frame(width: 96, height: 96)
                     ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 72)
                 }
@@ -2133,34 +2260,38 @@ private struct IntroHeroScene: View {
                     HStack(spacing: 9) {
                         Image(systemName: ["faceid", "lock.fill", "key.fill"][item])
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundStyle([Color.chillSecondaryBlue, Color.chillMint, Color.chillAccentTeal][item])
+                            .foregroundStyle([Color.chillPrimary, Color.chillMint, Color.chillSecondaryBlue][item])
                         Capsule()
                             .fill(.white.opacity(0.24))
                             .frame(width: CGFloat([82, 124, 102][item]), height: 7)
                     }
                     .frame(width: 156, alignment: .leading)
+                    .opacity(appeared ? 1 : 0)
+                    .offset(x: appeared ? 0 : -20)
+                    .animation(.spring(response: 0.50, dampingFraction: 0.80).delay(Double(item) * 0.10 + 0.22), value: appeared)
                 }
             }
             .offset(y: -6)
 
             Image(systemName: "lock.shield.fill")
-                .font(.system(size: 42, weight: .black))
+                .font(.system(size: 40, weight: .black))
                 .foregroundStyle(Color.chillMint)
-                .frame(width: 76, height: 76)
-                .background(Color.chillDarkBackground.opacity(0.72), in: Circle())
-                .overlay {
-                    Circle().stroke(Color.chillMint.opacity(0.32), lineWidth: 1)
-                }
-                .offset(x: 96, y: 104 + bob(1, amount: 3))
+                .frame(width: 74, height: 74)
+                .background(Color.chillDarkBackground.opacity(0.74), in: Circle())
+                .overlay { Circle().stroke(Color.chillMint.opacity(0.30), lineWidth: 1) }
+                .offset(x: 96, y: 102 + bob(1, amount: 3.5))
+                .shadow(color: Color.chillMint.opacity(0.36), radius: 18, y: 8)
         }
         .shadow(color: Color.chillPrimary.opacity(0.34), radius: 30, y: 16)
     }
 
+    // MARK: – Notice: staggered lines + pulsing badge
+
     private var noticeScene: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 44, style: .continuous)
-                .fill(.white.opacity(0.15))
-                .frame(width: 252, height: 248)
+                .fill(.white.opacity(0.13))
+                .frame(width: 252, height: 252)
                 .overlay {
                     RoundedRectangle(cornerRadius: 44, style: .continuous)
                         .stroke(.white.opacity(0.26), lineWidth: 1.2)
@@ -2170,46 +2301,62 @@ private struct IntroHeroScene: View {
                 HStack(spacing: 10) {
                     Image(systemName: "sparkles")
                         .font(.system(size: 19, weight: .black))
-                        .foregroundStyle(Color.chillMint)
+                        .foregroundStyle(LinearGradient.chillBrand)
+                        .symbolEffect(.bounce, options: .repeating.speed(0.5))
                     Text("BETA")
                         .font(.system(size: 32, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                 }
                 .padding(.horizontal, 18)
                 .padding(.vertical, 10)
-                .background(Color.chillPrimary.opacity(0.34), in: Capsule())
+                .background(
+                    LinearGradient.chillBrand.opacity(0.28),
+                    in: Capsule()
+                )
+                .scaleEffect(1 + bob(0, amount: 0.018))
 
                 VStack(spacing: 9) {
-                    BetaNoticeLine(text: "Not reviewed yet", symbol: "exclamationmark.triangle.fill")
-                    BetaNoticeLine(text: "Support is nearby", symbol: "heart.text.square.fill")
-                    BetaNoticeLine(text: "You stay in control", symbol: "checkmark.shield.fill")
+                    let lines = [("Wellbeing only", "heart.text.square.fill"),
+                                 ("Support is nearby", "person.2.fill"),
+                                 ("No dosage advice", "checkmark.shield.fill")]
+                    ForEach(Array(lines.enumerated()), id: \.offset) { i, pair in
+                        BetaNoticeLine(text: pair.0, symbol: pair.1)
+                            .opacity(appeared ? 1 : 0)
+                            .offset(x: appeared ? 0 : -24)
+                            .animation(.spring(response: 0.50, dampingFraction: 0.80).delay(Double(i) * 0.12 + 0.10), value: appeared)
+                    }
                 }
             }
         }
-        .rotationEffect(.degrees(Double(bob(1, amount: 1.5))))
+        .rotationEffect(.degrees(bob(1, amount: 1.2)))
     }
+
+    // MARK: – Exit: animated phone + home screen slide
 
     private var quickExitScene: some View {
         ZStack {
+            // App screen slides left when appeared
             RoundedRectangle(cornerRadius: 42, style: .continuous)
                 .fill(.white.opacity(0.14))
                 .frame(width: 154, height: 224)
                 .overlay(alignment: .top) {
                     Capsule()
-                        .fill(.black.opacity(0.65))
+                        .fill(.black.opacity(0.68))
                         .frame(width: 62, height: 17)
                         .padding(.top, 14)
                 }
                 .overlay {
                     VStack(spacing: 12) {
                         Circle()
-                            .fill(.red)
+                            .fill(LinearGradient(colors: [.red, Color(red:0.88,green:0.08,blue:0.08)], startPoint:.top, endPoint:.bottom))
                             .frame(width: 48, height: 48)
                             .overlay {
                                 Image(systemName: "xmark")
                                     .font(.system(size: 24, weight: .black))
                                     .foregroundStyle(.white)
                             }
+                            .shadow(color: .red.opacity(0.54), radius: 14, y: 6)
+                            .scaleEffect(1 + bob(0, amount: 0.044))
                         ForEach(0..<3, id: \.self) { item in
                             Capsule()
                                 .fill(.white.opacity(0.20))
@@ -2218,103 +2365,121 @@ private struct IntroHeroScene: View {
                     }
                     .padding(.top, 42)
                 }
-                .offset(x: isActive ? -72 : -24, y: -2)
+                .offset(x: appeared ? -72 : -24, y: -2)
+                .animation(.spring(response: 0.58, dampingFraction: 0.82).delay(0.08), value: appeared)
 
             Image(systemName: "arrow.right")
                 .font(.system(size: 24, weight: .black))
                 .foregroundStyle(Color.chillMint)
                 .frame(width: 52, height: 52)
                 .background(.white.opacity(0.14), in: Circle())
-                .overlay {
-                    Circle().stroke(.white.opacity(0.22), lineWidth: 1)
-                }
+                .overlay { Circle().stroke(.white.opacity(0.22), lineWidth: 1) }
                 .offset(x: 10, y: 10)
 
             RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(Color.chillDarkBackground.opacity(0.70))
+                .fill(Color.chillDarkBackground.opacity(0.74))
                 .frame(width: 128, height: 164)
                 .overlay {
                     VStack(spacing: 10) {
                         ForEach(0..<3, id: \.self) { row in
                             HStack(spacing: 10) {
-                                ForEach(0..<3, id: \.self) { column in
+                                ForEach(0..<3, id: \.self) { col in
                                     RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                        .fill(homeIconColor(row: row, column: column))
+                                        .fill(homeIconColor(row: row, col: col))
                                         .frame(width: 22, height: 22)
                                 }
                             }
                         }
-                        Capsule()
-                            .fill(.white.opacity(0.52))
-                            .frame(width: 58, height: 5)
+                        Capsule().fill(.white.opacity(0.52)).frame(width: 58, height: 5)
                     }
                 }
-                .offset(x: isActive ? 88 : 46, y: 42)
-                .opacity(isActive ? 1 : 0.42)
+                .offset(x: appeared ? 88 : 46, y: 42)
+                .opacity(appeared ? 1 : 0.38)
+                .animation(.spring(response: 0.58, dampingFraction: 0.82).delay(0.10), value: appeared)
         }
     }
+
+    // MARK: – Ready: sparkle orbit + person + logo bounce
 
     private var readyScene: some View {
         ZStack {
             Circle()
-                .fill(.white.opacity(0.14))
+                .fill(.white.opacity(0.12))
                 .frame(width: 230, height: 230)
-                .overlay {
-                    Circle().stroke(.white.opacity(0.26), lineWidth: 1.5)
-                }
+                .overlay { Circle().stroke(.white.opacity(0.24), lineWidth: 1.5) }
+
+            // Sparkle orbit
+            ForEach(0..<8, id: \.self) { i in
+                Image(systemName: "sparkle")
+                    .font(.system(size: 13, weight: .black))
+                    .foregroundStyle(i % 2 == 0 ? Color.chillPrimary : Color.chillMint)
+                    .offset(y: -112)
+                    .rotationEffect(.degrees(Double(i) * 45 + (phase * 14).truncatingRemainder(dividingBy: 360)))
+                    .opacity(appeared ? 0.68 + bob(i, amount: 0.28) : 0)
+                    .scaleEffect(appeared ? 0.80 + bob(i, amount: 0.26) : 0)
+                    .animation(.spring(response: 0.66, dampingFraction: 0.66).delay(Double(i) * 0.06 + 0.28), value: appeared)
+            }
 
             Image(systemName: "person.crop.circle.fill")
-                .font(.system(size: 112, weight: .black))
-                .foregroundStyle(Color.chillSecondaryBlue)
+                .font(.system(size: 110, weight: .black))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color.chillSecondaryBlue, Color.chillPrimary],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    )
+                )
                 .offset(y: -12)
+                .scaleEffect(appeared ? 1 : 0.46)
+                .opacity(appeared ? 1 : 0)
+                .animation(.spring(response: 0.66, dampingFraction: 0.66).delay(0.08), value: appeared)
 
-            ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 92)
-                .offset(x: 72, y: 86)
+            ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 90)
+                .offset(x: 72, y: 84)
+                .scaleEffect(appeared ? 1 : 0.28)
+                .opacity(appeared ? 1 : 0)
+                .animation(.spring(response: 0.68, dampingFraction: 0.60).delay(0.18), value: appeared)
         }
-        .shadow(color: Color.chillMint.opacity(0.28), radius: 28, y: 16)
+        .shadow(color: Color.chillMint.opacity(0.30), radius: 30, y: 18)
     }
 
-    private func bubblePosition(_ item: Int) -> CGPoint {
-        switch item {
-        case 0: CGPoint(x: -104, y: -10)
-        case 1: CGPoint(x: 106, y: 2)
-        case 2: CGPoint(x: -82, y: 132)
-        default: CGPoint(x: 94, y: 126)
-        }
-    }
+    // MARK: – Helpers
 
-    private func orbitPosition(_ item: Int) -> CGPoint {
-        switch item {
-        case 0: CGPoint(x: 0, y: -98)
-        case 1: CGPoint(x: 112, y: -48)
-        case 2: CGPoint(x: 112, y: 58)
-        case 3: CGPoint(x: 0, y: 108)
-        case 4: CGPoint(x: -112, y: 58)
-        default: CGPoint(x: -112, y: -48)
-        }
-    }
-
-    private func homeIconColor(row: Int, column: Int) -> Color {
-        let palette = [
-            Color.chillPrimary,
-            Color.chillSecondaryBlue,
-            Color.chillMint,
-            Color.chillVisiblePink,
-            Color.chillVisibleAmber,
-            Color.chillVisibleTeal,
-            Color.chillVisiblePurple,
-            Color.chillAccentTeal,
-            Color.chillVisibleBlue
+    private func homeIconColor(row: Int, col: Int) -> Color {
+        let palette: [Color] = [
+            .chillPrimary, .chillSecondaryBlue, .chillMint,
+            .chillIconPink, .chillIconAmber, .chillIconTeal,
+            .chillIconPurple, .chillAccentTeal, .chillSecondaryBlue
         ]
-        return palette[(row * 3 + column) % palette.count]
+        return palette[(row * 3 + col) % palette.count]
     }
 
     private func bob(_ item: Int, amount: CGFloat) -> CGFloat {
         let raw = (phase * (0.30 + Double(item) * 0.035) + Double(item) * 0.27)
             .truncatingRemainder(dividingBy: 2)
         let normalized = raw < 0 ? raw + 2 : raw
-        let triangle = normalized <= 1 ? normalized : 2 - normalized
-        return CGFloat(triangle * 2 - 1) * amount
+        let tri = normalized <= 1 ? normalized : 2 - normalized
+        return CGFloat(tri * 2 - 1) * amount
+    }
+}
+
+// MARK: – Animated score counter
+
+@MainActor
+private struct IntroScoreCounter: View {
+    let target: Int
+    @State private var displayed = 0
+
+    var body: some View {
+        Text("\(displayed)")
+            .font(.system(size: 54, weight: .black, design: .rounded))
+            .foregroundStyle(.white)
+            .contentTransition(.numericText(value: Double(displayed)))
+            .onAppear { animateTo(target) }
+            .onChange(of: target) { _, val in animateTo(val) }
+    }
+
+    private func animateTo(_ val: Int) {
+        withAnimation(.spring(response: 1.2, dampingFraction: 0.80)) { displayed = val }
     }
 }
 
@@ -2326,9 +2491,9 @@ private struct BetaNoticeLine: View {
         HStack(spacing: 9) {
             Image(systemName: symbol)
                 .font(.system(size: 13, weight: .bold))
-                .foregroundStyle(Color.chillMint)
+                .foregroundStyle(LinearGradient.chillBrand)
                 .frame(width: 26, height: 26)
-                .background(.white.opacity(0.12), in: Circle())
+                .background(Color.chillPrimary.opacity(0.18), in: Circle())
             Text(text)
                 .font(.caption.weight(.heavy))
                 .foregroundStyle(.white.opacity(0.86))
@@ -2371,7 +2536,7 @@ private struct ScoreRing: View {
     var body: some View {
         ZStack {
             Circle()
-                .stroke(.white.opacity(0.18), lineWidth: 18)
+                .stroke(.white.opacity(0.14), lineWidth: 18)
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(
@@ -2379,8 +2544,9 @@ private struct ScoreRing: View {
                     style: StrokeStyle(lineWidth: 18, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
+                .shadow(color: tint.opacity(0.44), radius: 10)
             Circle()
-                .fill(.white.opacity(0.08))
+                .fill(.white.opacity(0.06))
                 .padding(30)
         }
     }
@@ -2417,13 +2583,18 @@ private struct CareOrbitIcon: View {
 
     var body: some View {
         Image(systemName: symbol)
-            .font(.system(size: 24, weight: .bold))
+            .font(.system(size: 22, weight: .bold))
             .foregroundStyle(tint)
-            .frame(width: 58, height: 58)
-            .background(.white.opacity(0.15), in: Circle())
-            .overlay {
-                Circle().stroke(.white.opacity(0.22), lineWidth: 1)
-            }
+            .frame(width: 54, height: 54)
+            .background(
+                LinearGradient(
+                    colors: [tint.opacity(0.28), tint.opacity(0.10)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                ),
+                in: Circle()
+            )
+            .overlay { Circle().stroke(.white.opacity(0.24), lineWidth: 1) }
+            .shadow(color: tint.opacity(0.36), radius: 10, y: 4)
     }
 }
 
@@ -2560,13 +2731,14 @@ private struct ProfileSetupTextField: View {
                 TextField(placeholder, text: $text)
                     .textFieldStyle(.plain)
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
+                    .foregroundStyle(Color.chillDarkBackground)
+                    .tint(Color.chillPrimary)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)
-                    .background(.white.opacity(0.66), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+                    .background(.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
                     .overlay {
                         RoundedRectangle(cornerRadius: 15, style: .continuous)
-                            .stroke(Color.chillPrimary.opacity(0.28), lineWidth: 1.2)
+                            .stroke(Color.chillPrimary.opacity(0.36), lineWidth: 1.2)
                     }
             }
         }

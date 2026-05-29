@@ -105,6 +105,7 @@ struct DashboardView: View {
                 }
             }
             .navigationTitle("")
+            .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
                 lastDailyRecoveryScore = metrics.dailyScore.displayValue
             }
@@ -296,25 +297,44 @@ private struct HeaderSummaryView: View {
     let width: CGFloat
     let dailyScore: DailyRecoveryScore
 
-    private var palette: DailyScorePalette {
-        DailyScorePalette(score: dailyScore.displayValue)
-    }
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Summary")
-                .font(.largeTitle.bold())
-                .foregroundStyle(palette.heroText)
-                .minimumScaleFactor(0.82)
+        VStack(alignment: .leading, spacing: 6) {
+            // Brand wordmark
+            HStack(spacing: 9) {
+                ZStack {
+                    Circle()
+                        .trim(from: 0.14, to: 0.87)
+                        .stroke(LinearGradient.chillBrand,
+                                style: StrokeStyle(lineWidth: 3.0, lineCap: .round))
+                        .frame(width: 20, height: 20)
+                        .rotationEffect(.degrees(-42))
 
-            Text("Your private overview of the past 3 months")
-                .font(.callout)
-                .foregroundStyle(palette.heroSecondary)
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 7.5, weight: .black))
+                        .foregroundStyle(Color.chillMint)
+                        .offset(x: 0.5, y: 0.5)
+                }
+                .frame(width: 20, height: 20)
+
+                Text("ChillMate")
+                    .font(.subheadline.weight(.heavy))
+                    .foregroundStyle(LinearGradient.chillBrandDiagonal)
+            }
+            .padding(.bottom, 4)
+
+            Text("Summary")
+                .font(.system(size: 38, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .minimumScaleFactor(0.80)
+
+            Text("Your private overview · last 3 months")
+                .font(.callout.weight(.medium))
+                .foregroundStyle(.white.opacity(0.65))
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(width: max(320, width - 40), alignment: .leading)
         .padding(.horizontal, 20)
-        .padding(.top, 24)
+        .padding(.top, 20)
         .padding(.bottom, 4)
     }
 }
@@ -336,7 +356,7 @@ private struct DailyScoreStatusPill: View {
                 .foregroundStyle(Color.chillText)
                 .lineLimit(1)
 
-            Text(score.isActive ? score.label : "Make a log with drug use to activate daily score")
+            Text(score.isActive ? score.label : "Make a substance-related log to activate daily score")
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .multilineTextAlignment(.center)
@@ -349,7 +369,7 @@ private struct DailyScoreStatusPill: View {
         .padding(.vertical, 10)
         .glassSurface(radius: 24, tint: .white.opacity(0.24), interactive: true)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(score.isActive ? "Daily score \(score.value), \(score.label)" : "Daily score inactive. Make a log with drug use to activate daily score.")
+        .accessibilityLabel(score.isActive ? "Daily score \(score.value), \(score.label)" : "Daily score inactive. Make a substance-related log to activate daily score.")
     }
 }
 
@@ -653,7 +673,7 @@ struct CalendarOverviewView: View {
                         }
 
                         VStack(alignment: .leading, spacing: 12) {
-                            SectionTitle(title: "Drugs in \(monthTitle)", symbol: "pills.fill")
+                            SectionTitle(title: "Substance tags in \(monthTitle)", symbol: "pills.fill")
 
                             if data.monthlySubstanceCounts.isEmpty {
                                 EmptyGlassState(text: "No substance tags in this month.")
@@ -691,6 +711,7 @@ struct CalendarOverviewView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 if showsDoneButton {
                     ToolbarItem(placement: .topBarLeading) {
@@ -736,9 +757,9 @@ private struct CalendarDayCell: View {
             return .indigo
         }
         if summary.hasJournal {
-            return Color.chillVisibleBlue
+            return Color.chillSecondaryBlue
         }
-        return .black
+        return .clear
     }
 
     var body: some View {
@@ -769,7 +790,7 @@ private struct CalendarDayCell: View {
 
                     if summary.hasJournal {
                         Circle()
-                            .fill(isSelected ? .white.opacity(0.42) : Color.chillVisibleBlue)
+                            .fill(isSelected ? .white.opacity(0.42) : Color.chillSecondaryBlue)
                             .frame(width: 6, height: 6)
                     }
                 }
@@ -865,7 +886,7 @@ private struct RecoveryStreakBadge: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.72)
 
-                    Text("without logged drug use")
+                    Text("without logged substance use")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                 }
@@ -945,11 +966,11 @@ private struct DailyRecoveryScore {
             label = "not active"
             emoji = "😄"
             factors = [
-                Factor(name: "Daily score", caption: "make a log with drug use to activate"),
+                Factor(name: "Daily score", caption: "make a substance-related log to activate"),
                 Factor(name: "Sleep", caption: "starts after activation"),
                 Factor(name: "Hydration", caption: "starts after activation"),
                 Factor(name: "Food", caption: "starts after activation"),
-                Factor(name: "Substances", caption: "no drug use logged"),
+                Factor(name: "Substances", caption: "no substance use logged"),
                 Factor(name: "Streak", caption: "\(recoveryStreakDays) d"),
                 Factor(name: "Symptoms", caption: "starts after activation"),
                 Factor(name: "HRV", caption: "later")
@@ -1090,7 +1111,7 @@ private struct HealthWarningCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("You have logged \(count) Chills with sex and drug use in the last 3 weeks. That pattern can carry physical and mental health risks.")
+            Text("You have logged \(count) Chills involving sex and substances in the last 3 weeks. That pattern can carry physical and mental health risks.")
                 .font(.callout)
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1141,7 +1162,7 @@ private struct PEPCountdownCard: View {
                     Text(remainingText(for: remaining))
                         .font(.title2.bold())
                         .monospacedDigit()
-                        .foregroundStyle(remaining <= 12 * 60 * 60 ? .red : Color.chillVisibleBlue)
+                        .foregroundStyle(remaining <= 12 * 60 * 60 ? Color.chillIconRed : Color.chillSecondaryBlue)
                     Text("left in the 72 hour window")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(Color.chillSecondary)
@@ -1153,7 +1174,7 @@ private struct PEPCountdownCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(18)
-            .glassSurface(radius: 30, tint: Color.chillVisibleBlue.opacity(0.12), interactive: true)
+            .glassSurface(radius: 30, tint: Color.chillSecondaryBlue.opacity(0.12), interactive: true)
         }
     }
 
@@ -1195,14 +1216,14 @@ private struct WhatChangedPatternCard: View {
                             Spacer()
                             Text("\(item.count)")
                                 .font(.caption.monospacedDigit().weight(.bold))
-                                .foregroundStyle(Color.chillVisibleBlue)
+                                .foregroundStyle(Color.chillSecondaryBlue)
                         }
                     }
                 }
             }
         }
         .padding(18)
-        .glassSurface(radius: 30, tint: Color.chillVisibleBlue.opacity(0.10), interactive: true)
+        .glassSurface(radius: 30, tint: Color.chillSecondaryBlue.opacity(0.10), interactive: true)
     }
 }
 
@@ -1276,7 +1297,7 @@ private struct ProfessionalHelpView: View {
                             .font(.largeTitle.bold())
                             .foregroundStyle(palette.heroText)
 
-                        Text("A professional helper can talk through sex, drugs, sleep, PrEP, consent, and safety without judgment.")
+                        Text("A professional helper can talk through sex, substances, sleep, PrEP, consent, and safety without judgment.")
                             .font(.callout)
                             .foregroundStyle(palette.heroSecondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -1289,7 +1310,7 @@ private struct ProfessionalHelpView: View {
 
                         HelpResourceCard(
                             title: "GP or family doctor",
-                            detail: "Good for sleep, mood, drug use, medication interactions, and referrals.",
+                            detail: "Good for sleep, mood, substance concerns, medication interactions, and referrals.",
                             symbol: "stethoscope"
                         )
 
@@ -1304,6 +1325,7 @@ private struct ProfessionalHelpView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     BackChevronButton {
@@ -1369,16 +1391,21 @@ private struct TodayFocusCard: View {
 
     var body: some View {
         Button(action: performAction) {
-            HStack(alignment: .center, spacing: 12) {
-                Image(systemName: action.symbol)
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(action.tint)
-                    .frame(width: 38, height: 38)
-                    .glassSurface(radius: 19, tint: action.tint.opacity(0.14))
+            HStack(alignment: .center, spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(action.tint.opacity(0.22))
+                        .frame(width: 48, height: 48)
+                    Image(systemName: action.symbol)
+                        .font(.system(size: 20, weight: .black))
+                        .foregroundStyle(action.tint)
+                        .symbolRenderingMode(.hierarchical)
+                }
+                .shadow(color: action.tint.opacity(0.36), radius: 10, y: 4)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(action.title)
-                        .font(.headline)
+                        .font(.headline.weight(.bold))
                         .foregroundStyle(Color.chillText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.75)
@@ -1391,14 +1418,14 @@ private struct TodayFocusCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(Color.chillTertiary)
             }
-            .padding(12)
+            .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .buttonStyle(.plain)
-        .glassSurface(radius: 24, tint: action.tint.opacity(0.08), interactive: true)
+        .glassSurface(radius: 28, tint: .clear, interactive: true)
         .accessibilityLabel(action.accessibilityLabel)
     }
 
@@ -1445,7 +1472,7 @@ private struct SmartNextAction {
             title = "Timer running"
             detail = "\(timer.substanceName) is still active. Check the timer before deciding anything else."
             symbol = "timer"
-            tint = Color.chillVisibleAmber
+            tint = Color.chillIconAmber
             destination = .care(.drugTimers)
             return
         }
@@ -1454,7 +1481,7 @@ private struct SmartNextAction {
             title = "Plan in progress"
             detail = "Your plan ends around \(plan.endingDate.formatted(date: .omitted, time: .shortened)). Open it for check-ins and reminders."
             symbol = "checkmark.shield.fill"
-            tint = Color.chillVisibleMint
+            tint = Color.chillMint
             destination = .care(.saferPlanning)
             return
         }
@@ -1463,7 +1490,7 @@ private struct SmartNextAction {
             title = "PEP time window"
             detail = "A recent log may need quick sexual-health advice before \(pepEntry.pepDeadline.formatted(date: .abbreviated, time: .shortened))."
             symbol = "cross.case.fill"
-            tint = .red
+            tint = Color.chillIconRed
             destination = .care(.emergency)
             return
         }
@@ -1472,7 +1499,7 @@ private struct SmartNextAction {
             title = "STI results due"
             detail = "Your test from \(pendingTest.testDate.formatted(date: .abbreviated, time: .omitted)) is ready to update."
             symbol = "cross.case.fill"
-            tint = Color.chillVisibleTeal
+            tint = Color.chillIconTeal
             destination = .care(.stdTests)
             return
         }
@@ -1481,7 +1508,7 @@ private struct SmartNextAction {
             title = "Morning-after check-in"
             detail = "Check how you feel after \(entry.startDate.formatted(date: .abbreviated, time: .shortened))."
             symbol = "heart.text.square.fill"
-            tint = Color.chillVisiblePink
+            tint = Color.chillIconPink
             destination = .care(.aftercare)
             return
         }
@@ -1490,7 +1517,7 @@ private struct SmartNextAction {
             title = "Today is saved"
             detail = "You already have a journal entry for today. Review your calendar when you want context."
             symbol = "book.closed.fill"
-            tint = Color.chillVisiblePurple
+            tint = Color.chillIconPurple
             destination = .calendar
             return
         }
@@ -1499,7 +1526,7 @@ private struct SmartNextAction {
             title = "Ready when you are"
             detail = "No Chill has been logged today. Add one only if there is something worth saving."
             symbol = "plus.circle.fill"
-            tint = Color.chillVisibleBlue
+            tint = Color.chillSecondaryBlue
             destination = .log
             return
         }
@@ -1507,7 +1534,7 @@ private struct SmartNextAction {
         title = "Open your timeline"
         detail = "See today next to earlier logs, timers, plans, STI tests, and journal notes."
         symbol = "calendar"
-        tint = Color.chillVisibleBlue
+        tint = Color.chillSecondaryBlue
         destination = .calendar
     }
 
@@ -1539,18 +1566,18 @@ private struct MetricsGrid: View {
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 2)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             WellnessScoreRow(score: dailyScore, recoveryStreakDays: recoveryStreakDays, action: openRecoveryStreak)
 
             LazyVGrid(columns: columns, spacing: 8) {
-                MetricCard(title: "Logged", value: "\(trackedCount)", caption: "sex + substances", symbol: "heart.text.square.fill", tint: Color.chillVisiblePink)
-                MetricCard(title: "Skipped", value: "\(skippedCount)", caption: "checked Chills", symbol: "moon.zzz.fill", tint: Color.chillVisiblePurple)
-                MetricCard(title: "Substances", value: "\(substanceCount)", caption: "drugs logged", symbol: "pills.fill", tint: Color.chillVisibleBlue)
-                MetricCard(title: "Sleep", value: sleepValue, caption: sleepCaption, symbol: "bed.double.fill", tint: Color.chillVisibleAmber)
+                MetricCard(title: "Logged", value: "\(trackedCount)", caption: "sex + substances", symbol: "heart.text.square.fill", tint: Color.chillIconPink)
+                MetricCard(title: "Skipped", value: "\(skippedCount)", caption: "checked Chills", symbol: "moon.zzz.fill", tint: Color.chillIconPurple)
+                MetricCard(title: "Substances", value: "\(substanceCount)", caption: "logged tags", symbol: "pills.fill", tint: Color.chillSecondaryBlue)
+                MetricCard(title: "Sleep", value: sleepValue, caption: sleepCaption, symbol: "bed.double.fill", tint: Color.chillIconAmber)
             }
         }
-        .padding(10)
-        .glassSurface(radius: 26, tint: .white.opacity(0.18))
+        .padding(12)
+        .glassSurface(radius: 28, tint: .clear)
     }
 
     private var sleepValue: String {
@@ -1570,65 +1597,69 @@ private struct WellnessScoreRow: View {
     let action: () -> Void
 
     var body: some View {
-        HStack(spacing: 10) {
-            ZStack {
-                Circle()
-                    .stroke(Color.chillVisibleBlue.opacity(0.20), lineWidth: 8)
-                Circle()
-                    .trim(from: 0, to: score.isActive ? CGFloat(score.value) / 100 : 1)
-                    .stroke(
-                        score.isActive ? Color.chillVisibleMint : Color.chillVisibleBlue,
-                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
+        Button(action: action) {
+            HStack(spacing: 16) {
+                // Fitness-ring style score circle
+                ZStack {
+                    Circle()
+                        .stroke(Color.chillPrimary.opacity(0.14), lineWidth: 10)
+                    Circle()
+                        .trim(from: 0, to: score.isActive ? CGFloat(score.value) / 100 : 1)
+                        .stroke(
+                            score.isActive
+                                ? LinearGradient.chillBrand
+                                : LinearGradient(colors: [Color.chillPrimary.opacity(0.60), Color.chillSecondaryBlue.opacity(0.40)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                            style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                        .shadow(color: Color.chillPrimary.opacity(0.32), radius: 8)
 
-                Text(score.isActive ? "\(score.value)" : score.emoji)
-                    .font(.system(size: score.isActive ? 22 : 24, weight: .bold))
-                    .foregroundStyle(Color.chillText)
-                    .monospacedDigit()
-            }
-            .frame(width: 52, height: 52)
-
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 6) {
-                    Text("Daily score")
-                        .font(.subheadline.weight(.bold))
+                    Text(score.isActive ? "\(score.value)" : score.emoji)
+                        .font(.system(size: score.isActive ? 19 : 22, weight: .black, design: .rounded))
                         .foregroundStyle(Color.chillText)
-                    Text("•")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Color.chillTertiary)
-                    Text("\(recoveryStreakDays)d drug-free")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Color.chillVisibleMint)
+                        .monospacedDigit()
+                        .contentTransition(.numericText())
                 }
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
+                .frame(width: 58, height: 58)
+                .animation(.spring(response: 0.7, dampingFraction: 0.82), value: score.value)
 
-                Text(score.isActive ? "\(score.label). \(recoveryStreakText)" : "Make your first drug-use log to turn on your daily score. \(recoveryStreakText)")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .layoutPriority(1)
+                VStack(alignment: .leading, spacing: 5) {
+                    HStack(spacing: 6) {
+                        Text("Daily score")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(Color.chillText)
+                        if recoveryStreakDays > 0 {
+                            Text("·")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(Color.chillTertiary)
+                            Text("\(recoveryStreakDays)d clear")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(LinearGradient.chillBrand)
+                        }
+                    }
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
 
-            Button(action: action) {
-                Image(systemName: "calendar")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.chillVisibleBlue)
-                    .frame(width: 34, height: 34)
-                    .glassSurface(radius: 17, tint: Color.chillVisibleBlue.opacity(0.10), interactive: true)
+                    Text(score.isActive ? score.label.capitalized : "Make a log to activate")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(Color.chillTertiary)
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Open calendar for recovery streak")
+            .padding(14)
+            .glassSurface(radius: 22, tint: .clear, interactive: true)
         }
-        .frame(maxWidth: .infinity, minHeight: 78, alignment: .leading)
-        .padding(10)
-        .background(Color.chillVisibleBlue.opacity(0.08), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .buttonStyle(.plain)
+        .accessibilityLabel("Daily score \(score.isActive ? "\(score.value), \(score.label)" : "inactive"). \(recoveryStreakDays) days clear. Open calendar.")
     }
 
     private var recoveryStreakText: String {
-        recoveryStreakDays == 1 ? "1 day without logged drug use." : "\(recoveryStreakDays) days without logged drug use."
+        recoveryStreakDays == 1 ? "1 day without logged substance use." : "\(recoveryStreakDays) days without logged substance use."
     }
 }
 
@@ -1640,27 +1671,25 @@ private struct MetricCard: View {
     let tint: Color
 
     var body: some View {
-        HStack(alignment: .center, spacing: 9) {
-            Image(systemName: symbol)
-                .font(.system(size: 17, weight: .black))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [tint, tint.opacity(0.72)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 34, height: 34)
-                .background(tint.opacity(0.20), in: Circle())
-                .overlay {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center, spacing: 0) {
+                ZStack {
                     Circle()
-                        .stroke(.white.opacity(0.46), lineWidth: 1)
+                        .fill(tint.opacity(0.18))
+                        .frame(width: 34, height: 34)
+                    Image(systemName: symbol)
+                        .font(.system(size: 15, weight: .black))
+                        .foregroundStyle(tint)
+                        .symbolRenderingMode(.hierarchical)
                 }
-                .shadow(color: tint.opacity(0.26), radius: 8, x: 0, y: 4)
+                .shadow(color: tint.opacity(0.36), radius: 6, y: 2)
+
+                Spacer(minLength: 0)
+            }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(value)
-                    .font(.system(size: 19, weight: .bold))
+                    .font(.system(size: 22, weight: .black, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(Color.chillText)
                     .lineLimit(1)
@@ -1668,7 +1697,7 @@ private struct MetricCard: View {
 
                 Text(title)
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillText)
+                    .foregroundStyle(Color.chillText.opacity(0.90))
                     .lineLimit(1)
 
                 Text(caption)
@@ -1677,12 +1706,10 @@ private struct MetricCard: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.80)
             }
-
-            Spacer(minLength: 0)
         }
-        .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
-        .padding(9)
-        .background(tint.opacity(0.10), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
+        .padding(12)
+        .glassSurface(radius: 20, tint: .clear, interactive: true)
     }
 }
 
@@ -1691,7 +1718,7 @@ private struct SubstanceOverview: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            SectionTitle(title: "Drugs taken", symbol: "chart.bar.xaxis")
+            SectionTitle(title: "Substance tags", symbol: "chart.bar.xaxis")
 
             if counts.isEmpty {
                 EmptyGlassState(text: "No substance tags in the past 3 months.")
@@ -1723,13 +1750,13 @@ private struct DrugDoseHistoryGraph: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionTitle(title: "Drug dose history", symbol: "chart.xyaxis.line")
+            SectionTitle(title: "Substance pattern history", symbol: "chart.xyaxis.line")
 
             if rows.isEmpty {
-                EmptyGlassState(text: "Start a dosage timer or log substances to see route, dose, and redosing patterns here.")
+                EmptyGlassState(text: "Start a check-in or log substances to see private patterns here.")
             } else {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text("A private month view for spotting escalation or redosing patterns. It does not label anything as good or bad.")
+                    Text("A private month view for spotting changes over time. It does not label anything as good or bad.")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1739,7 +1766,7 @@ private struct DrugDoseHistoryGraph: View {
                     }
                 }
                 .padding(16)
-                .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+                .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08), interactive: true)
             }
         }
     }
@@ -1763,7 +1790,8 @@ private struct DoseHistoryRow: Identifiable {
             let substance = timer.substanceName
             let day = calendar.startOfDay(for: timer.startedAt)
             countsBySubstance[substance, default: [:]][day, default: 0] += 1
-            routeCounts[substance, default: [:]][timer.administrationRoute, default: 0] += 1
+            let routeLabel = AdministrationRoute(rawValue: timer.administrationRoute)?.displayName ?? timer.administrationRoute
+            routeCounts[substance, default: [:]][routeLabel, default: 0] += 1
             if !timer.doseNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 doseNotes[substance, default: 0] += 1
             }
@@ -1822,13 +1850,13 @@ private struct DoseHistoryRowView: View {
                 Spacer()
                 Text("\(total) logged")
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillVisibleBlue)
+                    .foregroundStyle(Color.chillSecondaryBlue)
             }
 
             HStack(alignment: .bottom, spacing: 3) {
                 ForEach(Array(row.dayCounts.enumerated()), id: \.offset) { _, count in
                     Capsule()
-                        .fill(count > 0 ? Color.chillVisibleBlue.opacity(0.82) : Color.black.opacity(0.08))
+                        .fill(count > 0 ? LinearGradient(colors: [Color.chillPrimary.opacity(0.90), Color.chillSecondaryBlue.opacity(0.70)], startPoint: .top, endPoint: .bottom) : LinearGradient(colors: [Color.white.opacity(0.07), Color.white.opacity(0.07)], startPoint: .top, endPoint: .bottom))
                         .frame(maxWidth: .infinity)
                         .frame(height: count > 0 ? max(8, CGFloat(count) / CGFloat(maxCount) * 42) : 6)
                         .accessibilityHidden(true)
@@ -1836,7 +1864,7 @@ private struct DoseHistoryRowView: View {
             }
             .frame(height: 46)
 
-            Text("\(row.routeSummary) · \(row.redoseDays) redose day\(row.redoseDays == 1 ? "" : "s") · \(row.doseNotesCount) dose note\(row.doseNotesCount == 1 ? "" : "s")")
+            Text("\(row.routeSummary) · \(row.redoseDays) continued day\(row.redoseDays == 1 ? "" : "s") · \(row.doseNotesCount) private note\(row.doseNotesCount == 1 ? "" : "s")")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1864,9 +1892,9 @@ private struct CalendarJournalCard: View {
             HStack(spacing: 10) {
                 Image(systemName: "book.closed.fill")
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(Color.chillVisibleBlue)
+                    .foregroundStyle(Color.chillSecondaryBlue)
                     .frame(width: 34, height: 34)
-                    .glassSurface(radius: 17, tint: Color.chillVisibleBlue.opacity(0.12))
+                    .glassSurface(radius: 17, tint: Color.chillSecondaryBlue.opacity(0.12))
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(entry.date.formatted(date: .omitted, time: .shortened))
@@ -1895,7 +1923,7 @@ private struct CalendarJournalCard: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassSurface(radius: 22, tint: Color.chillVisibleBlue.opacity(0.07))
+        .glassSurface(radius: 22, tint: Color.chillSecondaryBlue.opacity(0.07))
     }
 }
 
@@ -2131,9 +2159,9 @@ private struct TimelineRow: View {
                 }
 
                 if !entry.injectionSubstances.isEmpty {
-                    Label("Injected: \(entry.injectionSubstances.joined(separator: ", "))", systemImage: "syringe.fill")
+                    Label("Injection context: \(entry.injectionSubstances.joined(separator: ", "))", systemImage: "syringe.fill")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.chillVisibleMint)
+                        .foregroundStyle(Color.chillMint)
                         .lineLimit(2)
                 }
 
@@ -2157,6 +2185,7 @@ private struct TimelineRow: View {
 
 private struct FloatingLogBar: View {
     let add: () -> Void
+    @State private var isPressed = false
 
     var body: some View {
         LiquidGlassGroup(spacing: 12) {
@@ -2165,22 +2194,35 @@ private struct FloatingLogBar: View {
                     Text("Private log")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
-                    Text("Add sleep, drugs, or a skip")
+                    Text("Add sleep, reflection, or a skip")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color.chillText)
                 }
 
                 Spacer()
 
-                GlassActionButton(prominent: true, action: add) {
+                Button {
+                    withAnimation(.spring(response: 0.20, dampingFraction: 0.70)) { isPressed = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) {
+                        withAnimation(.spring(response: 0.28, dampingFraction: 0.80)) { isPressed = false }
+                    }
+                    add()
+                } label: {
                     Label("Add", systemImage: "plus")
-                        .font(.headline)
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 11)
+                        .background(LinearGradient.chillBrand, in: Capsule())
+                        .shadow(color: Color.chillPrimary.opacity(0.44), radius: 12, y: 6)
+                        .scaleEffect(isPressed ? 0.95 : 1.0)
                 }
+                .buttonStyle(.plain)
                 .accessibilityLabel("Add Chill")
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
-            .glassSurface(radius: 30, tint: .black.opacity(0.05))
+            .glassSurface(radius: 30, tint: .black.opacity(0.04))
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 8)
@@ -2192,9 +2234,15 @@ private struct SectionTitle: View {
     let symbol: String
 
     var body: some View {
-        Label(title, systemImage: symbol)
-            .font(.headline)
-            .foregroundStyle(Color.chillText)
+        HStack(spacing: 8) {
+            Image(systemName: symbol)
+                .font(.system(size: 14, weight: .black))
+                .foregroundStyle(LinearGradient.chillBrand)
+                .symbolRenderingMode(.hierarchical)
+            Text(title)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(Color.chillText)
+        }
     }
 }
 
@@ -2374,6 +2422,7 @@ struct ProfileOverviewView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: ProfileSectionPage.self) { page in
                 ProfileSectionDetailView(page: page, details: details, medications: profile?.medications ?? [])
             }
@@ -2750,7 +2799,7 @@ private struct ProfileMedicationEditor: View {
                     .padding(14)
                     .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
 
-                TextField("Dosage, for example 20 mg", text: $dosage)
+                TextField("Medication amount from your prescription, optional", text: $dosage)
                     .textFieldStyle(.plain)
                     .foregroundStyle(Color.chillText)
                     .padding(14)
@@ -2798,7 +2847,7 @@ private struct ProfileMedicationEditor: View {
             }
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+        .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08), interactive: true)
     }
 
     private func addMedication() {
@@ -2834,9 +2883,9 @@ private struct ProfileMedicationEditableRow: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "pills.fill")
                 .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(Color.chillVisibleBlue)
+                .foregroundStyle(Color.chillSecondaryBlue)
                 .frame(width: 36, height: 36)
-                .glassSurface(radius: 18, tint: Color.chillVisibleBlue.opacity(0.10))
+                .glassSurface(radius: 18, tint: Color.chillSecondaryBlue.opacity(0.10))
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(medication.name)
@@ -2867,9 +2916,9 @@ private struct ProfileMedicationDetailCard: View {
         HStack(alignment: .top, spacing: 12) {
             Image(systemName: "pills.fill")
                 .font(.system(size: 17, weight: .bold))
-                .foregroundStyle(Color.chillVisibleBlue)
+                .foregroundStyle(Color.chillSecondaryBlue)
                 .frame(width: 40, height: 40)
-                .glassSurface(radius: 20, tint: Color.chillVisibleBlue.opacity(0.10))
+                .glassSurface(radius: 20, tint: Color.chillSecondaryBlue.opacity(0.10))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(medication.name)
@@ -3036,7 +3085,7 @@ private struct ProfileSectionDetailView: View {
 
                     if page == .medications {
                         if medications.isEmpty {
-                            EmptyGlassState(text: "No medication saved yet. Use Edit on your profile to add medication, dose, timing, and effect duration.")
+                            EmptyGlassState(text: "No medication saved yet. Use Edit on your profile to add medication, prescription amount, timing, and duration.")
                         } else {
                             VStack(spacing: 12) {
                                 ForEach(medications) { medication in

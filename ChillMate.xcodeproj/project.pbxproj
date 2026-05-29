@@ -32,6 +32,7 @@
 		F88B00000000000000000001 /* ChillMateWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000011 /* ChillMateWatchApp.swift */; };
 		F88B00000000000000000002 /* WatchDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000012 /* WatchDashboardView.swift */; };
 		F88B00000000000000000003 /* ChillMateWatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000014 /* ChillMateWatchApp.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F88B00000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000015 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +103,7 @@
 		F88B00000000000000000011 /* ChillMateWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChillMateWatchApp.swift; sourceTree = "<group>"; };
 		F88B00000000000000000012 /* WatchDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDashboardView.swift; sourceTree = "<group>"; };
 		F88B00000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F88B00000000000000000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F88B00000000000000000014 /* ChillMateWatchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChillMateWatchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -182,9 +184,11 @@
 			path = ChillMateLiveActivityExtension;
 			sourceTree = "<group>";
 		};
+		F88B00000000000000000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F88B00000000000000000020 /* ChillMateWatchApp */ = {
 			isa = PBXGroup;
 			children = (
+				F88B00000000000000000015 /* Assets.xcassets */,
 				F88B00000000000000000011 /* ChillMateWatchApp.swift */,
 				F88B00000000000000000012 /* WatchDashboardView.swift */,
 				F88B00000000000000000013 /* Info.plist */,
@@ -306,6 +310,7 @@
 		F88B00000000000000000032 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				F88B00000000000000000004 /* Assets.xcassets in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -505,10 +510,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ChillMate/ChillMate.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 110;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 111;
 				DEVELOPMENT_ASSET_PATHS = "\"ChillMate/Preview Content\"";
-				DEVELOPMENT_TEAM = UCZEZS4VJ6;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UCZEZS4VJ6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMate/Info.plist;
@@ -530,9 +537,10 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codex.ChillMate;
+				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "BIJTHIJS Managed Profile";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -547,9 +555,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ChillMate/ChillMate.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 110;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 111;
 				DEVELOPMENT_ASSET_PATHS = "\"ChillMate/Preview Content\"";
 				DEVELOPMENT_TEAM = UCZEZS4VJ6;
 				ENABLE_PREVIEWS = YES;
@@ -573,9 +581,9 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codex.ChillMate;
+				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "ChillMate AppStore";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -591,7 +599,7 @@
 				CODE_SIGN_ENTITLEMENTS = ChillMateLiveActivityExtension/ChillMateLiveActivityExtension.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 110;
+				CURRENT_PROJECT_VERSION = 111;
 				DEVELOPMENT_TEAM = UCZEZS4VJ6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMateLiveActivityExtension/Info.plist;
@@ -604,7 +612,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codex.ChillMate.LiveActivityExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.LiveActivityExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -620,10 +628,11 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = ChillMateLiveActivityExtension/ChillMateLiveActivityExtension.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 110;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 111;
 				DEVELOPMENT_TEAM = UCZEZS4VJ6;
+				PROVISIONING_PROFILE_SPECIFIER = "ChillMate Extension AppStore";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMateLiveActivityExtension/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "ChillMate Timer";
@@ -635,7 +644,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codex.ChillMate.LiveActivityExtension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.LiveActivityExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -652,16 +661,16 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 110;
+				CURRENT_PROJECT_VERSION = 111;
 				DEVELOPMENT_TEAM = UCZEZS4VJ6;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMateWatchApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ChillMate;
 				INFOPLIST_KEY_WKApplication = YES;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.codex.ChillMate;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.BIJTHIJS.ChillMate;
 				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codex.ChillMate.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = NO;
@@ -675,19 +684,22 @@
 		F88B00000000000000000043 /* Release configuration for PBXNativeTarget "ChillMateWatchApp" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 110;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 111;
 				DEVELOPMENT_TEAM = UCZEZS4VJ6;
+				EXCLUDED_ARCHS = arm64e;
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
+				PROVISIONING_PROFILE_SPECIFIER = "ChillMate Watch AppStore IOS_APP_STORE";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMateWatchApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ChillMate;
 				INFOPLIST_KEY_WKApplication = YES;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.codex.ChillMate;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.BIJTHIJS.ChillMate;
 				MARKETING_VERSION = 1.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.codex.ChillMate.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = NO;

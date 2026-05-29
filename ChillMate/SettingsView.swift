@@ -182,6 +182,7 @@ struct SettingsView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: SettingsSectionPage.self) { page in
                 settingsPage(page)
             }
@@ -289,7 +290,7 @@ struct SettingsView: View {
 
                         SettingsToggleCard(
                             title: "Daily affirmations",
-                            caption: "Send a small confidence boost for recovery, drug-free days, and strong daily scores.",
+                            caption: "Send a small confidence boost for recovery, substance-free days, and strong daily scores.",
                             symbol: "sparkles",
                             isOn: $dailyAffirmationsEnabled
                         )
@@ -919,9 +920,9 @@ private struct PrivacyDashboardCard: View {
                 HStack(alignment: .top, spacing: 12) {
                     Image(systemName: row.2)
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(Color.chillVisibleBlue)
+                        .foregroundStyle(Color.chillSecondaryBlue)
                         .frame(width: 38, height: 38)
-                        .glassSurface(radius: 19, tint: Color.chillVisibleBlue.opacity(0.10))
+                        .glassSurface(radius: 19, tint: Color.chillSecondaryBlue.opacity(0.10))
 
                     VStack(alignment: .leading, spacing: 3) {
                         Text(row.0)
@@ -988,7 +989,7 @@ private struct HealthPermissionToggleLine: View {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: scope.symbolName)
                     .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(isOn ? Color.chillVisibleBlue : Color.chillSecondary)
+                    .foregroundStyle(isOn ? Color.chillPrimary : Color.chillSecondary)
                     .frame(width: 28, height: 28)
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -1058,15 +1059,15 @@ private struct AccessibilityQualityCard: View {
             SettingsToggleLine(title: "Prefer bottom actions", symbol: "hand.tap.fill", isOn: $oneHandedControls)
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
     }
 }
 
 private struct ClinicalReviewSettingsCard: View {
     private let rows = [
         "Risk wording uses caution levels instead of claiming a combination is safe.",
-        "Drug, STI, PrEP, and emergency content includes source links where practical.",
-        "Public release should still receive clinician or harm-reduction professional review before App Store distribution."
+        "Substance, STI, PrEP, and emergency content includes source links where practical.",
+        "This Beta should receive clinician, sexual-health, harm-reduction, and privacy review before public App Store distribution."
     ]
 
     var body: some View {
@@ -1088,7 +1089,7 @@ private struct ClinicalReviewSettingsCard: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillVisibleMint.opacity(0.08))
+        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.08))
     }
 }
 
@@ -1114,9 +1115,9 @@ private struct EncryptedBackupCard: View {
             HStack(alignment: .top, spacing: 14) {
                 Image(systemName: "lock.doc.fill")
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(Color.chillVisibleBlue)
+                    .foregroundStyle(Color.chillPrimary)
                     .frame(width: 42, height: 42)
-                    .glassSurface(radius: 21, tint: Color.chillVisibleBlue.opacity(0.12))
+                    .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.12))
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Encrypted backup")
@@ -1155,7 +1156,7 @@ private struct EncryptedBackupCard: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
-            .tint(Color.chillVisibleBlue)
+            .tint(Color.chillPrimary)
             .disabled(isWorking)
 
             if let backupURL {
@@ -1165,11 +1166,11 @@ private struct EncryptedBackupCard: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
-                .tint(Color.chillVisibleBlue)
+                .tint(Color.chillPrimary)
             }
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
     }
 }
 
@@ -1200,9 +1201,9 @@ private struct ICloudBackupCard: View {
             HStack(alignment: .top, spacing: 14) {
                 Image(systemName: "icloud.fill")
                     .font(.system(size: 21, weight: .semibold))
-                    .foregroundStyle(Color.chillVisibleBlue)
+                    .foregroundStyle(Color.chillPrimary)
                     .frame(width: 42, height: 42)
-                    .glassSurface(radius: 21, tint: Color.chillVisibleBlue.opacity(0.12))
+                    .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.12))
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Encrypted iCloud backup")
@@ -1248,7 +1249,7 @@ private struct ICloudBackupCard: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
-                .tint(Color.chillVisibleBlue)
+                .tint(Color.chillPrimary)
                 .disabled(isWorking)
             }
 
@@ -1262,7 +1263,7 @@ private struct ICloudBackupCard: View {
             .disabled(isWorking)
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08), interactive: true)
+        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
     }
 }
 

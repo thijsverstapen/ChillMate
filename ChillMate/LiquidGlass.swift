@@ -17,13 +17,13 @@ enum ChillBackgroundStyle: String, CaseIterable, Identifiable {
         case .score:
             []
         case .liquidPurple:
-            [.chillDarkBackground, .chillPrimary, .chillMint, .white]
+            [.chillDarkBackground, .chillPrimary.opacity(0.90), .chillMint.opacity(0.70)]
         case .dusk:
-            [.chillDarkBackground, .chillSurfaceDark, .chillSecondaryBlue, .white]
+            [.chillDarkBackground, .chillSurfaceDark, .chillSecondaryBlue.opacity(0.80)]
         case .mint:
-            [.chillDarkBackground, .chillMint, .chillAccentTeal, .white]
+            [.chillDarkBackground, .chillMint.opacity(0.60), .chillAccentTeal.opacity(0.50)]
         case .sunrise:
-            [.chillPrimary, .chillSecondaryBlue, .chillMint, .white]
+            [.chillDarkBackground, .chillPrimary.opacity(0.80), .chillSecondaryBlue.opacity(0.70)]
         case .photo:
             []
         }
@@ -56,22 +56,19 @@ struct DashboardBackdrop: View {
                 Image(uiImage: backgroundImage)
                     .resizable()
                     .scaledToFill()
-                    .overlay(.white.opacity(0.38))
+                    .overlay(.black.opacity(0.44))
                     .overlay(
                         LinearGradient(
-                            colors: [.black.opacity(0.22), .white.opacity(0.56)],
+                            colors: [.black.opacity(0.18), .black.opacity(0.52)],
                             startPoint: .top,
                             endPoint: .bottom
                         )
                     )
             } else {
                 LinearGradient(
-                    colors: style == .score ? [
-                        palette.top,
-                        palette.middle,
-                        palette.lower,
-                        .white
-                    ] : style.colors,
+                    colors: style == .score
+                        ? [palette.top, palette.middle, palette.lower]
+                        : style.colors,
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -168,25 +165,24 @@ struct DailyScorePalette {
         Double(min(max(score, 0), 100)) / 100
     }
 
+    // Top-left corner: stays near-black across all scores
     var top: Color {
-        color(from: RGB(0.06, 0.07, 0.09), to: RGB(0.98, 0.78, 0.12))
+        color(from: RGB(0.06, 0.07, 0.09), to: RGB(0.07, 0.08, 0.17))
     }
 
+    // Center: stays very dark throughout, slight indigo hint at 100
     var middle: Color {
-        color(from: RGB(0.11, 0.12, 0.17), to: RGB(1.00, 0.90, 0.38))
+        color(from: RGB(0.10, 0.11, 0.16), to: RGB(0.12, 0.14, 0.30))
     }
 
+    // Bottom-right: dark navy → dark forest teal at 100 (never bright)
     var lower: Color {
-        color(from: RGB(0.39, 0.40, 0.95), to: RGB(1.00, 0.98, 0.78))
+        color(from: RGB(0.09, 0.10, 0.16), to: RGB(0.08, 0.25, 0.21))
     }
 
-    var heroText: Color {
-        score >= 72 ? .chillText : .white
-    }
-
-    var heroSecondary: Color {
-        score >= 72 ? .chillSecondary : .white.opacity(0.78)
-    }
+    // Background is always dark — text is always white
+    var heroText: Color { .white }
+    var heroSecondary: Color { .white.opacity(0.72) }
 
     private func color(from: RGB, to: RGB) -> Color {
         Color(
@@ -212,18 +208,18 @@ struct DailyScorePalette {
 struct TestingOnlyNoticeCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "exclamationmark.triangle.fill")
+            Image(systemName: "checkmark.shield.fill")
                 .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(Color.chillVisibleOrange)
+                .foregroundStyle(Color.chillIconOrange)
                 .frame(width: 30, height: 30)
-                .glassSurface(radius: 15, tint: Color.chillVisibleOrange.opacity(0.12))
+                .glassSurface(radius: 15, tint: Color.chillIconOrange.opacity(0.12))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Beta notice")
+                Text("Beta safety note")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(Color.chillText)
 
-                Text("This Beta app has not been reviewed by harm-reduction, sexual-health, or privacy/security professionals. For real support, open Support from More.")
+                Text("ChillMate is a private reflection and wellbeing tool. It does not diagnose, treat, recommend substance use, or give dosage advice. For urgent help, use emergency services or Support.")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -235,18 +231,37 @@ struct TestingOnlyNoticeCard: View {
     }
 }
 
+struct MedicalSafetyDisclaimerCard: View {
+    var compact = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: compact ? 8 : 10) {
+            Label("Not medical advice", systemImage: "cross.case.fill")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Color.chillText)
+
+            Text("ChillMate supports reflection, recovery, STI care, privacy, and emergency planning. It does not replace a clinician, diagnose conditions, decide whether something is safe, or recommend amounts, timing, or substance use.")
+                .font((compact ? Font.caption : Font.callout).weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("If someone may be in immediate danger, call local emergency services.")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.red)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(compact ? 12 : 14)
+        .glassSurface(radius: compact ? 20 : 24, tint: Color.chillVisibleOrange.opacity(0.08), interactive: true)
+    }
+}
+
 struct LiquidGlassGroup<Content: View>: View {
     var spacing: CGFloat = 18
     @ViewBuilder var content: () -> Content
 
     var body: some View {
-        if #available(iOS 26.0, *) {
-            GlassEffectContainer(spacing: spacing) {
-                content()
-            }
-        } else {
-            content()
-        }
+        content()
     }
 }
 
@@ -256,28 +271,26 @@ struct GlassSurfaceModifier: ViewModifier {
     let interactive: Bool
 
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            if interactive {
-                content
-                    .glassEffect(.regular.tint(tint).interactive(), in: .rect(cornerRadius: radius))
-                    .glassOutline(radius: radius)
-            } else {
-                content
-                    .glassEffect(.regular.tint(tint), in: .rect(cornerRadius: radius))
-                    .glassOutline(radius: radius)
+        // Use dark ultraThinMaterial so our white text stays white.
+        // iOS 26's .glassEffect creates vibrancy that inverts content to dark-on-light;
+        // forcing .dark colorScheme on a material gives proper dark frosted glass instead.
+        content
+            .background(
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .environment(\.colorScheme, .dark)
+            .overlay {
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .stroke(.white.opacity(0.12), lineWidth: 0.5)
             }
-        } else {
-            content
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: radius, style: .continuous))
-                .glassOutline(radius: radius)
-        }
     }
 }
 
 extension View {
     func glassSurface(
         radius: CGFloat = 28,
-        tint: Color = .white.opacity(0.24),
+        tint: Color = .clear,
         interactive: Bool = false
     ) -> some View {
         modifier(GlassSurfaceModifier(radius: radius, tint: tint, interactive: interactive))
@@ -286,9 +299,24 @@ extension View {
     func glassOutline(radius: CGFloat) -> some View {
         overlay {
             RoundedRectangle(cornerRadius: radius, style: .continuous)
-                .stroke(.black.opacity(0.07), lineWidth: 1)
+                .stroke(.white.opacity(0.12), lineWidth: 0.5)
         }
     }
+}
+
+extension LinearGradient {
+    /// The ChillMate brand gradient: primary blue → mint green.
+    static let chillBrand = LinearGradient(
+        colors: [Color.chillPrimary, Color.chillMint],
+        startPoint: .leading,
+        endPoint: .trailing
+    )
+
+    static let chillBrandDiagonal = LinearGradient(
+        colors: [Color.chillPrimary, Color.chillSecondaryBlue, Color.chillMint],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 }
 
 extension Color {
@@ -296,6 +324,7 @@ extension Color {
     static let chillSecondaryBlue = Color(red: 96 / 255, green: 165 / 255, blue: 250 / 255)
     static let chillMint = Color(red: 126 / 255, green: 231 / 255, blue: 199 / 255)
     static let chillAccentTeal = Color(red: 167 / 255, green: 243 / 255, blue: 208 / 255)
+    // Accessibility colors (for text on light backgrounds / high contrast mode)
     static let chillVisibleMint = Color(red: 5 / 255, green: 118 / 255, blue: 95 / 255)
     static let chillVisibleBlue = Color(red: 49 / 255, green: 70 / 255, blue: 190 / 255)
     static let chillVisibleOrange = Color(red: 181 / 255, green: 76 / 255, blue: 0 / 255)
@@ -303,11 +332,20 @@ extension Color {
     static let chillVisiblePink = Color(red: 185 / 255, green: 28 / 255, blue: 96 / 255)
     static let chillVisibleTeal = Color(red: 0 / 255, green: 104 / 255, blue: 132 / 255)
     static let chillVisibleAmber = Color(red: 146 / 255, green: 64 / 255, blue: 14 / 255)
+    // Bright icon / accent colors — designed for dark-background glass UI (iOS 26 style)
+    static let chillIconAmber  = Color(red: 251 / 255, green: 191 / 255, blue: 36 / 255)
+    static let chillIconPink   = Color(red: 244 / 255, green: 114 / 255, blue: 182 / 255)
+    static let chillIconOrange = Color(red: 251 / 255, green: 146 / 255, blue: 60 / 255)
+    static let chillIconPurple = Color(red: 167 / 255, green: 139 / 255, blue: 250 / 255)
+    static let chillIconTeal   = Color(red: 45 / 255, green: 212 / 255, blue: 191 / 255)
+    static let chillIconRed    = Color(red: 248 / 255, green: 113 / 255, blue: 113 / 255)
+    static let chillIconGreen  = Color(red: 74 / 255, green: 222 / 255, blue: 128 / 255)
     static let chillDarkBackground = Color(red: 15 / 255, green: 17 / 255, blue: 23 / 255)
     static let chillSurfaceDark = Color(red: 28 / 255, green: 31 / 255, blue: 43 / 255)
-    static let chillText = Color(red: 15 / 255, green: 17 / 255, blue: 23 / 255)
-    static let chillSecondary = Color(red: 0.28, green: 0.31, blue: 0.39)
-    static let chillTertiary = Color(red: 0.48, green: 0.52, blue: 0.60)
+    // On the app's dark gradient background, text must be white-based
+    static let chillText = Color.white
+    static let chillSecondary = Color.white.opacity(0.68)
+    static let chillTertiary = Color.white.opacity(0.46)
 }
 
 struct GlassActionButton<Label: View>: View {

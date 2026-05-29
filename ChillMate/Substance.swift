@@ -52,25 +52,25 @@ enum Substance: String, CaseIterable, Identifiable {
     var tint: Color {
         switch self {
         case .cannabis:
-            Color.chillVisibleMint
+            Color.chillMint
         case .alcohol:
             .orange
         case .mdma:
-            Color.chillVisibleMint
+            Color.chillMint
         case .threeMMC:
             .red
         case .ketamine:
             Color.chillPrimary
         case .ghb:
-            Color.chillVisibleBlue
+            Color.chillSecondaryBlue
         case .gbl:
-            Color.chillVisibleMint
+            Color.chillMint
         case .cocaine:
-            Color.chillVisibleBlue
+            Color.chillSecondaryBlue
         case .poppers:
-            Color.chillVisibleMint
+            Color.chillMint
         case .kamagra:
-            Color.chillVisibleBlue
+            Color.chillSecondaryBlue
         case .viagra:
             .indigo
         case .psychedelics:
@@ -138,11 +138,11 @@ enum Substance: String, CaseIterable, Identifiable {
         case .mdma:
             "Stimulant/empathogen effects can include warmth, jaw tension, overheating, and a next-day dip."
         case .threeMMC:
-            "A stimulant cathinone. Can raise heart rate, reduce sleep, and increase redosing urges."
+            "A stimulant cathinone. Can raise heart rate, reduce sleep, and make it harder to pause."
         case .ketamine:
             "Dissociative effects can affect balance, memory, and consent clarity."
         case .ghb:
-            "Small amount changes can matter. Mixing with alcohol or sedatives can cause unconsciousness or breathing problems."
+            "Effects can become unpredictable quickly. Mixing with alcohol or sedatives can cause unconsciousness or breathing problems."
         case .gbl:
             "Converts to GHB in the body and carries similar risks, especially with alcohol or sedatives."
         case .cocaine:
@@ -158,7 +158,7 @@ enum Substance: String, CaseIterable, Identifiable {
         case .unknown:
             "Unknown substances are harder to predict. Avoid mixing and seek help if something feels wrong."
         case .other:
-            "Use this for personal notes when the substance is not listed."
+            "Use this only for private reflection when something is not listed."
         }
     }
 
@@ -171,11 +171,11 @@ enum Substance: String, CaseIterable, Identifiable {
         case .mdma:
             ["Overheating and dehydration", "Jaw tension and high heart rate", "Next-day low mood or sleep disruption"]
         case .threeMMC:
-            ["Strong redosing urges", "High heart rate and anxiety", "Sleep loss and comedown"]
+            ["Strong urge to continue", "High heart rate and anxiety", "Sleep loss and low mood afterwards"]
         case .ketamine:
             ["Dissociation and falls", "Memory gaps", "Consent clarity can be affected"]
         case .ghb, .gbl:
-            ["Narrow dose margin", "Unconsciousness risk", "Breathing problems when mixed"]
+            ["Unconsciousness can happen quickly", "Breathing problems when mixed", "Harder to judge safety and consent"]
         case .cocaine:
             ["Heart strain", "Anxiety or agitation", "Sleep loss and impulsive decisions"]
         case .poppers:
@@ -206,7 +206,7 @@ enum Substance: String, CaseIterable, Identifiable {
         case .ketamine:
             ["Avoid depressant stacks and settings where falls, water, stairs, or consent confusion are likely."]
         default:
-            ["Avoid unknown mixes, redosing pressure, and combining with medication without professional advice."]
+            ["Avoid unknown mixes, pressure to continue, and combining with medication without professional advice."]
         }
     }
 

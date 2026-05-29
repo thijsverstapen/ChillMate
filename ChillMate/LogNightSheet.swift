@@ -208,6 +208,7 @@ struct LogNightSheet: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     BackChevronButton {
@@ -699,7 +700,7 @@ private struct SubstancePicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label("Drugs taken", systemImage: "pills.fill")
+            Label("Substances involved", systemImage: "pills.fill")
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
@@ -724,7 +725,7 @@ private struct SubstancePicker: View {
 
             DisclosureGroup {
                 VStack(alignment: .leading, spacing: 12) {
-                    Toggle("Yes, slamming/injecting happened", isOn: $didInjectDrugs)
+                    Toggle("Injection use happened", isOn: $didInjectDrugs)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color.chillText)
                         .tint(Color.chillAccentTeal)
@@ -737,7 +738,7 @@ private struct SubstancePicker: View {
                                 }
                             }
                             .pickerStyle(.menu)
-                            .tint(Color.chillVisibleMint)
+                            .tint(Color.chillMint)
 
                             Button {
                                 addInjectedSubstance()
@@ -746,11 +747,11 @@ private struct SubstancePicker: View {
                                     .font(.title3)
                             }
                             .buttonStyle(.plain)
-                            .foregroundStyle(Color.chillVisibleMint)
+                            .foregroundStyle(Color.chillMint)
                         }
 
                         if injectedSubstances.isEmpty {
-                            Text("Add one or more injected substances if you want them saved.")
+                            Text("Add one or more substances only if it helps with later health or STI support.")
                                 .font(.caption)
                                 .foregroundStyle(Color.chillSecondary)
                         } else {
@@ -774,7 +775,7 @@ private struct SubstancePicker: View {
                 }
                 .padding(.top, 8)
             } label: {
-                Label("Slamming / injecting", systemImage: "syringe.fill")
+                Label("Injection context", systemImage: "syringe.fill")
                     .font(.headline)
                     .foregroundStyle(Color.chillText)
             }
@@ -854,7 +855,7 @@ private struct TriggerMapCard: View {
                     SelectableTextChip(
                         title: trigger.rawValue,
                         isSelected: selectedTriggers.contains(trigger),
-                        tint: Color.chillVisibleMint
+                        tint: Color.chillMint
                     ) {
                         toggle(trigger)
                     }
@@ -862,7 +863,7 @@ private struct TriggerMapCard: View {
             }
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillVisibleMint.opacity(0.08))
+        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.08))
     }
 
     private func toggle(_ trigger: ChillTrigger) {
@@ -890,7 +891,7 @@ private struct WhatChangedInputCard: View {
                         SelectableTextChip(
                             title: reason.rawValue,
                             isSelected: selectedReasons.contains(reason),
-                            tint: Color.chillVisibleBlue
+                            tint: Color.chillSecondaryBlue
                         ) {
                             toggle(reason)
                         }
@@ -904,7 +905,7 @@ private struct WhatChangedInputCard: View {
                 .foregroundStyle(Color.chillText)
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillVisibleBlue.opacity(0.08))
+        .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
     }
 
     private func toggle(_ reason: ChangeReason) {
