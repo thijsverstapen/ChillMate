@@ -119,6 +119,19 @@ enum AdministrationRoute: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var displayName: String {
+        switch self {
+        case .sniffed:
+            "Nasal"
+        case .injected:
+            "Injection"
+        case .swallowed:
+            "Oral"
+        case .smoked:
+            "Inhaled"
+        }
+    }
+
     var symbolName: String {
         switch self {
         case .sniffed:
@@ -342,6 +355,17 @@ enum RedoseDecision: String, CaseIterable, Identifiable {
     case avoided = "Did not redose"
 
     var id: String { rawValue }
+
+    var displayTitle: String {
+        switch self {
+        case .undecided:
+            "Not answered"
+        case .redosed:
+            "Logged more"
+        case .avoided:
+            "Paused or stopped"
+        }
+    }
 }
 
 enum DrugTimerLiveActivityController {
@@ -367,6 +391,7 @@ enum DrugTimerLiveActivityController {
             timer.liveActivityID = activity.id
         } catch {
             timer.liveActivityID = ""
+            print("[ChillMate] Live Activity request failed: \(error)")
         }
     }
 

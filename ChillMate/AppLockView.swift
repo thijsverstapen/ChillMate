@@ -1,3 +1,4 @@
+import CommonCrypto
 import CryptoKit
 import LocalAuthentication
 import SwiftUI
@@ -5,15 +6,15 @@ import SwiftUI
 struct AppLockView<Content: View>: View {
     @AppStorage("requiresFaceID") private var requiresFaceID = false
     @AppStorage("requiresPIN") private var requiresPIN = false
-    @AppStorage("appPINHash") private var appPINHash = ""
-    @AppStorage("appPINSalt") private var appPINSalt = ""
     @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
+    @AppStorage("autoLockMinutes") private var autoLockMinutes = 0
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var isUnlocked = false
     @State private var message: String?
     @State private var isAuthenticating = false
     @State private var pinCode = ""
+    @State private var backgroundedAt: Date?
 
     private let content: Content
 
@@ -55,8 +56,17 @@ struct AppLockView<Content: View>: View {
         }
         .onChange(of: scenePhase) { _, newPhase in
             if lockRequired, newPhase != .active {
-                isUnlocked = false
-                pinCode = ""
+                if backgroundedAt == nil { backgroundedAt = .now }
+            }
+
+            if lockRequired, newPhase == .active {
+                let elapsed = backgroundedAt.map { Date.now.timeIntervalSince($0) } ?? 0
+                let threshold = Double(autoLockMinutes) * 60
+                if autoLockMinutes == 0 || elapsed >= threshold {
+                    isUnlocked = false
+                    pinCode = ""
+                }
+                backgroundedAt = nil
             }
 
             if requiresFaceID, newPhase == .active, !isUnlocked {
@@ -97,7 +107,7 @@ struct AppLockView<Content: View>: View {
             return
         }
 
-        if LocalSecurityService.verifyPIN(pinCode, hash: appPINHash, salt: appPINSalt) {
+        if LocalSecurityService.verifyPINFromKeychain(pinCode) {
             isUnlocked = true
             pinCode = ""
             message = nil
@@ -219,18 +229,49 @@ enum AppAuthenticationError: LocalizedError {
 }
 
 enum LocalSecurityService {
-    static func makePINCredentials(pin: String) -> (hash: String, salt: String) {
-        let saltBytes = (0..<16).map { _ in UInt8.random(in: UInt8.min...UInt8.max) }
-        let salt = Data(saltBytes).base64EncodedString()
-        return (hashPIN(pin, salt: salt), salt)
+    private static let keychainService = "com.BIJTHIJS.ChillMate.pin-credentials"
+    private static let keychainHashAccount = "pin-hash-v2"
+    private static let keychainSaltAccount = "pin-salt-v2"
+
+    static func savePINToKeychain(pin: String) {
+        let saltBytes = (0..<32).map { _ in UInt8.random(in: UInt8.min...UInt8.max) }
+        let saltData = Data(saltBytes)
+        let hash = pbkdf2Hash(pin: pin, salt: saltData)
+
+        keychainSave(data: hash, account: keychainHashAccount)
+        keychainSave(data: saltData, account: keychainSaltAccount)
+
+        // Remove any legacy UserDefaults credentials
+        UserDefaults.standard.removeObject(forKey: "appPINHash")
+        UserDefaults.standard.removeObject(forKey: "appPINSalt")
     }
 
-    static func verifyPIN(_ pin: String, hash: String, salt: String) -> Bool {
-        guard !pin.isEmpty, !hash.isEmpty, !salt.isEmpty else {
-            return false
+    static func verifyPINFromKeychain(_ pin: String) -> Bool {
+        guard !pin.isEmpty else { return false }
+
+        // Try Keychain PBKDF2 hash first (v2)
+        if let storedHash = keychainRead(account: keychainHashAccount),
+           let storedSalt = keychainRead(account: keychainSaltAccount) {
+            let inputHash = pbkdf2Hash(pin: pin, salt: storedSalt)
+            if inputHash == storedHash {
+                return true
+            }
         }
 
-        return hashPIN(pin, salt: salt) == hash
+        // Fall back to legacy SHA256 UserDefaults credentials and migrate on success
+        let legacyHash = UserDefaults.standard.string(forKey: "appPINHash") ?? ""
+        let legacySalt = UserDefaults.standard.string(forKey: "appPINSalt") ?? ""
+        if !legacyHash.isEmpty, sha256Hash(pin: pin, salt: legacySalt) == legacyHash {
+            savePINToKeychain(pin: pin)
+            return true
+        }
+
+        return false
+    }
+
+    static func hasPINCredentials() -> Bool {
+        keychainRead(account: keychainHashAccount) != nil ||
+        !(UserDefaults.standard.string(forKey: "appPINHash") ?? "").isEmpty
     }
 
     static func isValidPIN(_ pin: String) -> Bool {
@@ -241,12 +282,82 @@ enum LocalSecurityService {
         UserDefaults.standard.removeObject(forKey: "requiresPIN")
         UserDefaults.standard.removeObject(forKey: "appPINHash")
         UserDefaults.standard.removeObject(forKey: "appPINSalt")
+        keychainDelete(account: keychainHashAccount)
+        keychainDelete(account: keychainSaltAccount)
     }
 
     static func applyFileProtection() {
         Task(priority: .utility) {
             await FileProtectionScheduler.shared.schedule()
         }
+    }
+
+    // PBKDF2 with 200,000 iterations — brute-force resistant
+    private static func pbkdf2Hash(pin: String, salt: Data) -> Data {
+        let pinData = Data(pin.utf8)
+        var derivedKey = Data(repeating: 0, count: 32)
+        _ = derivedKey.withUnsafeMutableBytes { derivedKeyBytes in
+            pinData.withUnsafeBytes { pinBytes in
+                salt.withUnsafeBytes { saltBytes in
+                    CCKeyDerivationPBKDF(
+                        CCPBKDFAlgorithm(kCCPBKDF2),
+                        pinBytes.baseAddress?.assumingMemoryBound(to: Int8.self),
+                        pinData.count,
+                        saltBytes.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                        salt.count,
+                        CCPseudoRandomAlgorithm(kCCPRFHmacAlgSHA256),
+                        200_000,
+                        derivedKeyBytes.baseAddress?.assumingMemoryBound(to: UInt8.self),
+                        32
+                    )
+                }
+            }
+        }
+        return derivedKey
+    }
+
+    // Legacy SHA256 for migration
+    private static func sha256Hash(pin: String, salt: String) -> String {
+        var data = Data(salt.utf8)
+        data.append(Data(pin.utf8))
+        let digest = SHA256.hash(data: data)
+        return digest.map(\.twoDigitHex).joined()
+    }
+
+    private static func keychainSave(data: Data, account: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: account
+        ]
+        SecItemDelete(query as CFDictionary)
+        var item = query
+        item[kSecValueData as String] = data
+        item[kSecAttrAccessible as String] = kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        SecItemAdd(item as CFDictionary, nil)
+    }
+
+    private static func keychainRead(account: String) -> Data? {
+        var query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var result: CFTypeRef?
+        let status = unsafe SecItemCopyMatching(query as CFDictionary, &result)
+        guard status == errSecSuccess else { return nil }
+        return result as? Data
+    }
+
+    private static func keychainDelete(account: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keychainService,
+            kSecAttrAccount as String: account
+        ]
+        SecItemDelete(query as CFDictionary)
     }
 
     fileprivate static func applyFileProtectionNow() {

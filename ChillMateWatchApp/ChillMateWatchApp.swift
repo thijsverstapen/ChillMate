@@ -5,6 +5,9 @@ struct ChillMateWatchApp: App {
     var body: some Scene {
         WindowGroup {
             WatchDashboardView()
+                .onAppear {
+                    WatchConnectivityReceiver.shared.activate()
+                }
         }
     }
 }

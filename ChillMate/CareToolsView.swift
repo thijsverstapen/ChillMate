@@ -24,18 +24,28 @@ enum CareToolPage: String, Identifiable {
     var id: String { rawValue }
 }
 
+struct CareToolDefinition: Identifiable {
+    let page: CareToolPage
+    let title: String
+    let subtitle: String
+    let symbol: String
+    let tint: Color
+
+    var id: String { page.id }
+}
+
 struct CareToolsSection: View {
     let open: (CareToolPage) -> Void
 
-    private let tools: [(CareToolPage, String, String, String, Color)] = [
-        (.safetyAutopilot, "Safety autopilot", "Next best action", "sparkles.rectangle.stack.fill", Color.chillSecondaryBlue),
-        (.emergency, "Emergency Information", "112, trusted contact, and location message", "sos.circle.fill", Color.chillIconRed),
-        (.panicSupport, "Panic support", "Breathing, contact, and grounding", "lungs.fill", Color.chillIconPurple),
-        (.saferPlanning, "Plan", "Before-Chill checklist", "checkmark.shield.fill", Color.chillMint),
-        (.drugTimers, "Check-ins", "Recovery reminders", "timer", Color.chillIconAmber),
-        (.aftercare, "Aftercare", "Check in tomorrow", "heart.text.square.fill", Color.chillIconPink),
-        (.stdTests, "STI tests", "Dates and results", "cross.case.fill", Color.chillIconTeal),
-        (.recoveryMode, "Recovery mode", "Goals and cravings", "figure.mind.and.body", Color.chillIconGreen)
+    private let tools: [CareToolDefinition] = [
+        CareToolDefinition(page: .safetyAutopilot, title: "Safety autopilot", subtitle: "Next best action", symbol: "sparkles.rectangle.stack.fill", tint: Color.chillSecondaryBlue),
+        CareToolDefinition(page: .emergency, title: "Emergency Information", subtitle: "112, trusted contact, and location message", symbol: "sos.circle.fill", tint: Color.chillIconRed),
+        CareToolDefinition(page: .panicSupport, title: "Panic support", subtitle: "Breathing, contact, and grounding", symbol: "lungs.fill", tint: Color.chillIconPurple),
+        CareToolDefinition(page: .saferPlanning, title: "Plan", subtitle: "Before-Chill checklist", symbol: "checkmark.shield.fill", tint: Color.chillMint),
+        CareToolDefinition(page: .drugTimers, title: "Check-ins", subtitle: "Recovery reminders", symbol: "timer", tint: Color.chillIconAmber),
+        CareToolDefinition(page: .aftercare, title: "Aftercare", subtitle: "Check in tomorrow", symbol: "heart.text.square.fill", tint: Color.chillIconPink),
+        CareToolDefinition(page: .stdTests, title: "STI tests", subtitle: "Dates and results", symbol: "cross.case.fill", tint: Color.chillIconTeal),
+        CareToolDefinition(page: .recoveryMode, title: "Recovery mode", subtitle: "Goals and cravings", symbol: "figure.mind.and.body", tint: Color.chillIconGreen)
     ]
 
     var body: some View {
@@ -43,7 +53,7 @@ struct CareToolsSection: View {
             CareSectionTitle(title: "Care tools", symbol: "heart.text.square.fill")
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                ForEach(tools, id: \.0.id) { tool in
+                ForEach(tools) { tool in
                     CareToolCard(tool: tool, open: open)
                 }
             }
@@ -54,13 +64,13 @@ struct CareToolsSection: View {
 struct InsightsToolsSection: View {
     let open: (CareToolPage) -> Void
 
-    private let tools: [(CareToolPage, String, String, String, Color)] = [
-        (.combinationRisk, "Risk checker", "Safety signals", "exclamationmark.shield.fill", Color.chillIconOrange),
-        (.drugInfo, "Substance info", "Safety reference", "pills.fill", Color.chillIconPurple),
-        (.consentBoundaries, "Boundaries", "Consent and exit plan", "hand.raised.fill", Color.chillIconTeal),
-        (.privateInsights, "Insights", "Private patterns", "chart.xyaxis.line", Color.chillSecondaryBlue),
-        (.helperBridge, "Helper summary", "Share talking points", "doc.text.magnifyingglass", Color.chillMint),
-        (.drugChecking, "Checking info", "Support information", "checkmark.seal.text.page.fill", Color.chillIconAmber)
+    private let tools: [CareToolDefinition] = [
+        CareToolDefinition(page: .combinationRisk, title: "Risk checker", subtitle: "Safety signals", symbol: "exclamationmark.shield.fill", tint: Color.chillIconOrange),
+        CareToolDefinition(page: .drugInfo, title: "Substance info", subtitle: "Safety reference", symbol: "pills.fill", tint: Color.chillIconPurple),
+        CareToolDefinition(page: .consentBoundaries, title: "Boundaries", subtitle: "Consent and exit plan", symbol: "hand.raised.fill", tint: Color.chillIconTeal),
+        CareToolDefinition(page: .privateInsights, title: "Insights", subtitle: "Private patterns", symbol: "chart.xyaxis.line", tint: Color.chillSecondaryBlue),
+        CareToolDefinition(page: .helperBridge, title: "Helper summary", subtitle: "Share talking points", symbol: "doc.text.magnifyingglass", tint: Color.chillMint),
+        CareToolDefinition(page: .drugChecking, title: "Checking info", subtitle: "Support information", symbol: "checkmark.seal.text.page.fill", tint: Color.chillIconAmber)
     ]
 
     var body: some View {
@@ -68,7 +78,7 @@ struct InsightsToolsSection: View {
             CareSectionTitle(title: "Insights", symbol: "chart.xyaxis.line")
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                ForEach(tools, id: \.0.id) { tool in
+                ForEach(tools) { tool in
                     CareToolCard(tool: tool, open: open)
                 }
             }
@@ -77,32 +87,32 @@ struct InsightsToolsSection: View {
 }
 
 private struct CareToolCard: View {
-    let tool: (CareToolPage, String, String, String, Color)
+    let tool: CareToolDefinition
     let open: (CareToolPage) -> Void
 
     var body: some View {
         Button {
-            open(tool.0)
+            open(tool.page)
         } label: {
             VStack(alignment: .leading, spacing: 10) {
                 ZStack {
                     Circle()
-                        .fill(tool.4.opacity(0.20))
+                        .fill(tool.tint.opacity(0.20))
                         .frame(width: 42, height: 42)
-                    Image(systemName: tool.3)
+                    Image(systemName: tool.symbol)
                         .font(.system(size: 18, weight: .black))
-                        .foregroundStyle(tool.4)
+                        .foregroundStyle(tool.tint)
                         .symbolRenderingMode(.hierarchical)
                 }
-                .shadow(color: tool.4.opacity(0.40), radius: 8, y: 3)
+                .shadow(color: tool.tint.opacity(0.40), radius: 8, y: 3)
 
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(tool.1)
+                    Text(tool.title)
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(Color.chillText)
                         .lineLimit(1)
                         .minimumScaleFactor(0.68)
-                    Text(tool.2)
+                    Text(tool.subtitle)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                         .lineLimit(2)
@@ -298,6 +308,7 @@ private struct STDTestCard: View {
     let contacts: [SexPartnerRecord]
     @State private var selectedSTI = STIOption.chlamydia.rawValue
     @State private var customSTIName = ""
+    @State private var positiveDetailsUnlocked = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -333,21 +344,38 @@ private struct STDTestCard: View {
             ResultPickerRow(title: "Anal", result: resultBinding(\.analResult))
 
             if test.hasPositiveResult {
-                PositiveSTIDetailsDisclosure(
-                    foundSTIs: foundSTIsBinding,
-                    selectedSTI: $selectedSTI,
-                    customSTIName: $customSTIName
-                )
+                if positiveDetailsUnlocked {
+                    PositiveSTIDetailsDisclosure(
+                        foundSTIs: foundSTIsBinding,
+                        selectedSTI: $selectedSTI,
+                        customSTIName: $customSTIName
+                    )
 
-                STIWarningMessagePanel(
-                    test: test,
-                    contacts: contacts,
-                    openMessage: { contact in
-                        if let url = warningMessageURL(for: contact) {
-                            openURL(url)
+                    STIWarningMessagePanel(
+                        test: test,
+                        contacts: contacts,
+                        openMessage: { contact in
+                            if let url = warningMessageURL(for: contact) {
+                                openURL(url)
+                            }
                         }
+                    )
+                } else {
+                    Button {
+                        Task {
+                            if let ok = try? await AppAuthenticator.authenticate(reason: "View positive STI result details"),
+                               ok {
+                                await MainActor.run { positiveDetailsUnlocked = true }
+                            }
+                        }
+                    } label: {
+                        Label("Unlock positive result details", systemImage: "lock.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
                     }
-                )
+                    .buttonStyle(.bordered)
+                    .tint(.red)
+                }
             }
 
             if !test.notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -488,7 +516,7 @@ private struct PositiveSTIDetailsDisclosure: View {
             }
             .padding(.top, 8)
         } label: {
-            Label("Positive STI details", systemImage: "cross.case.circle.fill")
+            Label("What was found", systemImage: "cross.case.circle.fill")
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
         }
@@ -1510,6 +1538,13 @@ struct DrugTimerView: View {
             .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
                 dismiss()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .chillMateRefreshTimers)) { _ in
+                Task { @MainActor in
+                    for timer in timers where !timer.liveActivityID.isEmpty {
+                        await DrugTimerLiveActivityController.update(timer)
+                    }
+                }
+            }
             .edgeSwipeBack(attemptDismiss)
             .endEditingOnTap()
         }
@@ -1536,6 +1571,7 @@ struct DrugTimerView: View {
             personName: timerScope == .others ? selectedTrackedPerson.trimmingCharacters(in: .whitespacesAndNewlines) : "",
             doseNote: doseNote.trimmingCharacters(in: .whitespacesAndNewlines)
         )
+        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
         modelContext.insert(timer)
         try? modelContext.save()
         DrugTimerLiveActivityController.start(for: timer)
@@ -2536,11 +2572,11 @@ private struct CombinationAssessment {
     var serotoninDetail: String {
         switch serotoninRisk {
         case .high:
-            "A serotonergic medication, MAOI, or multiple serotonergic substances are selected. Watch for confusion, fever, agitation, tremor, sweating, or diarrhea."
+            "You've selected a medication or substance mix that can affect serotonin — a brain chemical involved in mood and body function. Signs to watch for: confusion, fever, agitation, shaking, sweating, or diarrhea. Get help if these appear."
         case .caution:
-            "One serotonergic substance or medication match is selected. Risk can rise with repeated use, heat, dehydration, or medication interactions."
+            "One of your selections can affect serotonin levels. Risk can increase with repeated use, heat, dehydration, or other medication."
         case .lower:
-            "No clear serotonergic combination is selected."
+            "No known serotonin-related combination is selected."
         }
     }
 
@@ -2589,7 +2625,7 @@ private struct CombinationAssessment {
             if substanceSet.contains(.viagra) || substanceSet.contains(.kamagra) {
                 warnings.append("Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination.")
             } else {
-                warnings.append("Poppers can drop blood pressure sharply, especially with erectile dysfunction medication.")
+                warnings.append("Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication.")
             }
         }
 
@@ -2607,9 +2643,9 @@ private struct CombinationAssessment {
         }
 
         if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
-            warnings.append("MAOIs with MDMA, 3MMC, cocaine, or psychedelics can be dangerous. Avoid and get professional advice.")
+            warnings.append("Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice.")
         } else if hasMedicationCategory(.serotonergic) && !serotonergicSubstances.isEmpty {
-            warnings.append("Some antidepressants or serotonergic medication can interact with MDMA, 3MMC, cocaine, or psychedelics.")
+            warnings.append("Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics.")
         }
 
         if hasMedicationCategory(.ritonavirBooster) && (hasErectileMedication || substanceSet.contains(.mdma) || substanceSet.contains(.threeMMC)) {
@@ -2646,7 +2682,7 @@ private enum MedicationRiskCategory: String, CaseIterable {
     var label: String {
         switch self {
         case .serotonergic:
-            "Serotonergic"
+            "Affects serotonin"
         case .maoi:
             "MAOI"
         case .sedative:
@@ -2913,9 +2949,22 @@ struct EmergencyNetherlandsView: View {
     @AppStorage("trustedContactName") private var trustedContactName = ""
     @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
     @AppStorage("trustedContactMessage") private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
+    @AppStorage("localEmergencyNumber") private var localEmergencyNumber = "112"
+    @AppStorage("localHealthcareContact") private var localHealthcareContact = ""
 
     @State private var isFetchingLocation = false
     @State private var locationMessage: String?
+    @State private var isEditingEmergencyInfo = false
+
+    private var emergencyNumber: String {
+        let trimmed = localEmergencyNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "112" : trimmed
+    }
+
+    private var healthcareContactLabel: String {
+        let trimmed = localHealthcareContact.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "GP, huisarts, or GGD" : trimmed
+    }
 
     var body: some View {
         NavigationStack {
@@ -2926,29 +2975,46 @@ struct EmergencyNetherlandsView: View {
                     VStack(alignment: .leading, spacing: 18) {
                         PageHeader(
                             title: "Emergency Information",
-                            subtitle: "Fast support information for people in the Netherlands. Use 112 for immediate danger; trusted contact actions are for getting help quickly when you can still choose.",
+                            subtitle: "Fast emergency support. Set your local emergency number and healthcare contact in the edit menu.",
                             symbol: "sos.circle.fill",
                             tint: .red
                         )
 
                         VStack(alignment: .leading, spacing: 14) {
-                            Text("Call 112 for immediate danger, urgent medical help, fire, or a crime in progress. Say where you are and what happened.")
+                            Text("Call \(emergencyNumber) for immediate danger, urgent medical help, fire, or a crime in progress. Say where you are and what happened.")
                                 .font(.callout)
                                 .foregroundStyle(Color.chillText)
                                 .fixedSize(horizontal: false, vertical: true)
 
                             Button(role: .destructive) {
-                                call("112")
+                                call(emergencyNumber)
                             } label: {
-                                Label("Call 112", systemImage: "phone.fill")
+                                Label("Call \(emergencyNumber)", systemImage: "phone.fill")
                                     .font(.headline)
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(.borderedProminent)
                             .tint(.red)
+
+                            Button {
+                                isEditingEmergencyInfo = true
+                            } label: {
+                                Label("Change emergency number", systemImage: "pencil")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(.red)
                         }
                         .padding(16)
                         .glassSurface(radius: 28, tint: .red.opacity(0.10), interactive: true)
+                        .sheet(isPresented: $isEditingEmergencyInfo) {
+                            EmergencyContactEditSheet(
+                                emergencyNumber: $localEmergencyNumber,
+                                healthcareContact: $localHealthcareContact
+                            )
+                            .presentationDetents([.medium])
+                        }
 
                         EmergencyRedFlagCard()
 
@@ -3014,7 +3080,7 @@ struct EmergencyNetherlandsView: View {
 
                         VStack(alignment: .leading, spacing: 10) {
                             CareSectionTitle(title: "Non-urgent sexual health", symbol: "cross.case.fill")
-                            Text("For STI testing, sexual health questions, or treatment that is not an emergency, contact your GP, a huisartsenpost outside office hours, or your local GGD sexual health service.")
+                            Text("For STI testing, sexual health questions, or treatment that is not an emergency, contact \(healthcareContactLabel).")
                                 .font(.callout)
                                 .foregroundStyle(Color.chillSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -3551,7 +3617,7 @@ struct ClinicalReviewNoticeCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("ChillMate avoids calling combinations safe. It gives risk signals and source links, but public release should still be reviewed by a clinician or harm-reduction professional.")
+            Text("ChillMate avoids calling combinations safe. It shows risk signals and source links to help you make more informed choices.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -3588,6 +3654,62 @@ private struct CareEmptyState: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(18)
             .glassSurface(radius: 24, tint: .black.opacity(0.04))
+    }
+}
+
+private struct EmergencyContactEditSheet: View {
+    @Binding var emergencyNumber: String
+    @Binding var healthcareContact: String
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.86).ignoresSafeArea()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    Text("Emergency contacts")
+                        .font(.title2.bold())
+                        .foregroundStyle(Color.chillText)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Emergency number", systemImage: "phone.fill")
+                            .font(.headline)
+                            .foregroundStyle(Color.chillText)
+                        Text("Default is 112 (Netherlands / EU). Change to your local emergency number.")
+                            .font(.caption)
+                            .foregroundStyle(Color.chillSecondary)
+                        TextField("e.g. 911 or 999", text: $emergencyNumber)
+                            .keyboardType(.phonePad)
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(Color.chillText)
+                            .padding(14)
+                            .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Healthcare contact", systemImage: "cross.case.fill")
+                            .font(.headline)
+                            .foregroundStyle(Color.chillText)
+                        Text("Shown in the non-urgent sexual health section. Examples: local STI clinic, GP, PrEP provider.")
+                            .font(.caption)
+                            .foregroundStyle(Color.chillSecondary)
+                        TextField("e.g. local STI clinic or GP", text: $healthcareContact)
+                            .textFieldStyle(.plain)
+                            .foregroundStyle(Color.chillText)
+                            .padding(14)
+                            .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+                    }
+
+                    Button("Done") { dismiss() }
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color.chillPrimary)
+                }
+                .padding(20)
+            }
+        }
     }
 }
 
@@ -4223,10 +4345,22 @@ struct JournalView: View {
                                 }
                             }
 
-                            GlassActionButton(prominent: true, action: saveJournalEntry) {
-                                Label(selectedJournalEntry == nil ? "Save journal" : "Update journal", systemImage: "checkmark.circle.fill")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
+                            HStack(spacing: 10) {
+                                GlassActionButton(prominent: true, action: saveJournalEntry) {
+                                    Label(selectedJournalEntry == nil ? "Save journal" : "Update journal", systemImage: "checkmark.circle.fill")
+                                        .font(.headline)
+                                        .frame(maxWidth: .infinity)
+                                }
+
+                                if selectedJournalEntry != nil {
+                                    Button(role: .destructive, action: deleteJournalEntry) {
+                                        Image(systemName: "trash.fill")
+                                            .font(.headline)
+                                            .frame(width: 48, height: 48)
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .tint(.red)
+                                }
                             }
                         }
                         .padding(16)
@@ -4269,6 +4403,8 @@ struct JournalView: View {
     }
 
     private func saveJournalEntry() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+
         if let entry = selectedJournalEntry {
             entry.rememberClearly = rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines)
             entry.uncomfortableMoments = uncomfortableMoments.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -4276,6 +4412,8 @@ struct JournalView: View {
             entry.regrets = regrets.trimmingCharacters(in: .whitespacesAndNewlines)
             entry.feelsGoodAbout = feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines)
             entry.photos = photoData
+            try? modelContext.save()
+            SpotlightService.shared.indexJournalEntry(entry)
         } else {
             let entry = JournalEntry(
                 date: date,
@@ -4287,9 +4425,18 @@ struct JournalView: View {
                 photos: photoData
             )
             modelContext.insert(entry)
+            try? modelContext.save()
+            SpotlightService.shared.indexJournalEntry(entry)
         }
+    }
 
+    private func deleteJournalEntry() {
+        guard let entry = selectedJournalEntry else { return }
+        UINotificationFeedbackGenerator().notificationOccurred(.warning)
+        SpotlightService.shared.removeJournalEntry(entry)
+        modelContext.delete(entry)
         try? modelContext.save()
+        loadSelectedJournalEntry()
     }
 
     private func loadSelectedJournalEntry() {
@@ -4335,21 +4482,22 @@ private struct JournalWeekStrip: View {
                 Button {
                     selectedDate = day
                 } label: {
-                    VStack(spacing: 5) {
+                    VStack(spacing: 4) {
                         Text(day.formatted(.dateTime.weekday(.abbreviated)))
-                            .font(.caption2.weight(.bold))
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(isSelected ? .white.opacity(0.80) : Color.chillSecondary)
                         Text(day.formatted(.dateTime.day()))
-                            .font(.headline.weight(.bold))
+                            .font(.subheadline.weight(.bold))
                             .monospacedDigit()
+                            .foregroundStyle(isSelected ? .white : Color.chillText)
                         Circle()
-                            .fill(hasEntry ? Color.chillMint : .clear)
+                            .fill(hasEntry ? (isSelected ? .white.opacity(0.72) : Color.chillMint) : .clear)
                             .frame(width: 5, height: 5)
                     }
-                    .foregroundStyle(isSelected ? .white : Color.chillText)
-                    .frame(maxWidth: .infinity, minHeight: 62)
+                    .frame(maxWidth: .infinity, minHeight: 52)
                     .background(
-                        isSelected ? Color.chillPrimary : Color.black.opacity(0.04),
-                        in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        isSelected ? Color.chillPrimary : Color.clear,
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous)
                     )
                 }
                 .buttonStyle(.plain)
@@ -5404,7 +5552,7 @@ struct PrivateInsightsView: View {
                         )
 
                         InsightMetricGrid(entries: recentEntries, timers: timers, journals: journals)
-                        TrendListCard(title: "Trigger map", emptyText: "Add trigger tags in logs to build this map.", counts: ChillInsightCalculator.triggerCounts(entries: recentEntries), tint: Color.chillSecondaryBlue)
+                        TrendListCard(title: "What led to it?", emptyText: "Add trigger tags in logs to build this map.", counts: ChillInsightCalculator.triggerCounts(entries: recentEntries), tint: Color.chillSecondaryBlue)
                         TrendListCard(title: "What changed?", emptyText: "When risky logs increase, reasons you tag will appear here.", counts: ChillInsightCalculator.changeReasonCounts(entries: recentEntries), tint: .orange)
                         TrendListCard(title: "Substances", emptyText: "No substances logged in the selected window.", counts: ChillInsightCalculator.substanceCounts(entries: recentEntries), tint: Color.chillPrimary)
                         PersonalBaselineCard(entries: recentEntries, timers: timers)
@@ -5789,7 +5937,7 @@ struct TermsOfUseView: View {
                             symbol: "18.circle.fill",
                             rows: [
                                 "ChillMate is intended for adults only.",
-                                "This is a Beta build. Content may change and should be reviewed by qualified professionals before public release.",
+                                "ChillMate is for adults only. You are responsible for the information you save and who you share it with.",
                                 "You are responsible for deciding what information you save and who you share it with."
                             ]
                         )

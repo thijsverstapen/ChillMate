@@ -12,6 +12,7 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
     case accessibility = "Accessibility"
     case appearance = "Appearance"
     case watch = "Apple Watch"
+    case goals = "Reduction goals"
     case quality = "Safety review"
     case account = "Account data"
 
@@ -35,6 +36,8 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
             "paintpalette.fill"
         case .watch:
             "applewatch"
+        case .goals:
+            "chart.line.downtrend.xyaxis"
         case .quality:
             "checkmark.seal.text.page.fill"
         case .account:
@@ -60,6 +63,8 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
             "Adaptive background and photos"
         case .watch:
             "Companion preferences"
+        case .goals:
+            "Max sessions per month and reduction tracking"
         case .quality:
             "Medical wording, evidence limits, and review status"
         case .account:
@@ -72,8 +77,6 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
 struct SettingsView: View {
     @AppStorage("requiresFaceID") private var requiresFaceID = false
     @AppStorage("requiresPIN") private var requiresPIN = false
-    @AppStorage("appPINHash") private var appPINHash = ""
-    @AppStorage("appPINSalt") private var appPINSalt = ""
     @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
     @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
     @AppStorage("healthKitSexualActivityWriteEnabled") private var healthKitSexualActivityWriteEnabled = false
@@ -100,6 +103,13 @@ struct SettingsView: View {
     @AppStorage("watchDiscreetCheckIns") private var watchDiscreetCheckIns = true
     @AppStorage("watchVisibleTimers") private var watchVisibleTimers = true
     @AppStorage("watchStressAndTemperatureDetection") private var watchStressAndTemperatureDetection = false
+    @AppStorage("autoLockMinutes") private var autoLockMinutes = 0
+    @AppStorage("weeklyDigestEnabled") private var weeklyDigestEnabled = false
+    @AppStorage("stiReminderEnabled") private var stiReminderEnabled = false
+    @AppStorage("stiReminderMonths") private var stiReminderMonths = 3
+    @AppStorage("dataRetentionMonths") private var dataRetentionMonths = 0
+    @AppStorage("reductionGoalSessions") private var reductionGoalSessions = 0
+    @AppStorage("reductionGoalCountSubstanceOnly") private var reductionGoalCountSubstanceOnly = true
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -213,6 +223,21 @@ struct SettingsView: View {
             .onChange(of: iCloudBackupEnabled) { _, isOn in
                 iCloudBackupChanged(isOn)
             }
+            .onChange(of: weeklyDigestEnabled) { _, isOn in
+                if isOn {
+                    NotificationService.shared.scheduleWeeklySummary(streak: 0, score: 0)
+                } else {
+                    NotificationService.shared.clearWeeklySummary()
+                }
+            }
+            .onChange(of: stiReminderEnabled) { _, isOn in
+                if isOn {
+                    let dueDate = Calendar.current.date(byAdding: .month, value: stiReminderMonths, to: .now) ?? .now
+                    NotificationService.shared.scheduleSTIReminder(dueDate: dueDate)
+                } else {
+                    NotificationService.shared.clearSTIReminder()
+                }
+            }
             .edgeSwipeToDismiss()
             .endEditingOnTap()
         }
@@ -252,11 +277,13 @@ struct SettingsView: View {
                         )
 
                         SettingsToggleCard(
-                            title: "Local encryption",
-                            caption: "Protect local ChillMate files with complete iOS data protection while your phone is locked.",
+                            title: "Extra app security",
+                            caption: "Locks your private files even when the app is closed. Useful if your phone is ever lost or stolen.",
                             symbol: "lock.doc.fill",
                             isOn: $localEncryptionEnabled
                         )
+
+                        AutoLockTimeoutCard(selectedMinutes: $autoLockMinutes)
 
                         EncryptionInfoCard()
 
@@ -304,6 +331,24 @@ struct SettingsView: View {
 
                         NotificationToneCard(selectedTone: $notificationTone)
 
+                        SettingsToggleCard(
+                            title: "Weekly summary",
+                            caption: "Sunday evening digest of your streak, score, and recent logs.",
+                            symbol: "calendar.badge.clock",
+                            isOn: $weeklyDigestEnabled
+                        )
+
+                        SettingsToggleCard(
+                            title: "STI test reminders",
+                            caption: "Remind you to get tested on a regular schedule.",
+                            symbol: "cross.case.fill",
+                            isOn: $stiReminderEnabled
+                        )
+
+                        if stiReminderEnabled {
+                            STIReminderIntervalCard(selectedMonths: $stiReminderMonths)
+                        }
+
                     case .iCloud:
                         ICloudBackupCard(
                             isEnabled: $iCloudBackupEnabled,
@@ -329,6 +374,12 @@ struct SettingsView: View {
                             updatePhoto: updateBackgroundPhoto
                         )
 
+                    case .goals:
+                        ReductionGoalCard(
+                            goalSessions: $reductionGoalSessions,
+                            substanceOnly: $reductionGoalCountSubstanceOnly
+                        )
+
                     case .watch:
                         WatchCompanionSettingsCard(
                             hydrationReminders: $watchHydrationReminders,
@@ -351,6 +402,10 @@ struct SettingsView: View {
                                 isShowingBackupImporter = true
                             }
                         )
+
+                        CSVExportCard(isWorking: isWorking, export: exportCSV)
+
+                        DataRetentionCard(selectedMonths: $dataRetentionMonths, applyRetention: applyDataRetention)
 
                         DeleteAccountCard {
                             isShowingDeleteWarning = true
@@ -405,9 +460,7 @@ struct SettingsView: View {
         }
         .fullScreenCover(isPresented: $isShowingPINSetup) {
             PINSetupView(isChangingExistingPIN: requiresPIN) { newPIN in
-                let credentials = LocalSecurityService.makePINCredentials(pin: newPIN)
-                appPINHash = credentials.hash
-                appPINSalt = credentials.salt
+                LocalSecurityService.savePINToKeychain(pin: newPIN)
                 requiresPIN = true
                 message = "PIN lock is on."
             }
@@ -456,9 +509,9 @@ struct SettingsView: View {
     private func localEncryptionChanged(_ isOn: Bool) {
         if isOn {
             LocalSecurityService.applyFileProtection()
-            message = "Local encryption is on. ChillMate protects app files with complete iOS data protection when your phone is locked."
+            message = "Extra security is on. Your private files are locked while ChillMate is closed."
         } else {
-            message = "Extra local file protection is off. Your iPhone still applies its normal system protection."
+            message = "Extra security is off. Your iPhone still applies its built-in protection."
         }
     }
 
@@ -796,6 +849,72 @@ struct SettingsView: View {
         }
     }
 
+    private func exportCSV() {
+        isWorking = true
+        message = nil
+        Task {
+            do {
+                let entries = try modelContext.fetch(FetchDescriptor<NightEntry>(sortBy: [SortDescriptor(\.date)]))
+                var csv = "Date,StartDate,EndDate,HadSex,SkippedNight,Substances,PartnerCount,UsedCondom,WasPenetrated,SleptYet,SleepHours,Note\n"
+                for entry in entries {
+                    let row = [
+                        entry.date.formatted(.iso8601),
+                        entry.startDate.formatted(.iso8601),
+                        entry.endDate.formatted(.iso8601),
+                        entry.hadSex ? "true" : "false",
+                        entry.skippedNight ? "true" : "false",
+                        entry.substances.joined(separator: "|"),
+                        "\(entry.partnerCount)",
+                        entry.usedCondom ? "true" : "false",
+                        entry.wasPenetrated ? "true" : "false",
+                        entry.sleptYet ? "true" : "false",
+                        entry.sleepHours > 0 ? String(format: "%.1f", entry.sleepHours) : "",
+                        "\"\(entry.note.replacingOccurrences(of: "\"", with: "\"\""))\""
+                    ].joined(separator: ",")
+                    csv += row + "\n"
+                }
+                let data = Data(csv.utf8)
+                let formatter = ISO8601DateFormatter()
+                formatter.formatOptions = [.withInternetDateTime]
+                let stamp = formatter.string(from: .now).replacingOccurrences(of: ":", with: "-")
+                let url = FileManager.default.temporaryDirectory.appendingPathComponent("ChillMate-Export-\(stamp).csv")
+                try data.write(to: url, options: [.atomic, .completeFileProtection])
+                await MainActor.run {
+                    encryptedBackupURL = url
+                    message = "CSV export ready. Use the Share button to save it."
+                    isWorking = false
+                }
+            } catch {
+                await MainActor.run {
+                    message = "Could not create CSV: \(error.localizedDescription)"
+                    isWorking = false
+                }
+            }
+        }
+    }
+
+    private func applyDataRetention() {
+        guard dataRetentionMonths > 0 else { return }
+        let cutoff = Calendar.current.date(byAdding: .month, value: -dataRetentionMonths, to: .now) ?? .now
+        isWorking = true
+        Task {
+            do {
+                let old = try modelContext.fetch(FetchDescriptor<NightEntry>()).filter { $0.date < cutoff }
+                for entry in old { modelContext.delete(entry) }
+                try modelContext.save()
+                await MainActor.run {
+                    message = "Deleted \(old.count) entries older than \(dataRetentionMonths) months."
+                    isWorking = false
+                }
+            } catch {
+                await MainActor.run {
+                    message = "Could not apply retention: \(error.localizedDescription)"
+                    isWorking = false
+                }
+            }
+        }
+    }
+
     private func deleteAccountAndData() async -> Bool {
         isWorking = true
         message = nil
@@ -885,6 +1004,51 @@ private struct SettingsCategoryCard: View {
     }
 }
 
+private struct AutoLockTimeoutCard: View {
+    @Binding var selectedMinutes: Int
+
+    private let options: [(label: String, minutes: Int)] = [
+        ("Immediately", 0),
+        ("After 1 minute", 1),
+        ("After 5 minutes", 5),
+        ("After 15 minutes", 15),
+        ("After 1 hour", 60)
+    ]
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "timer.circle.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Color.chillPrimary)
+                .frame(width: 42, height: 42)
+                .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.10))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Auto-lock")
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+
+                Text("Re-lock when returning from the background.")
+                    .font(.caption)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 8)
+
+            Picker("Auto-lock", selection: $selectedMinutes) {
+                ForEach(options, id: \.minutes) { option in
+                    Text(option.label).tag(option.minutes)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(Color.chillPrimary)
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+    }
+}
+
 private struct EncryptionInfoCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -892,7 +1056,7 @@ private struct EncryptionInfoCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("Local protection is on by default. ChillMate can also prepare an AES-GCM encrypted backup archive that stays under your control.")
+            Text("Your data is protected by default. You can also create an encrypted backup file that only you can open — handy if you ever reinstall or switch phones.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -905,7 +1069,7 @@ private struct EncryptionInfoCard: View {
 private struct PrivacyDashboardCard: View {
     private let rows: [(String, String, String)] = [
         ("Stored on this device", "Profile, logs, STI tests, timers, plans, journal entries, trusted contact, background, and lock settings.", "iphone"),
-        ("Encrypted backup", "Created as local backup files or encrypted iCloud Drive backups when you turn those options on.", "externaldrive.badge.lock.fill"),
+        ("Encrypted backup", "Created as local backup files or encrypted iCloud Drive backups when you turn those options on.", "lock.doc.fill"),
         ("Shared with Apple Health", "Only the health categories you enable in Permissions.", "heart.text.square.fill"),
         ("Never sent by ChillMate", "Partner messages, emergency texts, and route actions stay user-initiated through iOS apps.", "hand.raised.fill")
     ]
@@ -1067,7 +1231,7 @@ private struct ClinicalReviewSettingsCard: View {
     private let rows = [
         "Risk wording uses caution levels instead of claiming a combination is safe.",
         "Substance, STI, PrEP, and emergency content includes source links where practical.",
-        "This Beta should receive clinician, sexual-health, harm-reduction, and privacy review before public App Store distribution."
+        "ChillMate supports safer decisions, but it is not a substitute for medical, legal, or emergency care."
     ]
 
     var body: some View {
@@ -1124,7 +1288,7 @@ private struct EncryptedBackupCard: View {
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
 
-                    Text("Create an encrypted emergency archive of the local ChillMate data. ChillMate also keeps a protected on-device recovery snapshot for reinstall recovery when iOS keeps the device Keychain.")
+                    Text("Create an encrypted backup of your ChillMate data. ChillMate also saves a recovery copy on your device automatically — useful if you ever reinstall the app.")
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1273,44 +1437,42 @@ private struct PINLockCard: View {
     let turnOff: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 14) {
-                Image(systemName: "number")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundStyle(isEnabled ? Color.chillPrimary : Color.chillSecondary)
-                    .frame(width: 42, height: 42)
-                    .glassSurface(radius: 21, tint: (isEnabled ? Color.chillPrimary : Color.black).opacity(0.10))
+        HStack(spacing: 14) {
+            Image(systemName: "number")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(isEnabled ? Color.chillPrimary : Color.chillSecondary)
+                .frame(width: 42, height: 42)
+                .glassSurface(radius: 21, tint: (isEnabled ? Color.chillPrimary : Color.black).opacity(0.10))
 
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Lock with PIN")
-                        .font(.headline)
-                        .foregroundStyle(Color.chillText)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Lock with PIN")
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
 
-                    Text(isEnabled ? "PIN lock is enabled. You can change or turn it off." : "Add a 4-8 digit PIN alongside Face ID.")
-                        .font(.caption)
-                        .foregroundStyle(Color.chillSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer()
+                Text(isEnabled ? "PIN is on. Tap to change." : "Add a 4–8 digit PIN alongside Face ID.")
+                    .font(.caption)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
-            HStack(spacing: 10) {
-                Spacer(minLength: 0)
+            Spacer(minLength: 8)
 
-                Button(isEnabled ? "Change PIN" : "Set PIN", action: setPIN)
-                    .font(.headline)
-                    .frame(minWidth: 118)
-                    .buttonStyle(.borderedProminent)
-                    .tint(.chillPrimary)
-
-                if isEnabled {
-                    Button("Turn off", role: .destructive, action: turnOff)
-                        .font(.headline)
-                        .frame(minWidth: 96)
+            if isEnabled {
+                HStack(spacing: 8) {
+                    Button("Change", action: setPIN)
+                        .font(.caption.weight(.bold))
+                        .buttonStyle(.bordered)
+                        .tint(.chillPrimary)
+                    Button("Off", role: .destructive, action: turnOff)
+                        .font(.caption.weight(.bold))
                         .buttonStyle(.bordered)
                         .tint(.red)
                 }
+            } else {
+                Button("Set PIN", action: setPIN)
+                    .font(.caption.weight(.bold))
+                    .buttonStyle(.borderedProminent)
+                    .tint(.chillPrimary)
             }
         }
         .padding(16)
@@ -1556,6 +1718,173 @@ private struct BackgroundLibraryCard: View {
     }
 }
 
+private struct STIReminderIntervalCard: View {
+    @Binding var selectedMonths: Int
+
+    private let options = [(1, "Every month"), (2, "Every 2 months"), (3, "Every 3 months"), (6, "Every 6 months"), (12, "Once a year")]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Reminder interval", systemImage: "calendar.badge.clock")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+
+            Picker("Interval", selection: $selectedMonths) {
+                ForEach(options, id: \.0) { option in
+                    Text(option.1).tag(option.0)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(Color.chillPrimary)
+        }
+        .padding(16)
+        .glassSurface(radius: 24, tint: Color.chillMint.opacity(0.08), interactive: true)
+    }
+}
+
+private struct ReductionGoalCard: View {
+    @Binding var goalSessions: Int
+    @Binding var substanceOnly: Bool
+
+    private let options = [(0, "No limit"), (1, "1 session"), (2, "2 sessions"), (3, "3 sessions"), (4, "4 sessions"), (6, "6 sessions"), (8, "8 sessions"), (10, "10 sessions")]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Label("Reduction goal", systemImage: "chart.line.downtrend.xyaxis")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+
+            Text("Set a monthly session limit. The dashboard will show how you're tracking against your goal.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Picker("Goal sessions per month", selection: $goalSessions) {
+                ForEach(options, id: \.0) { option in
+                    Text(option.1).tag(option.0)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(Color.chillPrimary)
+
+            Toggle(isOn: $substanceOnly) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Count substance use only")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.chillText)
+                    Text("When off, all tracked Chills count toward the goal.")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                }
+            }
+            .tint(Color.chillPrimary)
+
+            if goalSessions > 0 {
+                Text("Goal active: max \(goalSessions) \(goalSessions == 1 ? "session" : "sessions") per month (\(substanceOnly ? "substance use only" : "all Chills")).")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillMint)
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+    }
+}
+
+private struct CSVExportCard: View {
+    let isWorking: Bool
+    let export: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "tablecells.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(Color.chillPrimary)
+                    .frame(width: 42, height: 42)
+                    .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.12))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("CSV export")
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+
+                    Text("Export your Chill logs as a CSV file. Tap 'Prepare backup' first to also get the encrypted archive.")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            Button(action: export) {
+                HStack {
+                    if isWorking { ProgressView() }
+                    Label("Export as CSV", systemImage: "tablecells.fill")
+                        .font(.headline)
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(Color.chillPrimary)
+            .disabled(isWorking)
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+    }
+}
+
+private struct DataRetentionCard: View {
+    @Binding var selectedMonths: Int
+    let applyRetention: () -> Void
+
+    private let options = [(0, "Keep everything"), (6, "6 months"), (12, "1 year"), (24, "2 years"), (36, "3 years")]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "calendar.badge.minus")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(.orange)
+                    .frame(width: 42, height: 42)
+                    .glassSurface(radius: 21, tint: .orange.opacity(0.12))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Data retention")
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+
+                    Text("Delete logs older than a chosen age. This cannot be undone — back up first.")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            Picker("Keep data for", selection: $selectedMonths) {
+                ForEach(options, id: \.0) { option in
+                    Text(option.1).tag(option.0)
+                }
+            }
+            .pickerStyle(.menu)
+            .tint(.orange)
+
+            if selectedMonths > 0 {
+                Button(role: .destructive, action: applyRetention) {
+                    Label("Delete entries older than \(options.first(where: { $0.0 == selectedMonths })?.1 ?? "")", systemImage: "trash.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.red)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .glassSurface(radius: 28, tint: .orange.opacity(0.08), interactive: true)
+    }
+}
+
 private struct DeleteAccountCard: View {
     let action: () -> Void
 
@@ -1757,8 +2086,6 @@ private enum AccountDataDeletion {
         let keys = [
             "requiresFaceID",
             "requiresPIN",
-            "appPINHash",
-            "appPINSalt",
             "localEncryptionEnabled",
             "healthKitAutoSync",
             "healthKitSexualActivityWriteEnabled",

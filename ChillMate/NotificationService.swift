@@ -27,18 +27,32 @@ enum NotificationTone: String, CaseIterable, Identifiable {
 final class NotificationService {
     static let shared = NotificationService()
 
+    enum ActionIdentifier {
+        static let logNow = "CHILLMATE_LOG_NOW"
+        static let snooze = "CHILLMATE_SNOOZE"
+    }
+
     private let center = UNUserNotificationCenter.current()
     private let checkInIdentifier = "chillmate.checkin"
+    private let riskWarningIdentifier = "chillmate.risk.health"
     private let inactivityDays = [7, 14, 21]
     private let affirmationIdentifiers = (1...7).map { "chillmate.affirmation.\($0)" }
     private let checkInMessages = [
-        "Pause for a second. Are you still feeling okay?",
-        "Do you need water, food, air, or a break from the room?",
-        "Do you feel safe with the people around you?",
-        "Would calling someone you trust make this feel steadier?",
-        "Check your body before anything else: breathing, temperature, heartbeat, and boundaries.",
-        "If there is chest pain, fainting, blue lips, seizure, overheating, or someone cannot be woken: call 112 now."
+        "Pause for a second. How's your body doing right now?",
+        "Water. Food. Air. Which one do you need?",
+        "You don't have to be doing great. How are you actually feeling?",
+        "Check in with yourself. Are the people around you still feeling safe to you?",
+        "This is just a quiet check. You can close this and everything stays private.",
+        "If you need to step outside, that is always okay.",
+        "Would hearing a familiar voice help? You can call someone without explaining why.",
+        "How is your breathing? Try taking one slow breath before anything else.",
+        "No rush. Take a moment, then take the next small step.",
+        "If there is chest pain, blue lips, seizure, or someone cannot be woken: call emergency services now.",
+        "Your boundaries are still yours right now. Nothing has changed that.",
+        "Check your temperature. Are you warm enough? Too warm? Drink something."
     ]
+
+    private var pendingSnoozeID: String?
 
     private init() {}
 
@@ -55,6 +69,15 @@ final class NotificationService {
             return tone
         }
         return .gentle
+    }
+
+    var checkInHour: Int {
+        let stored = UserDefaults.standard.integer(forKey: "checkInHour")
+        return stored == 0 ? 10 : stored
+    }
+
+    var checkInMinute: Int {
+        UserDefaults.standard.integer(forKey: "checkInMinute")
     }
 
     private func tonedBody(_ body: String, discreetBody: String) -> String {
@@ -75,7 +98,8 @@ final class NotificationService {
         body: String,
         discreetTitle: String = "ChillMate",
         discreetBody: String = "Private check-in. Open ChillMate for details.",
-        destination: NotificationDestination? = nil
+        destination: NotificationDestination? = nil,
+        categoryIdentifier: String? = nil
     ) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         content.title = discreetNotificationsEnabled ? discreetTitle : title
@@ -84,10 +108,50 @@ final class NotificationService {
         if let destination {
             content.userInfo = ["destination": destination.rawValue]
         }
-        if #available(iOS 15.0, *) {
-            content.interruptionLevel = .passive
+        if let categoryIdentifier {
+            content.categoryIdentifier = categoryIdentifier
         }
+        content.interruptionLevel = .passive
         return content
+    }
+
+    func registerCategories() {
+        let logAction = UNNotificationAction(
+            identifier: ActionIdentifier.logNow,
+            title: "Log now",
+            options: [.foreground]
+        )
+        let snoozeAction = UNNotificationAction(
+            identifier: ActionIdentifier.snooze,
+            title: "Snooze 1 hour",
+            options: []
+        )
+        let checkInCategory = UNNotificationCategory(
+            identifier: "CHECKIN",
+            actions: [logAction, snoozeAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        let riskCategory = UNNotificationCategory(
+            identifier: "RISK",
+            actions: [logAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        center.setNotificationCategories([checkInCategory, riskCategory])
+    }
+
+    func snoozeCurrentCheckIn() {
+        let content = notificationContent(
+            title: "Private check-in",
+            body: "Add sleep, reflection notes, or a skipped Chill when you are ready.",
+            discreetBody: "Private check-in available.",
+            destination: .home,
+            categoryIdentifier: "CHECKIN"
+        )
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 60 * 60, repeats: false)
+        let id = "chillmate.checkin.snooze.\(Int(Date.now.timeIntervalSince1970))"
+        center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
     }
 
     func requestAuthorization() async throws -> Bool {
@@ -99,14 +163,15 @@ final class NotificationService {
 
         let content = notificationContent(
             title: "Private check-in",
-            body: "Add sleep, drugs, or a skipped Chill when you are ready.",
+            body: "Add sleep, reflection notes, or a skipped Chill when you are ready.",
             discreetBody: "Private check-in available.",
-            destination: .home
+            destination: .home,
+            categoryIdentifier: "CHECKIN"
         )
 
         var components = DateComponents()
-        components.hour = 10
-        components.minute = 0
+        components.hour = checkInHour
+        components.minute = checkInMinute
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
         let request = UNNotificationRequest(identifier: checkInIdentifier, content: content, trigger: trigger)
@@ -125,7 +190,8 @@ final class NotificationService {
                 title: "Maybe add a private log?",
                 body: "If there was a Chill, skipped Chill, sleep, or aftercare moment, you can add it when you feel ready.",
                 discreetBody: "Private reminder available.",
-                destination: .home
+                destination: .home,
+                categoryIdentifier: "CHECKIN"
             )
 
             let request = UNNotificationRequest(
@@ -143,29 +209,25 @@ final class NotificationService {
 
     func scheduleDailyAffirmations() {
         clearDailyAffirmations()
+        let pool = Self.affirmationMessagePool
+        let jitterMinutes = [3, -7, 11, -4, 8, -12, 5]
+        let stride = max(1, pool.count / 7)
 
-        let messages = [
-            "Every choice that protects your body counts.",
-            "A quiet Chill-free day still moves you forward.",
-            "You are allowed to rest, reset, and choose yourself.",
-            "Doing well with your score is worth noticing today.",
-            "Skipping substances is not missing out. It is taking care of future you.",
-            "You can be proud of small steady decisions.",
-            "Your recovery streak is built one kind choice at a time."
-        ]
+        for index in 0..<7 {
+            let messageIndex = (index * stride) % pool.count
+            let message = pool[messageIndex]
 
-        for (index, message) in messages.enumerated() {
             let content = notificationContent(
-                title: "ChillMate confidence boost",
+                title: Self.affirmationTitles[index % Self.affirmationTitles.count],
                 body: message,
-                discreetBody: "A confidence boost is waiting.",
+                discreetBody: "A private note is waiting for you.",
                 destination: .home
             )
 
             var components = DateComponents()
             components.weekday = index + 1
             components.hour = 11
-            components.minute = 15
+            components.minute = 15 + jitterMinutes[index]
 
             let request = UNNotificationRequest(
                 identifier: affirmationIdentifiers[index],
@@ -176,20 +238,64 @@ final class NotificationService {
         }
     }
 
+    private static let affirmationTitles = [
+        "A quiet note from ChillMate",
+        "Just checking in",
+        "One thing worth noticing today",
+        "Something small that counts",
+        "A moment for yourself",
+        "Today's reminder",
+        "You're doing better than you think"
+    ]
+
+    private static let affirmationMessagePool = [
+        "Every choice that protects your body is worth something, even the small ones.",
+        "A day without logged use is still a day that moved you forward.",
+        "You don't have to have it all figured out. Steady is enough.",
+        "Rest is not the same as giving up. It is part of how you recover.",
+        "Skipping a session is not missing out. It is choosing future you.",
+        "You can be proud of choices that no one else will ever see.",
+        "Your recovery streak is built one decision at a time, not all at once.",
+        "Checking in with yourself takes courage. You are doing that.",
+        "Nothing about today has to be perfect. Just real is already a lot.",
+        "The things you protect about yourself quietly — they matter.",
+        "Noticing patterns is harder than ignoring them. You are doing the harder thing.",
+        "There is no version of care that is too small to count.",
+        "You are allowed to move slowly. Slow is still moving.",
+        "The fact that you are thinking about your health at all — that is not nothing.",
+        "One honest log, one water refill, one text to someone you trust. That is a full day.",
+        "Recovery does not need an audience. Private progress still counts.",
+        "Being kind to your body is not always comfortable. You are doing it anyway.",
+        "Today you made it to this notification. Something in you is still paying attention.",
+        "It is okay to have complicated feelings about where you are right now.",
+        "What you are building with these logs is a kind of self-respect.",
+        "You have gotten through harder days than this one.",
+        "The streak is yours. No one can see it but you, and it is real.",
+        "You are not just tracking habits. You are learning what you need.",
+        "Substances change the picture. A clear day gives you back the full view.",
+        "Sometimes the healthiest thing is just not making it worse today.",
+        "You are worth checking in on, even when nothing is urgent.",
+        "There is no perfect way to do this. There is only what you actually do.",
+        "Your body remembers every kind decision you make, even the ones you forget."
+    ]
+
     func clearDailyAffirmations() {
         center.removePendingNotificationRequests(withIdentifiers: affirmationIdentifiers)
     }
 
     func scheduleRiskWarning(count: Int) {
+        let body = Self.riskWarningBody(count: count)
         let content = notificationContent(
-            title: "Health check-in",
-            body: "You have logged \(count) Chills with sex and drug use in 3 weeks. Consider talking with a professional helper.",
+            title: Self.riskWarningTitle(count: count),
+            body: body,
             discreetBody: "A private health check-in is available.",
-            destination: .home
+            destination: .home,
+            categoryIdentifier: "RISK"
         )
 
+        center.removePendingNotificationRequests(withIdentifiers: [riskWarningIdentifier])
         let request = UNNotificationRequest(
-            identifier: "chillmate.risk.\(UUID().uuidString)",
+            identifier: riskWarningIdentifier,
             content: content,
             trigger: UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
         )
@@ -217,7 +323,8 @@ final class NotificationService {
             title: "Gentle aftercare check-in",
             body: "How did you sleep, and how do you feel about last Chill?",
             discreetBody: "A private aftercare check-in is available.",
-            destination: .home
+            destination: .home,
+            categoryIdentifier: "CHECKIN"
         )
 
         let request = UNNotificationRequest(
@@ -228,6 +335,71 @@ final class NotificationService {
         center.add(request)
     }
 
+    func scheduleWeeklySummary(streak: Int, score: Int) {
+        clearWeeklySummary()
+        let scoreText = score > 0 ? ", score \(score)" : ""
+        let streakText = streak == 1 ? "1 day" : "\(streak) days"
+        let content = notificationContent(
+            title: "Your week in ChillMate",
+            body: "You're at \(streakText) without logged substance use\(scoreText). Check in when ready.",
+            discreetBody: "Your private weekly summary is available.",
+            destination: .home
+        )
+        var components = DateComponents()
+        components.weekday = 1
+        components.hour = 19
+        components.minute = 0
+        let request = UNNotificationRequest(
+            identifier: "chillmate.weekly.digest",
+            content: content,
+            trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        )
+        center.add(request)
+    }
+
+    func clearWeeklySummary() {
+        center.removePendingNotificationRequests(withIdentifiers: ["chillmate.weekly.digest"])
+    }
+
+    func schedule48hFollowUp(entryID: UUID, sessionDate: Date) {
+        let followUpDate = sessionDate.addingTimeInterval(48 * 60 * 60)
+        guard followUpDate > .now else { return }
+        let content = notificationContent(
+            title: "48-hour check-in",
+            body: "It's been two days since your last Chill. How are you really feeling — sleep, mood, energy?",
+            discreetBody: "A private follow-up is available.",
+            destination: .home,
+            categoryIdentifier: "CHECKIN"
+        )
+        let request = UNNotificationRequest(
+            identifier: "chillmate.followup48h.\(entryID.uuidString)",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval(for: followUpDate), repeats: false)
+        )
+        center.add(request)
+    }
+
+    func scheduleSTIReminder(dueDate: Date) {
+        clearSTIReminder()
+        guard dueDate > .now else { return }
+        let content = notificationContent(
+            title: "STI test reminder",
+            body: "Based on your test schedule, it may be time for a check-up. Regular STI testing is part of staying healthy.",
+            discreetBody: "A private health reminder is available.",
+            destination: .home
+        )
+        let request = UNNotificationRequest(
+            identifier: "chillmate.sti.periodic",
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval(for: dueDate), repeats: false)
+        )
+        center.add(request)
+    }
+
+    func clearSTIReminder() {
+        center.removePendingNotificationRequests(withIdentifiers: ["chillmate.sti.periodic"])
+    }
+
     func schedulePositiveSleepNotification(hours: Double) {
         let content = notificationContent(
             title: "Good recovery sleep",
@@ -236,8 +408,10 @@ final class NotificationService {
             destination: .home
         )
 
+        let id = "chillmate.sleep.positive"
+        center.removePendingNotificationRequests(withIdentifiers: [id])
         let request = UNNotificationRequest(
-            identifier: "chillmate.sleep.positive.\(UUID().uuidString)",
+            identifier: id,
             content: content,
             trigger: UNTimeIntervalNotificationTrigger(timeInterval: 2, repeats: false)
         )
@@ -265,7 +439,8 @@ final class NotificationService {
                 title: "Plan ending soon",
                 body: "Your safer session plan ends in \(label). Check water, transport, and your limits now.",
                 discreetBody: "Your private plan has a timing reminder.",
-                destination: .saferPlan
+                destination: .saferPlan,
+                categoryIdentifier: "CHECKIN"
             )
 
             let request = UNNotificationRequest(
@@ -282,9 +457,9 @@ final class NotificationService {
     func schedulePrepReminders(planID: UUID, plannedSexAt plannedDate: Date) {
         let firstDoseDate = plannedDate.addingTimeInterval(-2 * 60 * 60)
         let reminders: [(Date, String, String)] = [
-            (firstDoseDate, "PrEP before sex", "If you use around-sex PrEP and it is prescribed for you, take 2 pills now so there is at least 2 hours before sex."),
-            (firstDoseDate.addingTimeInterval(24 * 60 * 60), "PrEP follow-up", "Take 1 pill at the same time as the first PrEP pills yesterday."),
-            (firstDoseDate.addingTimeInterval(48 * 60 * 60), "PrEP follow-up", "Take the second follow-up pill at the same time. Continue daily if sex continues over consecutive days.")
+            (firstDoseDate, "PrEP reminder", "If around-sex PrEP is prescribed for you, follow the schedule your clinician gave you."),
+            (firstDoseDate.addingTimeInterval(24 * 60 * 60), "PrEP follow-up", "Follow your prescribed PrEP follow-up instructions at the planned time."),
+            (firstDoseDate.addingTimeInterval(48 * 60 * 60), "PrEP follow-up", "Use your prescribed PrEP plan. Contact a clinician or GGD if you are unsure.")
         ]
 
         let identifiers = reminders.indices.map { "chillmate.prep.\(planID.uuidString).\($0)" }
@@ -317,12 +492,15 @@ final class NotificationService {
 
         var date = firstDate
         var index = 0
-        while date < endDate, index < 8 {
+        let maxCheckIns = 48
+
+        while date < endDate, index < maxCheckIns {
             let content = notificationContent(
                 title: "Gentle safety check",
                 body: checkInMessages[index % checkInMessages.count],
                 discreetBody: "A private safety check is available.",
-                destination: destination
+                destination: destination,
+                categoryIdentifier: "CHECKIN"
             )
 
             let request = UNNotificationRequest(
@@ -339,16 +517,17 @@ final class NotificationService {
 
     func clearSessionCheckIns(id: UUID) {
         center.removePendingNotificationRequests(
-            withIdentifiers: (0..<8).map { sessionCheckInIdentifier(id: id, index: $0) }
+            withIdentifiers: (0..<48).map { sessionCheckInIdentifier(id: id, index: $0) }
         )
     }
 
     private func schedulePostPlanRedoseCheck(planID: UUID, date: Date) {
         let content = notificationContent(
             title: "Pause before adding more",
-            body: "Your planned ending time has passed. If you want to log more drugs, stop first and ask yourself clearly: is this really what you want right now?",
+            body: "Your planned ending time has passed. Pause first: are you safe, supported, and still choosing what protects you tomorrow?",
             discreetBody: "A private timing check is available.",
-            destination: .timers
+            destination: .timers,
+            categoryIdentifier: "CHECKIN"
         )
 
         let request = UNNotificationRequest(
@@ -373,6 +552,27 @@ final class NotificationService {
 
     private func triggerInterval(for date: Date) -> TimeInterval {
         max(60, date.timeIntervalSinceNow)
+    }
+}
+
+private extension NotificationService {
+    static func riskWarningTitle(count: Int) -> String {
+        switch count {
+        case 4...6: return "Worth a quick check-in"
+        case 7...9: return "A pattern worth noticing"
+        default:    return "Health check-in"
+        }
+    }
+
+    static func riskWarningBody(count: Int) -> String {
+        switch count {
+        case 4...6:
+            return "You have logged \(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person."
+        case 7...9:
+            return "ChillMate has logged \(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, GGD, or GP can help — without judgment."
+        default:
+            return "You have logged \(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, GGD, or counselor can support you."
+        }
     }
 }
 

@@ -1,11 +1,15 @@
-import Darwin
 import SwiftData
 import PhotosUI
 import SwiftUI
+import WidgetKit
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
+    @AppStorage("lastKnownHRVms") private var lastKnownHRVms: Double = 0
+    @AppStorage("healthKitHRVReadEnabled") private var healthKitHRVReadEnabled = false
+    @AppStorage("reductionGoalSessions") private var reductionGoalSessions = 0
+    @AppStorage("reductionGoalCountSubstanceOnly") private var reductionGoalCountSubstanceOnly = true
     @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
     @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
     @Query(sort: \SaferSessionPlan.createdAt, order: .reverse) private var plans: [SaferSessionPlan]
@@ -16,6 +20,7 @@ struct DashboardView: View {
     @State private var isShowingLogSheet = false
     @State private var isShowingCalendar = false
     @State private var activeCarePage: CareToolPage?
+    @State private var isPrivacyScreenActive = false
     let openCalendarTab: (() -> Void)?
 
     init(openCalendarTab: (() -> Void)? = nil) {
@@ -24,8 +29,24 @@ struct DashboardView: View {
 
     private var calendar: Calendar { .current }
 
+    @State private var cachedMetrics: DashboardMetrics?
+    @State private var cachedMetricsEntryCount = -1
+    @State private var cachedMetricsHRV: Double = -1
+
     private var dashboardMetrics: DashboardMetrics {
-        DashboardMetrics(entries: entries, profiles: profiles, calendar: calendar)
+        let needsRebuild = cachedMetrics == nil
+            || cachedMetricsEntryCount != entries.count
+            || cachedMetricsHRV != lastKnownHRVms
+        if needsRebuild {
+            let m = DashboardMetrics(entries: entries, profiles: profiles, calendar: calendar, latestHRVms: lastKnownHRVms)
+            Task { @MainActor in
+                cachedMetrics = m
+                cachedMetricsEntryCount = entries.count
+                cachedMetricsHRV = lastKnownHRVms
+            }
+            return m
+        }
+        return cachedMetrics!
     }
 
     var body: some View {
@@ -73,6 +94,14 @@ struct DashboardView: View {
                                     HealthWarningCard(count: metrics.healthWarningCount)
                                 }
 
+                                if reductionGoalSessions > 0 {
+                                    ReductionGoalProgressCard(
+                                        goal: reductionGoalSessions,
+                                        substanceOnly: reductionGoalCountSubstanceOnly,
+                                        entries: entries
+                                    )
+                                }
+
                                 if metrics.shouldShowWhatChanged {
                                     WhatChangedPatternCard(
                                         recentCount: metrics.recentRiskCount,
@@ -99,7 +128,7 @@ struct DashboardView: View {
                             .padding(.horizontal, 20)
                             .padding(.top, 18)
                         }
-                        .padding(.bottom, 112)
+                        .padding(.bottom, 136)
                     }
                     .scrollIndicators(.hidden)
                 }
@@ -108,15 +137,29 @@ struct DashboardView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .onAppear {
                 lastDailyRecoveryScore = metrics.dailyScore.displayValue
+                updateWidgetData(metrics: metrics)
             }
             .onChange(of: metrics.dailyScore.displayValue) { _, value in
                 lastDailyRecoveryScore = value
+                updateWidgetData(metrics: metrics)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestQuickSkip)) { _ in
+                quickSkip()
+            }
+            .task(id: healthKitHRVReadEnabled) {
+                guard healthKitHRVReadEnabled else { return }
+                if let hrv = try? await HealthKitService.shared.latestHRV() {
+                    lastKnownHRVms = hrv
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(role: .destructive) {
-                        _ = try? EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext)
-                        exit(0)
+                        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                        Task {
+                            _ = try? EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext)
+                        }
+                        isPrivacyScreenActive = true
                     } label: {
                         Image(systemName: "xmark.octagon.fill")
                             .font(.headline.weight(.bold))
@@ -127,12 +170,13 @@ struct DashboardView: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel("Panic close app")
                 }
-
             }
             .safeAreaInset(edge: .bottom) {
-                FloatingLogBar {
+                FloatingLogBar(add: {
                     isShowingLogSheet = true
-                }
+                }, skip: {
+                    quickSkip()
+                })
             }
             .fullScreenCover(isPresented: $isShowingLogSheet) {
                 LogNightSheet()
@@ -172,6 +216,9 @@ struct DashboardView: View {
                     DrugCheckingEducationView()
                 }
             }
+            .fullScreenCover(isPresented: $isPrivacyScreenActive) {
+                PrivacyShieldView(dismiss: { isPrivacyScreenActive = false })
+            }
         }
     }
 
@@ -181,6 +228,27 @@ struct DashboardView: View {
         } else {
             isShowingCalendar = true
         }
+    }
+
+    private func updateWidgetData(metrics: DashboardMetrics) {
+        let shared = UserDefaults(suiteName: "group.com.codex.ChillMate") ?? .standard
+        shared.set(metrics.recoveryStreakDays, forKey: "widgetRecoveryStreak")
+        shared.set(metrics.dailyScore.displayValue, forKey: "lastDailyRecoveryScore")
+        shared.set(metrics.dailyScore.isActive, forKey: "widgetScoreIsActive")
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
+    private func quickSkip() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        let entry = NightEntry(
+            date: .now,
+            hadSex: false,
+            skippedNight: true,
+            substances: []
+        )
+        modelContext.insert(entry)
+        try? modelContext.save()
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 }
 
@@ -202,10 +270,11 @@ private struct DashboardMetrics {
     }
 
     var realityCheckActive: Bool {
-        healthWarningCount > 3 || (dailyScore.isActive && dailyScore.value < 30) || substanceCount >= 10
+        let recentSessionsWithSubstances = healthWarningCount
+        return healthWarningCount > 3 || (dailyScore.isActive && dailyScore.value < 30) || recentSessionsWithSubstances >= 10
     }
 
-    init(entries: [NightEntry], profiles: [UserProfile], calendar: Calendar) {
+    init(entries: [NightEntry], profiles: [UserProfile], calendar: Calendar, latestHRVms: Double = 0) {
         let cutoffDate = calendar.date(byAdding: .month, value: -3, to: .now) ?? .now
         var trackedCount = 0
         var skippedCount = 0
@@ -289,7 +358,7 @@ private struct DashboardMetrics {
             recoveryStreakDays = max(0, calendar.dateComponents([.day], from: startDay, to: today).day ?? 0)
         }
 
-        dailyScore = DailyRecoveryScore(entries: entries, recoveryStreakDays: recoveryStreakDays, calendar: calendar)
+        dailyScore = DailyRecoveryScore(entries: entries, recoveryStreakDays: recoveryStreakDays, calendar: calendar, latestHRVms: latestHRVms)
     }
 }
 
@@ -356,7 +425,7 @@ private struct DailyScoreStatusPill: View {
                 .foregroundStyle(Color.chillText)
                 .lineLimit(1)
 
-            Text(score.isActive ? score.label : "Make a substance-related log to activate daily score")
+            Text(score.isActive ? score.label : "Log a Chill to activate your daily score")
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .multilineTextAlignment(.center)
@@ -806,31 +875,105 @@ private struct CalendarDayCell: View {
     }
 }
 
+private struct ReductionGoalProgressCard: View {
+    let goal: Int
+    let substanceOnly: Bool
+    let entries: [NightEntry]
+
+    private var currentMonthCount: Int {
+        let start = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: .now)) ?? .now
+        return entries.filter { entry in
+            entry.date >= start && !entry.skippedNight && (substanceOnly ? !entry.substances.isEmpty : entry.hadSex || !entry.substances.isEmpty)
+        }.count
+    }
+
+    private var progress: Double { min(1, Double(currentMonthCount) / Double(goal)) }
+
+    private var progressColor: Color {
+        switch progress {
+        case 0..<0.6: Color.chillMint
+        case 0.6..<0.85: .yellow
+        default: .red
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Monthly goal", systemImage: "chart.line.downtrend.xyaxis")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text("\(currentMonthCount)")
+                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .foregroundStyle(progressColor)
+                Text("/ \(goal)")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                Text(substanceOnly ? "substance sessions this month" : "sessions this month")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+            }
+
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(.black.opacity(0.10))
+                    Capsule()
+                        .fill(progressColor)
+                        .frame(width: max(12, proxy.size.width * progress))
+                }
+            }
+            .frame(height: 8)
+
+            if currentMonthCount >= goal {
+                Text("You've reached your limit for this month. Consider pausing.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.orange)
+            } else {
+                Text("\(goal - currentMonthCount) \(goal - currentMonthCount == 1 ? "session" : "sessions") remaining this month.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+            }
+        }
+        .padding(18)
+        .glassSurface(radius: 30, tint: progressColor.opacity(0.08), interactive: true)
+    }
+}
+
 private struct RecoveryStreakBadge: View {
     let days: Int
     let dailyScoreIsActive: Bool
     let openCalendar: () -> Void
 
-    private var cappedDays: Int {
-        min(max(days, 0), 14)
+    private var milestone: Int {
+        switch days {
+        case 0..<30:   return 30
+        case 30..<90:  return 90
+        case 90..<180: return 180
+        case 180..<365: return 365
+        default:        return 365
+        }
     }
 
     private var progress: Double {
-        Double(cappedDays) / 14
+        guard milestone > 0 else { return 1 }
+        return min(1, Double(days) / Double(milestone))
     }
 
     private var tint: Color {
-        switch cappedDays {
+        switch days {
         case 0...2:
             .red
         case 3...6:
             .orange
-        case 7...10:
+        case 7...13:
             .yellow
-        case 11...13:
+        case 14...29:
             Color.chillMint
-        default:
+        case 30...89:
             .green
+        default:
+            .cyan
         }
     }
 
@@ -839,17 +982,19 @@ private struct RecoveryStreakBadge: View {
             return "😄"
         }
 
-        switch cappedDays {
+        switch days {
         case 0...2:
             return "😢"
         case 3...6:
             return "🙁"
-        case 7...10:
+        case 7...13:
             return "🙂"
-        case 11...13:
+        case 14...29:
             return "😊"
-        default:
+        case 30...89:
             return "😄"
+        default:
+            return "🌟"
         }
     }
 
@@ -870,63 +1015,95 @@ private struct RecoveryStreakBadge: View {
         return "\(days) \(days == 1 ? "day" : "days")"
     }
 
+    private var isMilestoneDay: Bool {
+        [30, 90, 180, 365].contains(days)
+    }
+
+    @State private var isShowingMilestoneShare = false
+
     var body: some View {
-        Button(action: openCalendar) {
-            VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .center, spacing: 12) {
-                Text(emoji)
-                    .font(.system(size: 30))
-                    .frame(width: 48, height: 48)
-                    .glassSurface(radius: 24, tint: tint.opacity(0.16))
+        VStack(alignment: .leading, spacing: 10) {
+            Button(action: openCalendar) {
+                VStack(alignment: .leading, spacing: 14) {
+                    HStack(alignment: .center, spacing: 12) {
+                        Text(emoji)
+                            .font(.system(size: 30))
+                            .frame(width: 48, height: 48)
+                            .glassSurface(radius: 24, tint: tint.opacity(0.16))
 
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(displayText)
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundStyle(Color.chillText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(displayText)
+                                .font(.system(size: 30, weight: .bold))
+                                .foregroundStyle(Color.chillText)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.72)
 
-                    Text("without logged substance use")
+                            Text("without logged substance use")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                        }
+
+                        Spacer()
+                    }
+
+                    GeometryReader { proxy in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(.black.opacity(0.10))
+                            Capsule()
+                                .fill(.linearGradient(colors: [.red, .orange, .yellow, Color.chillMint, .green], startPoint: .leading, endPoint: .trailing))
+                                .frame(width: max(12, proxy.size.width * progress))
+                        }
+                    }
+                    .frame(height: 10)
+
+                    Text(encouragement)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                 }
-
-                Spacer()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(18)
+                .glassSurface(radius: 30, tint: tint.opacity(0.12), interactive: true)
             }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Open calendar for recovery streak")
 
-            GeometryReader { proxy in
-                ZStack(alignment: .leading) {
-                    Capsule()
-                        .fill(.black.opacity(0.10))
-                    Capsule()
-                        .fill(.linearGradient(colors: [.red, .orange, .yellow, Color.chillMint, .green], startPoint: .leading, endPoint: .trailing))
-                        .frame(width: max(12, proxy.size.width * progress))
+            if isMilestoneDay || days >= 30 {
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    isShowingMilestoneShare = true
+                } label: {
+                    Label("Share \(displayText) milestone", systemImage: "square.and.arrow.up")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(tint)
+                        .frame(maxWidth: .infinity)
+                        .padding(10)
+                        .glassSurface(radius: 18, tint: tint.opacity(0.10), interactive: true)
                 }
+                .buttonStyle(.plain)
             }
-            .frame(height: 10)
-
-            Text(encouragement)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Color.chillSecondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(18)
-            .glassSurface(radius: 30, tint: tint.opacity(0.12), interactive: true)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Open calendar for recovery streak")
+        .sheet(isPresented: $isShowingMilestoneShare) {
+            MilestoneShareSheet(days: days, emoji: emoji, tint: tint)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
     }
 
     private var encouragement: String {
-        switch cappedDays {
+        switch days {
         case 0...2:
             "Start gentle. One steady choice already counts."
         case 3...6:
             "You are creating space for recovery."
-        case 7...13:
+        case 7...29:
             "A full week changes how your body can rest."
+        case 30...89:
+            "Strong streak. Your body is building real recovery."
+        case 90...364:
+            "Three months of steady choices. That is significant."
         default:
-            "Strong streak. Keep choosing what helps you feel well."
+            "Over a year of sustained recovery. Remarkable consistency."
         }
     }
 }
@@ -942,7 +1119,7 @@ private struct DailyRecoveryScore {
         isActive ? value : 88
     }
 
-    init(entries: [NightEntry], recoveryStreakDays: Int, calendar: Calendar) {
+    init(entries: [NightEntry], recoveryStreakDays: Int, calendar: Calendar, latestHRVms: Double = 0) {
         var hasEverLoggedSubstances = false
         var latest: NightEntry?
         var latestDate = Date.distantPast
@@ -973,7 +1150,7 @@ private struct DailyRecoveryScore {
                 Factor(name: "Substances", caption: "no substance use logged"),
                 Factor(name: "Streak", caption: "\(recoveryStreakDays) d"),
                 Factor(name: "Symptoms", caption: "starts after activation"),
-                Factor(name: "HRV", caption: "later")
+                Factor(name: "HRV", caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
             ]
             return
         }
@@ -983,9 +1160,9 @@ private struct DailyRecoveryScore {
         let food = latest?.aftercareAteFood == true ? 10 : 4
         let substance = Self.substancePoints(latest)
         let anxiety = Self.anxietyPoints(latest)
-        let recovery = Int((Double(min(recoveryStreakDays, 14)) / 14) * 18)
+        let recovery = Int(min(18.0, (log(Double(max(1, recoveryStreakDays)) + 1) / log(30)) * 18))
         let symptoms = Self.symptomPoints(latest)
-        let hrv = 5
+        let hrv = Self.hrvPoints(latestHRVms)
         let total = min(100, max(0, sleep + hydration + food + substance + anxiety + recovery + symptoms + hrv))
 
         isActive = true
@@ -1000,7 +1177,7 @@ private struct DailyRecoveryScore {
             Factor(name: "Anxiety", caption: Self.anxietyCaption(latest)),
             Factor(name: "Streak", caption: "\(recoveryStreakDays) d"),
             Factor(name: "Symptoms", caption: latest?.aftercareSymptoms.isEmpty == false ? "\(latest?.aftercareSymptoms.count ?? 0) selected" : "none"),
-            Factor(name: "HRV", caption: "later")
+            Factor(name: "HRV", caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
         ]
     }
 
@@ -1072,6 +1249,20 @@ private struct DailyRecoveryScore {
 
         let mood = AftercareMood(rawValue: entry.aftercareMood) ?? .okay
         return entry.aftercareSymptoms.contains(.anxious) ? "selected" : mood.rawValue.lowercased()
+    }
+
+    private static func hrvPoints(_ ms: Double) -> Int {
+        guard ms > 0 else { return 5 }
+        switch ms {
+        case 60...:
+            return 12
+        case 40..<60:
+            return 9
+        case 25..<40:
+            return 6
+        default:
+            return 3
+        }
     }
 
     private static func label(for value: Int) -> String {
@@ -1153,7 +1344,7 @@ private struct PEPCountdownCard: View {
                     .font(.headline)
                     .foregroundStyle(Color.chillText)
 
-                Text("This Chill may be worth checking for HIV PEP because condom or penetration details suggest possible exposure.")
+                Text("Based on what you logged, this may be worth a quick HIV PEP check. PEP works best if started within 72 hours.")
                     .font(.callout)
                     .foregroundStyle(Color.chillSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1275,6 +1466,126 @@ private struct BreathingOrb: View {
                     endPoint: .bottomTrailing
                 )
             )
+    }
+}
+
+private struct MilestoneShareSheet: View {
+    let days: Int
+    let emoji: String
+    let tint: Color
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var renderedImage: Image?
+
+    private var milestoneText: String {
+        if days >= 365 {
+            let years = days / 365
+            return "\(years) \(years == 1 ? "year" : "years")"
+        }
+        return "\(days) days"
+    }
+
+    private var cardView: some View {
+        VStack(spacing: 18) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [Color.black.opacity(0.88), Color.black.opacity(0.72)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .stroke(tint.opacity(0.36), lineWidth: 1)
+                    )
+
+                VStack(spacing: 16) {
+                    Text(emoji)
+                        .font(.system(size: 52))
+
+                    Text(milestoneText)
+                        .font(.system(size: 36, weight: .black, design: .rounded))
+                        .foregroundStyle(.white)
+
+                    Text("without logged substance use")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.62))
+
+                    HStack(spacing: 6) {
+                        ZStack {
+                            Circle()
+                                .trim(from: 0.14, to: 0.87)
+                                .stroke(tint, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                                .frame(width: 18, height: 18)
+                                .rotationEffect(.degrees(-42))
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 7, weight: .black))
+                                .foregroundStyle(tint)
+                        }
+                        Text("ChillMate")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.white.opacity(0.54))
+                    }
+                }
+                .padding(28)
+            }
+            .frame(width: 300, height: 300)
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.84).ignoresSafeArea()
+
+            VStack(spacing: 20) {
+                Text("Share milestone")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(Color.chillText)
+
+                cardView
+                    .frame(width: 300, height: 300)
+
+                Text("Sharing this image reveals only your streak — no substances, dates, or other details.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 24)
+
+                if let img = renderedImage {
+                    ShareLink(item: img, preview: SharePreview("\(milestoneText) milestone", image: img)) {
+                        Label("Share milestone card", systemImage: "square.and.arrow.up")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(tint)
+                    .padding(.horizontal, 28)
+                } else {
+                    Button("Prepare card") {
+                        renderCard()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(tint)
+                    .padding(.horizontal, 28)
+                }
+
+                Button("Done") { dismiss() }
+                    .foregroundStyle(Color.chillSecondary)
+                    .padding(.bottom, 12)
+            }
+        }
+        .onAppear { renderCard() }
+    }
+
+    private func renderCard() {
+        let renderer = ImageRenderer(content: cardView.frame(width: 300, height: 300))
+        renderer.scale = 3
+        if let uiImage = renderer.uiImage {
+            renderedImage = Image(uiImage: uiImage)
+        }
     }
 }
 
@@ -1570,9 +1881,9 @@ private struct MetricsGrid: View {
             WellnessScoreRow(score: dailyScore, recoveryStreakDays: recoveryStreakDays, action: openRecoveryStreak)
 
             LazyVGrid(columns: columns, spacing: 8) {
-                MetricCard(title: "Logged", value: "\(trackedCount)", caption: "sex + substances", symbol: "heart.text.square.fill", tint: Color.chillIconPink)
-                MetricCard(title: "Skipped", value: "\(skippedCount)", caption: "checked Chills", symbol: "moon.zzz.fill", tint: Color.chillIconPurple)
-                MetricCard(title: "Substances", value: "\(substanceCount)", caption: "logged tags", symbol: "pills.fill", tint: Color.chillSecondaryBlue)
+                MetricCard(title: "Logged", value: "\(trackedCount)", caption: "with sex or substances", symbol: "heart.text.square.fill", tint: Color.chillIconPink)
+                MetricCard(title: "Skipped", value: "\(skippedCount)", caption: "all-clear check-ins", symbol: "moon.zzz.fill", tint: Color.chillIconPurple)
+                MetricCard(title: "Substances", value: "\(substanceCount)", caption: "tags across logs", symbol: "pills.fill", tint: Color.chillSecondaryBlue)
                 MetricCard(title: "Sleep", value: sleepValue, caption: sleepCaption, symbol: "bed.double.fill", tint: Color.chillIconAmber)
             }
         }
@@ -1596,10 +1907,14 @@ private struct WellnessScoreRow: View {
     let recoveryStreakDays: Int
     let action: () -> Void
 
+    @State private var isShowingFactors = false
+
     var body: some View {
-        Button(action: action) {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            isShowingFactors = true
+        } label: {
             HStack(spacing: 16) {
-                // Fitness-ring style score circle
                 ZStack {
                     Circle()
                         .stroke(Color.chillPrimary.opacity(0.14), lineWidth: 10)
@@ -1647,19 +1962,100 @@ private struct WellnessScoreRow: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 11, weight: .bold))
+                Image(systemName: "info.circle")
+                    .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color.chillTertiary)
             }
             .padding(14)
             .glassSurface(radius: 22, tint: .clear, interactive: true)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Daily score \(score.isActive ? "\(score.value), \(score.label)" : "inactive"). \(recoveryStreakDays) days clear. Open calendar.")
+        .accessibilityLabel("Daily score \(score.isActive ? "\(score.value), \(score.label)" : "inactive"). Tap to see breakdown.")
+        .sheet(isPresented: $isShowingFactors) {
+            ScoreFactorsSheet(score: score, openCalendar: {
+                isShowingFactors = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { action() }
+            })
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
     }
+}
 
-    private var recoveryStreakText: String {
-        recoveryStreakDays == 1 ? "1 day without logged substance use." : "\(recoveryStreakDays) days without logged substance use."
+private struct ScoreFactorsSheet: View {
+    let score: DailyRecoveryScore
+    let openCalendar: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.84).ignoresSafeArea()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    HStack(spacing: 14) {
+                        ZStack {
+                            Circle()
+                                .stroke(Color.chillPrimary.opacity(0.14), lineWidth: 8)
+                            Circle()
+                                .trim(from: 0, to: score.isActive ? CGFloat(score.value) / 100 : 1)
+                                .stroke(LinearGradient.chillBrand, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                                .rotationEffect(.degrees(-90))
+                            Text(score.isActive ? "\(score.value)" : score.emoji)
+                                .font(.system(size: 18, weight: .black, design: .rounded))
+                                .foregroundStyle(Color.chillText)
+                        }
+                        .frame(width: 52, height: 52)
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Daily recovery score")
+                                .font(.headline.weight(.bold))
+                                .foregroundStyle(Color.chillText)
+                            Text(score.isActive ? score.label.capitalized : "Log a Chill to activate")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                        }
+                    }
+
+                    VStack(spacing: 0) {
+                        ForEach(Array(score.factors.enumerated()), id: \.offset) { _, factor in
+                            HStack(spacing: 14) {
+                                Text(factor.name)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(Color.chillText)
+                                    .frame(width: 90, alignment: .leading)
+                                Text(factor.caption)
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color.chillSecondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 16)
+                            .overlay(alignment: .bottom) {
+                                Rectangle()
+                                    .fill(.white.opacity(0.06))
+                                    .frame(height: 1)
+                            }
+                        }
+                    }
+                    .glassSurface(radius: 20, tint: .white.opacity(0.07))
+
+                    Text("Score is based on your most recent log entry — sleep, aftercare, substances, recovery streak, and Apple Watch HRV if available.")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillTertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Button(action: openCalendar) {
+                        Label("View calendar", systemImage: "calendar")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(Color.chillPrimary)
+                }
+                .padding(20)
+                .padding(.bottom, 28)
+            }
+        }
     }
 }
 
@@ -2185,10 +2581,13 @@ private struct TimelineRow: View {
 
 private struct FloatingLogBar: View {
     let add: () -> Void
+    let skip: () -> Void
     @State private var isPressed = false
+    @State private var didSkip = false
 
     var body: some View {
-        LiquidGlassGroup(spacing: 12) {
+        VStack(spacing: 0) {
+            // Primary action — matches original clean design
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Private log")
@@ -2199,7 +2598,7 @@ private struct FloatingLogBar: View {
                         .foregroundStyle(Color.chillText)
                 }
 
-                Spacer()
+                Spacer(minLength: 12)
 
                 Button {
                     withAnimation(.spring(response: 0.20, dampingFraction: 0.70)) { isPressed = true }
@@ -2211,7 +2610,7 @@ private struct FloatingLogBar: View {
                     Label("Add", systemImage: "plus")
                         .font(.headline.weight(.bold))
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 18)
+                        .padding(.horizontal, 20)
                         .padding(.vertical, 11)
                         .background(LinearGradient.chillBrand, in: Capsule())
                         .shadow(color: Color.chillPrimary.opacity(0.44), radius: 12, y: 6)
@@ -2222,8 +2621,44 @@ private struct FloatingLogBar: View {
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
-            .glassSurface(radius: 30, tint: .black.opacity(0.04))
+
+            // Thin separator
+            Rectangle()
+                .fill(.white.opacity(0.07))
+                .frame(height: 0.5)
+                .padding(.horizontal, 16)
+
+            // Secondary action — clear night quick-log
+            Button {
+                withAnimation(.easeInOut(duration: 0.18)) { didSkip = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
+                    withAnimation { didSkip = false }
+                }
+                skip()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: didSkip ? "checkmark.circle.fill" : "moon.zzz.fill")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(didSkip ? Color.chillMint : Color.chillSecondary)
+                    Text(didSkip ? "Logged — clear night" : "Nothing happened tonight")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(didSkip ? Color.chillMint : Color.chillSecondary)
+                    Spacer(minLength: 0)
+                    if !didSkip {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(Color.chillTertiary)
+                    }
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 10)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .animation(.easeInOut(duration: 0.22), value: didSkip)
+            .accessibilityLabel("Log nothing happened tonight")
         }
+        .glassSurface(radius: 30, tint: .black.opacity(0.04))
         .padding(.horizontal, 20)
         .padding(.bottom, 8)
     }
@@ -3145,5 +3580,52 @@ private struct ProfileDetail: Identifiable {
     var displayValue: String {
         let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmedValue.isEmpty ? "Not added yet" : trimmedValue
+    }
+}
+
+struct PrivacyShieldView: View {
+    let dismiss: () -> Void
+    @State private var showUnlockButton = false
+
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+
+            VStack(spacing: 24) {
+                Spacer()
+
+                VStack(spacing: 14) {
+                    Image(systemName: "moon.fill")
+                        .font(.system(size: 52, weight: .light))
+                        .foregroundStyle(.white.opacity(0.38))
+
+                    Text("Screen paused")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.46))
+                }
+
+                Spacer()
+
+                if showUnlockButton {
+                    Button(action: dismiss) {
+                        Text("Resume")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.55))
+                            .padding(.horizontal, 28)
+                            .padding(.vertical, 12)
+                    }
+                    .buttonStyle(.plain)
+                    .transition(.opacity)
+                }
+            }
+            .padding(.bottom, 48)
+        }
+        .onTapGesture {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                showUnlockButton = true
+            }
+        }
+        .statusBarHidden(true)
+        .persistentSystemOverlays(.hidden)
     }
 }

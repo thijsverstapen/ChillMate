@@ -10,7 +10,7 @@
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Log Chill</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>com.codex.ChillMate.shortcut.log</string>
+			<string>com.BIJTHIJS.ChillMate.shortcut.log</string>
 		</dict>
 		<dict>
 			<key>UIApplicationShortcutItemIconType</key>
@@ -18,7 +18,7 @@
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Start Timer</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>com.codex.ChillMate.shortcut.timers</string>
+			<string>com.BIJTHIJS.ChillMate.shortcut.timers</string>
 		</dict>
 		<dict>
 			<key>UIApplicationShortcutItemIconType</key>
@@ -26,7 +26,7 @@
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Panic Support</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>com.codex.ChillMate.shortcut.panic</string>
+			<string>com.BIJTHIJS.ChillMate.shortcut.panic</string>
 		</dict>
 		<dict>
 			<key>UIApplicationShortcutItemIconType</key>
@@ -34,12 +34,13 @@
 			<key>UIApplicationShortcutItemTitle</key>
 			<string>Safe Route Home</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>com.codex.ChillMate.shortcut.route</string>
+			<string>com.BIJTHIJS.ChillMate.shortcut.route</string>
 		</dict>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>processing</string>
 		<string>bluetooth-central</string>
 		<string>fetch</string>
 		<string>location</string>

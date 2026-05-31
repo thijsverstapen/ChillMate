@@ -190,6 +190,55 @@ final class HealthKitService {
         return seconds / 3600
     }
 
+    func latestHRV() async throws -> Double? {
+        guard isAvailable, let hrvType = heartRateVariabilityType else {
+            return nil
+        }
+
+        try await requestAuthorization(scopes: [.heartRateVariabilityRead])
+
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(sampleType: hrvType, predicate: nil, limit: 1, sortDescriptors: [sort]) { _, samples, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let sdnn = (samples?.first as? HKQuantitySample)?
+                    .quantity.doubleValue(for: HKUnit.secondUnit(with: .milli))
+                continuation.resume(returning: sdnn)
+            }
+            store.execute(query)
+        }
+    }
+
+    func latestHeartRate() async throws -> Double? {
+        guard isAvailable, let hrType = heartRateType else {
+            return nil
+        }
+
+        try await requestAuthorization(scopes: [.heartRateRead])
+
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(sampleType: hrType, predicate: nil, limit: 1, sortDescriptors: [sort]) { _, samples, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                let bpm = (samples?.first as? HKQuantitySample)?
+                    .quantity.doubleValue(for: HKUnit(from: "count/min"))
+                continuation.resume(returning: bpm)
+            }
+            store.execute(query)
+        }
+    }
+
+    func sleepHoursAfterEntry(startDate: Date) async throws -> Double {
+        let windowEnd = startDate.addingTimeInterval(16 * 60 * 60)
+        return try await sleepHours(from: startDate, to: windowEnd)
+    }
+
     func save(_ snapshot: HealthLogSnapshot) async throws {
         guard isAvailable else {
             throw HealthKitError.unavailable

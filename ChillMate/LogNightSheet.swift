@@ -9,6 +9,7 @@ struct LogNightSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
+    @AppStorage("healthKitSleepReadWriteEnabled") private var healthKitSleepReadEnabled = false
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
 
     @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
@@ -169,6 +170,18 @@ struct LogNightSheet: View {
                                 columns: columns
                             )
 
+                            let interactionWarnings = SubstanceInteractionChecker.warnings(for: selectedSubstances)
+                            if !interactionWarnings.isEmpty {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Label("Combination risks", systemImage: "exclamationmark.triangle.fill")
+                                        .font(.headline)
+                                        .foregroundStyle(.orange)
+                                    SubstanceInteractionCard(warnings: interactionWarnings)
+                                }
+                                .padding(16)
+                                .glassSurface(radius: 28, tint: .orange.opacity(0.08))
+                            }
+
                             TriggerMapCard(selectedTriggers: $selectedTriggers)
 
                             WhatChangedInputCard(selectedReasons: $selectedChangeReasons)
@@ -278,10 +291,30 @@ struct LogNightSheet: View {
         modelContext.insert(entry)
         try? modelContext.save()
 
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+
         if healthKitAutoSync {
             let snapshot = HealthLogSnapshot(entry: entry)
             Task {
                 try? await HealthKitService.shared.save(snapshot)
+            }
+        }
+
+        if isTracked, !sleptYet, healthKitSleepReadEnabled {
+            let entryRef = entry
+            let ctx = modelContext
+            Task {
+                if let hours = try? await HealthKitService.shared.sleepHoursAfterEntry(startDate: entryRef.startDate),
+                   hours > 0 {
+                    await MainActor.run {
+                        entryRef.sleptYet = true
+                        entryRef.sleepHours = hours
+                        try? ctx.save()
+                        if hours >= 7 {
+                            NotificationService.shared.schedulePositiveSleepNotification(hours: hours)
+                        }
+                    }
+                }
             }
         }
 
@@ -298,6 +331,7 @@ struct LogNightSheet: View {
                     await MainActor.run {
                         notificationsEnabled = true
                         NotificationService.shared.scheduleAftercareReminder(entryID: entry.id, after: aftercareDate)
+                        NotificationService.shared.schedule48hFollowUp(entryID: entry.id, sessionDate: endDate)
                     }
                 }
             }
@@ -610,13 +644,13 @@ private struct SexPartnerDetailsCard: View {
     private func positionSummary(for partner: SexPartnerRecord) -> String {
         switch (partner.theyWerePenetrated, partner.userWasPenetrated) {
         case (true, true):
-            "Both penetration directions recorded"
+            "Both top and bottom recorded"
         case (true, false):
-            "This person was penetrated"
+            "They were the bottom"
         case (false, true):
-            "You were penetrated"
+            "You were the bottom"
         case (false, false):
-            "No penetration detail recorded"
+            "No position detail saved"
         }
     }
 }
@@ -841,11 +875,11 @@ private struct TriggerMapCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Label("Trigger map", systemImage: "map.fill")
+            Label("What led to this?", systemImage: "map.fill")
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("Optional. Tag what led into this Chill so patterns are easier to notice later.")
+            Text("Optional. Tag anything that played a role so patterns are easier to notice later.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)

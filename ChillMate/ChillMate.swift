@@ -1,3 +1,4 @@
+import ActivityKit
 import SwiftData
 import SwiftUI
 import UIKit
@@ -10,10 +11,15 @@ struct ChillMateApp: App {
     @AppStorage("dailyAffirmationsEnabled") private var dailyAffirmationsEnabled = false
     @AppStorage("lastAppUseTimestamp") private var lastAppUseTimestamp = Date.now.timeIntervalSince1970
     @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
+            if !hasCompletedOnboarding {
+                OnboardingView()
+                    .modelContainer(ChillMateModelContainer.container())
+            } else {
             AppLockView {
                 AppHomeView()
             }
@@ -21,19 +27,26 @@ struct ChillMateApp: App {
             .onAppear {
                 recordAppUse()
                 refreshPrivacyAndNotificationState()
+                WatchConnectivityService.shared.activate()
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     recordAppUse()
+                    refreshLiveActivities()
                 }
 
                 refreshPrivacyAndNotificationState()
             }
+            } // end else
         }
     }
 
     private func recordAppUse() {
         lastAppUseTimestamp = Date.now.timeIntervalSince1970
+    }
+
+    private func refreshLiveActivities() {
+        NotificationCenter.default.post(name: .chillMateRefreshTimers, object: nil)
     }
 
     private func refreshPrivacyAndNotificationState() {
@@ -64,6 +77,9 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
+        NotificationService.shared.registerCategories()
+        // Required for CloudKit silent-push sync and HealthKit background delivery
+        application.registerForRemoteNotifications()
         return true
     }
 
@@ -92,8 +108,15 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
-        if let destination = response.notification.request.content.userInfo["destination"] as? String {
-            UserDefaults.standard.set(destination, forKey: "pendingAppDestination")
+        switch response.actionIdentifier {
+        case NotificationService.ActionIdentifier.logNow:
+            UserDefaults.standard.set(NotificationDestination.log.rawValue, forKey: "pendingAppDestination")
+        case NotificationService.ActionIdentifier.snooze:
+            NotificationService.shared.snoozeCurrentCheckIn()
+        default:
+            if let destination = response.notification.request.content.userInfo["destination"] as? String {
+                UserDefaults.standard.set(destination, forKey: "pendingAppDestination")
+            }
         }
         completionHandler()
     }
@@ -103,13 +126,13 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         let destination: NotificationDestination?
 
         switch shortcutItem.type {
-        case "com.codex.ChillMate.shortcut.log":
+        case "com.BIJTHIJS.ChillMate.shortcut.log":
             destination = .log
-        case "com.codex.ChillMate.shortcut.timers":
+        case "com.BIJTHIJS.ChillMate.shortcut.timers":
             destination = .timers
-        case "com.codex.ChillMate.shortcut.panic":
+        case "com.BIJTHIJS.ChillMate.shortcut.panic":
             destination = .panic
-        case "com.codex.ChillMate.shortcut.route":
+        case "com.BIJTHIJS.ChillMate.shortcut.route":
             destination = .safeRoute
         default:
             destination = nil

@@ -239,7 +239,7 @@ enum EncryptedBackupError: LocalizedError {
 private final class EncryptedBackupKeychain {
     static let shared = EncryptedBackupKeychain()
 
-    private let service = "com.codex.ChillMate.encrypted-backup"
+    private let service = "com.BIJTHIJS.ChillMate.encrypted-backup"
     private let account = "primary-backup-key-v1"
     private let recoverySnapshotAccount = "on-device-recovery-snapshot-v1"
 

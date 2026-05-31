@@ -1,3 +1,4 @@
+import Foundation
 import SwiftData
 
 enum ChillMateModelContainer {
@@ -35,15 +36,25 @@ enum ChillMateModelContainer {
 
     @MainActor
     private static func makeContainer() throws -> ModelContainer {
+        try ensureApplicationSupportDirectory()
+
         let schema = appSchema
         let configuration = ModelConfiguration(
             schema: schema,
-            cloudKitDatabase: .none
+            cloudKitDatabase: .private("iCloud.com.codex.ChillMate")
         )
 
         let container = try ModelContainer(for: schema, configurations: [configuration])
         LocalSecurityService.applyFileProtection()
         return container
+    }
+
+    private static func ensureApplicationSupportDirectory() throws {
+        guard let applicationSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else {
+            return
+        }
+
+        try FileManager.default.createDirectory(at: applicationSupportURL, withIntermediateDirectories: true)
     }
 
     @MainActor
@@ -53,7 +64,7 @@ enum ChillMateModelContainer {
         }
 
         let schema = appSchema
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .private("iCloud.com.codex.ChillMate"))
         let container = try ModelContainer(for: schema, configurations: [configuration])
         LocalSecurityService.applyFileProtection()
         recoveryContainer = container

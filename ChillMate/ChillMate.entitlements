@@ -16,24 +16,11 @@
 	</array>
 	<key>com.apple.developer.icloud-services</key>
 	<array>
-		<string>CloudDocuments</string>
 		<string>CloudKit</string>
 	</array>
-	<key>com.apple.developer.ubiquity-container-identifiers</key>
+	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>iCloud.com.codex.ChillMate</string>
+		<string>group.com.codex.ChillMate</string>
 	</array>
-	<key>com.apple.security.hardened-process</key>
-	<true/>
-	<key>com.apple.security.hardened-process.checked-allocations</key>
-	<true/>
-	<key>com.apple.security.hardened-process.dyld-ro</key>
-	<true/>
-	<key>com.apple.security.hardened-process.enhanced-security-version-string</key>
-	<string>*</string>
-	<key>com.apple.security.hardened-process.hardened-heap</key>
-	<true/>
-	<key>com.apple.security.hardened-process.platform-restrictions-string</key>
-	<string>2</string>
 </dict>
 </plist>
