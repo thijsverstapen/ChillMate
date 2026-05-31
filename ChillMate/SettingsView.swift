@@ -868,7 +868,7 @@ struct SettingsView: View {
                         entry.usedCondom ? "true" : "false",
                         entry.wasPenetrated ? "true" : "false",
                         entry.sleptYet ? "true" : "false",
-                        entry.sleepHours > 0 ? String(format: "%.1f", entry.sleepHours) : "",
+                        entry.sleepHours > 0 ? entry.sleepHours.formatted(.number.precision(.fractionLength(1))) : "",
                         "\"\(entry.note.replacingOccurrences(of: "\"", with: "\"\""))\""
                     ].joined(separator: ",")
                     csv += row + "\n"

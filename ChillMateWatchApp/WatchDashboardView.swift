@@ -346,7 +346,7 @@ private struct WCContextBox: @unchecked Sendable {
     let dict: [String: Any]
 }
 
-extension WatchConnectivityReceiver: @preconcurrency WCSessionDelegate {
+extension WatchConnectivityReceiver: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard activationState == .activated else { return }
         let box = WCContextBox(dict: session.receivedApplicationContext)

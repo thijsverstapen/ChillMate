@@ -64,7 +64,7 @@ private struct WCPhoneContextBox: @unchecked Sendable {
     let dict: [String: Any]
 }
 
-extension WatchConnectivityService: @preconcurrency WCSessionDelegate {
+extension WatchConnectivityService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard activationState == .activated else { return }
         Task { @MainActor in

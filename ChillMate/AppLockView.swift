@@ -296,9 +296,9 @@ enum LocalSecurityService {
     private static func pbkdf2Hash(pin: String, salt: Data) -> Data {
         let pinData = Data(pin.utf8)
         var derivedKey = Data(repeating: 0, count: 32)
-        _ = derivedKey.withUnsafeMutableBytes { derivedKeyBytes in
-            pinData.withUnsafeBytes { pinBytes in
-                salt.withUnsafeBytes { saltBytes in
+        _ = unsafe derivedKey.withUnsafeMutableBytes { derivedKeyBytes in
+            unsafe pinData.withUnsafeBytes { pinBytes in
+                unsafe salt.withUnsafeBytes { saltBytes in
                     CCKeyDerivationPBKDF(
                         CCPBKDFAlgorithm(kCCPBKDF2),
                         pinBytes.baseAddress?.assumingMemoryBound(to: Int8.self),
@@ -338,7 +338,7 @@ enum LocalSecurityService {
     }
 
     private static func keychainRead(account: String) -> Data? {
-        var query: [String: Any] = [
+        let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,
             kSecAttrAccount as String: account,
