@@ -299,7 +299,7 @@ enum LocalSecurityService {
         _ = unsafe derivedKey.withUnsafeMutableBytes { derivedKeyBytes in
             unsafe pinData.withUnsafeBytes { pinBytes in
                 unsafe salt.withUnsafeBytes { saltBytes in
-                    CCKeyDerivationPBKDF(
+                    unsafe CCKeyDerivationPBKDF(
                         CCPBKDFAlgorithm(kCCPBKDF2),
                         pinBytes.baseAddress?.assumingMemoryBound(to: Int8.self),
                         pinData.count,

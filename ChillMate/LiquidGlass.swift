@@ -307,6 +307,65 @@ extension View {
     }
 }
 
+// ── Shared brand mark components ─────────────────────────────────────────────
+// Single source of truth so every in-app logo matches the app icon exactly.
+
+/// The checkmark path inside the ChillMate "C" logo.
+/// Proportional to the bounding rect — use .frame() to size it.
+struct ChillMateCheckmarkShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        p.move(to:    CGPoint(x: rect.minX + rect.width * 0.12, y: rect.minY + rect.height * 0.52))
+        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.40, y: rect.minY + rect.height * 0.78))
+        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.88, y: rect.minY + rect.height * 0.20))
+        return p
+    }
+}
+
+/// Scalable ChillMate brand mark that matches the app icon:
+///   • C-arc   — indigo → sky-blue gradient, gap on the right, ~73 % of circle
+///   • Checkmark — mint → teal gradient, thick rounded strokes
+///
+/// Usage:  `ChillMateBrandMark(size: 20)`
+struct ChillMateBrandMark: View {
+    var size: CGFloat = 20
+
+    private var arcLineWidth:   CGFloat { size * 0.155 }
+    private var checkLineWidth: CGFloat { size * 0.110 }
+
+    var body: some View {
+        ZStack {
+            // C arc — trim(0.14…0.87) = 73% arc, gap on right
+            Circle()
+                .trim(from: 0.14, to: 0.87)
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.chillPrimary, Color.chillSecondaryBlue],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: arcLineWidth, lineCap: .round)
+                )
+                .frame(width: size * 0.76, height: size * 0.76)
+                .rotationEffect(.degrees(-42))
+
+            // Checkmark — mint→teal, positioned to match icon
+            ChillMateCheckmarkShape()
+                .stroke(
+                    LinearGradient(
+                        colors: [Color.chillMint, Color.chillAccentTeal],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    style: StrokeStyle(lineWidth: checkLineWidth, lineCap: .round, lineJoin: .round)
+                )
+                .frame(width: size * 0.48, height: size * 0.36)
+                .offset(x: size * 0.07, y: size * 0.06)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
 extension LinearGradient {
     /// The ChillMate brand gradient: primary blue → mint green.
     static let chillBrand = LinearGradient(

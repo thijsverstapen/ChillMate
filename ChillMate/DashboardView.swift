@@ -370,20 +370,7 @@ private struct HeaderSummaryView: View {
         VStack(alignment: .leading, spacing: 6) {
             // Brand wordmark
             HStack(spacing: 9) {
-                ZStack {
-                    Circle()
-                        .trim(from: 0.14, to: 0.87)
-                        .stroke(LinearGradient.chillBrand,
-                                style: StrokeStyle(lineWidth: 3.0, lineCap: .round))
-                        .frame(width: 20, height: 20)
-                        .rotationEffect(.degrees(-42))
-
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 7.5, weight: .black))
-                        .foregroundStyle(Color.chillMint)
-                        .offset(x: 0.5, y: 0.5)
-                }
-                .frame(width: 20, height: 20)
+                ChillMateBrandMark(size: 20)
 
                 Text("ChillMate")
                     .font(.subheadline.weight(.heavy))
@@ -1514,16 +1501,7 @@ private struct MilestoneShareSheet: View {
                         .foregroundStyle(.white.opacity(0.62))
 
                     HStack(spacing: 6) {
-                        ZStack {
-                            Circle()
-                                .trim(from: 0.14, to: 0.87)
-                                .stroke(tint, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                                .frame(width: 18, height: 18)
-                                .rotationEffect(.degrees(-42))
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 7, weight: .black))
-                                .foregroundStyle(tint)
-                        }
+                        ChillMateBrandMark(size: 18)
                         Text("ChillMate")
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.white.opacity(0.54))

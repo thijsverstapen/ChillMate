@@ -1984,20 +1984,22 @@ private struct ChillMateOnboardingLogo: View {
 
     var body: some View {
         ZStack {
+            // C arc — identical trim/rotation to ChillMateBrandMark (matches app icon)
             Circle()
-                .trim(from: 0.15, to: 0.86)
+                .trim(from: 0.14, to: 0.87)
                 .stroke(
                     LinearGradient(
                         colors: [Color.chillPrimary, Color.chillSecondaryBlue],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    style: StrokeStyle(lineWidth: size * 0.15, lineCap: .round)
+                    style: StrokeStyle(lineWidth: size * 0.155, lineCap: .round)
                 )
                 .frame(width: size * 0.76, height: size * 0.76)
                 .rotationEffect(.degrees(-42))
                 .shadow(color: Color.chillPrimary.opacity(0.44), radius: size * 0.16, x: 0, y: size * 0.08)
 
+            // Checkmark — animated draw-in using the shared shape
             ChillMateCheckmarkShape()
                 .trim(from: 0, to: checkmarkInPlace ? 1 : 0.08)
                 .stroke(
@@ -2018,16 +2020,7 @@ private struct ChillMateOnboardingLogo: View {
         .frame(width: size, height: size)
     }
 }
-
-private struct ChillMateCheckmarkShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX + rect.width * 0.12, y: rect.minY + rect.height * 0.52))
-        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.40, y: rect.minY + rect.height * 0.78))
-        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.88, y: rect.minY + rect.height * 0.20))
-        return path
-    }
-}
+// ChillMateCheckmarkShape is now defined in LiquidGlass.swift (shared)
 
 @MainActor
 private struct IntroHeroScene: View {
