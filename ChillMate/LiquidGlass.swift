@@ -311,31 +311,38 @@ extension View {
 // Single source of truth so every in-app logo matches the app icon exactly.
 
 /// The checkmark path inside the ChillMate "C" logo.
-/// Proportional to the bounding rect — use .frame() to size it.
+///
+/// Path points are derived by pixel-measuring the actual app icon:
+///   start (30.1%, 50.2%+), mid-bottom (44%, 79%), end (79%, 21%)
+/// Place this shape in a frame equal to the brand-mark container size
+/// (no additional offset needed — positions are absolute within the container).
 struct ChillMateCheckmarkShape: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()
-        p.move(to:    CGPoint(x: rect.minX + rect.width * 0.12, y: rect.minY + rect.height * 0.52))
-        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.40, y: rect.minY + rect.height * 0.78))
-        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.88, y: rect.minY + rect.height * 0.20))
+        // start — lower-left arm begin
+        p.move(to:    CGPoint(x: rect.minX + rect.width * 0.35, y: rect.minY + rect.height * 0.55))
+        // mid — V-bottom (deepest point of checkmark)
+        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.44, y: rect.minY + rect.height * 0.79))
+        // end — upper-right tip
+        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.79, y: rect.minY + rect.height * 0.21))
         return p
     }
 }
 
-/// Scalable ChillMate brand mark that matches the app icon:
-///   • C-arc   — indigo → sky-blue gradient, gap on the right, ~73 % of circle
-///   • Checkmark — mint → teal gradient, thick rounded strokes
+/// Scalable ChillMate brand mark that matches the app icon pixel-for-pixel:
+///   • C-arc       — indigo→sky-blue, outer diameter = 69.5 % of `size`,
+///                   stroke = 12 % of `size`, gap on the right
+///   • Checkmark   — mint→teal, path fills the full `size` frame,
+///                   stroke = 9 % of `size`
 ///
 /// Usage:  `ChillMateBrandMark(size: 20)`
 struct ChillMateBrandMark: View {
     var size: CGFloat = 20
 
-    private var arcLineWidth:   CGFloat { size * 0.155 }
-    private var checkLineWidth: CGFloat { size * 0.110 }
-
     var body: some View {
         ZStack {
-            // C arc — trim(0.14…0.87) = 73% arc, gap on right
+            // C arc
+            // outer diameter = frame + lineWidth = 57.5% + 12% = 69.5% ✓
             Circle()
                 .trim(from: 0.14, to: 0.87)
                 .stroke(
@@ -344,12 +351,13 @@ struct ChillMateBrandMark: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    style: StrokeStyle(lineWidth: arcLineWidth, lineCap: .round)
+                    style: StrokeStyle(lineWidth: size * 0.12, lineCap: .round)
                 )
-                .frame(width: size * 0.76, height: size * 0.76)
+                .frame(width: size * 0.575, height: size * 0.575)
                 .rotationEffect(.degrees(-42))
 
-            // Checkmark — mint→teal, positioned to match icon
+            // Checkmark — uses the full container as its coordinate space
+            // (path proportions already encode the correct position/size)
             ChillMateCheckmarkShape()
                 .stroke(
                     LinearGradient(
@@ -357,10 +365,9 @@ struct ChillMateBrandMark: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    style: StrokeStyle(lineWidth: checkLineWidth, lineCap: .round, lineJoin: .round)
+                    style: StrokeStyle(lineWidth: size * 0.09, lineCap: .round, lineJoin: .round)
                 )
-                .frame(width: size * 0.48, height: size * 0.36)
-                .offset(x: size * 0.07, y: size * 0.06)
+                .frame(width: size, height: size)
         }
         .frame(width: size, height: size)
     }

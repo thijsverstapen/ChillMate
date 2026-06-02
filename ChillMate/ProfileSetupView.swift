@@ -1984,7 +1984,8 @@ private struct ChillMateOnboardingLogo: View {
 
     var body: some View {
         ZStack {
-            // C arc — identical trim/rotation to ChillMateBrandMark (matches app icon)
+            // C arc — same proportions as ChillMateBrandMark / app icon
+            // outer diameter = 57.5% + 12% = 69.5% of size
             Circle()
                 .trim(from: 0.14, to: 0.87)
                 .stroke(
@@ -1993,13 +1994,14 @@ private struct ChillMateOnboardingLogo: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    style: StrokeStyle(lineWidth: size * 0.155, lineCap: .round)
+                    style: StrokeStyle(lineWidth: size * 0.12, lineCap: .round)
                 )
-                .frame(width: size * 0.76, height: size * 0.76)
+                .frame(width: size * 0.575, height: size * 0.575)
                 .rotationEffect(.degrees(-42))
-                .shadow(color: Color.chillPrimary.opacity(0.44), radius: size * 0.16, x: 0, y: size * 0.08)
+                .shadow(color: Color.chillPrimary.opacity(0.44), radius: size * 0.14, x: 0, y: size * 0.07)
 
-            // Checkmark — animated draw-in using the shared shape
+            // Checkmark — animated draw-in; frame fills the container so the
+            // path proportions match the icon exactly when fully drawn
             ChillMateCheckmarkShape()
                 .trim(from: 0, to: checkmarkInPlace ? 1 : 0.08)
                 .stroke(
@@ -2008,19 +2010,19 @@ private struct ChillMateOnboardingLogo: View {
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),
-                    style: StrokeStyle(lineWidth: size * 0.11, lineCap: .round, lineJoin: .round)
+                    style: StrokeStyle(lineWidth: size * 0.09, lineCap: .round, lineJoin: .round)
                 )
-                .frame(width: size * 0.48, height: size * 0.36)
+                .frame(width: size, height: size)
                 .rotationEffect(.degrees(checkmarkInPlace ? 0 : -28))
                 .scaleEffect(checkmarkInPlace ? 1 : 0.54)
-                .offset(x: checkmarkInPlace ? size * 0.07 : -size * 0.42, y: checkmarkInPlace ? size * 0.06 : size * 0.40)
+                .offset(x: checkmarkInPlace ? 0 : -size * 0.38, y: checkmarkInPlace ? 0 : size * 0.36)
                 .opacity(checkmarkInPlace ? 1 : 0)
-                .shadow(color: Color.chillMint.opacity(0.44), radius: size * 0.14, x: 0, y: size * 0.06)
+                .shadow(color: Color.chillMint.opacity(0.44), radius: size * 0.12, x: 0, y: size * 0.05)
         }
         .frame(width: size, height: size)
     }
 }
-// ChillMateCheckmarkShape is now defined in LiquidGlass.swift (shared)
+// ChillMateCheckmarkShape is defined in LiquidGlass.swift (shared)
 
 @MainActor
 private struct IntroHeroScene: View {
