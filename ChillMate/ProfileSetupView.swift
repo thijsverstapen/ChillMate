@@ -1983,46 +1983,21 @@ private struct ChillMateOnboardingLogo: View {
     var size: CGFloat = 136
 
     var body: some View {
-        ZStack {
-            // C arc — same proportions as ChillMateBrandMark / app icon
-            // outer diameter = 57.5% + 12% = 69.5% of size
-            Circle()
-                .trim(from: 0.14, to: 0.87)
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.chillPrimary, Color.chillSecondaryBlue],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    style: StrokeStyle(lineWidth: size * 0.12, lineCap: .round)
-                )
-                .frame(width: size * 0.575, height: size * 0.575)
-                .rotationEffect(.degrees(-42))
-                .shadow(color: Color.chillPrimary.opacity(0.44), radius: size * 0.14, x: 0, y: size * 0.07)
-
-            // Checkmark — animated draw-in; frame fills the container so the
-            // path proportions match the icon exactly when fully drawn
-            ChillMateCheckmarkShape()
-                .trim(from: 0, to: checkmarkInPlace ? 1 : 0.08)
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.chillMint, Color.chillAccentTeal],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    style: StrokeStyle(lineWidth: size * 0.09, lineCap: .round, lineJoin: .round)
-                )
-                .frame(width: size, height: size)
-                .rotationEffect(.degrees(checkmarkInPlace ? 0 : -28))
-                .scaleEffect(checkmarkInPlace ? 1 : 0.54)
-                .offset(x: checkmarkInPlace ? 0 : -size * 0.38, y: checkmarkInPlace ? 0 : size * 0.36)
-                .opacity(checkmarkInPlace ? 1 : 0)
-                .shadow(color: Color.chillMint.opacity(0.44), radius: size * 0.12, x: 0, y: size * 0.05)
-        }
-        .frame(width: size, height: size)
+        // Real app-icon glyph (C + checkmark) — see ChillMateBrandMark.
+        // `checkmarkInPlace` drives a gentle pop-in entrance so the mark
+        // animates onto screen while always resolving to the exact icon art.
+        Image("ChillMateGlyph")
+            .resizable()
+            .interpolation(.high)
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .scaleEffect(checkmarkInPlace ? 1 : 0.6)
+            .opacity(checkmarkInPlace ? 1 : 0)
+            .shadow(color: Color.chillPrimary.opacity(0.40), radius: size * 0.13, x: 0, y: size * 0.06)
+            .shadow(color: Color.chillMint.opacity(0.30), radius: size * 0.10, x: 0, y: size * 0.04)
+            .accessibilityHidden(true)
     }
 }
-// ChillMateCheckmarkShape is defined in LiquidGlass.swift (shared)
 
 @MainActor
 private struct IntroHeroScene: View {

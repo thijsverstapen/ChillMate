@@ -309,67 +309,25 @@ extension View {
 
 // ── Shared brand mark components ─────────────────────────────────────────────
 // Single source of truth so every in-app logo matches the app icon exactly.
+//
+// The mark is rendered from the actual app-icon artwork ("ChillMateGlyph"
+// asset) — the C + checkmark glyph lifted out of `Assets/App Icon.png` with a
+// transparent background. Using the real art (instead of re-drawing it with
+// bezier paths) guarantees a pixel-perfect match with the App Store icon.
 
-/// The checkmark path inside the ChillMate "C" logo.
-///
-/// Path points are derived by pixel-measuring the actual app icon:
-///   start (30.1%, 50.2%+), mid-bottom (44%, 79%), end (79%, 21%)
-/// Place this shape in a frame equal to the brand-mark container size
-/// (no additional offset needed — positions are absolute within the container).
-struct ChillMateCheckmarkShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        // start — lower-left arm begin
-        p.move(to:    CGPoint(x: rect.minX + rect.width * 0.35, y: rect.minY + rect.height * 0.55))
-        // mid — V-bottom (deepest point of checkmark)
-        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.44, y: rect.minY + rect.height * 0.79))
-        // end — upper-right tip
-        p.addLine(to: CGPoint(x: rect.minX + rect.width * 0.79, y: rect.minY + rect.height * 0.21))
-        return p
-    }
-}
-
-/// Scalable ChillMate brand mark that matches the app icon pixel-for-pixel:
-///   • C-arc       — indigo→sky-blue, outer diameter = 69.5 % of `size`,
-///                   stroke = 12 % of `size`, gap on the right
-///   • Checkmark   — mint→teal, path fills the full `size` frame,
-///                   stroke = 9 % of `size`
+/// Scalable ChillMate brand mark — the C + checkmark glyph from the app icon.
 ///
 /// Usage:  `ChillMateBrandMark(size: 20)`
 struct ChillMateBrandMark: View {
     var size: CGFloat = 20
 
     var body: some View {
-        ZStack {
-            // C arc
-            // outer diameter = frame + lineWidth = 57.5% + 12% = 69.5% ✓
-            Circle()
-                .trim(from: 0.14, to: 0.87)
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.chillPrimary, Color.chillSecondaryBlue],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    style: StrokeStyle(lineWidth: size * 0.12, lineCap: .round)
-                )
-                .frame(width: size * 0.575, height: size * 0.575)
-                .rotationEffect(.degrees(-42))
-
-            // Checkmark — uses the full container as its coordinate space
-            // (path proportions already encode the correct position/size)
-            ChillMateCheckmarkShape()
-                .stroke(
-                    LinearGradient(
-                        colors: [Color.chillMint, Color.chillAccentTeal],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    style: StrokeStyle(lineWidth: size * 0.09, lineCap: .round, lineJoin: .round)
-                )
-                .frame(width: size, height: size)
-        }
-        .frame(width: size, height: size)
+        Image("ChillMateGlyph")
+            .resizable()
+            .interpolation(.high)
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .accessibilityHidden(true)
     }
 }
 
