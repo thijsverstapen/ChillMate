@@ -123,6 +123,8 @@ struct DashboardView: View {
                                 InsightsToolsSection { page in
                                     activeCarePage = page
                                 }
+
+                                MedicalSafetyDisclaimerCard(compact: true)
                             }
                             .frame(width: contentWidth, alignment: .leading)
                             .padding(.horizontal, 20)
@@ -153,7 +155,7 @@ struct DashboardView: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Button(role: .destructive) {
                         UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                         Task {

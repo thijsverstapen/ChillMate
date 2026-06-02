@@ -4277,9 +4277,16 @@ struct JournalView: View {
     @State private var selectedPhotos: [PhotosPickerItem] = []
     @State private var photoData: [Data] = []
     @State private var isShowingMorePrompts = false
+    @State private var isEditing = false
 
     private var selectedJournalEntry: JournalEntry? {
         journalEntries.first { Calendar.current.isDate($0.date, inSameDayAs: date) }
+    }
+
+    /// Drives whether the day shows a read-only overview or the editable form.
+    private var mode: JournalMode {
+        if selectedJournalEntry == nil { return .new }
+        return isEditing ? .editing : .viewing
     }
 
     var body: some View {
@@ -4307,52 +4314,24 @@ struct JournalView: View {
                                     .font(.headline)
                                     .foregroundStyle(Color.chillText)
                                     .tint(Color.chillPrimary)
+                                    .disabled(mode == .editing)
 
                                 Spacer(minLength: 0)
 
-                                JournalStatusPill(isEditing: selectedJournalEntry != nil)
+                                JournalStatusPill(mode: mode)
                             }
 
-                            JournalPromptField(title: "What do you remember?", text: $rememberClearly)
-                            JournalPromptField(title: "How do you feel about it now?", text: $feelsGoodAbout)
-                            JournalPromptField(title: "Any safety or consent concerns?", text: $consentConcerns)
+                            if mode == .viewing, let entry = selectedJournalEntry {
+                                // ── Read-only overview of the saved day ──
+                                JournalEntryOverview(entry: entry)
 
-                            DisclosureGroup(isExpanded: $isShowingMorePrompts) {
-                                VStack(spacing: 10) {
-                                    JournalPromptField(title: "Any uncomfortable moments?", text: $uncomfortableMoments)
-                                    JournalPromptField(title: "Regrets or loose ends", text: $regrets)
-                                }
-                                .padding(.top, 8)
-                            } label: {
-                                Label("More prompts", systemImage: "chevron.down.circle.fill")
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(Color.chillText)
-                            }
-                            .tint(Color.chillPrimary)
-                            .padding(12)
-                            .background(.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                                HStack(spacing: 10) {
+                                    GlassActionButton(prominent: true, action: beginEditing) {
+                                        Label("Edit entry", systemImage: "pencil")
+                                            .font(.headline)
+                                            .frame(maxWidth: .infinity)
+                                    }
 
-                            HStack(spacing: 10) {
-                                PhotosPicker(selection: $selectedPhotos, maxSelectionCount: 6, matching: .images) {
-                                    Label(photoPickerTitle, systemImage: "photo.on.rectangle.angled")
-                                        .font(.subheadline.weight(.bold))
-                                        .frame(maxWidth: .infinity)
-                                }
-                                .buttonStyle(.bordered)
-                                .tint(Color.chillPrimary)
-                                .onChange(of: selectedPhotos) { _, items in
-                                    loadPhotos(items)
-                                }
-                            }
-
-                            HStack(spacing: 10) {
-                                GlassActionButton(prominent: true, action: saveJournalEntry) {
-                                    Label(selectedJournalEntry == nil ? "Save journal" : "Update journal", systemImage: "checkmark.circle.fill")
-                                        .font(.headline)
-                                        .frame(maxWidth: .infinity)
-                                }
-
-                                if selectedJournalEntry != nil {
                                     Button(role: .destructive, action: deleteJournalEntry) {
                                         Image(systemName: "trash.fill")
                                             .font(.headline)
@@ -4361,14 +4340,62 @@ struct JournalView: View {
                                     .buttonStyle(.bordered)
                                     .tint(.red)
                                 }
+                            } else {
+                                // ── Editable form (new entry, or editing an existing one) ──
+                                JournalPromptField(title: "What do you remember?", text: $rememberClearly)
+                                JournalPromptField(title: "How do you feel about it now?", text: $feelsGoodAbout)
+                                JournalPromptField(title: "Any safety or consent concerns?", text: $consentConcerns)
+
+                                DisclosureGroup(isExpanded: $isShowingMorePrompts) {
+                                    VStack(spacing: 10) {
+                                        JournalPromptField(title: "Any uncomfortable moments?", text: $uncomfortableMoments)
+                                        JournalPromptField(title: "Regrets or loose ends", text: $regrets)
+                                    }
+                                    .padding(.top, 8)
+                                } label: {
+                                    Label("More prompts", systemImage: "chevron.down.circle.fill")
+                                        .font(.subheadline.weight(.bold))
+                                        .foregroundStyle(Color.chillText)
+                                }
+                                .tint(Color.chillPrimary)
+                                .padding(12)
+                                .background(.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+                                HStack(spacing: 10) {
+                                    PhotosPicker(selection: $selectedPhotos, maxSelectionCount: 6, matching: .images) {
+                                        Label(photoPickerTitle, systemImage: "photo.on.rectangle.angled")
+                                            .font(.subheadline.weight(.bold))
+                                            .frame(maxWidth: .infinity)
+                                    }
+                                    .buttonStyle(.bordered)
+                                    .tint(Color.chillPrimary)
+                                    .onChange(of: selectedPhotos) { _, items in
+                                        loadPhotos(items)
+                                    }
+                                }
+
+                                HStack(spacing: 10) {
+                                    GlassActionButton(prominent: true, action: saveJournalEntry) {
+                                        Label(mode == .editing ? "Save changes" : "Save journal", systemImage: "checkmark.circle.fill")
+                                            .font(.headline)
+                                            .frame(maxWidth: .infinity)
+                                    }
+
+                                    if mode == .editing {
+                                        Button(action: cancelEditing) {
+                                            Text("Cancel")
+                                                .font(.headline)
+                                                .frame(height: 48)
+                                                .padding(.horizontal, 16)
+                                        }
+                                        .buttonStyle(.bordered)
+                                        .tint(Color.chillSecondary)
+                                    }
+                                }
                             }
                         }
                         .padding(16)
                         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
-
-                        if !journalEntries.isEmpty {
-                            JournalRecentEntriesStrip(entries: Array(journalEntries.prefix(10)), selectedDate: $date)
-                        }
                     }
                     .padding(20)
                     .padding(.bottom, 36)
@@ -4380,6 +4407,7 @@ struct JournalView: View {
             .endEditingOnTap()
             .onAppear(perform: loadSelectedJournalEntry)
             .onChange(of: date) { _, _ in
+                isEditing = false
                 loadSelectedJournalEntry()
             }
         }
@@ -4428,6 +4456,20 @@ struct JournalView: View {
             try? modelContext.save()
             SpotlightService.shared.indexJournalEntry(entry)
         }
+
+        // Saved → drop back to the read-only overview for the day.
+        withAnimation(.snappy) { isEditing = false }
+    }
+
+    private func beginEditing() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        loadSelectedJournalEntry()
+        withAnimation(.snappy) { isEditing = true }
+    }
+
+    private func cancelEditing() {
+        loadSelectedJournalEntry() // discard unsaved edits
+        withAnimation(.snappy) { isEditing = false }
     }
 
     private func deleteJournalEntry() {
@@ -4436,6 +4478,7 @@ struct JournalView: View {
         SpotlightService.shared.removeJournalEntry(entry)
         modelContext.delete(entry)
         try? modelContext.save()
+        isEditing = false
         loadSelectedJournalEntry()
     }
 
@@ -4507,67 +4550,88 @@ private struct JournalWeekStrip: View {
     }
 }
 
+private enum JournalMode { case new, viewing, editing }
+
 private struct JournalStatusPill: View {
-    let isEditing: Bool
+    let mode: JournalMode
 
-    var body: some View {
-        Label(isEditing ? "Editing" : "New", systemImage: isEditing ? "pencil.circle.fill" : "plus.circle.fill")
-            .font(.caption.weight(.bold))
-            .foregroundStyle(isEditing ? Color.chillMint : Color.chillSecondaryBlue)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background((isEditing ? Color.chillMint : Color.chillSecondaryBlue).opacity(0.10), in: Capsule())
-    }
-}
-
-private struct JournalRecentEntriesStrip: View {
-    let entries: [JournalEntry]
-    @Binding var selectedDate: Date
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            CareSectionTitle(title: "Recent entries", symbol: "clock.arrow.circlepath")
-
-            ScrollView(.horizontal) {
-                HStack(spacing: 10) {
-                    ForEach(entries) { entry in
-                        Button {
-                            selectedDate = entry.date
-                        } label: {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(entry.date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated)))
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(Color.chillText)
-                                Text(previewText(for: entry))
-                                    .font(.caption2.weight(.semibold))
-                                    .foregroundStyle(Color.chillSecondary)
-                                    .lineLimit(2)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                            .frame(width: 126, alignment: .topLeading)
-                            .frame(minHeight: 74, alignment: .topLeading)
-                            .padding(12)
-                            .glassSurface(radius: 20, tint: Color.chillPrimary.opacity(0.07), interactive: true)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-                .padding(.vertical, 2)
-            }
-            .scrollIndicators(.hidden)
+    private var content: (title: String, symbol: String, tint: Color) {
+        switch mode {
+        case .new: ("New", "plus.circle.fill", Color.chillSecondaryBlue)
+        case .viewing: ("Saved", "checkmark.seal.fill", Color.chillMint)
+        case .editing: ("Editing", "pencil.circle.fill", Color.chillPrimary)
         }
     }
 
-    private func previewText(for entry: JournalEntry) -> String {
+    var body: some View {
+        let c = content
+        Label(c.title, systemImage: c.symbol)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(c.tint)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 7)
+            .background(c.tint.opacity(0.12), in: Capsule())
+    }
+}
+
+/// Read-only summary of a saved journal day — shown instead of the input form
+/// once a day has an entry, so a saved day reads as a finished overview rather
+/// than a blank form that looks like it still needs input.
+private struct JournalEntryOverview: View {
+    let entry: JournalEntry
+
+    private var answeredPrompts: [(prompt: String, answer: String)] {
         [
-            entry.rememberClearly,
-            entry.feelsGoodAbout,
-            entry.consentConcerns,
-            entry.uncomfortableMoments,
-            entry.regrets
-        ]
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .first { !$0.isEmpty } ?? "Saved entry"
+            ("What do you remember?", entry.rememberClearly),
+            ("How do you feel about it now?", entry.feelsGoodAbout),
+            ("Any safety or consent concerns?", entry.consentConcerns),
+            ("Any uncomfortable moments?", entry.uncomfortableMoments),
+            ("Regrets or loose ends", entry.regrets)
+        ].filter { !$0.1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            if answeredPrompts.isEmpty && entry.photos.isEmpty {
+                Text("No details saved for this day yet. Tap Edit to add some.")
+                    .font(.subheadline)
+                    .foregroundStyle(Color.chillSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                ForEach(Array(answeredPrompts.enumerated()), id: \.offset) { _, item in
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(item.prompt)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Color.chillSecondary)
+                        Text(item.answer)
+                            .font(.subheadline)
+                            .foregroundStyle(Color.chillText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+
+            if !entry.photos.isEmpty {
+                ScrollView(.horizontal) {
+                    HStack(spacing: 8) {
+                        ForEach(Array(entry.photos.enumerated()), id: \.offset) { _, data in
+                            if let image = UIImage(data: data) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 72, height: 72)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+                        }
+                    }
+                }
+                .scrollIndicators(.hidden)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
 
@@ -5959,6 +6023,16 @@ struct TermsOfUseView: View {
                                 "Use Support for Dutch sexual-health, crisis, addiction-care, and practical support resources.",
                                 "For STI, PrEP, PEP, medication, mental-health, or substance concerns, contact a GP, GGD, pharmacist, clinician, counselor, or other qualified professional.",
                                 "The app can help organize notes for a conversation, but it cannot replace that conversation."
+                            ]
+                        )
+
+                        LegalInfoCard(
+                            title: "Information & sources",
+                            symbol: "checkmark.seal.fill",
+                            rows: [
+                                "All wellbeing and harm-reduction information in ChillMate is compiled from verified, official public-health sources.",
+                                "It is reviewed and updated from time to time as those sources change or new information becomes available.",
+                                "ChillMate and its maker are not liable in any way for any decision, action, or outcome based on the app. Always confirm anything important with a qualified professional or official service."
                             ]
                         )
                     }

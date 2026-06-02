@@ -278,7 +278,7 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         case .privacyPolicy:
             "How your private information is handled"
         case .termsOfUse:
-            "Safety, medical, and Beta boundaries"
+            "Safety, medical, and app boundaries"
         case .cravingDelay:
             "Pause for 10 minutes before deciding"
         case .drugChecking:
@@ -1654,9 +1654,9 @@ private struct IntroPage {
             animation: .privacy
         ),
         IntroPage(
-            eyebrow: "Privacy notice",
+            eyebrow: "Information & liability",
             title: "Reflection, not medical advice",
-            subtitle: "ChillMate does not recommend substance use or amounts. For real support, use Support in More or emergency services.",
+            subtitle: "Information here comes from verified, official sources, updated over time as they change. It is not medical advice — ChillMate and its maker are not liable for how it is used.",
             animation: .notice
         ),
         IntroPage(
@@ -2254,23 +2254,12 @@ private struct IntroHeroScene: View {
                         .stroke(.white.opacity(0.26), lineWidth: 1.2)
                 }
 
-            VStack(spacing: 16) {
-                HStack(spacing: 10) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 19, weight: .black))
-                        .foregroundStyle(LinearGradient.chillBrand)
-                        .symbolEffect(.bounce, options: .repeating.speed(0.5))
-                    Text("PRIVATE")
-                        .font(.system(size: 32, weight: .black, design: .rounded))
-                        .foregroundStyle(.white)
-                }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 10)
-                .background(
-                    LinearGradient.chillBrand.opacity(0.28),
-                    in: Capsule()
-                )
-                .scaleEffect(1 + bob(0, amount: 0.018))
+            VStack(spacing: 18) {
+                Image(systemName: "checkmark.shield.fill")
+                    .font(.system(size: 48, weight: .black))
+                    .foregroundStyle(LinearGradient.chillBrand)
+                    .symbolEffect(.bounce, options: .repeating.speed(0.5))
+                    .scaleEffect(1 + bob(0, amount: 0.018))
 
                 VStack(spacing: 9) {
                     let lines = [("Wellbeing only", "heart.text.square.fill"),

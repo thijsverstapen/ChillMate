@@ -248,6 +248,11 @@ struct MedicalSafetyDisclaimerCard: View {
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
+            Text("Its information is drawn from verified, official public-health sources and is updated over time as those sources change. ChillMate and its maker are not liable in any way for decisions made using the app.")
+                .font((compact ? Font.caption : Font.callout).weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
             Text("If someone may be in immediate danger, call local emergency services.")
                 .font(.caption.weight(.bold))
                 .foregroundStyle(.red)
