@@ -1,6 +1,0 @@
-Target dependency graph (3 targets)
-Target 'ChillMate' in project 'ChillMate'
-➜ Explicit dependency on target 'ChillMateLiveActivityExtension' in project 'ChillMate'
-➜ Explicit dependency on target 'ChillMateWatchApp' in project 'ChillMate'
-Target 'ChillMateWatchApp' in project 'ChillMate' (no dependencies)
-Target 'ChillMateLiveActivityExtension' in project 'ChillMate' (no dependencies)

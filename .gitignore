@@ -1,0 +1,26 @@
+# Xcode / build artifacts
+DerivedDataMCP/
+DerivedData/
+build/
+*.xcarchive
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# macOS
+.DS_Store
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# CocoaPods / Carthage (if ever used)
+Pods/
+Carthage/Build/
+
+# Secrets / signing — never commit these
+*.p8
+*.mobileprovision
+*.p12
