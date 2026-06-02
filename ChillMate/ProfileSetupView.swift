@@ -1,5 +1,7 @@
+import PassKit
 import SwiftData
 import SwiftUI
+import UIKit
 import UniformTypeIdentifiers
 
 struct AppHomeView: View {
@@ -216,6 +218,7 @@ private struct MainTabView: View {
 private enum MoreHubPage: String, Identifiable, CaseIterable {
     case profile = "Profile"
     case settings = "Settings"
+    case supportDeveloper = "Support the developer"
     case safetyAutopilot = "Safety autopilot"
     case privacyReceipt = "Privacy"
     case privacyTimeline = "Privacy timeline"
@@ -238,6 +241,7 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
     static let visiblePages: [MoreHubPage] = [
         .profile,
         .settings,
+        .supportDeveloper,
         .privacyReceipt,
         .emergencyCard,
         .supportDirectory,
@@ -249,6 +253,8 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         switch self {
         case .settings:
             "Locks, alerts, look, and your data"
+        case .supportDeveloper:
+            "Leave a tip to say thanks — optional"
         case .profile:
             "Your details, photo, medication, and PrEP"
         case .safetyAutopilot:
@@ -290,6 +296,8 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         switch self {
         case .settings:
             "gearshape.fill"
+        case .supportDeveloper:
+            "heart.fill"
         case .profile:
             "person.crop.circle.fill"
         case .safetyAutopilot:
@@ -331,6 +339,8 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         switch self {
         case .settings:
             Color.chillSecondaryBlue
+        case .supportDeveloper:
+            Color.chillIconPink
         case .profile:
             Color.chillMint
         case .safetyAutopilot:
@@ -463,6 +473,8 @@ private struct MoreHubView: View {
             switch page {
             case .settings:
                 SettingsView(showsDoneButton: true)
+            case .supportDeveloper:
+                SupportDeveloperView()
             case .profile:
                 ProfileOverviewView(showsDoneButton: true)
             case .safetyAutopilot:
@@ -497,6 +509,387 @@ private struct MoreHubView: View {
                 CravingDelayView()
             case .drugChecking:
                 DrugCheckingEducationView()
+            }
+        }
+    }
+}
+
+// MARK: - Support the developer (tip jar)
+
+/// Apple Pay + tipping configuration.
+///
+/// To take tips live, do all three, then set `isLive = true`:
+///   1. Register an Apple Pay **Merchant ID** in the Apple Developer portal and
+///      put it in `merchantIdentifier` below.
+///   2. Add the **Apple Pay** capability to the ChillMate target in Xcode
+///      (this adds the `com.apple.developer.in-app-payments` entitlement).
+///   3. Connect a **payment processor** (Stripe / Adyen / Braintree / …) and
+///      forward the `PKPayment` token from `TipPaymentCoordinator`
+///      (see "CONNECT YOUR PAYMENT PROCESSOR HERE").
+///
+/// While `isLive` is false the page is fully visible but tapping shows a warm
+/// thank-you instead of charging — so it is safe to ship before payments exist.
+private enum TipConfig {
+    static let merchantIdentifier = "merchant.com.BIJTHIJS.ChillMate"
+    static let countryCode = "NL"
+    static let currencyCode = "EUR"
+    static let isLive = false
+}
+
+private struct TipOption: Identifiable, Equatable {
+    let id: String
+    let amount: Decimal
+    let title: String
+    let detail: String
+    let symbol: String
+    let tint: Color
+}
+
+struct SupportDeveloperView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    private let presets: [TipOption] = [
+        TipOption(id: "coffee", amount: 3, title: "Buy me a coffee", detail: "A little caffeine for late-night coding", symbol: "cup.and.saucer.fill", tint: Color.chillIconAmber),
+        TipOption(id: "pizza", amount: 10, title: "Treat me to a pizza", detail: "Fuel for a whole new feature", symbol: "fork.knife", tint: Color.chillIconOrange)
+    ]
+
+    @State private var selectedID = "coffee"
+    @State private var customAmountText = ""
+    @State private var alertMessage: String?
+    @StateObject private var coordinator = TipPaymentCoordinator()
+
+    private var isCustomSelected: Bool { selectedID == "custom" }
+
+    private var customAmount: Decimal? {
+        let cleaned = customAmountText
+            .replacingOccurrences(of: ",", with: ".")
+            .trimmingCharacters(in: .whitespaces)
+        guard let value = Decimal(string: cleaned), value > 0 else { return nil }
+        return value
+    }
+
+    private var effectiveAmount: Decimal? {
+        isCustomSelected ? customAmount : presets.first { $0.id == selectedID }?.amount
+    }
+
+    private var tipLabel: String {
+        isCustomSelected ? "ChillMate tip" : (presets.first { $0.id == selectedID }?.title ?? "ChillMate tip")
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        PageHeader(
+                            title: "Support the developer",
+                            subtitle: "ChillMate is free for everyone. A tip is a kind — and completely optional — way to say thanks.",
+                            symbol: "heart.fill",
+                            tint: Color.chillIconPink
+                        )
+
+                        storyCard
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label("Choose a tip", systemImage: "gift.fill")
+                                .font(.headline)
+                                .foregroundStyle(Color.chillText)
+
+                            ForEach(presets) { tipRow($0) }
+                            customRow
+                        }
+
+                        payButton
+
+                        Text("Tips are a voluntary gift to the developer. They don't unlock any features or content — everything in ChillMate stays free. Thank you for being here. 💜")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .padding(20)
+                    .padding(.bottom, 36)
+                }
+                .scrollIndicators(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationTitle("")
+            .endEditingOnTap()
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    BackChevronButton { dismiss() }
+                }
+            }
+            .edgeSwipeToDismiss()
+            .alert("Thank you 💜", isPresented: Binding(
+                get: { alertMessage != nil },
+                set: { if !$0 { alertMessage = nil } }
+            )) {
+                Button("Close", role: .cancel) { alertMessage = nil }
+            } message: {
+                Text(alertMessage ?? "")
+            }
+        }
+    }
+
+    private var storyCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Hey — thank you for using ChillMate 👋")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+
+            Text("I build ChillMate on my own — late nights and weekends — because I wanted a calm, private place to look after yourself, with no judgment. It's completely free: no ads, nothing locked behind a paywall, and it will stay that way.")
+                .font(.callout)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("If ChillMate has helped you feel a little safer or more in control, a small tip is a lovely way to say thanks. Every bit goes straight back into keeping the app running, updated, and free for everyone.")
+                .font(.callout)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .glassSurface(radius: 26, tint: Color.chillIconPink.opacity(0.10), interactive: true)
+    }
+
+    private func tipRow(_ tip: TipOption) -> some View {
+        let isSelected = selectedID == tip.id
+        return Button {
+            withAnimation(.snappy) { selectedID = tip.id }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: tip.symbol)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(tip.tint)
+                    .frame(width: 40, height: 40)
+                    .background(tip.tint.opacity(0.16), in: Circle())
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(tip.title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                    Text(tip.detail)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+
+                Text(formatted(tip.amount))
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(Color.chillText)
+
+                selectionDot(isSelected)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .glassSurface(radius: 20, tint: tip.tint.opacity(isSelected ? 0.16 : 0.06), interactive: true)
+            .overlay {
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .stroke(tip.tint.opacity(isSelected ? 0.7 : 0), lineWidth: 1.5)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var customRow: some View {
+        let tint = Color.chillPrimary
+        return VStack(alignment: .leading, spacing: 12) {
+            Button {
+                withAnimation(.snappy) { selectedID = "custom" }
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "pencil")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(tint)
+                        .frame(width: 40, height: 40)
+                        .background(tint.opacity(0.16), in: Circle())
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Your own amount")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(Color.chillText)
+                        Text("Tip whatever feels right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    selectionDot(isCustomSelected)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .buttonStyle(.plain)
+
+            if isCustomSelected {
+                HStack(spacing: 8) {
+                    Text("€")
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                    TextField("Amount", text: $customAmountText)
+                        .keyboardType(.decimalPad)
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                }
+                .padding(12)
+                .glassSurface(radius: 14, tint: .black.opacity(0.05), interactive: true)
+            }
+        }
+        .padding(14)
+        .glassSurface(radius: 20, tint: tint.opacity(isCustomSelected ? 0.16 : 0.06), interactive: true)
+        .overlay {
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(tint.opacity(isCustomSelected ? 0.7 : 0), lineWidth: 1.5)
+        }
+    }
+
+    private func selectionDot(_ isSelected: Bool) -> some View {
+        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+            .font(.system(size: 20, weight: .bold))
+            .foregroundStyle(isSelected ? Color.chillMint : Color.chillSecondary.opacity(0.5))
+    }
+
+    @ViewBuilder
+    private var payButton: some View {
+        let enabled = effectiveAmount != nil
+        Group {
+            if coordinator.canMakePayments {
+                ApplePayTipButton(type: .tip, style: .automatic) { startTip() }
+                    .frame(height: 50)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            } else {
+                GlassActionButton(prominent: true, action: { startTip() }) {
+                    Label("Leave a tip", systemImage: "heart.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .opacity(enabled ? 1 : 0.45)
+        .allowsHitTesting(enabled)
+    }
+
+    private func startTip() {
+        guard let amount = effectiveAmount else { return }
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+
+        guard TipConfig.isLive else {
+            alertMessage = "Thank you so much for wanting to support ChillMate! In-app tipping is being set up and will be available very soon. 💜"
+            return
+        }
+
+        coordinator.beginTip(amount: amount, label: tipLabel) { result in
+            switch result {
+            case .success:
+                alertMessage = "Your \(formatted(amount)) tip means the world and helps keep ChillMate free and updated. 💜"
+            case .failed:
+                alertMessage = "Something went wrong starting the tip. Please try again."
+            case .cancelled:
+                break
+            }
+        }
+    }
+
+    private func formatted(_ amount: Decimal) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = TipConfig.currencyCode
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        return formatter.string(from: NSDecimalNumber(decimal: amount)) ?? "€\(amount)"
+    }
+}
+
+/// Official Apple Pay button (`PKPaymentButton`) bridged into SwiftUI.
+private struct ApplePayTipButton: UIViewRepresentable {
+    var type: PKPaymentButtonType = .tip
+    var style: PKPaymentButtonStyle = .automatic
+    var action: () -> Void
+
+    func makeUIView(context: Context) -> PKPaymentButton {
+        let button = PKPaymentButton(paymentButtonType: type, paymentButtonStyle: style)
+        button.cornerRadius = 16
+        button.addTarget(context.coordinator, action: #selector(Coordinator.fire), for: .touchUpInside)
+        return button
+    }
+
+    func updateUIView(_ uiView: PKPaymentButton, context: Context) {
+        context.coordinator.action = action
+    }
+
+    func makeCoordinator() -> Coordinator { Coordinator(action: action) }
+
+    final class Coordinator: NSObject {
+        var action: () -> Void
+        init(action: @escaping () -> Void) { self.action = action }
+        @objc func fire() { action() }
+    }
+}
+
+/// Builds the Apple Pay request and handles authorization. Connect a real
+/// payment processor at the marked spot to actually capture tips.
+@MainActor
+final class TipPaymentCoordinator: NSObject, ObservableObject, @preconcurrency PKPaymentAuthorizationControllerDelegate {
+    enum TipResult { case success, cancelled, failed }
+
+    let canMakePayments = PKPaymentAuthorizationController.canMakePayments()
+
+    private var onResult: ((TipResult) -> Void)?
+    private var authorized = false
+
+    func beginTip(amount: Decimal, label: String, onResult: @escaping (TipResult) -> Void) {
+        self.onResult = onResult
+        authorized = false
+
+        let request = PKPaymentRequest()
+        request.merchantIdentifier = TipConfig.merchantIdentifier
+        request.countryCode = TipConfig.countryCode
+        request.currencyCode = TipConfig.currencyCode
+        request.merchantCapabilities = .threeDSecure
+        request.supportedNetworks = [.visa, .masterCard, .amex, .maestro]
+        request.paymentSummaryItems = [
+            PKPaymentSummaryItem(label: label, amount: NSDecimalNumber(decimal: amount), type: .final),
+            PKPaymentSummaryItem(label: "ChillMate — developer tip", amount: NSDecimalNumber(decimal: amount), type: .final)
+        ]
+
+        let controller = PKPaymentAuthorizationController(paymentRequest: request)
+        controller.delegate = self
+        controller.present { [weak self] presented in
+            guard !presented else { return }
+            Task { @MainActor in
+                self?.onResult?(.failed)
+                self?.onResult = nil
+            }
+        }
+    }
+
+    func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController,
+                                        didAuthorizePayment payment: PKPayment,
+                                        handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
+        authorized = true
+
+        // ─────────────────────────────────────────────────────────────────────
+        // CONNECT YOUR PAYMENT PROCESSOR HERE.
+        // Forward `payment.token.paymentData` to your backend (Stripe / Adyen /
+        // Braintree / …) to capture the tip, then return `.success` or
+        // `.failure(errors)` based on the processor's response.
+        // Until that's wired up, we accept locally so the flow is complete.
+        // ─────────────────────────────────────────────────────────────────────
+        completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
+    }
+
+    func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
+        controller.dismiss { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                self.onResult?(self.authorized ? .success : .cancelled)
+                self.onResult = nil
             }
         }
     }
