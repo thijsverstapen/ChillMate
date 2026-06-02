@@ -11,15 +11,13 @@ struct ChillMateApp: App {
     @AppStorage("dailyAffirmationsEnabled") private var dailyAffirmationsEnabled = false
     @AppStorage("lastAppUseTimestamp") private var lastAppUseTimestamp = Date.now.timeIntervalSince1970
     @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
-    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
-            if !hasCompletedOnboarding {
-                OnboardingView()
-                    .modelContainer(ChillMateModelContainer.container())
-            } else {
+            // Single onboarding path: AppLockView → AppHomeView.
+            // AppHomeView shows ProfileSetupView when no UserProfile exists,
+            // which is the sole first-run onboarding experience.
             AppLockView {
                 AppHomeView()
             }
@@ -37,7 +35,6 @@ struct ChillMateApp: App {
 
                 refreshPrivacyAndNotificationState()
             }
-            } // end else
         }
     }
 
