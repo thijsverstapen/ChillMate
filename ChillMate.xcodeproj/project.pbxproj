@@ -21,7 +21,6 @@
 		B22C00000000000000000005 /* WatchConnectivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000015 /* WatchConnectivityService.swift */; };
 		B22C00000000000000000006 /* AppIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000016 /* AppIntents.swift */; };
 		B22C00000000000000000007 /* SubstanceInteractions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000017 /* SubstanceInteractions.swift */; };
-		B22C00000000000000000008 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000018 /* OnboardingView.swift */; };
 		B22C00000000000000000009 /* SpotlightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000019 /* SpotlightService.swift */; };
 		B33D00000000000000000001 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B33D00000000000000000011 /* LaunchScreen.storyboard */; };
 		C44E00000000000000000001 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E00000000000000000011 /* UserProfile.swift */; };
@@ -96,7 +95,6 @@
 		B22C00000000000000000015 /* WatchConnectivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityService.swift; sourceTree = "<group>"; };
 		B22C00000000000000000016 /* AppIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntents.swift; sourceTree = "<group>"; };
 		B22C00000000000000000017 /* SubstanceInteractions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstanceInteractions.swift; sourceTree = "<group>"; };
-		B22C00000000000000000018 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		B22C00000000000000000019 /* SpotlightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightService.swift; sourceTree = "<group>"; };
 		B33D00000000000000000011 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C44E00000000000000000011 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
@@ -165,7 +163,6 @@
 				B22C00000000000000000015 /* WatchConnectivityService.swift */,
 				B22C00000000000000000016 /* AppIntents.swift */,
 				B22C00000000000000000017 /* SubstanceInteractions.swift */,
-				B22C00000000000000000018 /* OnboardingView.swift */,
 				B22C00000000000000000019 /* SpotlightService.swift */,
 				C44E00000000000000000011 /* UserProfile.swift */,
 				C44E00000000000000000012 /* ProfileSetupView.swift */,
@@ -346,7 +343,6 @@
 				B22C00000000000000000005 /* WatchConnectivityService.swift in Sources */,
 				B22C00000000000000000006 /* AppIntents.swift in Sources */,
 				B22C00000000000000000007 /* SubstanceInteractions.swift in Sources */,
-				B22C00000000000000000008 /* OnboardingView.swift in Sources */,
 				B22C00000000000000000009 /* SpotlightService.swift in Sources */,
 				C44E00000000000000000001 /* UserProfile.swift in Sources */,
 				C44E00000000000000000002 /* ProfileSetupView.swift in Sources */,
