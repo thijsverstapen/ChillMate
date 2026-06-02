@@ -398,8 +398,6 @@ private struct MoreHubView: View {
                         tint: Color.chillSecondaryBlue
                     )
 
-                    TestingOnlyNoticeCard()
-
                     TextField("Search", text: $searchText)
                         .textFieldStyle(.plain)
                         .foregroundStyle(Color.chillText)
@@ -1656,7 +1654,7 @@ private struct IntroPage {
             animation: .privacy
         ),
         IntroPage(
-            eyebrow: "Beta notice",
+            eyebrow: "Privacy notice",
             title: "Reflection, not medical advice",
             subtitle: "ChillMate does not recommend substance use or amounts. For real support, use Support in More or emergency services.",
             animation: .notice
@@ -1766,17 +1764,6 @@ private struct OnboardingTopBar: View {
             ChillMateIntroWordmark(checkmarkInPlace: checkmarkInPlace)
 
             Spacer(minLength: 12)
-
-            Text("Private Beta")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.white.opacity(0.88))
-                .lineLimit(1)
-                .padding(.horizontal, 13)
-                .frame(height: 36)
-                .background(.white.opacity(0.13), in: Capsule())
-                .overlay {
-                    Capsule().stroke(.white.opacity(0.20), lineWidth: 1)
-                }
         }
         .frame(height: 42, alignment: .center)
     }
@@ -2303,7 +2290,7 @@ private struct IntroHeroScene: View {
                         .font(.system(size: 19, weight: .black))
                         .foregroundStyle(LinearGradient.chillBrand)
                         .symbolEffect(.bounce, options: .repeating.speed(0.5))
-                    Text("BETA")
+                    Text("PRIVATE")
                         .font(.system(size: 32, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                 }

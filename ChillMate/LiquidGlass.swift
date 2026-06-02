@@ -205,7 +205,10 @@ struct DailyScorePalette {
     }
 }
 
-struct TestingOnlyNoticeCard: View {
+// Kept as typealias so any remaining call-sites continue to compile.
+typealias TestingOnlyNoticeCard = SafetyNoticeCard
+
+struct SafetyNoticeCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             Image(systemName: "checkmark.shield.fill")
@@ -215,7 +218,7 @@ struct TestingOnlyNoticeCard: View {
                 .glassSurface(radius: 15, tint: Color.chillIconOrange.opacity(0.12))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Beta safety note")
+                Text("Safety notice")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(Color.chillText)
 

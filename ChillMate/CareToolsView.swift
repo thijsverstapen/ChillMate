@@ -5852,7 +5852,7 @@ struct PrivacyPolicyView: View {
                     VStack(alignment: .leading, spacing: 14) {
                         PageHeader(
                             title: "Privacy Policy",
-                            subtitle: "Plain-language summary for this Beta build.",
+                            subtitle: "Plain-language privacy summary.",
                             symbol: "hand.raised.square.fill",
                             tint: Color.chillIconTeal
                         )
@@ -5933,7 +5933,7 @@ struct TermsOfUseView: View {
                         MedicalSafetyDisclaimerCard()
 
                         LegalInfoCard(
-                            title: "Age and Beta use",
+                            title: "Age and app use",
                             symbol: "18.circle.fill",
                             rows: [
                                 "ChillMate is intended for adults only.",
