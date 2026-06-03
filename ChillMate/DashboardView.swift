@@ -178,7 +178,7 @@ struct DashboardView: View {
                     isShowingLogSheet = true
                 }, skip: {
                     quickSkip()
-                })
+                }, isTonightLogged: entries.contains { Calendar.current.isDate($0.date, inSameDayAs: Date.now) })
             }
             .fullScreenCover(isPresented: $isShowingLogSheet) {
                 LogNightSheet()
@@ -2562,8 +2562,9 @@ private struct TimelineRow: View {
 private struct FloatingLogBar: View {
     let add: () -> Void
     let skip: () -> Void
+    var isTonightLogged: Bool = false
     @State private var isPressed = false
-    @State private var didSkip = false
+    @State private var confirmSkip = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -2602,45 +2603,47 @@ private struct FloatingLogBar: View {
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
 
-            // Thin separator
-            Rectangle()
-                .fill(.white.opacity(0.07))
-                .frame(height: 0.5)
-                .padding(.horizontal, 16)
+            // Secondary action — clear-night quick log.
+            // Hidden once tonight is already logged, so it can't be tapped twice.
+            if !isTonightLogged {
+                Rectangle()
+                    .fill(.white.opacity(0.07))
+                    .frame(height: 0.5)
+                    .padding(.horizontal, 16)
 
-            // Secondary action — clear night quick-log
-            Button {
-                withAnimation(.easeInOut(duration: 0.18)) { didSkip = true }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) {
-                    withAnimation { didSkip = false }
-                }
-                skip()
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: didSkip ? "checkmark.circle.fill" : "moon.zzz.fill")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(didSkip ? Color.chillMint : Color.chillSecondary)
-                    Text(didSkip ? "Logged — clear night" : "Nothing happened tonight")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(didSkip ? Color.chillMint : Color.chillSecondary)
-                    Spacer(minLength: 0)
-                    if !didSkip {
+                Button {
+                    confirmSkip = true
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "moon.zzz.fill")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                        Text("Nothing happened tonight")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                        Spacer(minLength: 0)
                         Image(systemName: "chevron.right")
                             .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(Color.chillTertiary)
                     }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 10)
+                    .contentShape(Rectangle())
                 }
-                .padding(.horizontal, 18)
-                .padding(.vertical, 10)
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                .accessibilityLabel("Log nothing happened tonight")
             }
-            .buttonStyle(.plain)
-            .animation(.easeInOut(duration: 0.22), value: didSkip)
-            .accessibilityLabel("Log nothing happened tonight")
         }
         .glassSurface(radius: 30, tint: .black.opacity(0.04))
         .padding(.horizontal, 20)
         .padding(.bottom, 8)
+        .animation(.easeInOut(duration: 0.25), value: isTonightLogged)
+        .alert("Log a clear night?", isPresented: $confirmSkip) {
+            Button("Cancel", role: .cancel) { }
+            Button("Confirm") { skip() }
+        } message: {
+            Text("This marks tonight as a clear night with nothing to track. You can still add a log later if something comes up.")
+        }
     }
 }
 

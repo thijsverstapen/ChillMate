@@ -68,9 +68,7 @@ struct InsightsToolsSection: View {
         CareToolDefinition(page: .combinationRisk, title: "Risk checker", subtitle: "Safety signals", symbol: "exclamationmark.shield.fill", tint: Color.chillIconOrange),
         CareToolDefinition(page: .drugInfo, title: "Substance info", subtitle: "Safety reference", symbol: "pills.fill", tint: Color.chillIconPurple),
         CareToolDefinition(page: .consentBoundaries, title: "Boundaries", subtitle: "Consent and exit plan", symbol: "hand.raised.fill", tint: Color.chillIconTeal),
-        CareToolDefinition(page: .privateInsights, title: "Insights", subtitle: "Private patterns", symbol: "chart.xyaxis.line", tint: Color.chillSecondaryBlue),
-        CareToolDefinition(page: .helperBridge, title: "Helper summary", subtitle: "Share talking points", symbol: "doc.text.magnifyingglass", tint: Color.chillMint),
-        CareToolDefinition(page: .drugChecking, title: "Checking info", subtitle: "Support information", symbol: "checkmark.seal.text.page.fill", tint: Color.chillIconAmber)
+        CareToolDefinition(page: .privateInsights, title: "Insights", subtitle: "Private patterns", symbol: "chart.xyaxis.line", tint: Color.chillSecondaryBlue)
     ]
 
     var body: some View {
@@ -5148,6 +5146,9 @@ struct SafetyAutopilotView: View {
     @Query(sort: \STDTestRecord.testDate, order: .reverse) private var stiTests: [STDTestRecord]
     @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
 
+    @State private var showHelperSummary = false
+    @State private var showCheckingInfo = false
+
     private var context: SafetyAutopilotContext {
         SafetyAutopilotContext(
             entries: entries,
@@ -5182,6 +5183,24 @@ struct SafetyAutopilotView: View {
                             }
                         }
 
+                        VStack(alignment: .leading, spacing: 10) {
+                            CareSectionTitle(title: "More support", symbol: "ellipsis.circle.fill")
+
+                            SafetyAutopilotLinkRow(
+                                title: "Helper summary",
+                                detail: "A simple summary to share with a GP, GGD, or helper",
+                                symbol: "doc.text.magnifyingglass",
+                                tint: Color.chillMint
+                            ) { showHelperSummary = true }
+
+                            SafetyAutopilotLinkRow(
+                                title: "Checking info",
+                                detail: "Drug-checking and where to find support",
+                                symbol: "checkmark.seal.text.page.fill",
+                                tint: Color.chillIconAmber
+                            ) { showCheckingInfo = true }
+                        }
+
                         ConsentMiniCard()
                         EvidenceSourcesSection(title: "Why these suggestions?", sources: EvidenceLibrary.coreSafety)
                     }
@@ -5197,7 +5216,53 @@ struct SafetyAutopilotView: View {
                 }
             }
             .edgeSwipeToDismiss()
+            .fullScreenCover(isPresented: $showHelperSummary) {
+                ProfessionalHelperBridgeView()
+            }
+            .fullScreenCover(isPresented: $showCheckingInfo) {
+                DrugCheckingEducationView()
+            }
         }
+    }
+}
+
+private struct SafetyAutopilotLinkRow: View {
+    let title: String
+    let detail: String
+    let symbol: String
+    let tint: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: symbol)
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(tint)
+                    .frame(width: 40, height: 40)
+                    .background(tint.opacity(0.16), in: Circle())
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                    Text(detail)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillSecondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .glassSurface(radius: 20, tint: tint.opacity(0.07), interactive: true)
+        }
+        .buttonStyle(.plain)
     }
 }
 
