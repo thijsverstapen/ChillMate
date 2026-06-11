@@ -295,6 +295,18 @@ struct GlassSurfaceModifier: ViewModifier {
     }
 }
 
+/// Drop-in replacement for `.buttonStyle(ChillPlainButtonStyle())` that makes the button's whole
+/// frame tappable instead of only its drawn icon/text. Many cards and chips wrap a
+/// `.frame(maxWidth: .infinity)` label in a glass surface; with the system plain
+/// style only the content registered taps, leaving the rest of the card "dead".
+struct ChillPlainButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .contentShape(Rectangle())
+            .opacity(configuration.isPressed ? 0.6 : 1)
+    }
+}
+
 extension View {
     func glassSurface(
         radius: CGFloat = 28,
@@ -380,37 +392,56 @@ extension Color {
     static let chillTertiary = Color.white.opacity(0.46)
 }
 
+/// Unified capsule action button used across the whole app. Matches the primary
+/// "Add" pill: a brand-gradient capsule with white text for prominent actions, and
+/// a soft tinted capsule for secondary ones. Shape, height, padding, and press
+/// feedback are identical everywhere so every button reads as one family.
+///
+/// Pass `tint` to recolour the fill (e.g. `.red` for a destructive confirmation);
+/// when `tint` is nil a prominent button uses the brand gradient.
+struct ChillPillButtonStyle: ButtonStyle {
+    var prominent: Bool = true
+    var tint: Color? = nil
+
+    private var fillStyle: AnyShapeStyle {
+        if prominent {
+            if let tint { return AnyShapeStyle(tint) }
+            return AnyShapeStyle(LinearGradient.chillBrand)
+        }
+        return AnyShapeStyle((tint ?? Color.chillPrimary).opacity(0.14))
+    }
+
+    func makeBody(configuration: Configuration) -> some View {
+        let pressed = configuration.isPressed
+        configuration.label
+            .font(.headline.weight(.bold))
+            .foregroundStyle(prominent ? Color.white : (tint ?? Color.chillPrimary))
+            .padding(.horizontal, 20)
+            .padding(.vertical, 13)
+            .frame(minHeight: 50)
+            .background(fillStyle, in: Capsule(style: .continuous))
+            .overlay {
+                if !prominent {
+                    Capsule(style: .continuous)
+                        .strokeBorder((tint ?? Color.chillPrimary).opacity(0.22), lineWidth: 1)
+                }
+            }
+            .shadow(color: prominent ? (tint ?? Color.chillPrimary).opacity(0.40) : .clear, radius: 12, y: 6)
+            .scaleEffect(pressed ? 0.96 : 1)
+            .animation(.spring(response: 0.28, dampingFraction: 0.82), value: pressed)
+            .contentShape(Capsule(style: .continuous))
+    }
+}
+
 struct GlassActionButton<Label: View>: View {
     let prominent: Bool
+    var tint: Color? = nil
     let action: () -> Void
     @ViewBuilder var label: () -> Label
 
     var body: some View {
-        if #available(iOS 26.0, *) {
-            if prominent {
-                Button(action: action) {
-                    label()
-                }
-                .buttonStyle(.glassProminent)
-            } else {
-                Button(action: action) {
-                    label()
-                }
-                .buttonStyle(.glass)
-            }
-        } else {
-            if prominent {
-                Button(action: action) {
-                    label()
-                }
-                .buttonStyle(.borderedProminent)
-            } else {
-                Button(action: action) {
-                    label()
-                }
-                .buttonStyle(.bordered)
-            }
-        }
+        Button(action: action, label: label)
+            .buttonStyle(ChillPillButtonStyle(prominent: prominent, tint: tint))
     }
 }
 
@@ -423,10 +454,31 @@ struct BackChevronButton: View {
                 .font(.headline.weight(.bold))
                 .frame(width: 36, height: 36)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
         .foregroundStyle(Color.chillText)
         .glassSurface(radius: 18, tint: .white.opacity(0.28), interactive: true)
         .accessibilityLabel("Go back")
+    }
+}
+
+/// Hosts a care page that is presented modally as a `fullScreenCover`, giving it
+/// its own navigation stack and a close control. The same care pages are also
+/// pushed onto the More hub's shared stack; there they render as plain content
+/// and rely on the native back button, so the pages themselves must never carry
+/// their own `NavigationStack`.
+struct CareCoverHost<Content: View>: View {
+    @Environment(\.dismiss) private var dismiss
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        NavigationStack {
+            content
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        BackChevronButton { dismiss() }
+                    }
+                }
+        }
     }
 }
 
@@ -437,12 +489,12 @@ struct DiscardChangesDialogModifier: ViewModifier {
     func body(content: Content) -> some View {
         content.liquidGlassAlert(
             isPresented: $isPresented,
-            title: "Discard changes?",
-            message: "You have entered information that has not been saved.",
-            primaryTitle: "Discard changes",
+            title: String(localized: "Discard changes?"),
+            message: String(localized: "You have entered information that has not been saved."),
+            primaryTitle: String(localized: "Discard changes"),
             primaryIsDestructive: true,
             primaryAction: discard,
-            secondaryTitle: "Keep editing"
+            secondaryTitle: String(localized: "Keep editing")
         )
     }
 }
@@ -494,7 +546,7 @@ struct LiquidGlassAlertModifier: ViewModifier {
                             }
 
                             VStack(spacing: 10) {
-                                GlassActionButton(prominent: true) {
+                                GlassActionButton(prominent: true, tint: primaryIsDestructive ? .red : nil) {
                                     isPresented = false
                                     primaryAction()
                                 } label: {
@@ -502,7 +554,6 @@ struct LiquidGlassAlertModifier: ViewModifier {
                                         .font(.headline)
                                         .frame(maxWidth: .infinity)
                                 }
-                                .tint(primaryTint)
 
                                 GlassActionButton(prominent: false) {
                                     isPresented = false
@@ -511,7 +562,6 @@ struct LiquidGlassAlertModifier: ViewModifier {
                                         .font(.headline)
                                         .frame(maxWidth: .infinity)
                                 }
-                                .tint(.chillPrimary)
                             }
                         }
                         .padding(22)

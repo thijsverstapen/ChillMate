@@ -48,27 +48,27 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
     var subtitle: String {
         switch self {
         case .privacy:
-            "Face ID, PIN, and local protection"
+            String(localized: "Face ID, PIN, and local protection")
         case .privacyDashboard:
-            "What is stored, exported, and never shared"
+            String(localized: "What is stored, exported, and never shared")
         case .permissions:
-            "Health and system access"
+            String(localized: "Health and system access")
         case .notifications:
-            "Check-ins and affirmations"
+            String(localized: "Check-ins and affirmations")
         case .iCloud:
-            "Encrypted backup and restore"
+            String(localized: "Encrypted backup and restore")
         case .accessibility:
-            "Readable, calm, and one-handed app behavior"
+            String(localized: "Readable, calm, and one-handed app behavior")
         case .appearance:
-            "Adaptive background and photos"
+            String(localized: "Adaptive background and photos")
         case .watch:
-            "Companion preferences"
+            String(localized: "Companion preferences")
         case .goals:
-            "Max sessions per month and reduction tracking"
+            String(localized: "Max sessions per month and reduction tracking")
         case .quality:
-            "Medical wording, evidence limits, and review status"
+            String(localized: "Medical wording, evidence limits, and review status")
         case .account:
-            "Export backup, delete account, and stored data"
+            String(localized: "Export backup, delete account, and stored data")
         }
     }
 }
@@ -86,7 +86,7 @@ struct SettingsView: View {
     @AppStorage("healthKitWorkoutReadEnabled") private var healthKitWorkoutReadEnabled = false
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
     @AppStorage("dailyAffirmationsEnabled") private var dailyAffirmationsEnabled = false
-    @AppStorage("discreetNotifications") private var discreetNotifications = true
+    @AppStorage("discreetNotifications") private var discreetNotifications = false
     @AppStorage("notificationTone") private var notificationTone = NotificationTone.gentle.rawValue
     @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
     @AppStorage("lastICloudBackupStatus") private var lastICloudBackupStatus = ""
@@ -122,7 +122,6 @@ struct SettingsView: View {
     @State private var isShowingPINSetup = false
     @State private var isShowingDisablePINAlert = false
     @State private var selectedBackgroundPhoto: PhotosPickerItem?
-    @State private var settingsPath: [SettingsSectionPage] = []
     @State private var encryptedBackupURL: URL?
     @State private var isShowingBackupImporter = false
 
@@ -137,18 +136,17 @@ struct SettingsView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $settingsPath) {
-            ZStack {
-                DashboardBackdrop()
+        ZStack {
+            DashboardBackdrop()
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Privacy & lock")
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 8) {
+                            Text("Settings")
                                 .font(.largeTitle.bold())
                                 .foregroundStyle(palette.heroText)
 
-                            Text("Choose how ChillMate protects private logs and which system features can use them.")
+                            Text("Locks, alerts, look, and your data")
                                 .font(.callout)
                                 .foregroundStyle(palette.heroSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -160,7 +158,7 @@ struct SettingsView: View {
                                 NavigationLink(value: page) {
                                     SettingsCategoryCard(page: page)
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(ChillPlainButtonStyle())
                             }
                         }
 
@@ -196,15 +194,6 @@ struct SettingsView: View {
             .navigationDestination(for: SettingsSectionPage.self) { page in
                 settingsPage(page)
             }
-            .toolbar {
-                if showsDoneButton && settingsPath.isEmpty {
-                    ToolbarItem(placement: .topBarLeading) {
-                        BackChevronButton {
-                            dismiss()
-                        }
-                    }
-                }
-            }
             .onChange(of: requiresFaceID) { _, isOn in
                 faceIDLockChanged(isOn)
             }
@@ -238,9 +227,7 @@ struct SettingsView: View {
                     NotificationService.shared.clearSTIReminder()
                 }
             }
-            .edgeSwipeToDismiss()
             .endEditingOnTap()
-        }
     }
 
     @ViewBuilder
@@ -260,8 +247,8 @@ struct SettingsView: View {
                     switch page {
                     case .privacy:
                         SettingsToggleCard(
-                            title: "Lock with Face ID",
-                            caption: "Ask for Face ID whenever the app is opened.",
+                            title: String(localized: "Lock with Face ID"),
+                            caption: String(localized: "Ask for Face ID whenever the app is opened."),
                             symbol: "faceid",
                             isOn: $requiresFaceID
                         )
@@ -277,8 +264,8 @@ struct SettingsView: View {
                         )
 
                         SettingsToggleCard(
-                            title: "Extra app security",
-                            caption: "Locks your private files even when the app is closed. Useful if your phone is ever lost or stolen.",
+                            title: String(localized: "Extra app security"),
+                            caption: String(localized: "Locks your private files even when the app is closed. Useful if your phone is ever lost or stolen."),
                             symbol: "lock.doc.fill",
                             isOn: $localEncryptionEnabled
                         )
@@ -292,8 +279,8 @@ struct SettingsView: View {
 
                     case .permissions:
                         SettingsToggleCard(
-                            title: "Add logs to Apple Health",
-                            caption: "Save sex and sleep entries to Apple Health after each log.",
+                            title: String(localized: "Add logs to Apple Health"),
+                            caption: String(localized: "Save sex and sleep entries to Apple Health after each log."),
                             symbol: "heart.text.square.fill",
                             isOn: $healthKitAutoSync
                         )
@@ -309,22 +296,22 @@ struct SettingsView: View {
 
                     case .notifications:
                         SettingsToggleCard(
-                            title: "Notifications",
-                            caption: "Allow private reminders and health check-in warnings.",
+                            title: String(localized: "Notifications"),
+                            caption: String(localized: "Allow private reminders and health check-in warnings."),
                             symbol: "bell.badge.fill",
                             isOn: $notificationsEnabled
                         )
 
                         SettingsToggleCard(
-                            title: "Daily affirmations",
-                            caption: "Send a small confidence boost for recovery, substance-free days, and strong daily scores.",
+                            title: String(localized: "Daily affirmations"),
+                            caption: String(localized: "Send a small confidence boost for recovery, substance-free days, and strong daily scores."),
                             symbol: "sparkles",
                             isOn: $dailyAffirmationsEnabled
                         )
 
                         SettingsToggleCard(
-                            title: "Discreet notification text",
-                            caption: "Use vague lock-screen wording and show details only after opening ChillMate.",
+                            title: String(localized: "Discreet notification text"),
+                            caption: String(localized: "Use vague lock-screen wording and show details only after opening ChillMate."),
                             symbol: "eye.slash.fill",
                             isOn: $discreetNotifications
                         )
@@ -332,15 +319,15 @@ struct SettingsView: View {
                         NotificationToneCard(selectedTone: $notificationTone)
 
                         SettingsToggleCard(
-                            title: "Weekly summary",
-                            caption: "Sunday evening digest of your streak, score, and recent logs.",
+                            title: String(localized: "Weekly summary"),
+                            caption: String(localized: "Sunday evening digest of your streak, score, and recent logs."),
                             symbol: "calendar.badge.clock",
                             isOn: $weeklyDigestEnabled
                         )
 
                         SettingsToggleCard(
-                            title: "STI test reminders",
-                            caption: "Remind you to get tested on a regular schedule.",
+                            title: String(localized: "STI test reminders"),
+                            caption: String(localized: "Remind you to get tested on a regular schedule."),
                             symbol: "cross.case.fill",
                             isOn: $stiReminderEnabled
                         )
@@ -429,29 +416,31 @@ struct SettingsView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
         .liquidGlassAlert(
             isPresented: $isShowingDisablePINAlert,
-            title: "Turn off PIN lock?",
-            message: "ChillMate will no longer ask for your PIN. Face ID stays on if it is enabled.",
-            primaryTitle: "Turn off PIN",
+            title: String(localized: "Turn off PIN lock?"),
+            message: String(localized: "ChillMate will no longer ask for your PIN. Face ID stays on if it is enabled."),
+            primaryTitle: String(localized: "Turn off PIN"),
             primaryIsDestructive: true,
             primaryAction: {
                 requiresPIN = false
                 LocalSecurityService.clearPIN()
-                message = "PIN lock is off."
+                message = String(localized: "PIN lock is off.")
             },
-            secondaryTitle: "Keep PIN"
+            secondaryTitle: String(localized: "Keep PIN")
         )
         .liquidGlassAlert(
             isPresented: $isShowingDeleteWarning,
-            title: "Delete account and all data?",
-            message: "This will delete your profile and every log stored by ChillMate on this device.",
-            primaryTitle: "Continue to final check",
+            title: String(localized: "Delete account and all data?"),
+            message: String(localized: "This will delete your profile and every log stored by ChillMate on this device."),
+            primaryTitle: String(localized: "Continue to final check"),
             primaryIsDestructive: true,
             primaryAction: {
                 isShowingFinalDeleteCheck = true
             },
-            secondaryTitle: "Cancel"
+            secondaryTitle: String(localized: "Cancel")
         )
         .fullScreenCover(isPresented: $isShowingFinalDeleteCheck) {
             DeleteAccountConfirmationView {
@@ -462,7 +451,7 @@ struct SettingsView: View {
             PINSetupView(isChangingExistingPIN: requiresPIN) { newPIN in
                 LocalSecurityService.savePINToKeychain(pin: newPIN)
                 requiresPIN = true
-                message = "PIN lock is on."
+                message = String(localized: "PIN lock is on.")
             }
         }
         .fileImporter(
@@ -488,7 +477,7 @@ struct SettingsView: View {
         isWorking = true
         Task {
             do {
-                let success = try await AppAuthenticator.authenticate(reason: "Protect ChillMate with Face ID")
+                let success = try await AppAuthenticator.authenticate(reason: String(localized: "Protect ChillMate with Face ID"))
                 await MainActor.run {
                     isRevertingToggle = !success
                     requiresFaceID = success
@@ -509,9 +498,9 @@ struct SettingsView: View {
     private func localEncryptionChanged(_ isOn: Bool) {
         if isOn {
             LocalSecurityService.applyFileProtection()
-            message = "Extra security is on. Your private files are locked while ChillMate is closed."
+            message = String(localized: "Extra security is on. Your private files are locked while ChillMate is closed.")
         } else {
-            message = "Extra security is off. Your iPhone still applies its built-in protection."
+            message = String(localized: "Extra security is off. Your iPhone still applies its built-in protection.")
         }
     }
 
@@ -534,7 +523,7 @@ struct SettingsView: View {
                     healthKitAutoSync = true
                     healthKitSexualActivityWriteEnabled = true
                     healthKitSleepReadWriteEnabled = true
-                    message = "Apple Health export is on for new logs."
+                    message = String(localized: "Apple Health export is on for new logs.")
                     isWorking = false
                 }
             } catch {
@@ -599,7 +588,7 @@ struct SettingsView: View {
 
                 await MainActor.run {
                     encryptedBackupURL = url
-                    message = "Encrypted backup prepared."
+                    message = String(localized: "Encrypted backup prepared.")
                     isWorking = false
                 }
             } catch {
@@ -698,7 +687,7 @@ struct SettingsView: View {
                 return
             }
 
-            message = "iCloud backup is off. Local encrypted recovery stays available on this iPhone."
+            message = String(localized: "iCloud backup is off. Local encrypted recovery stays available on this iPhone.")
             return
         }
 
@@ -710,12 +699,12 @@ struct SettingsView: View {
         }
 
         lastICloudBackupStatus = ICloudBackupService.shared.statusLine
-        message = "iCloud backup is on. ChillMate saves encrypted backup files to your iCloud Drive."
+        message = String(localized: "iCloud backup is on. ChillMate saves encrypted backup files to your iCloud Drive.")
     }
 
     private func saveICloudBackup() {
         guard iCloudBackupEnabled else {
-            message = "Turn on iCloud backup first."
+            message = String(localized: "Turn on iCloud backup first.")
             return
         }
 
@@ -732,7 +721,8 @@ struct SettingsView: View {
                 }
             } catch {
                 await MainActor.run {
-                    lastICloudBackupStatus = error.localizedDescription
+                    // Do NOT write error to lastICloudBackupStatus — it is a shared key
+                    // shown across views and would propagate the error everywhere.
                     message = "Could not save to iCloud: \(error.localizedDescription)"
                     isWorking = false
                 }
@@ -753,7 +743,7 @@ struct SettingsView: View {
                 }
             } catch {
                 await MainActor.run {
-                    lastICloudBackupStatus = error.localizedDescription
+                    // Do NOT write error to lastICloudBackupStatus — keep errors local.
                     message = "Could not restore from iCloud: \(error.localizedDescription)"
                     isWorking = false
                 }
@@ -796,7 +786,7 @@ struct SettingsView: View {
 
         if notificationsEnabled {
             NotificationService.shared.scheduleDailyAffirmations()
-            message = "Daily affirmations are on."
+            message = String(localized: "Daily affirmations are on.")
             return
         }
 
@@ -844,7 +834,7 @@ struct SettingsView: View {
             await MainActor.run {
                 appBackgroundPhotoData = optimizedData.base64EncodedString()
                 appBackgroundStyle = ChillBackgroundStyle.photo.rawValue
-                message = "Background photo updated."
+                message = String(localized: "Background photo updated.")
             }
         }
     }
@@ -881,7 +871,7 @@ struct SettingsView: View {
                 try data.write(to: url, options: [.atomic, .completeFileProtection])
                 await MainActor.run {
                     encryptedBackupURL = url
-                    message = "CSV export ready. Use the Share button to save it."
+                    message = String(localized: "CSV export ready. Use the Share button to save it.")
                     isWorking = false
                 }
             } catch {
@@ -984,7 +974,7 @@ private struct SettingsCategoryCard: View {
                 .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.14))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(page.rawValue)
+                Text(page.localizedDisplayName)
                     .font(.headline)
                     .foregroundStyle(Color.chillText)
 
@@ -1056,7 +1046,7 @@ private struct EncryptionInfoCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("Your data is protected by default. You can also create an encrypted backup file that only you can open — handy if you ever reinstall or switch phones.")
+            Text("Your data is protected by default. You can also create an encrypted backup file that only you can open. Handy if you ever reinstall or switch phones.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1157,7 +1147,7 @@ private struct HealthPermissionToggleLine: View {
                     .frame(width: 28, height: 28)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(scope.rawValue)
+                    Text(scope.localizedDisplayName)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color.chillText)
                     Text(scope.caption)
@@ -1187,7 +1177,7 @@ private struct NotificationToneCard: View {
 
             Picker("Tone", selection: $selectedTone) {
                 ForEach(NotificationTone.allCases) { tone in
-                    Text(tone.rawValue).tag(tone.rawValue)
+                    Text(tone.localizedDisplayName).tag(tone.rawValue)
                 }
             }
             .pickerStyle(.segmented)
@@ -1218,9 +1208,9 @@ private struct AccessibilityQualityCard: View {
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            SettingsToggleLine(title: "High contrast overlays", symbol: "circle.lefthalf.filled", isOn: $highContrastMode)
-            SettingsToggleLine(title: "Reduce ChillMate animations", symbol: "figure.walk.motion", isOn: $reducedMotion)
-            SettingsToggleLine(title: "Prefer bottom actions", symbol: "hand.tap.fill", isOn: $oneHandedControls)
+            SettingsToggleLine(title: String(localized: "High contrast overlays"), symbol: "circle.lefthalf.filled", isOn: $highContrastMode)
+            SettingsToggleLine(title: String(localized: "Reduce ChillMate animations"), symbol: "figure.walk.motion", isOn: $reducedMotion)
+            SettingsToggleLine(title: String(localized: "Prefer bottom actions"), symbol: "hand.tap.fill", isOn: $oneHandedControls)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
@@ -1229,9 +1219,9 @@ private struct AccessibilityQualityCard: View {
 
 private struct ClinicalReviewSettingsCard: View {
     private let rows = [
-        "Risk wording uses caution levels instead of claiming a combination is safe.",
-        "Substance, STI, PrEP, and emergency content includes source links where practical.",
-        "ChillMate supports safer decisions, but it is not a substitute for medical, legal, or emergency care."
+        String(localized: "Risk wording uses caution levels instead of claiming a combination is safe."),
+        String(localized: "Substance, STI, PrEP, and emergency content includes source links where practical."),
+        String(localized: "ChillMate supports safer decisions, but it is not a substitute for medical, legal, or emergency care.")
     ]
 
     var body: some View {
@@ -1288,7 +1278,7 @@ private struct EncryptedBackupCard: View {
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
 
-                    Text("Create an encrypted backup of your ChillMate data. ChillMate also saves a recovery copy on your device automatically — useful if you ever reinstall the app.")
+                    Text("Create an encrypted backup of your ChillMate data. ChillMate also saves a recovery copy on your device automatically. Useful if you ever reinstall the app.")
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1310,8 +1300,7 @@ private struct EncryptedBackupCard: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(Color.chillPrimary)
+            .buttonStyle(ChillPillButtonStyle(prominent: true))
             .disabled(isWorking)
 
             Button(action: importBackup) {
@@ -1319,8 +1308,7 @@ private struct EncryptedBackupCard: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.bordered)
-            .tint(Color.chillPrimary)
+            .buttonStyle(ChillPillButtonStyle(prominent: false))
             .disabled(isWorking)
 
             if let backupURL {
@@ -1329,8 +1317,7 @@ private struct EncryptedBackupCard: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
-                .tint(Color.chillPrimary)
+                .buttonStyle(ChillPillButtonStyle(prominent: false))
             }
         }
         .padding(16)
@@ -1403,8 +1390,7 @@ private struct ICloudBackupCard: View {
                             .frame(maxWidth: .infinity)
                     }
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(Color.chillPrimary)
+                .buttonStyle(ChillPillButtonStyle(prominent: true))
                 .disabled(isWorking || !isEnabled)
 
                 Button(action: restore) {
@@ -1412,8 +1398,7 @@ private struct ICloudBackupCard: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
-                .tint(Color.chillPrimary)
+                .buttonStyle(ChillPillButtonStyle(prominent: false))
                 .disabled(isWorking)
             }
 
@@ -1422,8 +1407,7 @@ private struct ICloudBackupCard: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.bordered)
-            .tint(.red)
+            .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .red))
             .disabled(isWorking)
         }
         .padding(16)
@@ -1449,7 +1433,7 @@ private struct PINLockCard: View {
                     .font(.headline)
                     .foregroundStyle(Color.chillText)
 
-                Text(isEnabled ? "PIN is on. Tap to change." : "Add a 4–8 digit PIN alongside Face ID.")
+                Text(isEnabled ? String(localized: "PIN is on. Tap to change.") : String(localized: "Add a 4–8 digit PIN alongside Face ID."))
                     .font(.caption)
                     .foregroundStyle(Color.chillSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1471,8 +1455,7 @@ private struct PINLockCard: View {
             } else {
                 Button("Set PIN", action: setPIN)
                     .font(.caption.weight(.bold))
-                    .buttonStyle(.borderedProminent)
-                    .tint(.chillPrimary)
+                    .buttonStyle(ChillPillButtonStyle(prominent: true))
             }
         }
         .padding(16)
@@ -1514,7 +1497,7 @@ private struct PINSetupView: View {
                             .frame(width: 72, height: 72)
                             .glassSurface(radius: 36, tint: Color.chillPrimary.opacity(0.16))
 
-                        Text(isChangingExistingPIN ? "Change your PIN" : "Set a PIN")
+                        Text(isChangingExistingPIN ? String(localized: "Change your PIN") : String(localized: "Set a PIN"))
                             .font(.largeTitle.bold())
                             .foregroundStyle(Color.chillText)
 
@@ -1620,12 +1603,12 @@ private struct WatchCompanionSettingsCard: View {
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            SettingsToggleLine(title: "Hydration reminders", symbol: "drop.fill", isOn: $hydrationReminders)
-            SettingsToggleLine(title: "Elevated heart-rate warnings", symbol: "heart.fill", isOn: $heartRateWarnings)
-            SettingsToggleLine(title: "Breathing haptics", symbol: "lungs.fill", isOn: $breathingHaptics)
-            SettingsToggleLine(title: "Discreet haptic check-ins", symbol: "applewatch.radiowaves.left.and.right", isOn: $discreetCheckIns)
-            SettingsToggleLine(title: "Visible timers and complications", symbol: "timer", isOn: $visibleTimers)
-            SettingsToggleLine(title: "Stress and temperature detection", symbol: "thermometer.medium", isOn: $stressAndTemperatureDetection)
+            SettingsToggleLine(title: String(localized: "Hydration reminders"), symbol: "drop.fill", isOn: $hydrationReminders)
+            SettingsToggleLine(title: String(localized: "Elevated heart-rate warnings"), symbol: "heart.fill", isOn: $heartRateWarnings)
+            SettingsToggleLine(title: String(localized: "Breathing haptics"), symbol: "lungs.fill", isOn: $breathingHaptics)
+            SettingsToggleLine(title: String(localized: "Discreet haptic check-ins"), symbol: "applewatch.radiowaves.left.and.right", isOn: $discreetCheckIns)
+            SettingsToggleLine(title: String(localized: "Visible timers and complications"), symbol: "timer", isOn: $visibleTimers)
+            SettingsToggleLine(title: String(localized: "Stress and temperature detection"), symbol: "thermometer.medium", isOn: $stressAndTemperatureDetection)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
@@ -1691,14 +1674,14 @@ private struct BackgroundLibraryCard: View {
                                 )
                                 .frame(height: 48)
 
-                            Text(style.rawValue)
+                            Text(style.localizedDisplayName)
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(Color.chillText)
                         }
                         .padding(10)
                         .background(.white.opacity(selectedStyle == style.rawValue ? 0.55 : 0.24), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ChillPlainButtonStyle())
                 }
             }
 
@@ -1707,8 +1690,7 @@ private struct BackgroundLibraryCard: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.chillPrimary)
+            .buttonStyle(ChillPillButtonStyle(prominent: true))
             .onChange(of: selectedPhoto) { _, newValue in
                 updatePhoto(newValue)
             }
@@ -1780,7 +1762,7 @@ private struct ReductionGoalCard: View {
             .tint(Color.chillPrimary)
 
             if goalSessions > 0 {
-                Text("Goal active: max \(goalSessions) \(goalSessions == 1 ? "session" : "sessions") per month (\(substanceOnly ? "substance use only" : "all Chills")).")
+                Text("Goal active: max \(goalSessions) \(goalSessions == 1 ? String(localized: "session") : String(localized: "sessions")) per month (\(substanceOnly ? String(localized: "substance use only") : String(localized: "all Chills"))).")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(Color.chillMint)
             }
@@ -1823,8 +1805,7 @@ private struct CSVExportCard: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(Color.chillPrimary)
+            .buttonStyle(ChillPillButtonStyle(prominent: true))
             .disabled(isWorking)
         }
         .padding(16)
@@ -1852,7 +1833,7 @@ private struct DataRetentionCard: View {
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
 
-                    Text("Delete logs older than a chosen age. This cannot be undone — back up first.")
+                    Text("Delete logs older than a chosen age. This cannot be undone. Back up first.")
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1875,8 +1856,7 @@ private struct DataRetentionCard: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
-                .tint(.red)
+                .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .red))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1914,8 +1894,7 @@ private struct DeleteAccountCard: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.red)
+            .buttonStyle(ChillPillButtonStyle(prominent: true, tint: .red))
         }
         .padding(16)
         .glassSurface(radius: 28, tint: .red.opacity(0.08), interactive: true)
@@ -2001,21 +1980,19 @@ private struct DeleteAccountConfirmationView: View {
                                 ProgressView()
                             }
 
-                            Text(isDeleting ? "Deleting" : "Delete everything")
+                            Text(isDeleting ? String(localized: "Deleting") : String(localized: "Delete everything"))
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.red)
+                    .buttonStyle(ChillPillButtonStyle(prominent: true, tint: .red))
                     .disabled(!canDelete || isDeleting)
                     .opacity(canDelete ? 1 : 0.55)
 
                     Button("Cancel") {
                         attemptDismiss()
                     }
-                    .buttonStyle(.bordered)
-                    .tint(.white)
+                    .buttonStyle(ChillPillButtonStyle(prominent: false))
                     .frame(maxWidth: .infinity)
 
                     Spacer(minLength: 20)

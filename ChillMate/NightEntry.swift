@@ -271,6 +271,15 @@ enum ChillTrigger: String, CaseIterable, Identifiable, Codable {
     case stress = "Stress"
     case impulsive = "Impulsive"
     case planned = "Planned"
+    case depressed = "Depressed"
+    case numb = "Numb"
+    case anxious = "Anxious"
+    case grief = "Grief"
+    case trauma = "Trauma"
+    case heartbreak = "Heartbreak"
+    case celebration = "Celebration"
+    case socialPressure = "Social pressure"
+    case boredom = "Boredom"
 
     var id: String { rawValue }
 }
@@ -284,6 +293,13 @@ enum ChangeReason: String, CaseIterable, Identifiable, Codable {
     case housing = "Housing"
     case conflict = "Conflict"
     case boredom = "Boredom"
+    case depression = "Depression"
+    case anxiety = "Anxiety"
+    case bereavement = "Bereavement"
+    case trauma = "Trauma"
+    case relationship = "Relationship"
+    case health = "Health"
+    case medication = "Medication change"
 
     var id: String { rawValue }
 }
@@ -347,19 +363,19 @@ enum AftercareSymptom: String, CaseIterable, Identifiable, Codable {
     var likelyCause: String {
         switch self {
         case .anxious:
-            "alcohol rebound, stimulant comedown, lack of sleep, or feeling overstimulated"
+            String(localized: "alcohol rebound, stimulant comedown, lack of sleep, or feeling overstimulated")
         case .depressed:
-            "serotonin dip, sleep debt, alcohol rebound, or emotional overload"
+            String(localized: "serotonin dip, sleep debt, alcohol rebound, or emotional overload")
         case .numb:
-            "dissociation, exhaustion, emotional shutdown, or a delayed stress response"
+            String(localized: "dissociation, exhaustion, emotional shutdown, or a delayed stress response")
         case .exhausted:
-            "sleep deprivation, dehydration, low food intake, or a long stimulant window"
+            String(localized: "sleep deprivation, dehydration, low food intake, or a long stimulant window")
         case .overstimulated:
-            "stimulant overload, too little rest, dehydration, or intense sensory input"
+            String(localized: "stimulant overload, too little rest, dehydration, or intense sensory input")
         case .shaky:
-            "stimulants, low blood sugar, dehydration, anxiety, or alcohol rebound"
+            String(localized: "stimulants, low blood sugar, dehydration, anxiety, or alcohol rebound")
         case .dissociated:
-            "ketamine or other dissociatives, stress, sleep loss, or feeling unsafe"
+            String(localized: "ketamine or other dissociatives, stress, sleep loss, or feeling unsafe")
         }
     }
 }
@@ -385,15 +401,15 @@ struct SleepMood {
     var label: String {
         switch hours {
         case 6...:
-            "Rested"
+            String(localized: "Rested")
         case 4..<6:
-            "Some sleep"
+            String(localized: "Some sleep")
         case 2..<4:
-            "Low sleep"
+            String(localized: "Low sleep")
         case 0..<2:
-            "Very little sleep"
+            String(localized: "Very little sleep")
         default:
-            "Sleep"
+            String(localized: "Sleep")
         }
     }
 }

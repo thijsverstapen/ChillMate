@@ -8,13 +8,7 @@
     <string>export</string>
     <key>teamID</key>
     <string>UCZEZS4VJ6</string>
-    <key>uploadBitcode</key>
-    <false/>
-    <key>uploadSymbols</key>
-    <true/>
     <key>signingStyle</key>
     <string>automatic</string>
-    <key>manageAppVersionAndBuildNumber</key>
-    <false/>
 </dict>
 </plist>

@@ -211,9 +211,9 @@ enum ICloudBackupError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .iCloudUnavailable:
-            "iCloud Drive is not available. Sign in to iCloud and make sure iCloud Drive is on."
+            String(localized: "iCloud Drive is not available. Sign in to iCloud and make sure iCloud Drive is on.")
         case .noBackupFound:
-            "No ChillMate iCloud backup was found yet."
+            String(localized: "No ChillMate iCloud backup was found yet.")
         }
     }
 }
@@ -226,9 +226,9 @@ enum EncryptedBackupError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .encryptionFailed:
-            "Could not seal the encrypted backup archive."
+            String(localized: "Could not seal the encrypted backup archive.")
         case .decryptionFailed:
-            "Could not unlock this backup. Use a ChillMate backup made on this device with the same protected backup key."
+            String(localized: "Could not unlock this backup. Use a ChillMate backup made on this device with the same protected backup key.")
         case .keychainFailure(let status):
             "Keychain failed with status \(status)."
         }

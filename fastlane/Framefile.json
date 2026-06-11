@@ -1,0 +1,17 @@
+{
+  "default": {
+    "title": { "color": "#FFFFFF" },
+    "backgroundColor": "#1C1C1E",
+    "padding": 50,
+    "show_complete_frame": false,
+    "stack_title": true,
+    "title_below_image": false,
+    "frame": "BLACK"
+  },
+  "data": [
+    { "filter": "01_Dashboard", "keyword": { "color": "#32ADE6" } },
+    { "filter": "02_CareTools", "keyword": { "color": "#5E5CE6" } },
+    { "filter": "03_Timers", "keyword": { "color": "#FF9F0A" } },
+    { "filter": "04_Journal", "keyword": { "color": "#FF375F" } }
+  ]
+}

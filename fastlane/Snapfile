@@ -1,0 +1,14 @@
+devices([
+  "iPhone 17 Pro Max",
+  "iPhone 17 Pro",
+  "iPhone 11 Pro Max",
+  "iPhone 17"
+])
+
+languages([
+  "en-US"
+])
+
+scheme("ChillMate")
+output_directory("./fastlane/screenshots")
+clear_previous_screenshots(true)

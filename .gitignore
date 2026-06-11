@@ -3,6 +3,7 @@ DerivedDataMCP/
 DerivedData/
 build/
 *.xcarchive
+*.log
 
 # Xcode user state
 xcuserdata/

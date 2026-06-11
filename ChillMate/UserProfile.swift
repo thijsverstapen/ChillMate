@@ -7,9 +7,9 @@ final class UserProfile {
     var name: String = ""
     var age: Int = 18
     var dateOfBirth: Date = Calendar.current.date(byAdding: .year, value: -18, to: .now) ?? .now
-    var sex: String = ProfileSex.male.rawValue
-    var sexualOrientation: String = SexualOrientation.gay.rawValue
-    var sexualRole: String = SexualRole.versatile.rawValue
+    var sex: String = ProfileSex.preferNotToSay.rawValue
+    var sexualOrientation: String = SexualOrientation.preferNotToSay.rawValue
+    var sexualRole: String = SexualRole.preferNotToSay.rawValue
     var isOnPrEP: Bool = false
     var prepStartDate: Date = Date.now
     var prepSchedule: String = PrEPSchedule.daily.rawValue
@@ -27,7 +27,7 @@ final class UserProfile {
         dateOfBirth: Date? = nil,
         sex: ProfileSex,
         sexualOrientation: SexualOrientation,
-        sexualRole: SexualRole = .notApplicable,
+        sexualRole: SexualRole = .preferNotToSay,
         isOnPrEP: Bool,
         prepStartDate: Date = .now,
         prepSchedule: PrEPSchedule = .daily,
@@ -94,6 +94,7 @@ enum PrEPSchedule: String, CaseIterable, Identifiable {
 }
 
 enum ProfileSex: String, CaseIterable, Identifiable {
+    case preferNotToSay = "Prefer not to say"
     case male = "Male"
     case female = "Female"
     case nonBinary = "Non-binary"
@@ -103,6 +104,7 @@ enum ProfileSex: String, CaseIterable, Identifiable {
 }
 
 enum SexualOrientation: String, CaseIterable, Identifiable {
+    case preferNotToSay = "Prefer not to say"
     case gay = "Gay"
     case bisexual = "Bisexual"
     case straight = "Straight"
@@ -114,6 +116,7 @@ enum SexualOrientation: String, CaseIterable, Identifiable {
 }
 
 enum SexualRole: String, CaseIterable, Identifiable {
+    case preferNotToSay = "Prefer not to say"
     case top = "Top"
     case versatile = "Versatile"
     case bottom = "Bottom"

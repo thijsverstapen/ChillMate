@@ -1,3 +1,6 @@
+import Contacts
+import ContactsUI
+import PhotosUI
 import StoreKit
 import SwiftData
 import SwiftUI
@@ -130,8 +133,7 @@ private struct MainTabView: View {
         .tint(.chillPrimary)
         .fullScreenCover(item: $activeCarePage) { page in
             switch page {
-            case .safetyAutopilot:
-                SafetyAutopilotView()
+            // Modal-only pages keep their own NavigationStack.
             case .saferPlanning:
                 SaferSessionPlanView()
             case .stdTests:
@@ -150,14 +152,18 @@ private struct MainTabView: View {
                 PanicSupportView()
             case .consentBoundaries:
                 ConsentBoundariesView()
+            // Pages shared with the More hub are de-nested; host them in a
+            // navigation stack with a close control for this modal context.
+            case .safetyAutopilot:
+                CareCoverHost { SafetyAutopilotView() }
             case .recoveryMode:
-                RecoveryModeView()
+                CareCoverHost { RecoveryModeView() }
             case .privateInsights:
-                PrivateInsightsView()
+                CareCoverHost { PrivateInsightsView() }
             case .helperBridge:
-                ProfessionalHelperBridgeView()
+                CareCoverHost { ProfessionalHelperBridgeView() }
             case .drugChecking:
-                DrugCheckingEducationView()
+                CareCoverHost { DrugCheckingEducationView() }
             }
         }
         .fullScreenCover(isPresented: $isShowingShortcutLog) {
@@ -244,51 +250,92 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         .supportDeveloper,
         .privacyReceipt,
         .emergencyCard,
-        .supportDirectory,
-        .privacyPolicy,
-        .termsOfUse
+        .supportDirectory
     ]
+
+    var title: String {
+        switch self {
+        case .profile:
+            String(localized: "Profile")
+        case .settings:
+            String(localized: "Settings")
+        case .supportDeveloper:
+            String(localized: "Support the developer")
+        case .safetyAutopilot:
+            String(localized: "Safety autopilot")
+        case .privacyReceipt:
+            String(localized: "Privacy")
+        case .privacyTimeline:
+            String(localized: "Privacy timeline")
+        case .securityHealth:
+            String(localized: "Security check")
+        case .helperBridge:
+            String(localized: "Helper summary")
+        case .recoveryMode:
+            String(localized: "Recovery mode")
+        case .privateInsights:
+            String(localized: "Private insights")
+        case .unifiedTimeline:
+            String(localized: "Full timeline")
+        case .recentlyDeleted:
+            String(localized: "Recently deleted")
+        case .weeklyReflection:
+            String(localized: "Weekly reflection")
+        case .emergencyCard:
+            String(localized: "Emergency card")
+        case .supportDirectory:
+            String(localized: "Support")
+        case .privacyPolicy:
+            String(localized: "Privacy Policy")
+        case .termsOfUse:
+            String(localized: "Terms")
+        case .cravingDelay:
+            String(localized: "Craving delay")
+        case .drugChecking:
+            String(localized: "Checking info")
+        }
+    }
 
     var subtitle: String {
         switch self {
         case .settings:
-            "Locks, alerts, look, and your data"
+            String(localized: "Locks, alerts, look, and your data")
         case .supportDeveloper:
-            "Leave a tip to say thanks — optional"
+            String(localized: "Leave a tip to say thanks (optional)")
         case .profile:
-            "Your details, photo, medication, and PrEP"
+            String(localized: "Your details, photo, medication, and PrEP")
         case .safetyAutopilot:
-            "A calm next step when things feel busy"
+            String(localized: "A calm next step when things feel busy")
         case .privacyReceipt:
-            "What is saved and what is protected"
+            String(localized: "What is saved, policies, and terms")
         case .privacyTimeline:
-            "Recent backup, restore, and lock activity"
+            String(localized: "Recent backup, restore, and lock activity")
         case .securityHealth:
-            "See which privacy options are on"
+            String(localized: "See which privacy options are on")
         case .helperBridge:
-            "A simple summary for a GP, GGD, or helper"
+            String(localized: "A simple summary for a GP, GGD, or helper")
         case .recoveryMode:
-            "Goals, cravings, and a fresh start"
+            String(localized: "Goals, cravings, and a fresh start")
         case .privateInsights:
-            "Your patterns over time"
+            String(localized: "Your patterns over time")
         case .unifiedTimeline:
-            "Everything you saved, in one place"
+            String(localized: "Everything you saved, in one place")
         case .recentlyDeleted:
-            "Things you recently removed"
+            String(localized: "Things you recently removed")
         case .weeklyReflection:
-            "A calm look at the last 7 days"
+            String(localized: "A calm look at the last 7 days")
         case .emergencyCard:
-            "Important help info in one card"
+            String(localized: "Important help info in one card")
         case .supportDirectory:
-            "Dutch help lines and support"
+            String(localized: "Dutch help lines and support")
         case .privacyPolicy:
-            "How your private information is handled"
+            String(localized: "How your private information is handled")
         case .termsOfUse:
-            "Safety, medical, and app boundaries"
+            String(localized: "Safety, medical, and app boundaries")
         case .cravingDelay:
-            "Pause for 10 minutes before deciding"
+            String(localized: "Pause for 10 minutes before deciding")
         case .drugChecking:
-            "Testing and support information"
+            String(localized: "Testing and support information")
         }
     }
 
@@ -380,7 +427,6 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
 }
 
 private struct MoreHubView: View {
-    @State private var activePage: MoreHubPage?
     @State private var searchText = ""
 
     private var filteredPages: [MoreHubPage] {
@@ -390,20 +436,21 @@ private struct MoreHubView: View {
         }
 
         return MoreHubPage.allCases.filter {
-            $0.rawValue.localizedCaseInsensitiveContains(query) ||
+            $0.title.localizedCaseInsensitiveContains(query) ||
             $0.subtitle.localizedCaseInsensitiveContains(query)
         }
     }
 
     var body: some View {
-        ZStack {
+        NavigationStack {
+            ZStack {
             DashboardBackdrop()
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     PageHeader(
-                        title: "More",
-                        subtitle: "The basics are here. Use search if you need something else.",
+                        title: String(localized: "More"),
+                        subtitle: String(localized: "Your profile, settings, and privacy tools in one place."),
                         symbol: "ellipsis.circle.fill",
                         tint: Color.chillSecondaryBlue
                     )
@@ -426,9 +473,7 @@ private struct MoreHubView: View {
                         }
 
                         ForEach(filteredPages) { page in
-                            Button {
-                                activePage = page
-                            } label: {
+                            NavigationLink(value: page) {
                                 HStack(spacing: 12) {
                                     Image(systemName: page.symbol)
                                         .font(.system(size: 17, weight: .black))
@@ -437,7 +482,7 @@ private struct MoreHubView: View {
                                         .background(page.tint.opacity(0.14), in: Circle())
 
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text(page.rawValue)
+                                        Text(page.title)
                                             .font(.subheadline.weight(.bold))
                                             .foregroundStyle(Color.chillText)
                                         Text(page.subtitle)
@@ -456,8 +501,9 @@ private struct MoreHubView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 11)
+                                .contentShape(Rectangle())
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(ChillPlainButtonStyle())
                             .glassSurface(radius: 20, tint: page.tint.opacity(0.07), interactive: true)
                         }
                     }
@@ -469,47 +515,58 @@ private struct MoreHubView: View {
             .scrollDismissesKeyboard(.interactively)
         }
         .endEditingOnTap()
-        .fullScreenCover(item: $activePage) { page in
-            switch page {
-            case .settings:
-                SettingsView(showsDoneButton: true)
-            case .supportDeveloper:
-                SupportDeveloperView()
-            case .profile:
-                ProfileOverviewView(showsDoneButton: true)
-            case .safetyAutopilot:
-                SafetyAutopilotView()
-            case .privacyReceipt:
-                PrivacyReceiptView()
-            case .privacyTimeline:
-                PrivacyTimelineView()
-            case .securityHealth:
-                SecurityHealthCheckView()
-            case .helperBridge:
-                ProfessionalHelperBridgeView()
-            case .recoveryMode:
-                RecoveryModeView()
-            case .privateInsights:
-                PrivateInsightsView()
-            case .unifiedTimeline:
-                UnifiedTimelineView()
-            case .recentlyDeleted:
-                RecentlyDeletedView()
-            case .weeklyReflection:
-                WeeklyReflectionView()
-            case .emergencyCard:
-                EmergencyCardView()
-            case .supportDirectory:
-                NetherlandsSupportDirectoryView()
-            case .privacyPolicy:
-                PrivacyPolicyView()
-            case .termsOfUse:
-                TermsOfUseView()
-            case .cravingDelay:
-                CravingDelayView()
-            case .drugChecking:
-                DrugCheckingEducationView()
-            }
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationDestination(for: MoreHubPage.self) { page in
+            moreHubDestination(page)
+                .navigationTitle("")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .toolbar(.hidden, for: .tabBar)
+        }
+        }
+    }
+
+    @ViewBuilder
+    private func moreHubDestination(_ page: MoreHubPage) -> some View {
+        switch page {
+        case .settings:
+            SettingsView(showsDoneButton: true)
+        case .supportDeveloper:
+            SupportDeveloperView()
+        case .profile:
+            ProfileOverviewView(showsDoneButton: true)
+        case .safetyAutopilot:
+            SafetyAutopilotView()
+        case .privacyReceipt:
+            PrivacyReceiptView()
+        case .privacyTimeline:
+            PrivacyTimelineView()
+        case .securityHealth:
+            SecurityHealthCheckView()
+        case .helperBridge:
+            ProfessionalHelperBridgeView()
+        case .recoveryMode:
+            RecoveryModeView()
+        case .privateInsights:
+            PrivateInsightsView()
+        case .unifiedTimeline:
+            UnifiedTimelineView()
+        case .recentlyDeleted:
+            RecentlyDeletedView()
+        case .weeklyReflection:
+            WeeklyReflectionView()
+        case .emergencyCard:
+            EmergencyCardView()
+        case .supportDirectory:
+            NetherlandsSupportDirectoryView()
+        case .privacyPolicy:
+            PrivacyPolicyView()
+        case .termsOfUse:
+            TermsOfUseView()
+        case .cravingDelay:
+            CravingDelayView()
+        case .drugChecking:
+            DrugCheckingEducationView()
         }
     }
 }
@@ -542,9 +599,9 @@ struct SupportDeveloperView: View {
     @StateObject private var store = TipStore()
 
     private let options: [TipOption] = [
-        TipOption(id: TipProduct.coffee, title: "Buy me a coffee", detail: "A little caffeine for late-night coding", symbol: "cup.and.saucer.fill", tint: Color.chillIconAmber, fallbackPrice: "€3"),
-        TipOption(id: TipProduct.pizza, title: "Treat me to a pizza", detail: "Fuel for a whole new feature", symbol: "fork.knife", tint: Color.chillIconOrange, fallbackPrice: "€10"),
-        TipOption(id: TipProduct.generous, title: "Sponsor a feature", detail: "Wow, thank you so much", symbol: "sparkles", tint: Color.chillIconPink, fallbackPrice: "€25")
+        TipOption(id: TipProduct.coffee, title: String(localized: "Buy me a coffee"), detail: String(localized: "A little caffeine for late-night coding"), symbol: "cup.and.saucer.fill", tint: Color.chillIconAmber, fallbackPrice: "€3"),
+        TipOption(id: TipProduct.pizza, title: String(localized: "Treat me to a pizza"), detail: String(localized: "Fuel for a whole new feature"), symbol: "fork.knife", tint: Color.chillIconOrange, fallbackPrice: "€10"),
+        TipOption(id: TipProduct.generous, title: String(localized: "Sponsor a feature"), detail: String(localized: "Wow, thank you so much"), symbol: "sparkles", tint: Color.chillIconPink, fallbackPrice: "€25")
     ]
 
     @State private var selectedID = TipProduct.coffee
@@ -561,15 +618,15 @@ struct SupportDeveloperView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {
                         PageHeader(
-                            title: "Support the developer",
-                            subtitle: "ChillMate is free for everyone. A tip is a small, completely optional way to say thanks.",
+                            title: String(localized: "Support the developer"),
+                            subtitle: String(localized: "ChillMate is free for everyone. A tip is a small, completely optional way to say thanks."),
                             symbol: "heart.fill",
                             tint: Color.chillIconPink
                         )
@@ -598,12 +655,6 @@ struct SupportDeveloperView: View {
                 .scrollIndicators(.hidden)
             }
             .navigationTitle("")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton { dismiss() }
-                }
-            }
-            .edgeSwipeToDismiss()
             .task { await store.loadProducts() }
             .alert(alertTitle, isPresented: Binding(
                 get: { alertMessage != nil },
@@ -687,7 +738,7 @@ struct SupportDeveloperView: View {
                     .stroke(tip.tint.opacity(isSelected ? 0.7 : 0), lineWidth: 1.5)
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
     }
 
     private func selectionDot(_ isSelected: Bool) -> some View {
@@ -699,36 +750,63 @@ struct SupportDeveloperView: View {
     @ViewBuilder
     private var payButton: some View {
         let priceLabel = selectedOption.map { priceText(for: $0) } ?? ""
-        Button(action: purchase) {
-            HStack(spacing: 9) {
-                if isPurchasing {
-                    ProgressView()
-                        .tint(.white)
-                } else {
-                    Image(systemName: "heart.fill")
+        let isLoadingProducts = store.loadState == .loading
+        let loadFailed = store.loadState == .failed || (store.loadState == .loaded && store.products.isEmpty)
+        let isBlocked = isPurchasing || isLoadingProducts
+
+        if loadFailed {
+            Button {
+                Task { await store.retryLoad() }
+            } label: {
+                HStack(spacing: 9) {
+                    Image(systemName: "arrow.clockwise")
                         .font(.headline)
+                    Text("Retry")
+                        .font(.headline.weight(.bold))
                 }
-                Text(isPurchasing ? "Processing…" : "Leave a \(priceLabel) tip")
-                    .font(.headline.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(Color.chillSecondary.opacity(0.6), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity)
-            .frame(height: 52)
-            .background(
-                LinearGradient(
-                    colors: [Color.chillPrimary, Color.chillSecondaryBlue],
-                    startPoint: .leading,
-                    endPoint: .trailing
-                ),
-                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
-            )
+            .buttonStyle(ChillPlainButtonStyle())
+        } else {
+            Button(action: purchase) {
+                HStack(spacing: 9) {
+                    if isBlocked {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: "heart.fill")
+                            .font(.headline)
+                    }
+                    Text(isPurchasing ? String(localized: "Processing…") :
+                         isLoadingProducts ? String(localized: "Loading…") :
+                         String(localized: "Leave a \(priceLabel) tip"))
+                        .font(.headline.weight(.bold))
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 52)
+                .background(
+                    LinearGradient(
+                        colors: [Color.chillPrimary, Color.chillSecondaryBlue],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    ),
+                    in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                )
+            }
+            .buttonStyle(ChillPlainButtonStyle())
+            .opacity(isBlocked ? 0.6 : 1)
+            .allowsHitTesting(!isBlocked)
         }
-        .buttonStyle(.plain)
-        .opacity(isPurchasing ? 0.6 : 1)
-        .allowsHitTesting(!isPurchasing)
     }
 
     private func purchase() {
+        if store.loadState == .loading {
+            return
+        }
         guard let product = store.products.first(where: { $0.id == selectedID }) else {
             alertTitle = "Tips unavailable"
             alertMessage = "Tipping isn't available right now. Make sure you're signed in to the App Store, then try again."
@@ -757,17 +835,28 @@ struct SupportDeveloperView: View {
 @MainActor
 final class TipStore: ObservableObject {
     enum Outcome { case success, cancelled, failed(String?) }
+    enum LoadState { case idle, loading, loaded, failed }
 
     @Published private(set) var products: [Product] = []
+    @Published private(set) var loadState: LoadState = .idle
 
     func loadProducts() async {
         guard products.isEmpty else { return }
+        loadState = .loading
         do {
             let fetched = try await Product.products(for: TipProduct.all)
             products = fetched.sorted { $0.price < $1.price }
+            loadState = .loaded
         } catch {
             products = []
+            loadState = .failed
         }
+    }
+
+    func retryLoad() async {
+        loadState = .idle
+        products = []
+        await loadProducts()
     }
 
     func purchase(_ product: Product) async -> Outcome {
@@ -794,9 +883,13 @@ final class TipStore: ObservableObject {
     }
 }
 
-private enum ProfileSetupStep {
-    case details
-    case permissions
+private enum ProfileSetupStep: Int, CaseIterable, Identifiable {
+    case basicDetails = 1
+    case identityAndHealth = 2
+    case safetyAndEmergency = 3
+    case featuresAndPermissions = 4
+
+    var id: Int { rawValue }
 }
 
 struct ProfileSetupView: View {
@@ -807,7 +900,11 @@ struct ProfileSetupView: View {
     @AppStorage("healthKitHeartRateReadEnabled") private var healthKitHeartRateReadEnabled = false
     @AppStorage("healthKitHRVReadEnabled") private var healthKitHRVReadEnabled = false
     @AppStorage("healthKitWorkoutReadEnabled") private var healthKitWorkoutReadEnabled = false
+    @AppStorage("appLanguage") private var appLanguage = "en"
+    @AppStorage("country") private var country = "Netherlands"
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @AppStorage("dailyAffirmationsEnabled") private var dailyAffirmationsEnabled = false
+    @AppStorage("requiresFaceID") private var requiresFaceID = false
     @AppStorage("locationServicesChecked") private var locationServicesChecked = false
     @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
     @AppStorage("lastICloudBackupStatus") private var lastICloudBackupStatus = ""
@@ -816,12 +913,15 @@ struct ProfileSetupView: View {
     @AppStorage("trustedContactMessage") private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
 
     @State private var hasSeenIntroduction = false
-    @State private var setupStep: ProfileSetupStep = .details
+    @State private var setupStep: ProfileSetupStep = .basicDetails
+    @State private var selectedPhoto: PhotosPickerItem?
+    @State private var profileImageData: Data?
+    @State private var hasAgreed = false
     @State private var name = ""
     @State private var dateOfBirth = Calendar.current.date(byAdding: .year, value: -18, to: Date.now) ?? Date.now
-    @State private var sex: ProfileSex = .male
-    @State private var sexualOrientation: SexualOrientation = .gay
-    @State private var sexualRole: SexualRole = .versatile
+    @State private var sex: ProfileSex = .preferNotToSay
+    @State private var sexualOrientation: SexualOrientation = .preferNotToSay
+    @State private var sexualRole: SexualRole = .preferNotToSay
     @State private var isOnPrEP = false
     @State private var prepStartDate = Date.now
     @State private var prepSchedule: PrEPSchedule = .daily
@@ -845,6 +945,7 @@ struct ProfileSetupView: View {
     @State private var isShowingBackupImporter = false
     @State private var isImportingBackup = false
     @State private var isRestoringICloudBackup = false
+    @State private var isShowingTrustedContactPicker = false
 
     private var canCreate: Bool {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && calculatedAge >= 18
@@ -888,300 +989,40 @@ struct ProfileSetupView: View {
                 DashboardBackdrop()
 
                 if hasSeenIntroduction {
-                    GeometryReader { proxy in
-                        let contentWidth = max(320, proxy.size.width - 40)
+                    VStack(spacing: 0) {
+                        SetupWizardProgressBar(step: setupStep)
+                            .padding(.horizontal, 20)
+                            .padding(.top, 12)
+                            .padding(.bottom, 2)
 
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 22) {
-                                if setupStep == .details {
-                                    VStack(alignment: .leading, spacing: 16) {
-                                        ProfileSetupSectionHeader(
-                                            eyebrow: "Step 1 of 2",
-                                            title: "Let’s set up your profile",
-                                            subtitle: "Add what feels useful now. You can change it later."
-                                        )
-
-                                        ProfileSetupBackupImportCard(
-                                            isImporting: isImportingBackup,
-                                            isRestoringICloud: isRestoringICloudBackup,
-                                            message: backupImportMessage,
-                                            importAction: {
-                                                isShowingBackupImporter = true
-                                            },
-                                            restoreICloudAction: {
-                                                restoreICloudBackup()
-                                            }
-                                        )
-
-                                        VStack(spacing: 12) {
-                                            ProfileSetupTextField(
-                                                title: "Name",
-                                                placeholder: "Enter your name",
-                                                text: $name,
-                                                systemImage: "person.fill"
-                                            )
-
-                                            ProfileSetupDateRow(
-                                                title: "Date of birth (\(calculatedAge))",
-                                                date: $dateOfBirth,
-                                                systemImage: "calendar"
-                                            )
-
-                                            if calculatedAge < 18 {
-                                                Text("ChillMate is for adults. You need to be 18 or older to create an account.")
-                                                    .font(.caption.weight(.semibold))
-                                                    .foregroundStyle(.red)
-                                                    .fixedSize(horizontal: false, vertical: true)
-                                            }
-                                        }
-                                        .padding(16)
-                                        .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                        TabView(selection: $setupStep) {
+                            ForEach(ProfileSetupStep.allCases) { step in
+                                ScrollView {
+                                    VStack(alignment: .leading, spacing: 22) {
+                                        stepContent(step)
                                     }
-
-                                    VStack(alignment: .leading, spacing: 16) {
-                                        ProfileSetupSectionHeader(
-                                            eyebrow: "Profile context",
-                                            title: "Identity & preferences",
-                                            subtitle: "This helps ChillMate make your overview feel more personal."
-                                        )
-
-                                        VStack(spacing: 12) {
-                                            ProfileSetupPickerRow(
-                                                title: "Sex",
-                                                systemImage: "person.2.fill"
-                                            ) {
-                                                Picker("Sex", selection: $sex) {
-                                                    ForEach(ProfileSex.allCases) { option in
-                                                        Text(option.rawValue).tag(option)
-                                                    }
-                                                }
-                                            }
-
-                                            ProfileSetupPickerRow(
-                                                title: "Sexual orientation",
-                                                systemImage: "heart.fill"
-                                            ) {
-                                                Picker("Sexual orientation", selection: $sexualOrientation) {
-                                                    ForEach(SexualOrientation.allCases) { option in
-                                                        Text(option.rawValue).tag(option)
-                                                    }
-                                                }
-                                            }
-
-                                            if shouldShowSexualRole {
-                                                ProfileSetupPickerRow(
-                                                    title: "Role",
-                                                    systemImage: "arrow.left.arrow.right"
-                                                ) {
-                                                    Picker("Role", selection: $sexualRole) {
-                                                        ForEach(SexualRole.allCases.filter { $0 != .notApplicable }) { option in
-                                                            Text(option.rawValue).tag(option)
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        .padding(16)
-                                        .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
-                                    }
-
-                                    VStack(alignment: .leading, spacing: 16) {
-                                        ProfileSetupSectionHeader(
-                                            eyebrow: "Home",
-                                            title: "Home information",
-                                            subtitle: "Optional. This helps the Route tab get you home faster."
-                                        )
-
-                                        VStack(spacing: 12) {
-                                            ProfileSetupTextField(
-                                                title: "Street",
-                                                placeholder: "Street name",
-                                                text: $homeStreet,
-                                                systemImage: "house.fill"
-                                            )
-
-                                            ProfileSetupTextField(
-                                                title: "House number",
-                                                placeholder: "Number or addition",
-                                                text: $homeHouseNumber,
-                                                systemImage: "number"
-                                            )
-
-                                            ProfileSetupTextField(
-                                                title: "Postal code",
-                                                placeholder: "Postal code",
-                                                text: $homePostalCode,
-                                                systemImage: "envelope.fill"
-                                            )
-
-                                            ProfileSetupTextField(
-                                                title: "City",
-                                                placeholder: "City",
-                                                text: $homeCity,
-                                                systemImage: "building.2.fill"
-                                            )
-
-                                            ProfileSetupTextField(
-                                                title: "Country",
-                                                placeholder: "Country",
-                                                text: $homeCountry,
-                                                systemImage: "globe.europe.africa.fill"
-                                            )
-                                        }
-                                        .padding(16)
-                                        .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
-                                    }
-
-                                    VStack(alignment: .leading, spacing: 16) {
-                                        ProfileSetupSectionHeader(
-                                            eyebrow: "Safety",
-                                            title: "Emergency contact",
-                                            subtitle: "Optional, but helpful. You can call or message this person from Emergency, Panic support, and Safe Route."
-                                        )
-
-                                        VStack(spacing: 12) {
-                                            ProfileSetupTextField(
-                                                title: "Contact name",
-                                                placeholder: "Someone you trust",
-                                                text: $trustedContactName,
-                                                systemImage: "person.crop.circle.badge.checkmark"
-                                            )
-
-                                            ProfileSetupTextField(
-                                                title: "Phone number",
-                                                placeholder: "+31...",
-                                                text: $trustedContactPhone,
-                                                systemImage: "phone.fill"
-                                            )
-
-                                            ProfileSetupTextField(
-                                                title: "Message",
-                                                placeholder: "Short message to send if you need help",
-                                                text: $trustedContactMessage,
-                                                systemImage: "message.fill"
-                                            )
-                                        }
-                                        .padding(16)
-                                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.08), interactive: true)
-                                    }
-
-                                    VStack(alignment: .leading, spacing: 16) {
-                                        ProfileSetupSectionHeader(
-                                            eyebrow: "Health context",
-                                            title: "Body information",
-                                            subtitle: "This helps with your profile and timer estimates."
-                                        )
-
-                                        VStack(spacing: 12) {
-                                            ProfileSetupMeasurementRow(
-                                                title: "Weight",
-                                                value: $weightKg,
-                                                range: 35...180,
-                                                unit: "kg",
-                                                systemImage: "scalemass.fill"
-                                            )
-
-                                            ProfileSetupMeasurementRow(
-                                                title: "Height",
-                                                value: $heightCm,
-                                                range: 130...220,
-                                                unit: "cm",
-                                                systemImage: "ruler.fill"
-                                            )
-                                        }
-                                        .padding(16)
-                                        .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
-                                    }
-
-                                    VStack(alignment: .leading, spacing: 16) {
-                                        ProfileSetupSectionHeader(
-                                            eyebrow: "Health context",
-                                            title: "PrEP status",
-                                            subtitle: "Optional. Add it if you want reminders or easier planning."
-                                        )
-
-                                        VStack(spacing: 12) {
-
-                                            ProfileSetupToggleRow(
-                                                title: "On PrEP",
-                                                subtitle: isOnPrEP ? "Enabled" : "Not enabled",
-                                                isOn: $isOnPrEP,
-                                                systemImage: "cross.case.fill"
-                                            )
-
-                                            if isOnPrEP {
-                                                ProfileSetupPickerRow(
-                                                    title: "PrEP schedule",
-                                                    systemImage: "clock.badge.checkmark.fill"
-                                                ) {
-                                                    Picker("PrEP schedule", selection: $prepSchedule) {
-                                                        ForEach(PrEPSchedule.allCases) { option in
-                                                            Text(option.rawValue).tag(option)
-                                                        }
-                                                    }
-                                                }
-
-                                                ProfileSetupDateRow(
-                                                    title: "Since",
-                                                    date: $prepStartDate,
-                                                    systemImage: "calendar.badge.clock"
-                                                )
-
-                                                if prepSchedule == .daily && Calendar.current.dateComponents([.day], from: prepStartDate, to: .now).day ?? 0 < 7 {
-                                                    Text("Daily PrEP needs about 7 days to reach maximum protection for receptive anal sex. Until then, use extra protection and follow medical advice.")
-                                                        .font(.caption.weight(.semibold))
-                                                        .foregroundStyle(.red)
-                                                        .fixedSize(horizontal: false, vertical: true)
-                                                }
-                                            }
-                                        }
-                                        .padding(16)
-                                        .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
-                                    }
-
-                                    ProfileSetupMedicationSection(
-                                        isEnabled: $usesCurrentMedication,
-                                        medications: $medications,
-                                        name: $medicationName,
-                                        dosage: $medicationDosage,
-                                        takenAt: $medicationTakenAt,
-                                        effectiveHours: $medicationEffectiveHours
-                                    )
-
-                                    GlassActionButton(prominent: true) {
-                                        setupStep = .permissions
-                                    } label: {
-                                        Label("Continue to permissions", systemImage: "arrow.right.circle.fill")
-                                            .font(.headline)
-                                            .frame(maxWidth: .infinity)
-                                    }
-                                    .disabled(!canCreate)
-                                    .opacity(canCreate ? 1 : 0.55)
-                                } else {
-                                    ProfilePermissionsPage(
-                                        healthKitAutoSync: $healthKitAutoSync,
-                                        notificationsEnabled: $notificationsEnabled,
-                                        locationServicesChecked: $locationServicesChecked,
-                                        iCloudBackupEnabled: $iCloudBackupEnabled,
-                                        message: permissionMessage,
-                                        isChecking: isCheckingPermissions,
-                                        requestHealth: requestHealthPermission,
-                                        requestNotifications: requestNotificationPermission,
-                                        requestLocation: requestLocationPermission,
-                                        requestICloud: requestICloudBackup,
-                                        createProfile: finishSetup,
-                                        back: {
-                                            setupStep = .details
-                                        }
-                                    )
+                                    .frame(maxWidth: 600, alignment: .leading)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(20)
+                                    .padding(.bottom, 24)
                                 }
+                                .scrollIndicators(.hidden)
+                                .scrollDismissesKeyboard(.interactively)
+                                .tag(step)
                             }
-                            .frame(width: contentWidth, alignment: .leading)
-                            .padding(20)
-                            .padding(.bottom, 32)
                         }
-                        .scrollIndicators(.hidden)
-                        .scrollDismissesKeyboard(.interactively)
+                        .tabViewStyle(.page(indexDisplayMode: .never))
+                        .animation(.easeInOut(duration: 0.3), value: setupStep)
+
+                        SetupWizardFooter(
+                            step: setupStep,
+                            canAdvance: footerCanAdvance,
+                            onBack: goToPreviousStep,
+                            onNext: goToNextStep
+                        )
+                        .padding(.horizontal, 20)
+                        .padding(.top, 8)
+                        .padding(.bottom, 12)
                     }
                 } else {
                     ProfileIntroductionView {
@@ -1192,11 +1033,11 @@ struct ProfileSetupView: View {
             .navigationTitle("")
             .liquidGlassAlert(
                 isPresented: $isShowingPermissionWarning,
-                title: "Continue without everything on?",
-                message: "ChillMate still works. Apple Health, notifications, location, and iCloud backup just make reminders, recovery, emergency messages, and restore easier.",
-                primaryTitle: "Yes, continue",
+                title: String(localized: "Continue without everything on?"),
+                message: String(localized: "ChillMate still works. Apple Health, notifications, location, and iCloud backup just make reminders, recovery, emergency messages, and restore easier."),
+                primaryTitle: String(localized: "Yes, continue"),
                 primaryAction: createProfile,
-                secondaryTitle: "Review permissions"
+                secondaryTitle: String(localized: "Review permissions")
             )
             .fileImporter(
                 isPresented: $isShowingBackupImporter,
@@ -1204,7 +1045,439 @@ struct ProfileSetupView: View {
                 allowsMultipleSelection: false,
                 onCompletion: handleBackupImport
             )
+            .sheet(isPresented: $isShowingTrustedContactPicker) {
+                ContactPicker { contact in
+                    trustedContactName = contact.name
+                    trustedContactPhone = contact.phoneNumber
+                }
+            }
             .endEditingOnTap()
+            .onChange(of: selectedPhoto) { _, newValue in
+                loadProfilePhoto(newValue)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func stepContent(_ step: ProfileSetupStep) -> some View {
+        switch step {
+        case .basicDetails:
+            basicDetailsStep
+        case .identityAndHealth:
+            identityStep
+        case .safetyAndEmergency:
+            safetyStep
+        case .featuresAndPermissions:
+            permissionsStep
+        }
+    }
+
+    @ViewBuilder
+    private var basicDetailsStep: some View {
+        ProfileSetupPhotoPicker(imageData: profileImageData, selectedPhoto: $selectedPhoto)
+
+                VStack(alignment: .leading, spacing: 16) {
+                    ProfileSetupSectionHeader(
+                        eyebrow: String(localized: "Step 1 of 4"),
+                        title: String(localized: "Let’s set up your profile"),
+                        subtitle: String(localized: "Add what feels useful now. You can change it later.")
+                    )
+
+                    ProfileSetupBackupImportCard(
+                        isImporting: isImportingBackup,
+                        isRestoringICloud: isRestoringICloudBackup,
+                        message: backupImportMessage,
+                        importAction: {
+                            isShowingBackupImporter = true
+                        },
+                        restoreICloudAction: {
+                            restoreICloudBackup()
+                        }
+                    )
+
+                    VStack(spacing: 0) {
+                        ProfileSetupPickerRow(
+                            title: String(localized: "Language"),
+                            systemImage: "globe"
+                        ) {
+                            Picker("Language", selection: $appLanguage) {
+                                Text("English").tag("en")
+                                Text("Nederlands (Dutch)").tag("nl")
+                            }
+                        }
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupPickerRow(
+                            title: String(localized: "Country"),
+                            systemImage: "mappin.and.ellipse"
+                        ) {
+                            Picker("Country", selection: $country) {
+                                Text("Netherlands").tag("Netherlands")
+                                Text("Belgium").tag("Belgium")
+                                Text("Germany").tag("Germany")
+                                Text("United Kingdom").tag("United Kingdom")
+                                Text("France").tag("France")
+                                Text("Spain").tag("Spain")
+                                Text("Other").tag("Other")
+                            }
+                        }
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupTextField(
+                            title: String(localized: "Name"),
+                            placeholder: String(localized: "Enter your name"),
+                            text: $name,
+                            systemImage: "person.fill"
+                        )
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupDateRow(
+                            title: "Date of birth (\(calculatedAge))",
+                            date: $dateOfBirth,
+                            systemImage: "calendar"
+                        )
+
+                        if calculatedAge < 18 {
+                            ProfileSetupRowDivider()
+
+                            Text("ChillMate is for adults. You need to be 18 or older to create an account.")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.red)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, 8)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                }
+    }
+
+    @ViewBuilder
+    private var identityStep: some View {
+                VStack(alignment: .leading, spacing: 16) {
+                    ProfileSetupSectionHeader(
+                        eyebrow: String(localized: "Step 2 of 4"),
+                        title: String(localized: "Identity & preferences"),
+                        subtitle: String(localized: "(Optional) This helps ChillMate make your overview feel more personal.")
+                    )
+
+                    VStack(spacing: 0) {
+                        ProfileSetupPickerRow(
+                            title: String(localized: "Sex"),
+                            systemImage: "person.2.fill"
+                        ) {
+                            Picker("Sex", selection: $sex) {
+                                ForEach(ProfileSex.allCases) { option in
+                                    Text(option.localizedDisplayName).tag(option)
+                                }
+                            }
+                        }
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupPickerRow(
+                            title: String(localized: "Orientation"),
+                            systemImage: "heart.fill"
+                        ) {
+                            Picker("Sexual orientation", selection: $sexualOrientation) {
+                                ForEach(SexualOrientation.allCases) { option in
+                                    Text(option.localizedDisplayName).tag(option)
+                                }
+                            }
+                        }
+
+                        if shouldShowSexualRole {
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupPickerRow(
+                                title: String(localized: "Role"),
+                                systemImage: "arrow.left.arrow.right"
+                            ) {
+                                Picker("Role", selection: $sexualRole) {
+                                    ForEach(SexualRole.allCases.filter { $0 != .notApplicable }) { option in
+                                        Text(option.localizedDisplayName).tag(option)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                }
+    }
+
+    @ViewBuilder
+    private var safetyStep: some View {
+                VStack(alignment: .leading, spacing: 16) {
+                    ProfileSetupSectionHeader(
+                        eyebrow: String(localized: "Step 3 of 4"),
+                        title: String(localized: "Home information"),
+                        subtitle: String(localized: "Optional. This helps the Route tab get you home faster.")
+                    )
+
+                    VStack(spacing: 0) {
+                        ProfileSetupTextField(
+                            title: String(localized: "Street"),
+                            placeholder: String(localized: "Street name"),
+                            text: $homeStreet,
+                            systemImage: "house.fill"
+                        )
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupTextField(
+                            title: String(localized: "House number"),
+                            placeholder: String(localized: "Number or addition"),
+                            text: $homeHouseNumber,
+                            systemImage: "number"
+                        )
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupTextField(
+                            title: String(localized: "Postal code"),
+                            placeholder: String(localized: "Postal code"),
+                            text: $homePostalCode,
+                            systemImage: "envelope.fill"
+                        )
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupTextField(
+                            title: String(localized: "City"),
+                            placeholder: String(localized: "City"),
+                            text: $homeCity,
+                            systemImage: "building.2.fill"
+                        )
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupTextField(
+                            title: String(localized: "Country"),
+                            placeholder: String(localized: "Country"),
+                            text: $homeCountry,
+                            systemImage: "globe.europe.africa.fill"
+                        )
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                }
+
+                VStack(alignment: .leading, spacing: 16) {
+                    ProfileSetupSectionHeader(
+                        eyebrow: String(localized: "Step 3 of 4"),
+                        title: String(localized: "Emergency contact"),
+                        subtitle: String(localized: "Optional, but helpful. You can call or message this person from Emergency, Panic support, and Safe Route.")
+                    )
+
+                    VStack(spacing: 0) {
+                        // Import from Contacts button
+                        Button {
+                            isShowingTrustedContactPicker = true
+                        } label: {
+                            HStack(spacing: 12) {
+                                ProfileSetupIcon(systemImage: "person.crop.circle.badge.plus")
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(trustedContactName.isEmpty ? String(localized: "Import from Contacts") : trustedContactName)
+                                        .font(.body.weight(.semibold))
+                                        .foregroundStyle(trustedContactName.isEmpty ? Color.chillPrimary : Color.chillText)
+                                    if !trustedContactPhone.isEmpty {
+                                        Text(trustedContactPhone)
+                                            .font(.caption)
+                                            .foregroundStyle(Color.chillSecondary)
+                                    }
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(Color.chillTertiary)
+                            }
+                            .padding(.vertical, 8)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(ChillPlainButtonStyle())
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupTextField(
+                            title: String(localized: "Message to send"),
+                            placeholder: String(localized: "Short message to send if you need help"),
+                            text: $trustedContactMessage,
+                            systemImage: "message.fill"
+                        )
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.08), interactive: true)
+                }
+
+                VStack(alignment: .leading, spacing: 16) {
+                    ProfileSetupSectionHeader(
+                        eyebrow: String(localized: "Health context"),
+                        title: String(localized: "Body information"),
+                        subtitle: String(localized: "This helps with your profile and timer estimates.")
+                    )
+
+                    VStack(spacing: 0) {
+                        ProfileSetupMeasurementRow(
+                            title: String(localized: "Weight"),
+                            value: $weightKg,
+                            range: 35...180,
+                            unit: "kg",
+                            systemImage: "scalemass.fill"
+                        )
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupMeasurementRow(
+                            title: String(localized: "Height"),
+                            value: $heightCm,
+                            range: 130...220,
+                            unit: "cm",
+                            systemImage: "ruler.fill"
+                        )
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                }
+
+                VStack(alignment: .leading, spacing: 16) {
+                    ProfileSetupSectionHeader(
+                        eyebrow: String(localized: "Health context"),
+                        title: String(localized: "PrEP status"),
+                        subtitle: String(localized: "Optional. Add it if you want reminders or easier planning.")
+                    )
+
+                    VStack(spacing: 0) {
+                        ProfileSetupToggleRow(
+                            title: String(localized: "On PrEP"),
+                            subtitle: isOnPrEP ? "Enabled" : "Not enabled",
+                            isOn: $isOnPrEP,
+                            systemImage: "cross.case.fill"
+                        )
+
+                        if isOnPrEP {
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupPickerRow(
+                                title: String(localized: "PrEP schedule"),
+                                systemImage: "clock.badge.checkmark.fill"
+                            ) {
+                                Picker("PrEP schedule", selection: $prepSchedule) {
+                                    ForEach(PrEPSchedule.allCases) { option in
+                                        Text(option.localizedDisplayName).tag(option)
+                                    }
+                                }
+                            }
+
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupDateRow(
+                                title: String(localized: "Since"),
+                                date: $prepStartDate,
+                                systemImage: "calendar.badge.clock"
+                            )
+
+                            if prepSchedule == .daily && Calendar.current.dateComponents([.day], from: prepStartDate, to: .now).day ?? 0 < 7 {
+                                ProfileSetupRowDivider()
+
+                                Text("Daily PrEP needs about 7 days to reach maximum protection for receptive anal sex. Until then, use extra protection and follow medical advice.")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.red)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.vertical, 8)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                }
+
+                ProfileSetupMedicationSection(
+                    isEnabled: $usesCurrentMedication,
+                    medications: $medications,
+                    name: $medicationName,
+                    dosage: $medicationDosage,
+                    takenAt: $medicationTakenAt,
+                    effectiveHours: $medicationEffectiveHours
+                )
+    }
+
+    @ViewBuilder
+    private var permissionsStep: some View {
+        ProfilePermissionsPage(
+            healthKitAutoSync: $healthKitAutoSync,
+            notificationsEnabled: $notificationsEnabled,
+            dailyAffirmationsEnabled: $dailyAffirmationsEnabled,
+            requiresFaceID: $requiresFaceID,
+            locationServicesChecked: $locationServicesChecked,
+            iCloudBackupEnabled: $iCloudBackupEnabled,
+            message: permissionMessage,
+            isChecking: isCheckingPermissions,
+            requestHealth: requestHealthPermission,
+            requestNotifications: requestNotificationPermission,
+            requestFaceID: requestFaceID,
+            requestLocation: requestLocationPermission,
+            requestICloud: requestICloudBackup,
+            hasAgreed: $hasAgreed
+        )
+    }
+
+    private var footerCanAdvance: Bool {
+        switch setupStep {
+        case .basicDetails:
+            return canCreate
+        case .featuresAndPermissions:
+            return canCreate && hasAgreed
+        default:
+            return true
+        }
+    }
+
+    private func goToNextStep() {
+        switch setupStep {
+        case .basicDetails:
+            withAnimation { setupStep = .identityAndHealth }
+        case .identityAndHealth:
+            withAnimation { setupStep = .safetyAndEmergency }
+        case .safetyAndEmergency:
+            withAnimation { setupStep = .featuresAndPermissions }
+        case .featuresAndPermissions:
+            finishSetup()
+        }
+    }
+
+    private func goToPreviousStep() {
+        switch setupStep {
+        case .basicDetails:
+            break
+        case .identityAndHealth:
+            withAnimation { setupStep = .basicDetails }
+        case .safetyAndEmergency:
+            withAnimation { setupStep = .identityAndHealth }
+        case .featuresAndPermissions:
+            withAnimation { setupStep = .safetyAndEmergency }
+        }
+    }
+
+    private func loadProfilePhoto(_ item: PhotosPickerItem?) {
+        guard let item else { return }
+        Task {
+            guard let data = try? await item.loadTransferable(type: Data.self) else { return }
+            let optimized = await Task.detached(priority: .utility) {
+                ChillImageOptimizer.downsampledJPEGData(from: data, maxPixelSize: 640, compressionQuality: 0.84)
+            }.value
+            await MainActor.run { profileImageData = optimized }
         }
     }
 
@@ -1230,7 +1503,8 @@ struct ProfileSetupView: View {
             weightKg: weightKg,
             heightCm: heightCm,
             homeAddress: formattedHomeAddress,
-            medications: usesCurrentMedication ? medications : []
+            medications: usesCurrentMedication ? medications : [],
+            profileImageData: profileImageData
         )
 
         modelContext.insert(profile)
@@ -1317,6 +1591,25 @@ struct ProfileSetupView: View {
         }
     }
 
+    private func requestFaceID() {
+        isCheckingPermissions = true
+        permissionMessage = nil
+
+        Task {
+            let success = try? await AppAuthenticator.authenticate(reason: String(localized: "Protect ChillMate with Face ID"))
+            await MainActor.run {
+                if success == true {
+                    requiresFaceID = true
+                    permissionMessage = "Face ID lock is enabled."
+                } else {
+                    requiresFaceID = false
+                    permissionMessage = "Face ID could not be enabled."
+                }
+                isCheckingPermissions = false
+            }
+        }
+    }
+
     private func requestICloudBackup() {
         isCheckingPermissions = true
         permissionMessage = nil
@@ -1397,62 +1690,220 @@ struct ProfileSetupView: View {
     }
 }
 
+private struct SetupWizardProgressBar: View {
+    let step: ProfileSetupStep
+
+    var body: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 7) {
+                ForEach(ProfileSetupStep.allCases) { item in
+                    Capsule()
+                        .fill(item.rawValue <= step.rawValue ? Color.chillPrimary : Color.chillPrimary.opacity(0.18))
+                        .frame(height: 6)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .animation(.easeInOut(duration: 0.3), value: step)
+
+            Text("Step \(step.rawValue) of \(ProfileSetupStep.allCases.count)")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Step \(step.rawValue) of \(ProfileSetupStep.allCases.count)")
+    }
+}
+
+private struct SetupWizardFooter: View {
+    let step: ProfileSetupStep
+    let canAdvance: Bool
+    let onBack: () -> Void
+    let onNext: () -> Void
+
+    private var isFirst: Bool { step == .basicDetails }
+    private var isLast: Bool { step == .featuresAndPermissions }
+
+    var body: some View {
+        HStack(spacing: 12) {
+            if !isFirst {
+                Button(action: onBack) {
+                    Label("Back", systemImage: "chevron.left")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChillPillButtonStyle(prominent: false))
+            }
+
+            GlassActionButton(prominent: true, action: onNext) {
+                Label(
+                    isLast ? String(localized: "Create account") : String(localized: "Continue"),
+                    systemImage: isLast ? "person.crop.circle.badge.checkmark" : "arrow.right.circle.fill"
+                )
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+            }
+            .disabled(!canAdvance)
+            .opacity(canAdvance ? 1 : 0.55)
+        }
+    }
+}
+
+private struct ProfileSetupPhotoPicker: View {
+    let imageData: Data?
+    @Binding var selectedPhoto: PhotosPickerItem?
+    @State private var image: UIImage?
+
+    var body: some View {
+        VStack(spacing: 10) {
+            ZStack(alignment: .bottomTrailing) {
+                Group {
+                    if let image {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(Color.chillPrimary.opacity(0.62))
+                            .padding(26)
+                    }
+                }
+                .frame(width: 116, height: 116)
+                .clipShape(Circle())
+                .glassSurface(radius: 58, tint: Color.chillPrimary.opacity(0.18))
+
+                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                    Image(systemName: "camera.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(Color.chillText)
+                        .frame(width: 38, height: 38)
+                        .background(.ultraThinMaterial, in: Circle())
+                        .overlay {
+                            Circle().stroke(.white.opacity(0.35), lineWidth: 1)
+                        }
+                        .shadow(color: .black.opacity(0.16), radius: 10, y: 5)
+                }
+                .accessibilityLabel("Add profile picture")
+            }
+
+            Text(image == nil ? String(localized: "Add a photo (optional)") : String(localized: "Tap to change photo"))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .onAppear {
+            if image == nil, let imageData {
+                image = UIImage(data: imageData)
+            }
+        }
+        .onChange(of: imageData) { _, newValue in
+            image = newValue.flatMap(UIImage.init(data:))
+        }
+    }
+}
+
 private struct ProfilePermissionsPage: View {
     @Binding var healthKitAutoSync: Bool
     @Binding var notificationsEnabled: Bool
+    @Binding var dailyAffirmationsEnabled: Bool
+    @Binding var requiresFaceID: Bool
     @Binding var locationServicesChecked: Bool
     @Binding var iCloudBackupEnabled: Bool
+    @AppStorage("discreetNotifications") private var discreetNotifications = false
     let message: String?
     let isChecking: Bool
     let requestHealth: () -> Void
     let requestNotifications: () -> Void
+    let requestFaceID: () -> Void
     let requestLocation: () -> Void
     let requestICloud: () -> Void
-    let createProfile: () -> Void
-    let back: () -> Void
+    @Binding var hasAgreed: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
             ProfileSetupSectionHeader(
-                eyebrow: "Step 2 of 2",
-                title: "Permissions",
-                subtitle: "Choose which system features ChillMate can use. You can change these later in Settings."
+                eyebrow: String(localized: "Step 4 of 4"),
+                title: String(localized: "Features & Permissions"),
+                subtitle: String(localized: "Choose which system features ChillMate can use. You can change these later in Settings.")
             )
 
-            VStack(spacing: 12) {
+            VStack(spacing: 0) {
                 PermissionSetupCard(
-                    title: "Notifications",
-                    subtitle: "Reminders for safe plans, STI results, aftercare, and private check-ins.",
+                    title: String(localized: "Face ID"),
+                    subtitle: String(localized: "Require Face ID to open ChillMate and protect your local data."),
+                    symbol: "faceid",
+                    isOn: requiresFaceID,
+                    action: requestFaceID
+                )
+
+                ProfileSetupRowDivider()
+
+                PermissionSetupCard(
+                    title: String(localized: "Notifications"),
+                    subtitle: String(localized: "Reminders for safe plans, STI results, aftercare, and private check-ins."),
                     symbol: "bell.badge.fill",
                     isOn: notificationsEnabled,
                     action: requestNotifications
                 )
 
+                if notificationsEnabled {
+                    ProfileSetupRowDivider()
+
+                    PermissionSetupCard(
+                        title: String(localized: "Discreet notifications"),
+                        subtitle: String(localized: "Keep lock-screen wording vague. Off shows the full reminder text."),
+                        symbol: "eye.slash.fill",
+                        isOn: discreetNotifications,
+                        action: { discreetNotifications.toggle() }
+                    )
+                }
+
+                ProfileSetupRowDivider()
+
                 PermissionSetupCard(
-                    title: "Apple Health Sync",
-                    subtitle: "Request read/write access for logs, sleep, heart rate, HRV, and workouts.",
+                    title: String(localized: "Daily Affirmations"),
+                    subtitle: String(localized: "Receive a gentle affirmation when you open the app."),
+                    symbol: "quote.bubble.fill",
+                    isOn: dailyAffirmationsEnabled,
+                    action: {
+                        dailyAffirmationsEnabled.toggle()
+                    }
+                )
+
+                ProfileSetupRowDivider()
+
+                PermissionSetupCard(
+                    title: String(localized: "Apple Health Sync"),
+                    subtitle: String(localized: "Request read/write access for logs, sleep, heart rate, HRV, and workouts."),
                     symbol: "heart.text.square.fill",
                     isOn: healthKitAutoSync,
                     action: requestHealth
                 )
 
+                ProfileSetupRowDivider()
+
                 PermissionSetupCard(
-                    title: "Location",
-                    subtitle: "Attach a location to logs and include your current location in emergency messages.",
+                    title: String(localized: "Location"),
+                    subtitle: String(localized: "Attach a location to logs and include your current location in emergency messages."),
                     symbol: "location.fill",
                     isOn: locationServicesChecked,
                     action: requestLocation
                 )
 
+                ProfileSetupRowDivider()
+
                 PermissionSetupCard(
-                    title: "iCloud Backup",
-                    subtitle: "Save and restore encrypted ChillMate backups through iCloud Drive.",
+                    title: String(localized: "iCloud Backup"),
+                    subtitle: String(localized: "Save and restore encrypted ChillMate backups through iCloud Drive."),
                     symbol: "icloud.fill",
                     isOn: iCloudBackupEnabled,
                     action: requestICloud
                 )
             }
-            .padding(16)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
             .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
 
             if isChecking {
@@ -1472,21 +1923,25 @@ private struct ProfilePermissionsPage: View {
                     .glassSurface(radius: 20, tint: .white.opacity(0.26))
             }
 
-            HStack(spacing: 12) {
-                Button(action: back) {
-                    Label("Back", systemImage: "chevron.left")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .tint(.chillPrimary)
+            VStack(alignment: .leading, spacing: 12) {
+                Label("Before you start", systemImage: "doc.text.fill")
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
 
-                GlassActionButton(prominent: true, action: createProfile) {
-                    Label("Create account", systemImage: "person.crop.circle.badge.checkmark")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
+                Text("ChillMate supports reflection, recovery, STI care, privacy, and emergency planning. It does not replace a clinician, diagnose conditions, decide whether something is safe, or recommend amounts, timing, or substance use. Its information is drawn from verified, official public-health sources and is updated over time as those sources change. ChillMate and its maker are not liable in any way for decisions made using the app. If someone may be in immediate danger, call local emergency services.")
+                    .font(.footnote)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Toggle(isOn: $hasAgreed.animation(.snappy)) {
+                    Text("I have read and agree to this.")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.chillText)
                 }
+                .tint(.chillMint)
             }
+            .padding(16)
+            .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
 
             Text("Your profile stays private on this device. If iCloud Backup is on, ChillMate saves encrypted backup files to iCloud Drive.")
                 .font(.footnote)
@@ -1498,7 +1953,7 @@ private struct ProfilePermissionsPage: View {
     }
 }
 
-private struct ProfileSetupBackupImportCard: View {
+struct ProfileSetupBackupImportCard: View {
     let isImporting: Bool
     let isRestoringICloud: Bool
     let message: String?
@@ -1527,13 +1982,14 @@ private struct ProfileSetupBackupImportCard: View {
                         if isRestoringICloud {
                             ProgressView()
                         }
-                        Label("Restore iCloud", systemImage: "icloud.and.arrow.down.fill")
+                        Label("iCloud", systemImage: "icloud.and.arrow.down.fill")
                             .font(.headline)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(Color.chillPrimary)
+                .buttonStyle(ChillPillButtonStyle(prominent: true))
                 .disabled(isRestoringICloud || isImporting)
 
                 Button(action: importAction) {
@@ -1543,11 +1999,12 @@ private struct ProfileSetupBackupImportCard: View {
                         }
                         Label("File", systemImage: "square.and.arrow.down.fill")
                             .font(.headline)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.bordered)
-                .tint(Color.chillSecondaryBlue)
+                .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .chillSecondaryBlue))
                 .disabled(isImporting || isRestoringICloud)
             }
 
@@ -1579,29 +2036,26 @@ private struct PermissionSetupCard: View {
                     Text(title)
                         .font(.body.weight(.semibold))
                         .foregroundStyle(Color.chillText)
-                    Text(isOn ? "Enabled" : subtitle)
+                    Text(isOn ? String(localized: "Enabled") : subtitle)
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
-                Spacer()
+                Spacer(minLength: 8)
 
                 Image(systemName: isOn ? "checkmark.circle.fill" : "plus.circle.fill")
+                    .font(.title3)
                     .foregroundStyle(isOn ? Color.chillMint : Color.chillPrimary)
             }
-            .padding(14)
-            .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .stroke(.white.opacity(0.22), lineWidth: 1)
-            }
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
     }
 }
 
-private struct ProfileSetupMedicationSection: View {
+struct ProfileSetupMedicationSection: View {
     @Binding var isEnabled: Bool
     @Binding var medications: [ProfileMedication]
     @Binding var name: String
@@ -1616,42 +2070,50 @@ private struct ProfileSetupMedicationSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             ProfileSetupSectionHeader(
-                eyebrow: "Medication",
-                title: "Current medication",
-                subtitle: "Turn this on only if you want ChillMate to remember medication for check-ins and risk checks."
+                eyebrow: String(localized: "Medication"),
+                title: String(localized: "Current medication"),
+                subtitle: String(localized: "Turn this on only if you want ChillMate to remember medication for check-ins and risk checks.")
             )
 
-            VStack(spacing: 12) {
+            VStack(spacing: 0) {
                 ProfileSetupToggleRow(
-                    title: "I use current medication",
+                    title: String(localized: "I use current medication"),
                     subtitle: isEnabled ? "Medication fields are shown" : "No medication fields needed",
                     isOn: $isEnabled,
                     systemImage: "pills.fill"
                 )
 
                 if isEnabled {
+                    ProfileSetupRowDivider()
+
                     ProfileSetupTextField(
-                        title: "Medication name",
-                        placeholder: "For example sertraline",
+                        title: String(localized: "Medication name"),
+                        placeholder: String(localized: "For example sertraline"),
                         text: $name,
                         systemImage: "pills.fill"
                     )
 
+                    ProfileSetupRowDivider()
+
                     ProfileSetupTextField(
-                        title: "Prescription amount",
-                        placeholder: "As written on your label",
+                        title: String(localized: "Prescription amount"),
+                        placeholder: String(localized: "As written on your label"),
                         text: $dosage,
                         systemImage: "number"
                     )
 
+                    ProfileSetupRowDivider()
+
                     ProfileSetupDateRow(
-                        title: "Last taken",
+                        title: String(localized: "Last taken"),
                         date: $takenAt,
                         systemImage: "clock.fill"
                     )
 
+                    ProfileSetupRowDivider()
+
                     ProfileSetupMeasurementRow(
-                        title: "Medication duration",
+                        title: String(localized: "Medication duration"),
                         value: $effectiveHours,
                         range: 0.5...72,
                         unit: "h",
@@ -1665,12 +2127,14 @@ private struct ProfileSetupMedicationSection: View {
                     }
                     .disabled(!canAdd)
                     .opacity(canAdd ? 1 : 0.55)
+                    .padding(.top, 14)
 
                     if medications.isEmpty {
                         Text("No medication saved yet.")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Color.chillSecondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.top, 12)
                     } else {
                         VStack(spacing: 8) {
                             ForEach(medications) { medication in
@@ -1694,17 +2158,19 @@ private struct ProfileSetupMedicationSection: View {
                                     } label: {
                                         Image(systemName: "xmark.circle.fill")
                                     }
-                                    .buttonStyle(.plain)
+                                    .buttonStyle(ChillPlainButtonStyle())
                                     .foregroundStyle(Color.chillSecondary)
                                 }
                                 .padding(10)
                                 .background(.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                             }
                         }
+                        .padding(.top, 12)
                     }
                 }
             }
-            .padding(16)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
             .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
         }
     }
@@ -1776,7 +2242,7 @@ private struct ProfileIntroductionView: View {
                 index: activePage,
                 count: pages.count,
                 isCompleting: isCompleting,
-                actionTitle: activePage == pages.count - 1 ? "Set up my profile" : "Next",
+                actionTitle: activePage == pages.count - 1 ? String(localized: "Set up my profile") : String(localized: "Next"),
                 action: advance
             )
             .opacity(isCompleting ? 0 : 1)
@@ -1862,7 +2328,7 @@ private struct IntroBottomControls: View {
                 .scaleEffect(isPressed ? 0.96 : 1.0)
                 .animation(.spring(response: 0.22, dampingFraction: 0.74), value: isPressed)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ChillPlainButtonStyle())
             .disabled(isCompleting)
             .padding(.horizontal, 22)
             .padding(.bottom, 24)
@@ -1913,54 +2379,54 @@ private struct IntroPage {
     let animation: IntroAnimationKind
 
     static let fallback = IntroPage(
-        eyebrow: "Summary",
-        title: "A clear look at your last 3 months",
-        subtitle: "See Chills, sleep, substances, and aftercare in one private overview.",
+        eyebrow: String(localized: "Summary"),
+        title: String(localized: "A clear look at your last 3 months"),
+        subtitle: String(localized: "See Chills, sleep, substances, and aftercare in one private overview."),
         animation: .summary
     )
 
     static let all = [
         fallback,
         IntroPage(
-            eyebrow: "Daily score",
-            title: "The app mood follows your day",
-            subtitle: "After your first substance-related log, ChillMate gently adapts the background to your recovery and wellbeing score.",
+            eyebrow: String(localized: "Daily score"),
+            title: String(localized: "The app mood follows your day"),
+            subtitle: String(localized: "After your first substance-related log, ChillMate gently adapts the background to your recovery and wellbeing score."),
             animation: .background
         ),
         IntroPage(
-            eyebrow: "Log a Chill",
-            title: "Save the parts you want to remember",
-            subtitle: "Add time, sleep, substances, condoms, partners, and location when that context matters.",
+            eyebrow: String(localized: "Log a Chill"),
+            title: String(localized: "Save the parts you want to remember"),
+            subtitle: String(localized: "Add time, sleep, substances, condoms, partners, and location when that context matters."),
             animation: .log
         ),
         IntroPage(
-            eyebrow: "Care tools",
-            title: "Plan safer and recover softer",
-            subtitle: "Use plans, check-ins, safety information, STI reminders, emergency shortcuts, reflection, and aftercare.",
+            eyebrow: String(localized: "Care tools"),
+            title: String(localized: "Plan safer and recover softer"),
+            subtitle: String(localized: "Use plans, check-ins, safety information, STI reminders, emergency shortcuts, reflection, and aftercare."),
             animation: .care
         ),
         IntroPage(
-            eyebrow: "Privacy",
-            title: "Private by default",
-            subtitle: "Lock ChillMate with Face ID or a PIN. Your local data can stay encrypted on this iPhone.",
+            eyebrow: String(localized: "Privacy"),
+            title: String(localized: "Private by default"),
+            subtitle: String(localized: "Lock ChillMate with Face ID or a PIN. Your local data can stay encrypted on this iPhone."),
             animation: .privacy
         ),
         IntroPage(
-            eyebrow: "Information & liability",
-            title: "Reflection, not medical advice",
-            subtitle: "Information here comes from verified, official sources, updated over time as they change. It is not medical advice — ChillMate and its maker are not liable for how it is used.",
+            eyebrow: String(localized: "Information & liability"),
+            title: String(localized: "Reflection, not medical advice"),
+            subtitle: String(localized: "Information here comes from verified, official sources, updated over time as they change. It is not medical advice. ChillMate and its maker are not liable for how it is used."),
             animation: .notice
         ),
         IntroPage(
-            eyebrow: "Quick exit",
-            title: "Back to iPhone Home",
-            subtitle: "This means the iPhone Home Screen. The red exit button closes ChillMate quickly.",
+            eyebrow: String(localized: "Quick exit"),
+            title: String(localized: "Back to iPhone Home"),
+            subtitle: String(localized: "This means the iPhone Home Screen. The red exit button closes ChillMate quickly."),
             animation: .exit
         ),
         IntroPage(
-            eyebrow: "Ready",
-            title: "Set up your private profile",
-            subtitle: "Add only what feels useful. You can change everything later.",
+            eyebrow: String(localized: "Ready"),
+            title: String(localized: "Set up your private profile"),
+            subtitle: String(localized: "Add only what feels useful. You can change everything later."),
             animation: .ready
         )
     ]
@@ -2863,7 +3329,7 @@ private struct ProfileIntroTile: View {
     }
 }
 
-private struct ProfileSetupHeroCard: View {
+struct ProfileSetupHeroCard: View {
     let contentWidth: CGFloat
 
     var body: some View {
@@ -2926,7 +3392,7 @@ private struct ProfileSetupHeroCard: View {
     }
 }
 
-private struct ProfileSetupSectionHeader: View {
+struct ProfileSetupSectionHeader: View {
     let eyebrow: String
     let title: String
     let subtitle: String
@@ -2951,45 +3417,46 @@ private struct ProfileSetupSectionHeader: View {
     }
 }
 
-private struct ProfileSetupTextField: View {
+/// A hairline separator between flat rows inside a setup card, inset to line up
+/// under the row text (past the leading icon) the way iOS grouped lists do.
+struct ProfileSetupRowDivider: View {
+    var body: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.10))
+            .frame(height: 1)
+            .padding(.leading, 50)
+    }
+}
+
+struct ProfileSetupTextField: View {
     let title: String
     let placeholder: String
     @Binding var text: String
     let systemImage: String
+    var axis: Axis = .horizontal
 
     var body: some View {
         HStack(spacing: 12) {
             ProfileSetupIcon(systemImage: systemImage)
 
-            VStack(alignment: .leading, spacing: 7) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text(title)
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
+                    .foregroundStyle(Color.chillMint)
 
-                TextField(placeholder, text: $text)
+                TextField(placeholder, text: $text, axis: axis)
                     .textFieldStyle(.plain)
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(Color.chillDarkBackground)
+                    .foregroundStyle(Color.chillText)
                     .tint(Color.chillPrimary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 15, style: .continuous)
-                            .stroke(Color.chillPrimary.opacity(0.36), lineWidth: 1.2)
-                    }
+                    .lineLimit(axis == .vertical ? 1...4 : 1...1)
             }
         }
-        .padding(14)
-        .background(.white.opacity(0.32), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.42), lineWidth: 1)
-        }
+        .padding(.vertical, 8)
     }
 }
 
-private struct ProfileSetupStepperRow: View {
+struct ProfileSetupStepperRow: View {
     let title: String
     @Binding var value: Int
     let range: ClosedRange<Int>
@@ -3000,10 +3467,10 @@ private struct ProfileSetupStepperRow: View {
             ProfileSetupIcon(systemImage: systemImage)
 
             Stepper(value: $value, in: range) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(title)
                         .font(.caption.weight(.bold))
-                        .foregroundStyle(Color.chillSecondary)
+                        .foregroundStyle(Color.chillMint)
 
                     Text("\(value) years old")
                         .font(.body.weight(.semibold))
@@ -3012,16 +3479,11 @@ private struct ProfileSetupStepperRow: View {
             }
             .tint(.chillPrimary)
         }
-        .padding(14)
-        .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.22), lineWidth: 1)
-        }
+        .padding(.vertical, 8)
     }
 }
 
-private struct ProfileSetupMeasurementRow: View {
+struct ProfileSetupMeasurementRow: View {
     let title: String
     @Binding var value: Double
     let range: ClosedRange<Double>
@@ -3033,10 +3495,10 @@ private struct ProfileSetupMeasurementRow: View {
             ProfileSetupIcon(systemImage: systemImage)
 
             Stepper(value: $value, in: range, step: 1) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(title)
                         .font(.caption.weight(.bold))
-                        .foregroundStyle(Color.chillSecondary)
+                        .foregroundStyle(Color.chillMint)
 
                     Text("\(Int(value.rounded())) \(unit)")
                         .font(.body.weight(.semibold))
@@ -3045,16 +3507,11 @@ private struct ProfileSetupMeasurementRow: View {
             }
             .tint(.chillPrimary)
         }
-        .padding(14)
-        .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.22), lineWidth: 1)
-        }
+        .padding(.vertical, 8)
     }
 }
 
-private struct ProfileSetupPickerRow<Content: View>: View {
+struct ProfileSetupPickerRow<Content: View>: View {
     let title: String
     let systemImage: String
     @ViewBuilder let content: Content
@@ -3063,26 +3520,25 @@ private struct ProfileSetupPickerRow<Content: View>: View {
         HStack(spacing: 12) {
             ProfileSetupIcon(systemImage: systemImage)
 
-            Text(title)
-                .font(.body.weight(.semibold))
-                .foregroundStyle(Color.chillText)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillMint)
 
-            Spacer()
+                content
+                    .pickerStyle(.menu)
+                    .tint(.chillPrimary)
+                    .font(.body.weight(.semibold))
+                    .fixedSize()
+            }
 
-            content
-                .pickerStyle(.menu)
-                .tint(.chillPrimary)
+            Spacer(minLength: 0)
         }
-        .padding(14)
-        .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.22), lineWidth: 1)
-        }
+        .padding(.vertical, 8)
     }
 }
 
-private struct ProfileSetupToggleRow: View {
+struct ProfileSetupToggleRow: View {
     let title: String
     let subtitle: String
     @Binding var isOn: Bool
@@ -3093,7 +3549,7 @@ private struct ProfileSetupToggleRow: View {
             ProfileSetupIcon(systemImage: systemImage)
 
             Toggle(isOn: $isOn) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 3) {
                     Text(title)
                         .font(.body.weight(.semibold))
                         .foregroundStyle(Color.chillText)
@@ -3101,20 +3557,16 @@ private struct ProfileSetupToggleRow: View {
                     Text(subtitle)
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .tint(.chillPrimary)
         }
-        .padding(14)
-        .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.22), lineWidth: 1)
-        }
+        .padding(.vertical, 8)
     }
 }
 
-private struct ProfileSetupDateRow: View {
+struct ProfileSetupDateRow: View {
     let title: String
     @Binding var date: Date
     let systemImage: String
@@ -3128,27 +3580,22 @@ private struct ProfileSetupDateRow: View {
                 .foregroundStyle(Color.chillText)
                 .tint(.chillPrimary)
         }
-        .padding(14)
-        .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 22, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.22), lineWidth: 1)
-        }
+        .padding(.vertical, 8)
     }
 }
 
-private struct ProfileSetupIcon: View {
+struct ProfileSetupIcon: View {
     let systemImage: String
 
     var body: some View {
         Image(systemName: systemImage)
             .font(.system(size: 16, weight: .bold))
-            .foregroundStyle(Color.chillPrimary)
+            .foregroundStyle(Color.chillMint)
             .frame(width: 38, height: 38)
-            .background(.white.opacity(0.24), in: Circle())
+            .background(Color.chillMint.opacity(0.16), in: Circle())
             .overlay {
                 Circle()
-                    .stroke(.white.opacity(0.24), lineWidth: 1)
+                    .stroke(Color.chillMint.opacity(0.34), lineWidth: 1)
             }
     }
 }

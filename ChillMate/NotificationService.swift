@@ -12,13 +12,13 @@ enum NotificationTone: String, CaseIterable, Identifiable {
     var caption: String {
         switch self {
         case .gentle:
-            "Soft and supportive"
+            String(localized: "Soft and supportive")
         case .direct:
-            "Clear and practical"
+            String(localized: "Clear and practical")
         case .minimal:
-            "Short and discreet"
+            String(localized: "Short and discreet")
         case .playful:
-            "Light, but still serious"
+            String(localized: "Light, but still serious")
         }
     }
 }
@@ -38,18 +38,18 @@ final class NotificationService {
     private let inactivityDays = [7, 14, 21]
     private let affirmationIdentifiers = (1...7).map { "chillmate.affirmation.\($0)" }
     private let checkInMessages = [
-        "Pause for a second. How's your body doing right now?",
-        "Water. Food. Air. Which one do you need?",
-        "You don't have to be doing great. How are you actually feeling?",
-        "Check in with yourself. Are the people around you still feeling safe to you?",
-        "This is just a quiet check. You can close this and everything stays private.",
-        "If you need to step outside, that is always okay.",
-        "Would hearing a familiar voice help? You can call someone without explaining why.",
-        "How is your breathing? Try taking one slow breath before anything else.",
-        "No rush. Take a moment, then take the next small step.",
-        "If there is chest pain, blue lips, seizure, or someone cannot be woken: call emergency services now.",
-        "Your boundaries are still yours right now. Nothing has changed that.",
-        "Check your temperature. Are you warm enough? Too warm? Drink something."
+        String(localized: "Pause for a second. How's your body doing right now?"),
+        String(localized: "Water. Food. Air. Which one do you need?"),
+        String(localized: "You don't have to be doing great. How are you actually feeling?"),
+        String(localized: "Check in with yourself. Are the people around you still feeling safe to you?"),
+        String(localized: "This is just a quiet check. You can close this and everything stays private."),
+        String(localized: "If you need to step outside, that is always okay."),
+        String(localized: "Would hearing a familiar voice help? You can call someone without explaining why."),
+        String(localized: "How is your breathing? Try taking one slow breath before anything else."),
+        String(localized: "No rush. Take a moment, then take the next small step."),
+        String(localized: "If there is chest pain, blue lips, seizure, or someone cannot be woken: call emergency services now."),
+        String(localized: "Your boundaries are still yours right now. Nothing has changed that."),
+        String(localized: "Check your temperature. Are you warm enough? Too warm? Drink something.")
     ]
 
     private var pendingSnoozeID: String?
@@ -58,7 +58,7 @@ final class NotificationService {
 
     private var discreetNotificationsEnabled: Bool {
         if UserDefaults.standard.object(forKey: "discreetNotifications") == nil {
-            return true
+            return false
         }
         return UserDefaults.standard.bool(forKey: "discreetNotifications")
     }
@@ -118,12 +118,12 @@ final class NotificationService {
     func registerCategories() {
         let logAction = UNNotificationAction(
             identifier: ActionIdentifier.logNow,
-            title: "Log now",
+            title: String(localized: "Log now"),
             options: [.foreground]
         )
         let snoozeAction = UNNotificationAction(
             identifier: ActionIdentifier.snooze,
-            title: "Snooze 1 hour",
+            title: String(localized: "Snooze 1 hour"),
             options: []
         )
         let checkInCategory = UNNotificationCategory(
@@ -143,9 +143,9 @@ final class NotificationService {
 
     func snoozeCurrentCheckIn() {
         let content = notificationContent(
-            title: "Private check-in",
-            body: "Add sleep, reflection notes, or a skipped Chill when you are ready.",
-            discreetBody: "Private check-in available.",
+            title: String(localized: "Private check-in"),
+            body: String(localized: "Add sleep, reflection notes, or a skipped Chill when you are ready."),
+            discreetBody: String(localized: "Private check-in available."),
             destination: .home,
             categoryIdentifier: "CHECKIN"
         )
@@ -162,9 +162,9 @@ final class NotificationService {
         center.removePendingNotificationRequests(withIdentifiers: [checkInIdentifier])
 
         let content = notificationContent(
-            title: "Private check-in",
-            body: "Add sleep, reflection notes, or a skipped Chill when you are ready.",
-            discreetBody: "Private check-in available.",
+            title: String(localized: "Private check-in"),
+            body: String(localized: "Add sleep, reflection notes, or a skipped Chill when you are ready."),
+            discreetBody: String(localized: "Private check-in available."),
             destination: .home,
             categoryIdentifier: "CHECKIN"
         )
@@ -187,9 +187,9 @@ final class NotificationService {
             }
 
             let content = notificationContent(
-                title: "Maybe add a private log?",
-                body: "If there was a Chill, skipped Chill, sleep, or aftercare moment, you can add it when you feel ready.",
-                discreetBody: "Private reminder available.",
+                title: String(localized: "Maybe add a private log?"),
+                body: String(localized: "If there was a Chill, skipped Chill, sleep, or aftercare moment, you can add it when you feel ready."),
+                discreetBody: String(localized: "Private reminder available."),
                 destination: .home,
                 categoryIdentifier: "CHECKIN"
             )
@@ -220,7 +220,7 @@ final class NotificationService {
             let content = notificationContent(
                 title: Self.affirmationTitles[index % Self.affirmationTitles.count],
                 body: message,
-                discreetBody: "A private note is waiting for you.",
+                discreetBody: String(localized: "A private note is waiting for you."),
                 destination: .home
             )
 
@@ -238,46 +238,46 @@ final class NotificationService {
         }
     }
 
-    private static let affirmationTitles = [
-        "A quiet note from ChillMate",
-        "Just checking in",
-        "One thing worth noticing today",
-        "Something small that counts",
-        "A moment for yourself",
-        "Today's reminder",
-        "You're doing better than you think"
-    ]
+    private static var affirmationTitles: [String] { [
+        String(localized: "A quiet note from ChillMate"),
+        String(localized: "Just checking in"),
+        String(localized: "One thing worth noticing today"),
+        String(localized: "Something small that counts"),
+        String(localized: "A moment for yourself"),
+        String(localized: "Today's reminder"),
+        String(localized: "You're doing better than you think")
+    ] }
 
-    private static let affirmationMessagePool = [
-        "Every choice that protects your body is worth something, even the small ones.",
-        "A day without logged use is still a day that moved you forward.",
-        "You don't have to have it all figured out. Steady is enough.",
-        "Rest is not the same as giving up. It is part of how you recover.",
-        "Skipping a session is not missing out. It is choosing future you.",
-        "You can be proud of choices that no one else will ever see.",
-        "Your recovery streak is built one decision at a time, not all at once.",
-        "Checking in with yourself takes courage. You are doing that.",
-        "Nothing about today has to be perfect. Just real is already a lot.",
-        "The things you protect about yourself quietly — they matter.",
-        "Noticing patterns is harder than ignoring them. You are doing the harder thing.",
-        "There is no version of care that is too small to count.",
-        "You are allowed to move slowly. Slow is still moving.",
-        "The fact that you are thinking about your health at all — that is not nothing.",
-        "One honest log, one water refill, one text to someone you trust. That is a full day.",
-        "Recovery does not need an audience. Private progress still counts.",
-        "Being kind to your body is not always comfortable. You are doing it anyway.",
-        "Today you made it to this notification. Something in you is still paying attention.",
-        "It is okay to have complicated feelings about where you are right now.",
-        "What you are building with these logs is a kind of self-respect.",
-        "You have gotten through harder days than this one.",
-        "The streak is yours. No one can see it but you, and it is real.",
-        "You are not just tracking habits. You are learning what you need.",
-        "Substances change the picture. A clear day gives you back the full view.",
-        "Sometimes the healthiest thing is just not making it worse today.",
-        "You are worth checking in on, even when nothing is urgent.",
-        "There is no perfect way to do this. There is only what you actually do.",
-        "Your body remembers every kind decision you make, even the ones you forget."
-    ]
+    private static var affirmationMessagePool: [String] { [
+        String(localized: "Every choice that protects your body is worth something, even the small ones."),
+        String(localized: "A day without logged use is still a day that moved you forward."),
+        String(localized: "You don't have to have it all figured out. Steady is enough."),
+        String(localized: "Rest is not the same as giving up. It is part of how you recover."),
+        String(localized: "Skipping a session is not missing out. It is choosing future you."),
+        String(localized: "You can be proud of choices that no one else will ever see."),
+        String(localized: "Your recovery streak is built one decision at a time, not all at once."),
+        String(localized: "Checking in with yourself takes courage. You are doing that."),
+        String(localized: "Nothing about today has to be perfect. Just real is already a lot."),
+        String(localized: "The things you protect about yourself quietly. They matter."),
+        String(localized: "Noticing patterns is harder than ignoring them. You are doing the harder thing."),
+        String(localized: "There is no version of care that is too small to count."),
+        String(localized: "You are allowed to move slowly. Slow is still moving."),
+        String(localized: "The fact that you are thinking about your health at all. That is not nothing."),
+        String(localized: "One honest log, one water refill, one text to someone you trust. That is a full day."),
+        String(localized: "Recovery does not need an audience. Private progress still counts."),
+        String(localized: "Being kind to your body is not always comfortable. You are doing it anyway."),
+        String(localized: "Today you made it to this notification. Something in you is still paying attention."),
+        String(localized: "It is okay to have complicated feelings about where you are right now."),
+        String(localized: "What you are building with these logs is a kind of self-respect."),
+        String(localized: "You have gotten through harder days than this one."),
+        String(localized: "The streak is yours. No one can see it but you, and it is real."),
+        String(localized: "You are not just tracking habits. You are learning what you need."),
+        String(localized: "Substances change the picture. A clear day gives you back the full view."),
+        String(localized: "Sometimes the healthiest thing is just not making it worse today."),
+        String(localized: "You are worth checking in on, even when nothing is urgent."),
+        String(localized: "There is no perfect way to do this. There is only what you actually do."),
+        String(localized: "Your body remembers every kind decision you make, even the ones you forget.")
+    ] }
 
     func clearDailyAffirmations() {
         center.removePendingNotificationRequests(withIdentifiers: affirmationIdentifiers)
@@ -288,7 +288,7 @@ final class NotificationService {
         let content = notificationContent(
             title: Self.riskWarningTitle(count: count),
             body: body,
-            discreetBody: "A private health check-in is available.",
+            discreetBody: String(localized: "A private health check-in is available."),
             destination: .home,
             categoryIdentifier: "RISK"
         )
@@ -304,9 +304,9 @@ final class NotificationService {
 
     func scheduleSTDResultReminder(testID: UUID, dueDate: Date) {
         let content = notificationContent(
-            title: "STI results check",
-            body: "If your results are in, add oral, genital, and anal results to ChillMate.",
-            discreetBody: "A private results reminder is available.",
+            title: String(localized: "STI results check"),
+            body: String(localized: "If your results are in, add oral, genital, and anal results to ChillMate."),
+            discreetBody: String(localized: "A private results reminder is available."),
             destination: .home
         )
 
@@ -320,9 +320,9 @@ final class NotificationService {
 
     func scheduleAftercareReminder(entryID: UUID, after date: Date) {
         let content = notificationContent(
-            title: "Gentle aftercare check-in",
-            body: "How did you sleep, and how do you feel about last Chill?",
-            discreetBody: "A private aftercare check-in is available.",
+            title: String(localized: "Gentle aftercare check-in"),
+            body: String(localized: "How did you sleep, and how do you feel about last Chill?"),
+            discreetBody: String(localized: "A private aftercare check-in is available."),
             destination: .home,
             categoryIdentifier: "CHECKIN"
         )
@@ -337,12 +337,12 @@ final class NotificationService {
 
     func scheduleWeeklySummary(streak: Int, score: Int) {
         clearWeeklySummary()
-        let scoreText = score > 0 ? ", score \(score)" : ""
-        let streakText = streak == 1 ? "1 day" : "\(streak) days"
+        let scoreText = score > 0 ? String(localized: ", score \(score)") : ""
+        let streakText = streak == 1 ? String(localized: "1 day") : String(localized: "\(streak) days")
         let content = notificationContent(
-            title: "Your week in ChillMate",
-            body: "You're at \(streakText) without logged substance use\(scoreText). Check in when ready.",
-            discreetBody: "Your private weekly summary is available.",
+            title: String(localized: "Your week in ChillMate"),
+            body: String(localized: "You're at \(streakText) without logged substance use\(scoreText). Check in when ready."),
+            discreetBody: String(localized: "Your private weekly summary is available."),
             destination: .home
         )
         var components = DateComponents()
@@ -365,9 +365,9 @@ final class NotificationService {
         let followUpDate = sessionDate.addingTimeInterval(48 * 60 * 60)
         guard followUpDate > .now else { return }
         let content = notificationContent(
-            title: "48-hour check-in",
-            body: "It's been two days since your last Chill. How are you really feeling — sleep, mood, energy?",
-            discreetBody: "A private follow-up is available.",
+            title: String(localized: "48-hour check-in"),
+            body: String(localized: "It's been two days since your last Chill. How are you really feeling: sleep, mood, energy?"),
+            discreetBody: String(localized: "A private follow-up is available."),
             destination: .home,
             categoryIdentifier: "CHECKIN"
         )
@@ -383,9 +383,9 @@ final class NotificationService {
         clearSTIReminder()
         guard dueDate > .now else { return }
         let content = notificationContent(
-            title: "STI test reminder",
-            body: "Based on your test schedule, it may be time for a check-up. Regular STI testing is part of staying healthy.",
-            discreetBody: "A private health reminder is available.",
+            title: String(localized: "STI test reminder"),
+            body: String(localized: "Based on your test schedule, it may be time for a check-up. Regular STI testing is part of staying healthy."),
+            discreetBody: String(localized: "A private health reminder is available."),
             destination: .home
         )
         let request = UNNotificationRequest(
@@ -402,9 +402,9 @@ final class NotificationService {
 
     func schedulePositiveSleepNotification(hours: Double) {
         let content = notificationContent(
-            title: "Good recovery sleep",
+            title: String(localized: "Good recovery sleep"),
             body: "Apple Health shows \(hours.formatted(.number.precision(.fractionLength(0...1)))) hours of sleep. That is a strong recovery signal.",
-            discreetBody: "A private recovery update is available.",
+            discreetBody: String(localized: "A private recovery update is available."),
             destination: .home
         )
 
@@ -436,9 +436,9 @@ final class NotificationService {
             }
 
             let content = notificationContent(
-                title: "Plan ending soon",
+                title: String(localized: "Plan ending soon"),
                 body: "Your safer session plan ends in \(label). Check water, transport, and your limits now.",
-                discreetBody: "Your private plan has a timing reminder.",
+                discreetBody: String(localized: "Your private plan has a timing reminder."),
                 destination: .saferPlan,
                 categoryIdentifier: "CHECKIN"
             )
@@ -469,7 +469,7 @@ final class NotificationService {
             let content = notificationContent(
                 title: reminder.1,
                 body: reminder.2,
-                discreetBody: "A private medication reminder is available.",
+                discreetBody: String(localized: "A private medication reminder is available."),
                 destination: .saferPlan
             )
 
@@ -496,9 +496,9 @@ final class NotificationService {
 
         while date < endDate, index < maxCheckIns {
             let content = notificationContent(
-                title: "Gentle safety check",
+                title: String(localized: "Gentle safety check"),
                 body: checkInMessages[index % checkInMessages.count],
-                discreetBody: "A private safety check is available.",
+                discreetBody: String(localized: "A private safety check is available."),
                 destination: destination,
                 categoryIdentifier: "CHECKIN"
             )
@@ -523,9 +523,9 @@ final class NotificationService {
 
     private func schedulePostPlanRedoseCheck(planID: UUID, date: Date) {
         let content = notificationContent(
-            title: "Pause before adding more",
-            body: "Your planned ending time has passed. Pause first: are you safe, supported, and still choosing what protects you tomorrow?",
-            discreetBody: "A private timing check is available.",
+            title: String(localized: "Pause before adding more"),
+            body: String(localized: "Your planned ending time has passed. Pause first: are you safe, supported, and still choosing what protects you tomorrow?"),
+            discreetBody: String(localized: "A private timing check is available."),
             destination: .timers,
             categoryIdentifier: "CHECKIN"
         )
@@ -536,6 +536,59 @@ final class NotificationService {
             trigger: UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval(for: date), repeats: false)
         )
         center.add(request)
+    }
+
+    func schedulePEPWindowReminders(entry: NightEntry) {
+        clearPEPWindowReminders()
+        guard entry.pepDeadline > .now else { return }
+
+        let calendar = Calendar.current
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: .now) ?? .now
+
+        // Morning reminder at 9am
+        let morningComponents = calendar.dateComponents([.year, .month, .day], from: tomorrow)
+        var morning = DateComponents()
+        morning.year = morningComponents.year
+        morning.month = morningComponents.month
+        morning.day = morningComponents.day
+        morning.hour = 9
+        morning.minute = 0
+
+        // Afternoon reminder at 3pm
+        var afternoon = morning
+        afternoon.hour = 15
+
+        let deadlineString = entry.pepDeadline.formatted(date: .abbreviated, time: .shortened)
+
+        let morningContent = notificationContent(
+            title: String(localized: "PEP time window is open"),
+            body: "A recent log may indicate a risk. Contact a doctor or sexual health clinic today. Window closes \(deadlineString).",
+            discreetTitle: String(localized: "ChillMate"),
+            discreetBody: String(localized: "A private health reminder is waiting for you."),
+            destination: .emergency
+        )
+        let morningContent2 = notificationContent(
+            title: String(localized: "PEP window still open"),
+            body: "You still have time to speak with a clinician before \(deadlineString). Don't wait longer than needed.",
+            discreetTitle: String(localized: "ChillMate"),
+            discreetBody: String(localized: "A private health follow-up is available."),
+            destination: .emergency
+        )
+
+        center.add(UNNotificationRequest(
+            identifier: "chillmate.pep.morning",
+            content: morningContent,
+            trigger: UNCalendarNotificationTrigger(dateMatching: morning, repeats: false)
+        ))
+        center.add(UNNotificationRequest(
+            identifier: "chillmate.pep.afternoon",
+            content: morningContent2,
+            trigger: UNCalendarNotificationTrigger(dateMatching: afternoon, repeats: false)
+        ))
+    }
+
+    func clearPEPWindowReminders() {
+        center.removePendingNotificationRequests(withIdentifiers: ["chillmate.pep.morning", "chillmate.pep.afternoon"])
     }
 
     func clearScheduledNotifications() {
@@ -569,7 +622,7 @@ private extension NotificationService {
         case 4...6:
             return "You have logged \(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person."
         case 7...9:
-            return "ChillMate has logged \(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, GGD, or GP can help — without judgment."
+            return "ChillMate has logged \(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, GGD, or GP can help, without judgment."
         default:
             return "You have logged \(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, GGD, or counselor can support you."
         }

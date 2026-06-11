@@ -41,6 +41,8 @@ struct LogNightSheet: View {
     @State private var memoryConsentConcern = false
     @State private var memoryNeedsHelp = false
     @State private var memoryNotes = ""
+    @State private var isShowingMemoryGapAlert = false
+    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
     @State private var note = ""
     @State private var attachedLocation: LoggedLocation?
     @State private var locationMessage: String?
@@ -170,18 +172,6 @@ struct LogNightSheet: View {
                                 columns: columns
                             )
 
-                            let interactionWarnings = SubstanceInteractionChecker.warnings(for: selectedSubstances)
-                            if !interactionWarnings.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Label("Combination risks", systemImage: "exclamationmark.triangle.fill")
-                                        .font(.headline)
-                                        .foregroundStyle(.orange)
-                                    SubstanceInteractionCard(warnings: interactionWarnings)
-                                }
-                                .padding(16)
-                                .glassSurface(radius: 28, tint: .orange.opacity(0.08))
-                            }
-
                             TriggerMapCard(selectedTriggers: $selectedTriggers)
 
                             WhatChangedInputCard(selectedReasons: $selectedChangeReasons)
@@ -194,6 +184,15 @@ struct LogNightSheet: View {
                                 needsHelp: $memoryNeedsHelp,
                                 notes: $memoryNotes
                             )
+                            .onChange(of: memoryInjuries) { _, val in
+                                if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
+                            }
+                            .onChange(of: memoryConsentConcern) { _, val in
+                                if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
+                            }
+                            .onChange(of: memoryNeedsHelp) { _, val in
+                                if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
+                            }
                         } else {
                             SkippedNightMessage()
                         }
@@ -247,6 +246,21 @@ struct LogNightSheet: View {
             }
             .edgeSwipeBack(attemptDismiss)
             .endEditingOnTap()
+            .alert("You may need support right now", isPresented: $isShowingMemoryGapAlert) {
+                if !trustedContactPhone.isEmpty {
+                    Button("Call trusted contact") {
+                        guard let url = URL(string: "tel://\(trustedContactPhone.filter { $0.isNumber || $0 == "+" })") else { return }
+                        UIApplication.shared.open(url)
+                    }
+                }
+                Button("Call 112") {
+                    guard let url = URL(string: "tel://112") else { return }
+                    UIApplication.shared.open(url)
+                }
+                Button("I'm okay for now", role: .cancel) { }
+            } message: {
+                Text("It sounds like something serious may have happened. You don't have to deal with this alone.")
+            }
         }
     }
 
@@ -429,8 +443,7 @@ private struct LocationCaptureCard: View {
                             .font(.subheadline.weight(.semibold))
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.bordered)
-                    .tint(.teal)
+                    .buttonStyle(ChillPillButtonStyle(prominent: false))
                     .disabled(isFetching)
 
                     Button(role: .destructive, action: remove) {
@@ -458,8 +471,7 @@ private struct LocationCaptureCard: View {
                     }
                     .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.teal)
+                .buttonStyle(ChillPillButtonStyle(prominent: true))
                 .disabled(isFetching)
             }
 
@@ -535,8 +547,7 @@ private struct SexPartnerDetailsCard: View {
                         .font(.subheadline.weight(.bold))
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(Color.chillPrimary)
+                .buttonStyle(ChillPillButtonStyle(prominent: true))
 
                 TextField("Name or nickname", text: $partnerName)
                     .textFieldStyle(.plain)
@@ -598,7 +609,7 @@ private struct SexPartnerDetailsCard: View {
                                 } label: {
                                     Image(systemName: "xmark.circle.fill")
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(ChillPlainButtonStyle())
                                 .foregroundStyle(Color.chillSecondary)
                             }
                             .padding(10)
@@ -644,13 +655,13 @@ private struct SexPartnerDetailsCard: View {
     private func positionSummary(for partner: SexPartnerRecord) -> String {
         switch (partner.theyWerePenetrated, partner.userWasPenetrated) {
         case (true, true):
-            "Both top and bottom recorded"
+            String(localized: "Both top and bottom recorded")
         case (true, false):
-            "They were the bottom"
+            String(localized: "They were the bottom")
         case (false, true):
-            "You were the bottom"
+            String(localized: "You were the bottom")
         case (false, false):
-            "No position detail saved"
+            String(localized: "No position detail saved")
         }
     }
 }
@@ -690,14 +701,14 @@ private struct TimeFrameCard: View {
 
             VStack(spacing: 12) {
                 DatePicker(
-                    "Started",
+                    String(localized: "Started"),
                     selection: $startDate,
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 .tint(Color.chillAccentTeal)
 
                 DatePicker(
-                    "Ended",
+                    String(localized: "Ended"),
                     selection: $endDate,
                     in: startDate...,
                     displayedComponents: [.date, .hourAndMinute]
@@ -780,7 +791,7 @@ private struct SubstancePicker: View {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title3)
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(ChillPlainButtonStyle())
                             .foregroundStyle(Color.chillMint)
                         }
 
@@ -801,7 +812,7 @@ private struct SubstancePicker: View {
                                             .padding(.vertical, 6)
                                             .glassSurface(radius: 14, tint: Color.chillAccentTeal.opacity(0.12))
                                     }
-                                    .buttonStyle(.plain)
+                                    .buttonStyle(ChillPlainButtonStyle())
                                 }
                             }
                         }
@@ -845,7 +856,7 @@ private struct SubstanceChip: View {
             HStack(spacing: 8) {
                 Image(systemName: substance.symbolName)
                     .font(.caption.weight(.bold))
-                Text(substance.rawValue)
+                Text(substance.localizedDisplayName)
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.78)
@@ -854,7 +865,7 @@ private struct SubstanceChip: View {
             .frame(maxWidth: .infinity, minHeight: 42)
             .padding(.horizontal, 10)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
         .glassSurface(
             radius: 21,
             tint: isSelected ? substance.tint.opacity(0.32) : .black.opacity(0.04),
@@ -959,6 +970,10 @@ private struct MemoryGapProtocolCard: View {
     @Binding var needsHelp: Bool
     @Binding var notes: String
 
+    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
+    @Environment(\.openURL) private var openURL
+    @State private var showSafetyCheck = false
+
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             Toggle(isOn: $reportedMemoryGap) {
@@ -1000,6 +1015,28 @@ private struct MemoryGapProtocolCard: View {
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+        .onChange(of: [injuries, consentConcern, needsHelp]) { oldValue, newValue in
+            // Surface an actionable check the moment a concerning field is turned on
+            // (being "safe right now" never triggers it).
+            if newValue.contains(true) && !oldValue.contains(true) {
+                showSafetyCheck = true
+            }
+        }
+        .alert("Do you want to reach out for help?", isPresented: $showSafetyCheck) {
+            Button("Call 112", role: .destructive) { call("112") }
+            if !trustedContactPhone.isEmpty {
+                Button("Call trusted contact") { call(trustedContactPhone) }
+            }
+            Button("Do nothing", role: .cancel) { }
+        } message: {
+            Text("You marked something that may need attention. You can reach out now, or just keep going. This stays private.")
+        }
+    }
+
+    private func call(_ number: String) {
+        let digits = number.filter { $0.isNumber || $0 == "+" }
+        guard let url = URL(string: "tel://\(digits)") else { return }
+        openURL(url)
     }
 }
 
@@ -1018,7 +1055,7 @@ private struct SelectableTextChip: View {
                 .padding(.vertical, 7)
                 .glassSurface(radius: 16, tint: isSelected ? tint.opacity(0.20) : Color.black.opacity(0.04), interactive: true)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
@@ -1290,13 +1327,13 @@ enum LocationLookupError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .servicesDisabled:
-            "Location services are turned off for this device."
+            String(localized: "Location services are turned off for this device.")
         case .permissionDenied:
-            "Location permission is needed to attach your current location."
+            String(localized: "Location permission is needed to attach your current location.")
         case .locationUnavailable:
-            "ChillMate could not find your current location."
+            String(localized: "ChillMate could not find your current location.")
         case .requestInProgress:
-            "ChillMate is already checking your location."
+            String(localized: "ChillMate is already checking your location.")
         }
     }
 }

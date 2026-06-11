@@ -18,7 +18,7 @@ struct SubstanceInteraction {
 
         var label: String {
             switch self {
-            case .caution: "Worth noting"
+            case .caution: String(localized: "Worth noting")
             case .serious: "Significant risk"
             case .critical: "High-risk combination"
             }
@@ -43,67 +43,67 @@ enum SubstanceInteractionChecker {
         SubstanceInteraction(
             substances: [.ghb, .alcohol],
             level: .critical,
-            warning: "GHB and alcohol together strongly increase the risk of unconsciousness and breathing problems. This combination has caused deaths. Seek immediate help if someone cannot be woken."
+            warning: String(localized: "GHB and alcohol together strongly increase the risk of unconsciousness and breathing problems. This combination has caused deaths. Seek immediate help if someone cannot be woken.")
         ),
         SubstanceInteraction(
             substances: [.gbl, .alcohol],
             level: .critical,
-            warning: "GBL converts to GHB in the body. Combined with alcohol, the risk of losing consciousness or stopping breathing rises sharply. This is a life-threatening combination."
+            warning: String(localized: "GBL converts to GHB in the body. Combined with alcohol, the risk of losing consciousness or stopping breathing rises sharply. This is a life-threatening combination.")
         ),
         SubstanceInteraction(
             substances: [.ghb, .gbl],
             level: .critical,
-            warning: "GHB and GBL are effectively the same substance. Combining them stacks the dose unpredictably and can cause sudden unconsciousness."
+            warning: String(localized: "GHB and GBL are effectively the same substance. Combining them stacks the dose unpredictably and can cause sudden unconsciousness.")
         ),
         SubstanceInteraction(
             substances: [.poppers, .kamagra],
             level: .critical,
-            warning: "Poppers and Kamagra together can cause a sudden, dangerous drop in blood pressure. This can lead to fainting, stroke, or cardiac arrest. Do not combine these."
+            warning: String(localized: "Poppers and Kamagra together can cause a sudden, dangerous drop in blood pressure. This can lead to fainting, stroke, or cardiac arrest. Do not combine these.")
         ),
         SubstanceInteraction(
             substances: [.poppers, .viagra],
             level: .critical,
-            warning: "Poppers and Viagra together can cause a dangerous blood pressure drop. This is a high-risk combination — avoid it."
+            warning: String(localized: "Poppers and Viagra together can cause a dangerous blood pressure drop. This is a high-risk combination. Avoid it.")
         ),
         SubstanceInteraction(
             substances: [.ghb, .ketamine],
             level: .serious,
-            warning: "GHB and ketamine combine depressant and dissociative effects. This increases the risk of losing the ability to respond to problems around you."
+            warning: String(localized: "GHB and ketamine combine depressant and dissociative effects. This increases the risk of losing the ability to respond to problems around you.")
         ),
         SubstanceInteraction(
             substances: [.gbl, .ketamine],
             level: .serious,
-            warning: "GBL and ketamine together carry a higher risk of losing control and difficulty getting help."
+            warning: String(localized: "GBL and ketamine together carry a higher risk of losing control and difficulty getting help.")
         ),
         SubstanceInteraction(
             substances: [.alcohol, .ketamine],
             level: .serious,
-            warning: "Alcohol and ketamine together combine depressant effects and can cause deeper disorientation and breathing problems."
+            warning: String(localized: "Alcohol and ketamine together combine depressant effects and can cause deeper disorientation and breathing problems.")
         ),
         SubstanceInteraction(
             substances: [.cocaine, .mdma],
             level: .serious,
-            warning: "Cocaine and MDMA both strain the heart. Combined, the risk of irregular heartbeat and overheating is significantly higher."
+            warning: String(localized: "Cocaine and MDMA both strain the heart. Combined, the risk of irregular heartbeat and overheating is significantly higher.")
         ),
         SubstanceInteraction(
             substances: [.cocaine, .threeMMC],
             level: .serious,
-            warning: "Cocaine and 3-MMC together stack stimulant effects on the heart and raise the risk of cardiac problems and anxiety."
+            warning: String(localized: "Cocaine and 3-MMC together stack stimulant effects on the heart and raise the risk of cardiac problems and anxiety.")
         ),
         SubstanceInteraction(
             substances: [.mdma, .threeMMC],
             level: .serious,
-            warning: "MDMA and 3-MMC together increase stimulant and serotonergic load. The combination raises heart rate, temperature, and the chance of a difficult crash."
+            warning: String(localized: "MDMA and 3-MMC together increase stimulant and serotonergic load. The combination raises heart rate, temperature, and the chance of a difficult crash.")
         ),
         SubstanceInteraction(
             substances: [.ghb, .cocaine],
             level: .caution,
-            warning: "Stimulants can mask GHB effects, making it harder to notice when a dose is too high. This increases the risk of accidental overdose."
+            warning: String(localized: "Stimulants can mask GHB effects, making it harder to notice when a dose is too high. This increases the risk of accidental overdose.")
         ),
         SubstanceInteraction(
             substances: [.gbl, .cocaine],
             level: .caution,
-            warning: "Stimulants can mask GBL effects, making it harder to notice when a dose is too high."
+            warning: String(localized: "Stimulants can mask GBL effects, making it harder to notice when a dose is too high.")
         ),
     ]
 

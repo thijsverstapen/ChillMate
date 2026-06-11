@@ -215,8 +215,12 @@ struct DrugTimerLiveActivityWidget: Widget {
                 Image(systemName: "timer")
                     .foregroundStyle(.cyan)
             } compactTrailing: {
-                TimerText(endDate: context.state.endsAt)
+                // Show the (fixed) end time rather than a ticking H:MM:SS countdown.
+                // The countdown reserves a wide area and stretches the Dynamic Island
+                // pill; the end time is content-sized and always correct without ticking.
+                Text(context.state.endsAt, style: .time)
                     .font(.caption2.weight(.bold))
+                    .foregroundStyle(.cyan)
             } minimal: {
                 Image(systemName: context.state.redoseNudgeActive ? "hand.raised.fill" : "timer")
                     .foregroundStyle(context.state.redoseNudgeActive ? .orange : .cyan)

@@ -132,33 +132,33 @@ enum Substance: String, CaseIterable, Identifiable {
     var informationSummary: String {
         switch self {
         case .cannabis:
-            "Can affect memory, coordination, anxiety, and sleep. Effects vary strongly by route and strength."
+            String(localized: "Can affect memory, coordination, anxiety, and sleep. Effects vary strongly by route and strength.")
         case .alcohol:
-            "Can lower boundaries and coordination. Mixing with sedatives, GHB/GBL, or other depressants can be dangerous."
+            String(localized: "Can lower boundaries and coordination. Mixing with sedatives, GHB/GBL, or other depressants can be dangerous.")
         case .mdma:
-            "Stimulant/empathogen effects can include warmth, jaw tension, overheating, and a next-day dip."
+            String(localized: "Stimulant/empathogen effects can include warmth, jaw tension, overheating, and a next-day dip.")
         case .threeMMC:
-            "A stimulant cathinone. Can raise heart rate, reduce sleep, and make it harder to pause."
+            String(localized: "A stimulant cathinone. Can raise heart rate, reduce sleep, and make it harder to pause.")
         case .ketamine:
-            "Dissociative effects can affect balance, memory, and consent clarity."
+            String(localized: "Dissociative effects can affect balance, memory, and consent clarity.")
         case .ghb:
-            "Effects can become unpredictable quickly. Mixing with alcohol or sedatives can cause unconsciousness or breathing problems."
+            String(localized: "Effects can become unpredictable quickly. Mixing with alcohol or sedatives can cause unconsciousness or breathing problems.")
         case .gbl:
-            "Converts to GHB in the body and carries similar risks, especially with alcohol or sedatives."
+            String(localized: "Converts to GHB in the body and carries similar risks, especially with alcohol or sedatives.")
         case .cocaine:
-            "Stimulant effects can strain the heart, reduce sleep, and increase impulsive decisions."
+            String(localized: "Stimulant effects can strain the heart, reduce sleep, and increase impulsive decisions.")
         case .poppers:
-            "Short-acting vasodilator. Avoid with erectile dysfunction medication because blood pressure can drop sharply."
+            String(localized: "Short-acting vasodilator. Avoid with erectile dysfunction medication because blood pressure can drop sharply.")
         case .kamagra:
-            "Often contains sildenafil. Avoid with poppers or nitrates because blood pressure can drop dangerously."
+            String(localized: "Often contains sildenafil. Avoid with poppers or nitrates because blood pressure can drop dangerously.")
         case .viagra:
-            "Sildenafil for erections. Avoid with poppers or nitrates because blood pressure can drop dangerously."
+            String(localized: "Sildenafil for erections. Avoid with poppers or nitrates because blood pressure can drop dangerously.")
         case .psychedelics:
-            "Can strongly change perception and emotions. Setting, support, and mental state matter."
+            String(localized: "Can strongly change perception and emotions. Setting, support, and mental state matter.")
         case .unknown:
-            "Unknown substances are harder to predict. Avoid mixing and seek help if something feels wrong."
+            String(localized: "Unknown substances are harder to predict. Avoid mixing and seek help if something feels wrong.")
         case .other:
-            "Use this only for private reflection when something is not listed."
+            String(localized: "Use this only for private reflection when something is not listed.")
         }
     }
 
@@ -212,20 +212,20 @@ enum Substance: String, CaseIterable, Identifiable {
 
     var seekHelpSigns: [String] {
         [
-            "Chest pain, seizure, fainting, or cannot be woken",
-            "Blue lips, slow breathing, overheating, or severe confusion",
-            "Severe panic, hallucinations, or feeling unsafe with people nearby"
+            String(localized: "Chest pain, seizure, fainting, or cannot be woken"),
+            String(localized: "Blue lips, slow breathing, overheating, or severe confusion"),
+            String(localized: "Severe panic, hallucinations, or feeling unsafe with people nearby")
         ]
     }
 
     var referenceLabel: String {
         switch self {
         case .kamagra, .viagra:
-            "Apotheek.nl sildenafil"
+            String(localized: "Apotheek.nl sildenafil")
         case .unknown, .other:
-            "No source"
+            String(localized: "No source")
         default:
-            "Drugsinfo.nl"
+            String(localized: "Drugsinfo.nl")
         }
     }
 

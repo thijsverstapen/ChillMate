@@ -10,6 +10,7 @@ struct DashboardView: View {
     @AppStorage("healthKitHRVReadEnabled") private var healthKitHRVReadEnabled = false
     @AppStorage("reductionGoalSessions") private var reductionGoalSessions = 0
     @AppStorage("reductionGoalCountSubstanceOnly") private var reductionGoalCountSubstanceOnly = true
+    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
     @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
     @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
     @Query(sort: \SaferSessionPlan.createdAt, order: .reverse) private var plans: [SaferSessionPlan]
@@ -145,6 +146,13 @@ struct DashboardView: View {
                 lastDailyRecoveryScore = value
                 updateWidgetData(metrics: metrics)
             }
+            .onChange(of: metrics.pepConcernEntry?.id) { _, entryID in
+                if let entry = metrics.pepConcernEntry, notificationsEnabled {
+                    NotificationService.shared.schedulePEPWindowReminders(entry: entry)
+                } else {
+                    NotificationService.shared.clearPEPWindowReminders()
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestQuickSkip)) { _ in
                 quickSkip()
             }
@@ -169,7 +177,7 @@ struct DashboardView: View {
                             .frame(width: 36, height: 36)
                             .glassSurface(radius: 18, tint: .white.opacity(0.34), interactive: true)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ChillPlainButtonStyle())
                     .accessibilityLabel("Panic close app")
                 }
             }
@@ -188,8 +196,7 @@ struct DashboardView: View {
             }
             .fullScreenCover(item: $activeCarePage) { page in
                 switch page {
-                case .safetyAutopilot:
-                    SafetyAutopilotView()
+                // Modal-only pages keep their own NavigationStack.
                 case .saferPlanning:
                     SaferSessionPlanView()
                 case .stdTests:
@@ -208,14 +215,18 @@ struct DashboardView: View {
                     CombinationRiskCheckerView()
                 case .consentBoundaries:
                     ConsentBoundariesView()
+                // Pages shared with the More hub are de-nested; host them in a
+                // navigation stack with a close control for this modal context.
+                case .safetyAutopilot:
+                    CareCoverHost { SafetyAutopilotView() }
                 case .recoveryMode:
-                    RecoveryModeView()
+                    CareCoverHost { RecoveryModeView() }
                 case .privateInsights:
-                    PrivateInsightsView()
+                    CareCoverHost { PrivateInsightsView() }
                 case .helperBridge:
-                    ProfessionalHelperBridgeView()
+                    CareCoverHost { ProfessionalHelperBridgeView() }
                 case .drugChecking:
-                    DrugCheckingEducationView()
+                    CareCoverHost { DrugCheckingEducationView() }
                 }
             }
             .fullScreenCover(isPresented: $isPrivacyScreenActive) {
@@ -414,7 +425,7 @@ private struct DailyScoreStatusPill: View {
                 .foregroundStyle(Color.chillText)
                 .lineLimit(1)
 
-            Text(score.isActive ? score.label : "Log a Chill to activate your daily score")
+            Text(score.isActive ? score.label : String(localized: "Log a Chill to activate your daily score"))
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .multilineTextAlignment(.center)
@@ -490,7 +501,7 @@ private struct CalendarOverviewButton: View {
             .padding(16)
             .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.09), interactive: true)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
     }
 }
 
@@ -642,8 +653,8 @@ struct CalendarOverviewView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 18) {
                         PageHeader(
-                            title: "Calendar",
-                            subtitle: "Tap a day to see logs, skipped Chills, substances, and notes in one place.",
+                            title: String(localized: "Calendar"),
+                            subtitle: String(localized: "Tap a day to see logs, skipped Chills, substances, and notes in one place."),
                             symbol: "calendar",
                             tint: Color.chillPrimary
                         )
@@ -712,7 +723,7 @@ struct CalendarOverviewView: View {
                             )
 
                             if selectedEntries.isEmpty {
-                                EmptyGlassState(text: "No entries for this day.")
+                                EmptyGlassState(text: String(localized: "No entries for this day."))
                             } else {
                                 ForEach(selectedEntries) { entry in
                                     TimelineRow(entry: entry, delete: delete)
@@ -721,7 +732,7 @@ struct CalendarOverviewView: View {
 
                             if !selectedJournalEntries.isEmpty {
                                 VStack(alignment: .leading, spacing: 10) {
-                                    SectionTitle(title: "Journal", symbol: "book.closed.fill")
+                                    SectionTitle(title: String(localized: "Journal"), symbol: "book.closed.fill")
 
                                     ForEach(selectedJournalEntries) { entry in
                                         CalendarJournalCard(entry: entry)
@@ -734,7 +745,7 @@ struct CalendarOverviewView: View {
                             SectionTitle(title: "Substance tags in \(monthTitle)", symbol: "pills.fill")
 
                             if data.monthlySubstanceCounts.isEmpty {
-                                EmptyGlassState(text: "No substance tags in this month.")
+                                EmptyGlassState(text: String(localized: "No substance tags in this month."))
                             } else {
                                 LazyVStack(spacing: 12) {
                                     ForEach(data.monthlySubstanceCounts.prefix(8), id: \.name) { item in
@@ -749,10 +760,10 @@ struct CalendarOverviewView: View {
                         DrugDoseHistoryGraph(timers: data.monthTimers, entries: data.monthEntries, monthDays: data.monthDays)
 
                         VStack(alignment: .leading, spacing: 12) {
-                            SectionTitle(title: "Month timeline", symbol: "list.bullet.rectangle")
+                            SectionTitle(title: String(localized: "Month timeline"), symbol: "list.bullet.rectangle")
 
                             if data.monthEntries.isEmpty {
-                                EmptyGlassState(text: "No entries in this month.")
+                                EmptyGlassState(text: String(localized: "No entries in this month."))
                             } else {
                                 LazyVStack(spacing: 12) {
                                     ForEach(data.monthEntries) { entry in
@@ -860,7 +871,7 @@ private struct CalendarDayCell: View {
                 in: RoundedRectangle(cornerRadius: 14, style: .continuous)
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
     }
 }
 
@@ -899,7 +910,7 @@ private struct ReductionGoalProgressCard: View {
                 Text("/ \(goal)")
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
-                Text(substanceOnly ? "substance sessions this month" : "sessions this month")
+                Text(substanceOnly ? String(localized: "substance sessions this month") : String(localized: "sessions this month"))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
             }
@@ -919,7 +930,7 @@ private struct ReductionGoalProgressCard: View {
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(.orange)
             } else {
-                Text("\(goal - currentMonthCount) \(goal - currentMonthCount == 1 ? "session" : "sessions") remaining this month.")
+                Text("\(goal - currentMonthCount) \(goal - currentMonthCount == 1 ? String(localized: "session") : String(localized: "sessions")) remaining this month.")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
             }
@@ -989,19 +1000,25 @@ private struct RecoveryStreakBadge: View {
 
     private var displayText: String {
         if days >= 365 * 4 {
-            return "4+ years"
+            return String(localized: "4+ years")
         }
 
         if days >= 365 {
             let years = days / 365
             let remainingDays = days % 365
             if remainingDays == 0 {
-                return "\(years) \(years == 1 ? "year" : "years")"
+                return years == 1
+                    ? String(localized: "\(years) year")
+                    : String(localized: "\(years) years")
             }
-            return "\(years) \(years == 1 ? "year" : "years"), \(remainingDays) d"
+            return years == 1
+                ? String(localized: "\(years) year, \(remainingDays) d")
+                : String(localized: "\(years) years, \(remainingDays) d")
         }
 
-        return "\(days) \(days == 1 ? "day" : "days")"
+        return days == 1
+            ? String(localized: "\(days) day")
+            : String(localized: "\(days) days")
     }
 
     private var isMilestoneDay: Bool {
@@ -1027,7 +1044,7 @@ private struct RecoveryStreakBadge: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.72)
 
-                            Text("without logged substance use")
+                            Text(String(localized: "without logged substance use"))
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(Color.chillSecondary)
                         }
@@ -1054,7 +1071,7 @@ private struct RecoveryStreakBadge: View {
                 .padding(18)
                 .glassSurface(radius: 30, tint: tint.opacity(0.12), interactive: true)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ChillPlainButtonStyle())
             .accessibilityLabel("Open calendar for recovery streak")
 
             if isMilestoneDay || days >= 30 {
@@ -1069,7 +1086,7 @@ private struct RecoveryStreakBadge: View {
                         .padding(10)
                         .glassSurface(radius: 18, tint: tint.opacity(0.10), interactive: true)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ChillPlainButtonStyle())
             }
         }
         .sheet(isPresented: $isShowingMilestoneShare) {
@@ -1082,17 +1099,17 @@ private struct RecoveryStreakBadge: View {
     private var encouragement: String {
         switch days {
         case 0...2:
-            "Start gentle. One steady choice already counts."
+            String(localized: "Start gentle. One steady choice already counts.")
         case 3...6:
-            "You are creating space for recovery."
+            String(localized: "You are creating space for recovery.")
         case 7...29:
-            "A full week changes how your body can rest."
+            String(localized: "A full week changes how your body can rest.")
         case 30...89:
-            "Strong streak. Your body is building real recovery."
+            String(localized: "Strong streak. Your body is building real recovery.")
         case 90...364:
-            "Three months of steady choices. That is significant."
+            String(localized: "Three months of steady choices. That is significant.")
         default:
-            "Over a year of sustained recovery. Remarkable consistency."
+            String(localized: "Over a year of sustained recovery. Remarkable consistency.")
         }
     }
 }
@@ -1129,17 +1146,17 @@ private struct DailyRecoveryScore {
         if !hasEverLoggedSubstances {
             isActive = false
             value = 0
-            label = "not active"
+            label = String(localized: "not active")
             emoji = "😄"
             factors = [
-                Factor(name: "Daily score", caption: "make a substance-related log to activate"),
-                Factor(name: "Sleep", caption: "starts after activation"),
-                Factor(name: "Hydration", caption: "starts after activation"),
-                Factor(name: "Food", caption: "starts after activation"),
-                Factor(name: "Substances", caption: "no substance use logged"),
-                Factor(name: "Streak", caption: "\(recoveryStreakDays) d"),
-                Factor(name: "Symptoms", caption: "starts after activation"),
-                Factor(name: "HRV", caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
+                Factor(name: String(localized: "Daily score"), caption: String(localized: "make a substance-related log to activate")),
+                Factor(name: String(localized: "Sleep"), caption: String(localized: "starts after activation")),
+                Factor(name: String(localized: "Hydration"), caption: String(localized: "starts after activation")),
+                Factor(name: String(localized: "Food"), caption: String(localized: "starts after activation")),
+                Factor(name: String(localized: "Substances"), caption: String(localized: "no substance use logged")),
+                Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
+                Factor(name: String(localized: "Symptoms"), caption: String(localized: "starts after activation")),
+                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
             ]
             return
         }
@@ -1159,14 +1176,14 @@ private struct DailyRecoveryScore {
         label = Self.label(for: total)
         emoji = Self.emoji(for: total)
         factors = [
-            Factor(name: "Sleep", caption: latest?.sleptYet == true ? "\(latest?.sleepHours.formatted(.number.precision(.fractionLength(0...1))) ?? "0") h" : "not logged"),
-            Factor(name: "Hydration", caption: latest?.aftercareDrankWater == true ? "checked" : "unknown"),
-            Factor(name: "Food", caption: latest?.aftercareAteFood == true ? "checked" : "unknown"),
-            Factor(name: "Substances", caption: latest?.substances.isEmpty == false ? "logged" : "clear"),
-            Factor(name: "Anxiety", caption: Self.anxietyCaption(latest)),
-            Factor(name: "Streak", caption: "\(recoveryStreakDays) d"),
-            Factor(name: "Symptoms", caption: latest?.aftercareSymptoms.isEmpty == false ? "\(latest?.aftercareSymptoms.count ?? 0) selected" : "none"),
-            Factor(name: "HRV", caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
+            Factor(name: String(localized: "Sleep"), caption: latest?.sleptYet == true ? "\(latest?.sleepHours.formatted(.number.precision(.fractionLength(0...1))) ?? "0") h" : "not logged"),
+            Factor(name: String(localized: "Hydration"), caption: latest?.aftercareDrankWater == true ? "checked" : "unknown"),
+            Factor(name: String(localized: "Food"), caption: latest?.aftercareAteFood == true ? "checked" : "unknown"),
+            Factor(name: String(localized: "Substances"), caption: latest?.substances.isEmpty == false ? "logged" : "clear"),
+            Factor(name: String(localized: "Anxiety"), caption: Self.anxietyCaption(latest)),
+            Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
+            Factor(name: String(localized: "Symptoms"), caption: latest?.aftercareSymptoms.isEmpty == false ? "\(latest?.aftercareSymptoms.count ?? 0) selected" : "none"),
+            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
         ]
     }
 
@@ -1257,13 +1274,13 @@ private struct DailyRecoveryScore {
     private static func label(for value: Int) -> String {
         switch value {
         case 0..<35:
-            "needs care"
+            String(localized: "needs care")
         case 35..<60:
-            "gentle pace"
+            String(localized: "gentle pace")
         case 60..<80:
-            "recovering"
+            String(localized: "recovering")
         default:
-            "steady"
+            String(localized: "steady")
         }
     }
 
@@ -1437,8 +1454,7 @@ private struct RealityCheckCard: View {
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: 48)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(Color.chillPrimary)
+            .buttonStyle(ChillPillButtonStyle(prominent: true))
         }
         .padding(18)
         .glassSurface(radius: 30, tint: Color.chillDarkBackground.opacity(0.10), interactive: true)
@@ -1469,9 +1485,11 @@ private struct MilestoneShareSheet: View {
     private var milestoneText: String {
         if days >= 365 {
             let years = days / 365
-            return "\(years) \(years == 1 ? "year" : "years")"
+            return years == 1
+                ? String(localized: "\(years) year")
+                : String(localized: "\(years) years")
         }
-        return "\(days) days"
+        return String(localized: "\(days) days")
     }
 
     private var cardView: some View {
@@ -1498,7 +1516,7 @@ private struct MilestoneShareSheet: View {
                         .font(.system(size: 36, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
 
-                    Text("without logged substance use")
+                    Text(String(localized: "without logged substance use"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.white.opacity(0.62))
 
@@ -1520,14 +1538,14 @@ private struct MilestoneShareSheet: View {
             Color.black.opacity(0.84).ignoresSafeArea()
 
             VStack(spacing: 20) {
-                Text("Share milestone")
+                Text(String(localized: "Share milestone"))
                     .font(.headline.weight(.bold))
                     .foregroundStyle(Color.chillText)
 
                 cardView
                     .frame(width: 300, height: 300)
 
-                Text("Sharing this image reveals only your streak — no substances, dates, or other details.")
+                Text(String(localized: "Sharing this image reveals only your streak: no substances, dates, or other details."))
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
                     .multilineTextAlignment(.center)
@@ -1536,23 +1554,21 @@ private struct MilestoneShareSheet: View {
 
                 if let img = renderedImage {
                     ShareLink(item: img, preview: SharePreview("\(milestoneText) milestone", image: img)) {
-                        Label("Share milestone card", systemImage: "square.and.arrow.up")
+                        Label(String(localized: "Share milestone card"), systemImage: "square.and.arrow.up")
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(tint)
+                    .buttonStyle(ChillPillButtonStyle(prominent: true))
                     .padding(.horizontal, 28)
                 } else {
-                    Button("Prepare card") {
+                    Button(String(localized: "Prepare card")) {
                         renderCard()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(tint)
+                    .buttonStyle(ChillPillButtonStyle(prominent: true))
                     .padding(.horizontal, 28)
                 }
 
-                Button("Done") { dismiss() }
+                Button(String(localized: "Done")) { dismiss() }
                     .foregroundStyle(Color.chillSecondary)
                     .padding(.bottom, 12)
             }
@@ -1584,30 +1600,30 @@ private struct ProfessionalHelpView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("Talk to someone")
+                        Text(String(localized: "Talk to someone"))
                             .font(.largeTitle.bold())
                             .foregroundStyle(palette.heroText)
 
-                        Text("A professional helper can talk through sex, substances, sleep, PrEP, consent, and safety without judgment.")
+                        Text(String(localized: "A professional helper can talk through sex, substances, sleep, PrEP, consent, and safety without judgment."))
                             .font(.callout)
                             .foregroundStyle(palette.heroSecondary)
                             .fixedSize(horizontal: false, vertical: true)
 
                         HelpResourceCard(
-                            title: "Sexual health clinic",
-                            detail: "Good for STI testing, PrEP, condoms, chemsex support, and safer-sex planning.",
+                            title: String(localized: "Sexual health clinic"),
+                            detail: String(localized: "Good for STI testing, PrEP, condoms, chemsex support, and safer-sex planning."),
                             symbol: "cross.case.fill"
                         )
 
                         HelpResourceCard(
-                            title: "GP or family doctor",
-                            detail: "Good for sleep, mood, substance concerns, medication interactions, and referrals.",
+                            title: String(localized: "GP or family doctor"),
+                            detail: String(localized: "Good for sleep, mood, substance concerns, medication interactions, and referrals."),
                             symbol: "stethoscope"
                         )
 
                         HelpResourceCard(
-                            title: "Counselor or addiction support",
-                            detail: "Good when patterns feel hard to change, risky, or emotionally heavy.",
+                            title: String(localized: "Counselor or addiction support"),
+                            detail: String(localized: "Good when patterns feel hard to change, risky, or emotionally heavy."),
                             symbol: "person.2.fill"
                         )
                     }
@@ -1715,7 +1731,7 @@ private struct TodayFocusCard: View {
             .padding(16)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
         .glassSurface(radius: 28, tint: .clear, interactive: true)
         .accessibilityLabel(action.accessibilityLabel)
     }
@@ -1760,8 +1776,8 @@ private struct SmartNextAction {
         calendar: Calendar = .current
     ) {
         if let timer = timers.first(where: { $0.endsAt > now }) {
-            title = "Timer running"
-            detail = "\(timer.substanceName) is still active. Check the timer before deciding anything else."
+            title = String(localized: "Timer running")
+            detail = String(localized: "\(timer.substanceName) is still active. Check the timer before deciding anything else.")
             symbol = "timer"
             tint = Color.chillIconAmber
             destination = .care(.drugTimers)
@@ -1769,8 +1785,8 @@ private struct SmartNextAction {
         }
 
         if let plan = plans.first(where: { $0.endingDate > now }) {
-            title = "Plan in progress"
-            detail = "Your plan ends around \(plan.endingDate.formatted(date: .omitted, time: .shortened)). Open it for check-ins and reminders."
+            title = String(localized: "Plan in progress")
+            detail = String(localized: "Your plan ends around \(plan.endingDate.formatted(date: .omitted, time: .shortened)). Open it for check-ins and reminders.")
             symbol = "checkmark.shield.fill"
             tint = Color.chillMint
             destination = .care(.saferPlanning)
@@ -1778,8 +1794,8 @@ private struct SmartNextAction {
         }
 
         if let pepEntry = metrics.pepConcernEntry {
-            title = "PEP time window"
-            detail = "A recent log may need quick sexual-health advice before \(pepEntry.pepDeadline.formatted(date: .abbreviated, time: .shortened))."
+            title = String(localized: "PEP time window")
+            detail = String(localized: "A recent log may need quick sexual-health advice before \(pepEntry.pepDeadline.formatted(date: .abbreviated, time: .shortened)).")
             symbol = "cross.case.fill"
             tint = Color.chillIconRed
             destination = .care(.emergency)
@@ -1787,8 +1803,8 @@ private struct SmartNextAction {
         }
 
         if let pendingTest = tests.first(where: { $0.resultsDueDate <= now && Self.hasPendingResult($0) }) {
-            title = "STI results due"
-            detail = "Your test from \(pendingTest.testDate.formatted(date: .abbreviated, time: .omitted)) is ready to update."
+            title = String(localized: "STI results due")
+            detail = String(localized: "Your test from \(pendingTest.testDate.formatted(date: .abbreviated, time: .omitted)) is ready to update.")
             symbol = "cross.case.fill"
             tint = Color.chillIconTeal
             destination = .care(.stdTests)
@@ -1796,8 +1812,8 @@ private struct SmartNextAction {
         }
 
         if let entry = entries.first(where: { Self.needsAftercare($0, now: now) }) {
-            title = "Morning-after check-in"
-            detail = "Check how you feel after \(entry.startDate.formatted(date: .abbreviated, time: .shortened))."
+            title = String(localized: "Morning-after check-in")
+            detail = String(localized: "Check how you feel after \(entry.startDate.formatted(date: .abbreviated, time: .shortened)).")
             symbol = "heart.text.square.fill"
             tint = Color.chillIconPink
             destination = .care(.aftercare)
@@ -1805,8 +1821,8 @@ private struct SmartNextAction {
         }
 
         if journalEntries.first(where: { calendar.isDateInToday($0.date) }) != nil {
-            title = "Today is saved"
-            detail = "You already have a journal entry for today. Review your calendar when you want context."
+            title = String(localized: "Today is saved")
+            detail = String(localized: "You already have a journal entry for today. Review your calendar when you want context.")
             symbol = "book.closed.fill"
             tint = Color.chillIconPurple
             destination = .calendar
@@ -1814,16 +1830,16 @@ private struct SmartNextAction {
         }
 
         if entries.first(where: { calendar.isDateInToday($0.date) }) == nil {
-            title = "Ready when you are"
-            detail = "No Chill has been logged today. Add one only if there is something worth saving."
+            title = String(localized: "Ready when you are")
+            detail = String(localized: "No Chill has been logged today. Add one only if there is something worth saving.")
             symbol = "plus.circle.fill"
             tint = Color.chillSecondaryBlue
             destination = .log
             return
         }
 
-        title = "Open your timeline"
-        detail = "See today next to earlier logs, timers, plans, STI tests, and journal notes."
+        title = String(localized: "Open your timeline")
+        detail = String(localized: "See today next to earlier logs, timers, plans, STI tests, and journal notes.")
         symbol = "calendar"
         tint = Color.chillSecondaryBlue
         destination = .calendar
@@ -1861,10 +1877,10 @@ private struct MetricsGrid: View {
             WellnessScoreRow(score: dailyScore, recoveryStreakDays: recoveryStreakDays, action: openRecoveryStreak)
 
             LazyVGrid(columns: columns, spacing: 8) {
-                MetricCard(title: "Logged", value: "\(trackedCount)", caption: "with sex or substances", symbol: "heart.text.square.fill", tint: Color.chillIconPink)
-                MetricCard(title: "Skipped", value: "\(skippedCount)", caption: "all-clear check-ins", symbol: "moon.zzz.fill", tint: Color.chillIconPurple)
-                MetricCard(title: "Substances", value: "\(substanceCount)", caption: "tags across logs", symbol: "pills.fill", tint: Color.chillSecondaryBlue)
-                MetricCard(title: "Sleep", value: sleepValue, caption: sleepCaption, symbol: "bed.double.fill", tint: Color.chillIconAmber)
+                MetricCard(title: String(localized: "Logged"), value: "\(trackedCount)", caption: String(localized: "with sex or substances"), symbol: "heart.text.square.fill", tint: Color.chillIconPink)
+                MetricCard(title: String(localized: "Skipped"), value: "\(skippedCount)", caption: String(localized: "all-clear check-ins"), symbol: "moon.zzz.fill", tint: Color.chillIconPurple)
+                MetricCard(title: String(localized: "Substances"), value: "\(substanceCount)", caption: String(localized: "tags across logs"), symbol: "pills.fill", tint: Color.chillSecondaryBlue)
+                MetricCard(title: String(localized: "Sleep"), value: sleepValue, caption: sleepCaption, symbol: "bed.double.fill", tint: Color.chillIconAmber)
             }
         }
         .padding(12)
@@ -1872,13 +1888,13 @@ private struct MetricsGrid: View {
     }
 
     private var sleepValue: String {
-        guard let averageSleepHours else { return "0 hours" }
+        guard let averageSleepHours else { return String(localized: "0 hours") }
         return SleepMood(hours: averageSleepHours).emoji
     }
 
     private var sleepCaption: String {
-        guard let averageSleepHours else { return "sleep not logged" }
-        return "avg \(averageSleepHours.formatted(.number.precision(.fractionLength(0...1)))) h"
+        guard let averageSleepHours else { return String(localized: "sleep not logged") }
+        return String(localized: "avg \(averageSleepHours.formatted(.number.precision(.fractionLength(0...1)))) h")
     }
 }
 
@@ -1920,14 +1936,14 @@ private struct WellnessScoreRow: View {
 
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 6) {
-                        Text("Daily score")
+                        Text(String(localized: "Daily score"))
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(Color.chillText)
                         if recoveryStreakDays > 0 {
-                            Text("·")
+                            Text(String(localized: "·"))
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(Color.chillTertiary)
-                            Text("\(recoveryStreakDays)d clear")
+                            Text(String(localized: "\(recoveryStreakDays)d clear"))
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(LinearGradient.chillBrand)
                         }
@@ -1935,7 +1951,7 @@ private struct WellnessScoreRow: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
 
-                    Text(score.isActive ? score.label.capitalized : "Make a log to activate")
+                    Text(score.isActive ? score.label.capitalized : String(localized: "Make a log to activate"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                         .lineLimit(1)
@@ -1949,7 +1965,7 @@ private struct WellnessScoreRow: View {
             .padding(14)
             .glassSurface(radius: 22, tint: .clear, interactive: true)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ChillPlainButtonStyle())
         .accessibilityLabel("Daily score \(score.isActive ? "\(score.value), \(score.label)" : "inactive"). Tap to see breakdown.")
         .sheet(isPresented: $isShowingFactors) {
             ScoreFactorsSheet(score: score, openCalendar: {
@@ -1987,10 +2003,10 @@ private struct ScoreFactorsSheet: View {
                         .frame(width: 52, height: 52)
 
                         VStack(alignment: .leading, spacing: 3) {
-                            Text("Daily recovery score")
+                            Text(String(localized: "Daily recovery score"))
                                 .font(.headline.weight(.bold))
                                 .foregroundStyle(Color.chillText)
-                            Text(score.isActive ? score.label.capitalized : "Log a Chill to activate")
+                            Text(score.isActive ? score.label.capitalized : String(localized: "Log a Chill to activate"))
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(Color.chillSecondary)
                         }
@@ -2019,18 +2035,17 @@ private struct ScoreFactorsSheet: View {
                     }
                     .glassSurface(radius: 20, tint: .white.opacity(0.07))
 
-                    Text("Score is based on your most recent log entry — sleep, aftercare, substances, recovery streak, and Apple Watch HRV if available.")
+                    Text(String(localized: "Score is based on your most recent log entry: sleep, aftercare, substances, recovery streak, and Apple Watch HRV if available."))
                         .font(.caption)
                         .foregroundStyle(Color.chillTertiary)
                         .fixedSize(horizontal: false, vertical: true)
 
                     Button(action: openCalendar) {
-                        Label("View calendar", systemImage: "calendar")
+                        Label(String(localized: "View calendar"), systemImage: "calendar")
                             .font(.subheadline.weight(.semibold))
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.bordered)
-                    .tint(Color.chillPrimary)
+                    .buttonStyle(ChillPillButtonStyle(prominent: false))
                 }
                 .padding(20)
                 .padding(.bottom, 28)
@@ -2094,10 +2109,10 @@ private struct SubstanceOverview: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            SectionTitle(title: "Substance tags", symbol: "chart.bar.xaxis")
+            SectionTitle(title: String(localized: "Substance tags"), symbol: "chart.bar.xaxis")
 
             if counts.isEmpty {
-                EmptyGlassState(text: "No substance tags in the past 3 months.")
+                EmptyGlassState(text: String(localized: "No substance tags in the past 3 months."))
             } else {
                 VStack(spacing: 12) {
                     ForEach(counts.prefix(6), id: \.name) { item in
@@ -2126,13 +2141,13 @@ private struct DrugDoseHistoryGraph: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SectionTitle(title: "Substance pattern history", symbol: "chart.xyaxis.line")
+            SectionTitle(title: String(localized: "Substance pattern history"), symbol: "chart.xyaxis.line")
 
             if rows.isEmpty {
-                EmptyGlassState(text: "Start a check-in or log substances to see private patterns here.")
+                EmptyGlassState(text: String(localized: "Start a check-in or log substances to see private patterns here."))
             } else {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text("A private month view for spotting changes over time. It does not label anything as good or bad.")
+                    Text(String(localized: "A private month view for spotting changes over time. It does not label anything as good or bad."))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -2196,7 +2211,7 @@ private struct DoseHistoryRow: Identifiable {
                 id: substance,
                 substance: substance,
                 dayCounts: counts,
-                routeSummary: routes.isEmpty ? "No route saved" : routes,
+                routeSummary: routes.isEmpty ? String(localized: "No route saved") : routes,
                 doseNotesCount: doseNotes[substance] ?? 0,
                 redoseDays: dayMap.values.filter { $0 > 1 }.count
             )
@@ -2224,7 +2239,7 @@ private struct DoseHistoryRowView: View {
                     .font(.headline)
                     .foregroundStyle(Color.chillText)
                 Spacer()
-                Text("\(total) logged")
+                Text(String(localized: "\(total) logged"))
                     .font(.caption.weight(.bold))
                     .foregroundStyle(Color.chillSecondaryBlue)
             }
@@ -2276,7 +2291,7 @@ private struct CalendarJournalCard: View {
                     Text(entry.date.formatted(date: .omitted, time: .shortened))
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
-                    Text(entry.photos.isEmpty ? "Journal entry" : "\(entry.photos.count) picture\(entry.photos.count == 1 ? "" : "s") attached")
+                    Text(entry.photos.isEmpty ? String(localized: "Journal entry") : String(localized: "\(entry.photos.count) picture\(entry.photos.count == 1 ? "" : "s") attached"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                 }
@@ -2348,7 +2363,7 @@ private struct SkippedNightCard: View {
         LiquidGlassGroup(spacing: 14) {
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .firstTextBaseline) {
-                    SectionTitle(title: "Skipped Chill check", symbol: "checklist")
+                    SectionTitle(title: String(localized: "Skipped Chill check"), symbol: "checklist")
                     Spacer()
                     Button {
                         isExpanded.toggle()
@@ -2357,7 +2372,7 @@ private struct SkippedNightCard: View {
                             .font(.headline)
                             .frame(width: 34, height: 34)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ChillPlainButtonStyle())
                     .glassSurface(radius: 17, tint: .black.opacity(0.05), interactive: true)
                     .accessibilityLabel(isExpanded ? "Collapse skipped Chill check" : "Expand skipped Chill check")
                 }
@@ -2431,7 +2446,7 @@ private struct NightStatusRow: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ChillPlainButtonStyle())
                 .glassSurface(radius: 16, tint: .indigo.opacity(0.20), interactive: true)
             }
         }
@@ -2446,10 +2461,10 @@ private struct TimelineSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            SectionTitle(title: "Timeline", symbol: "calendar")
+            SectionTitle(title: String(localized: "Timeline"), symbol: "calendar")
 
             if entries.isEmpty {
-                EmptyGlassState(text: "No entries in the past 3 months.")
+                EmptyGlassState(text: String(localized: "No entries in the past 3 months."))
             } else {
                 LazyVStack(spacing: 12) {
                     ForEach(entries) { entry in
@@ -2481,7 +2496,7 @@ private struct TimelineRow: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text(entry.skippedNight ? "Skipped Chill" : "Sex + substances")
+                    Text(entry.skippedNight ? String(localized: "Skipped Chill") : String(localized: "Sex + substances"))
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
                     Spacer()
@@ -2492,7 +2507,7 @@ private struct TimelineRow: View {
                             .font(.caption.weight(.bold))
                             .foregroundStyle(Color.chillSecondary)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ChillPlainButtonStyle())
                     .accessibilityLabel("Delete entry")
                 }
 
@@ -2518,7 +2533,7 @@ private struct TimelineRow: View {
                 }
 
                 if entry.substances.isEmpty {
-                    Text("No substances recorded.")
+                    Text(String(localized: "No substances recorded."))
                         .font(.subheadline)
                         .foregroundStyle(Color.chillSecondary)
                 } else {
@@ -2565,16 +2580,17 @@ private struct FloatingLogBar: View {
     var isTonightLogged: Bool = false
     @State private var isPressed = false
     @State private var confirmSkip = false
+    @State private var hasQuickSkippedLocally = false
 
     var body: some View {
         VStack(spacing: 0) {
             // Primary action — matches original clean design
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Private log")
+                    Text(String(localized: "Private log"))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
-                    Text("Add sleep, reflection, or a skip")
+                    Text(String(localized: "Add sleep, reflection, or a skip"))
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color.chillText)
                 }
@@ -2597,15 +2613,15 @@ private struct FloatingLogBar: View {
                         .shadow(color: Color.chillPrimary.opacity(0.44), radius: 12, y: 6)
                         .scaleEffect(isPressed ? 0.95 : 1.0)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ChillPlainButtonStyle())
                 .accessibilityLabel("Add Chill")
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
 
             // Secondary action — clear-night quick log.
-            // Hidden once tonight is already logged, so it can't be tapped twice.
-            if !isTonightLogged {
+            // Hidden once tonight is already logged, or immediately hidden when tapped locally
+            if !isTonightLogged && !hasQuickSkippedLocally {
                 Rectangle()
                     .fill(.white.opacity(0.07))
                     .frame(height: 0.5)
@@ -2618,7 +2634,7 @@ private struct FloatingLogBar: View {
                         Image(systemName: "moon.zzz.fill")
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(Color.chillSecondary)
-                        Text("Nothing happened tonight")
+                        Text(String(localized: "Nothing happened tonight"))
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Color.chillSecondary)
                         Spacer(minLength: 0)
@@ -2630,7 +2646,7 @@ private struct FloatingLogBar: View {
                     .padding(.vertical, 10)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ChillPlainButtonStyle())
                 .accessibilityLabel("Log nothing happened tonight")
             }
         }
@@ -2638,9 +2654,12 @@ private struct FloatingLogBar: View {
         .padding(.horizontal, 20)
         .padding(.bottom, 8)
         .animation(.easeInOut(duration: 0.25), value: isTonightLogged)
-        .alert("Log a clear night?", isPresented: $confirmSkip) {
-            Button("Cancel", role: .cancel) { }
-            Button("Confirm") { skip() }
+        .alert(String(localized: "Log a clear night?"), isPresented: $confirmSkip) {
+            Button(String(localized: "Cancel"), role: .cancel) { }
+            Button(String(localized: "Confirm")) {
+                withAnimation { hasQuickSkippedLocally = true }
+                skip()
+            }
         } message: {
             Text("This marks tonight as a clear night with nothing to track. You can still add a log later if something comes up.")
         }
@@ -2762,7 +2781,6 @@ struct ProfileOverviewView: View {
     @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var isShowingProfileEditor = false
-    @State private var profilePath: [ProfileSectionPage] = []
     let showsDoneButton: Bool
 
     init(showsDoneButton: Bool = true) {
@@ -2779,49 +2797,48 @@ struct ProfileOverviewView: View {
         }
 
         var items = [
-            ProfileDetail(label: "Name", value: profile.name, symbol: "person.fill"),
-            ProfileDetail(label: "Date of birth", value: "\(profile.dateOfBirth.formatted(date: .abbreviated, time: .omitted)) (\(profile.calculatedAge))", symbol: "calendar"),
-            ProfileDetail(label: "Weight", value: "\(Int(profile.weightKg.rounded())) kg", symbol: "scalemass.fill"),
-            ProfileDetail(label: "Height", value: "\(Int(profile.heightCm.rounded())) cm", symbol: "ruler.fill"),
-            ProfileDetail(label: "Sex", value: profile.sex, symbol: "person.2.fill"),
-            ProfileDetail(label: "Sexual orientation", value: profile.sexualOrientation, symbol: "heart.fill")
+            ProfileDetail(label: String(localized: "Name"), value: profile.name, symbol: "person.fill"),
+            ProfileDetail(label: String(localized: "Date of birth"), value: "\(profile.dateOfBirth.formatted(date: .abbreviated, time: .omitted)) (\(profile.calculatedAge))", symbol: "calendar"),
+            ProfileDetail(label: String(localized: "Weight"), value: "\(Int(profile.weightKg.rounded())) kg", symbol: "scalemass.fill"),
+            ProfileDetail(label: String(localized: "Height"), value: "\(Int(profile.heightCm.rounded())) cm", symbol: "ruler.fill"),
+            ProfileDetail(label: String(localized: "Sex"), value: profile.sex, symbol: "person.2.fill"),
+            ProfileDetail(label: String(localized: "Sexual orientation"), value: profile.sexualOrientation, symbol: "heart.fill")
         ]
 
         if profile.sexualRole != SexualRole.notApplicable.rawValue {
-            items.append(ProfileDetail(label: "Role", value: profile.sexualRole, symbol: "arrow.left.arrow.right"))
+            items.append(ProfileDetail(label: String(localized: "Role"), value: profile.sexualRole, symbol: "arrow.left.arrow.right"))
         }
 
-        items.append(ProfileDetail(label: "PrEP", value: profile.isOnPrEP ? "Yes" : "No", symbol: "cross.case.fill"))
+        items.append(ProfileDetail(label: String(localized: "PrEP"), value: profile.isOnPrEP ? "Yes" : "No", symbol: "cross.case.fill"))
 
         if profile.isOnPrEP {
             items.append(
                 ProfileDetail(
-                    label: "PrEP schedule",
+                    label: String(localized: "PrEP schedule"),
                     value: profile.prepSchedule,
                     symbol: "clock.badge.checkmark.fill"
                 )
             )
             items.append(
                 ProfileDetail(
-                    label: "PrEP since",
+                    label: String(localized: "PrEP since"),
                     value: profile.prepStartDate.formatted(date: .abbreviated, time: .omitted),
                     symbol: "calendar.badge.clock"
                 )
             )
         }
 
-        items.append(ProfileDetail(label: "Medication", value: "\(profile.medications.count) saved", symbol: "pills.fill"))
+        items.append(ProfileDetail(label: String(localized: "Medication"), value: "\(profile.medications.count) saved", symbol: "pills.fill"))
 
         return items
     }
 
     var body: some View {
-        NavigationStack(path: $profilePath) {
-            ZStack {
-                DashboardBackdrop()
+        ZStack {
+            DashboardBackdrop()
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
                         if profile == nil {
                             MissingProfileCard()
                         } else {
@@ -2845,14 +2862,6 @@ struct ProfileOverviewView: View {
                 ProfileSectionDetailView(page: page, details: details, medications: profile?.medications ?? [])
             }
             .toolbar {
-                if showsDoneButton && profilePath.isEmpty {
-                    ToolbarItem(placement: .topBarLeading) {
-                        BackChevronButton {
-                            dismiss()
-                        }
-                    }
-                }
-
                 if profile != nil {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
@@ -2861,7 +2870,7 @@ struct ProfileOverviewView: View {
                             Label("Edit", systemImage: "pencil")
                                 .font(.headline)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(ChillPlainButtonStyle())
                         .foregroundStyle(Color.chillText)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -2874,8 +2883,6 @@ struct ProfileOverviewView: View {
                     ProfileEditView(profile: profile)
                 }
             }
-            .edgeSwipeToDismiss()
-        }
     }
 
     private func updateProfilePhoto(_ item: PhotosPickerItem?) {
@@ -3047,88 +3054,101 @@ private struct ProfileEditView: View {
                         }
                         .padding(.top, 8)
 
-                        VStack(alignment: .leading, spacing: 14) {
-                            DatePicker("Date of birth (\(profile.calculatedAge))", selection: $profile.dateOfBirth, displayedComponents: [.date])
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(Color.chillText)
-                                .tint(Color.chillPrimary)
+                        VStack(spacing: 0) {
+                            ProfileSetupDateRow(
+                                title: "Date of birth (\(profile.calculatedAge))",
+                                date: $profile.dateOfBirth,
+                                systemImage: "calendar"
+                            )
 
-                            ProfileMeasurementStepper(title: "Weight", value: $profile.weightKg, range: 35...180, unit: "kg")
-                            ProfileMeasurementStepper(title: "Height", value: $profile.heightCm, range: 130...220, unit: "cm")
+                            ProfileSetupRowDivider()
 
-                            TextField("Home address", text: $profile.homeAddress, axis: .vertical)
-                                .lineLimit(1...3)
-                                .textFieldStyle(.plain)
-                                .foregroundStyle(Color.chillText)
-                                .padding(14)
-                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+                            ProfileSetupMeasurementRow(title: String(localized: "Weight"), value: $profile.weightKg, range: 35...180, unit: "kg", systemImage: "scalemass.fill")
 
-                            HStack {
-                                Text("Sex")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(Color.chillText)
-                                Spacer()
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupMeasurementRow(title: String(localized: "Height"), value: $profile.heightCm, range: 130...220, unit: "cm", systemImage: "ruler.fill")
+
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupTextField(
+                                title: String(localized: "Home address"),
+                                placeholder: String(localized: "Street, number, and city"),
+                                text: $profile.homeAddress,
+                                systemImage: "house.fill",
+                                axis: .vertical
+                            )
+
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupPickerRow(title: String(localized: "Sex"), systemImage: "person.2.fill") {
                                 Picker("Sex", selection: sexBinding) {
                                     ForEach(ProfileSex.allCases) { option in
-                                        Text(option.rawValue).tag(option)
+                                        Text(option.localizedDisplayName).tag(option)
                                     }
                                 }
-                                .pickerStyle(.menu)
-                                .tint(Color.chillPrimary)
                             }
 
-                            HStack {
-                                Text("Role")
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(Color.chillText)
-                                Spacer()
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupPickerRow(title: String(localized: "Role"), systemImage: "arrow.left.arrow.right") {
                                 Picker("Role", selection: roleBinding) {
                                     ForEach(SexualRole.allCases) { option in
-                                        Text(option.rawValue).tag(option)
+                                        Text(option.localizedDisplayName).tag(option)
                                     }
                                 }
-                                .pickerStyle(.menu)
-                                .tint(Color.chillPrimary)
                             }
 
-                            Toggle("On PrEP", isOn: $profile.isOnPrEP)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(Color.chillText)
-                                .tint(Color.chillPrimary)
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupToggleRow(
+                                title: String(localized: "On PrEP"),
+                                subtitle: profile.isOnPrEP ? String(localized: "Enabled") : String(localized: "Not enabled"),
+                                isOn: $profile.isOnPrEP,
+                                systemImage: "cross.case.fill"
+                            )
 
                             if profile.isOnPrEP {
-                                HStack {
-                                    Text("PrEP schedule")
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(Color.chillText)
-                                    Spacer()
+                                ProfileSetupRowDivider()
+
+                                ProfileSetupPickerRow(title: String(localized: "PrEP schedule"), systemImage: "clock.badge.checkmark.fill") {
                                     Picker("PrEP schedule", selection: prepScheduleBinding) {
                                         ForEach(PrEPSchedule.allCases) { option in
-                                            Text(option.rawValue).tag(option)
+                                            Text(option.localizedDisplayName).tag(option)
                                         }
                                     }
-                                    .pickerStyle(.menu)
-                                    .tint(Color.chillPrimary)
                                 }
 
-                                DatePicker("PrEP since", selection: $profile.prepStartDate, displayedComponents: [.date])
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(Color.chillText)
-                                    .tint(Color.chillPrimary)
+                                ProfileSetupRowDivider()
+
+                                ProfileSetupDateRow(
+                                    title: String(localized: "PrEP since"),
+                                    date: $profile.prepStartDate,
+                                    systemImage: "calendar.badge.clock"
+                                )
 
                                 if dailyPrEPNotice {
+                                    ProfileSetupRowDivider()
+
                                     Text("Daily PrEP needs about 7 days to reach maximum protection for receptive anal sex. Until then, use extra protection and follow medical advice.")
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(.red)
                                         .fixedSize(horizontal: false, vertical: true)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.vertical, 8)
                                 }
                             }
+
+                            ProfileSetupRowDivider()
 
                             Text("Changes save automatically.")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(Color.chillSecondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, 8)
                         }
-                        .padding(16)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 6)
                         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
 
                         ProfileMedicationEditor(profile: profile)
@@ -3208,7 +3228,7 @@ private struct ProfileMedicationEditor: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            SectionTitle(title: "Medication", symbol: "pills.fill")
+            SectionTitle(title: String(localized: "Medication"), symbol: "pills.fill")
 
             VStack(spacing: 10) {
                 TextField("Medication name", text: $name)
@@ -3319,7 +3339,7 @@ private struct ProfileMedicationEditableRow: View {
             Button(role: .destructive, action: remove) {
                 Image(systemName: "trash.fill")
             }
-            .buttonStyle(.plain)
+            .buttonStyle(ChillPlainButtonStyle())
             .foregroundStyle(Color.chillSecondary)
         }
         .padding(12)
@@ -3428,7 +3448,7 @@ private struct ProfileCompactSections: View {
                             .glassSurface(radius: 20, tint: Color.chillPrimary.opacity(0.12))
 
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(page.rawValue)
+                            Text(page.localizedDisplayName)
                                 .font(.headline)
                                 .foregroundStyle(Color.chillText)
                             Text(summary(for: page))
@@ -3445,7 +3465,7 @@ private struct ProfileCompactSections: View {
                     .padding(16)
                     .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(ChillPlainButtonStyle())
             }
         }
     }
@@ -3496,14 +3516,14 @@ private struct ProfileSectionDetailView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     PageHeader(
                         title: page.rawValue,
-                        subtitle: "Profile details from setup and edit profile.",
+                        subtitle: String(localized: "Profile details from setup and edit profile."),
                         symbol: page.symbol,
                         tint: Color.chillPrimary
                     )
 
                     if page == .medications {
                         if medications.isEmpty {
-                            EmptyGlassState(text: "No medication saved yet. Use Edit on your profile to add medication, prescription amount, timing, and duration.")
+                            EmptyGlassState(text: String(localized: "No medication saved yet. Use Edit on your profile to add medication, prescription amount, timing, and duration."))
                         } else {
                             VStack(spacing: 12) {
                                 ForEach(medications) { medication in
@@ -3521,6 +3541,8 @@ private struct ProfileSectionDetailView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar(.hidden, for: .tabBar)
     }
 }
 
@@ -3597,7 +3619,7 @@ struct PrivacyShieldView: View {
                             .padding(.horizontal, 28)
                             .padding(.vertical, 12)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(ChillPlainButtonStyle())
                     .transition(.opacity)
                 }
             }

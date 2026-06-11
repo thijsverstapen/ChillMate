@@ -351,15 +351,15 @@ enum HealthKitPermissionScope: String, CaseIterable, Identifiable {
     var caption: String {
         switch self {
         case .sexualActivityWrite:
-            "Use Apple Health sexual activity access for Chill log export."
+            String(localized: "Use Apple Health sexual activity access for Chill log export.")
         case .sleepReadWrite:
-            "Read sleep for aftercare and write sleep from saved logs."
+            String(localized: "Read sleep for aftercare and write sleep from saved logs.")
         case .heartRateRead:
-            "Prepare heart-rate signals for safer check-ins and Watch support."
+            String(localized: "Prepare heart-rate signals for safer check-ins and Watch support.")
         case .heartRateVariabilityRead:
-            "Prepare HRV as a future recovery-score input."
+            String(localized: "Prepare HRV as a future recovery-score input.")
         case .workoutRead:
-            "Use workout context later to avoid false stress alerts."
+            String(localized: "Use workout context later to avoid false stress alerts.")
         }
     }
 }
@@ -373,13 +373,13 @@ enum HealthKitError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unavailable:
-            "Apple Health is not available on this device."
+            String(localized: "Apple Health is not available on this device.")
         case .missingTypes:
-            "ChillMate could not find the Apple Health types it needs."
+            String(localized: "ChillMate could not find the Apple Health types it needs.")
         case .authorizationDenied:
-            "Apple Health permission was not granted."
+            String(localized: "Apple Health permission was not granted.")
         case .saveFailed:
-            "ChillMate could not save the log to Apple Health."
+            String(localized: "ChillMate could not save the log to Apple Health.")
         }
     }
 }

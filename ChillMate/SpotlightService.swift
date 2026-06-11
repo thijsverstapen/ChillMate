@@ -9,8 +9,13 @@ final class SpotlightService {
     private init() {}
 
     func indexJournalEntry(_ entry: JournalEntry) {
+        let contentHash = (entry.rememberClearly + entry.feelsGoodAbout + entry.regrets).hashValue
+        let key = "spotlightHash-\(entry.id.uuidString)"
+        guard UserDefaults.standard.integer(forKey: key) != contentHash else { return }
+        UserDefaults.standard.set(contentHash, forKey: key)
+
         let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
-        attributeSet.title = "Journal — \(entry.date.formatted(date: .abbreviated, time: .shortened))"
+        attributeSet.title = "Journal: \(entry.date.formatted(date: .abbreviated, time: .shortened))"
 
         var parts: [String] = []
         if !entry.rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

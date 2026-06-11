@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		829A0F926B88BDF40A69C412 /* ChillMateUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6079172DEC0D2D76B936C7B /* ChillMateUITests.swift */; };
+		96D7A1948BD120EE618F4EEF /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4847B183922FB77E12D70357 /* SnapshotHelper.swift */; };
+		994F16462FD9D043009DA0A5 /* ChillMate.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 994F16452FD9D043009DA0A5 /* ChillMate.storekit */; };
 		A11B00000000000000000001 /* ChillMate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000011 /* ChillMate.swift */; };
 		A11B00000000000000000002 /* NightEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000012 /* NightEntry.swift */; };
 		A11B00000000000000000003 /* Substance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000013 /* Substance.swift */; };
@@ -14,6 +17,7 @@
 		A11B00000000000000000005 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000015 /* DashboardView.swift */; };
 		A11B00000000000000000006 /* LogNightSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000016 /* LogNightSheet.swift */; };
 		A11B00000000000000000007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000017 /* Assets.xcassets */; };
+		A59876E7BF6206A7C1340C90 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C85331B142C2356AE703C063 /* Foundation.framework */; };
 		B22C00000000000000000001 /* ChillMateModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000011 /* ChillMateModelContainer.swift */; };
 		B22C00000000000000000002 /* HealthKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000012 /* HealthKitService.swift */; };
 		B22C00000000000000000003 /* AppLockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000013 /* AppLockView.swift */; };
@@ -37,6 +41,7 @@
 		F88B00000000000000000002 /* WatchDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000012 /* WatchDashboardView.swift */; };
 		F88B00000000000000000003 /* ChillMateWatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000014 /* ChillMateWatchApp.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F88B00000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000015 /* Assets.xcassets */; };
+		F99C00000000000000000002 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F99C00000000000000000001 /* Localizable.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +51,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = E66F00000000000000000040;
 			remoteInfo = ChillMateLiveActivityExtension;
+		};
+		E857625D6A424A7BD9A6B9C7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A11B00000000000000000026 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A11B00000000000000000022;
+			remoteInfo = ChillMate;
 		};
 		F88B00000000000000000045 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -78,6 +90,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4847B183922FB77E12D70357 /* SnapshotHelper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
+		57DA17A79741169D938DA69E /* ChillMateUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChillMateUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		994F16452FD9D043009DA0A5 /* ChillMate.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = ChillMate.storekit; sourceTree = "<group>"; };
 		999FB1F12FBCA47E00F3BA3E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		99C79EAC2FBC8C3200A17BA3 /* ChillMate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ChillMate.entitlements; sourceTree = "<group>"; };
 		A11B00000000000000000008 /* ChillMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChillMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,6 +115,8 @@
 		C44E00000000000000000011 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		C44E00000000000000000012 /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
 		C44E00000000000000000013 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		C6079172DEC0D2D76B936C7B /* ChillMateUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ChillMateUITests.swift; sourceTree = "<group>"; };
+		C85331B142C2356AE703C063 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		D55F00000000000000000011 /* CareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareModels.swift; sourceTree = "<group>"; };
 		D55F00000000000000000012 /* CareToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsView.swift; sourceTree = "<group>"; };
 		E66F00000000000000000010 /* DrugTimerActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugTimerActivityAttributes.swift; sourceTree = "<group>"; };
@@ -113,12 +130,19 @@
 		F88B00000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F88B00000000000000000014 /* ChillMateWatchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChillMateWatchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F88B00000000000000000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F99C00000000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A11B00000000000000000018 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+			);
+		};
+		C8F13ECCBCB479B91B4D8F0F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				A59876E7BF6206A7C1340C90 /* Foundation.framework in Frameworks */,
 			);
 		};
 		E66F00000000000000000031 /* Frameworks */ = {
@@ -134,6 +158,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3B7B92283DDB7C5428F4E239 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				C85331B142C2356AE703C063 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 		A11B00000000000000000019 = {
 			isa = PBXGroup;
 			children = (
@@ -141,6 +173,8 @@
 				E66F00000000000000000020 /* ChillMateLiveActivityExtension */,
 				F88B00000000000000000020 /* ChillMateWatchApp */,
 				A11B00000000000000000021 /* Products */,
+				CB57EF9638BDB1037A9E71CF /* Frameworks */,
+				FB13991735BCF9331F9CEB34 /* ChillMateUITests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -170,6 +204,8 @@
 				D55F00000000000000000011 /* CareModels.swift */,
 				D55F00000000000000000012 /* CareToolsView.swift */,
 				E66F00000000000000000010 /* DrugTimerActivityAttributes.swift */,
+				994F16452FD9D043009DA0A5 /* ChillMate.storekit */,
+				F99C00000000000000000001 /* Localizable.xcstrings */,
 				B33D00000000000000000011 /* LaunchScreen.storyboard */,
 				A11B00000000000000000017 /* Assets.xcassets */,
 			);
@@ -182,8 +218,17 @@
 				A11B00000000000000000008 /* ChillMate.app */,
 				E66F00000000000000000013 /* ChillMateLiveActivityExtension.appex */,
 				F88B00000000000000000014 /* ChillMateWatchApp.app */,
+				57DA17A79741169D938DA69E /* ChillMateUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CB57EF9638BDB1037A9E71CF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3B7B92283DDB7C5428F4E239 /* iOS */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		E66F00000000000000000020 /* ChillMateLiveActivityExtension */ = {
@@ -207,9 +252,36 @@
 			path = ChillMateWatchApp;
 			sourceTree = "<group>";
 		};
+		FB13991735BCF9331F9CEB34 /* ChillMateUITests */ = {
+			isa = PBXGroup;
+			children = (
+				C6079172DEC0D2D76B936C7B /* ChillMateUITests.swift */,
+				4847B183922FB77E12D70357 /* SnapshotHelper.swift */,
+			);
+			path = ChillMateUITests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		96097C3D692474B75C77C5A7 /* ChillMateUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5D5BDD94A69E37C6789CE4B6 /* Build configuration list for PBXNativeTarget "ChillMateUITests" */;
+			buildPhases = (
+				75279D0CC745F76A05A98DFA /* Sources */,
+				C8F13ECCBCB479B91B4D8F0F /* Frameworks */,
+				E46AEAD8B5369DDDBE5AE54A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BA4CBEBCEF2E983DB93A261D /* PBXTargetDependency */,
+			);
+			name = ChillMateUITests;
+			productName = ChillMateUITests;
+			productReference = 57DA17A79741169D938DA69E /* ChillMateUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		A11B00000000000000000022 /* ChillMate */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A11B00000000000000000023 /* Build configuration list for PBXNativeTarget "ChillMate" */;
@@ -301,6 +373,7 @@
 				A11B00000000000000000022 /* ChillMate */,
 				E66F00000000000000000040 /* ChillMateLiveActivityExtension */,
 				F88B00000000000000000040 /* ChillMateWatchApp */,
+				96097C3D692474B75C77C5A7 /* ChillMateUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -309,8 +382,15 @@
 		A11B00000000000000000025 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				994F16462FD9D043009DA0A5 /* ChillMate.storekit in Resources */,
 				A11B00000000000000000007 /* Assets.xcassets in Resources */,
+				F99C00000000000000000002 /* Localizable.xcstrings in Resources */,
 				B33D00000000000000000001 /* LaunchScreen.storyboard in Resources */,
+			);
+		};
+		E46AEAD8B5369DDDBE5AE54A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
 			);
 		};
 		E66F00000000000000000032 /* Resources */ = {
@@ -327,6 +407,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		75279D0CC745F76A05A98DFA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				829A0F926B88BDF40A69C412 /* ChillMateUITests.swift in Sources */,
+				96D7A1948BD120EE618F4EEF /* SnapshotHelper.swift in Sources */,
+			);
+		};
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -370,6 +457,12 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		BA4CBEBCEF2E983DB93A261D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ChillMate;
+			target = A11B00000000000000000022 /* ChillMate */;
+			targetProxy = E857625D6A424A7BD9A6B9C7 /* PBXContainerItemProxy */;
+		};
 		E66F00000000000000000044 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E66F00000000000000000040 /* ChillMateLiveActivityExtension */;
@@ -383,6 +476,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		0671BE32FD8C38B0D6F717CA /* Debug configuration for PBXNativeTarget "ChillMateUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bijthijs.chillmate.uitests;
+				PRODUCT_NAME = ChillMateUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = ChillMate;
+			};
+			name = Debug;
+		};
 		A11B00000000000000000028 /* Debug configuration for PBXProject "ChillMate" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -527,11 +634,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 210;
+				CURRENT_PROJECT_VERSION = 230;
 				DEVELOPMENT_ASSET_PATHS = "\"ChillMate/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UCZEZS4VJ6;
-				ENABLE_PREVIEWS = YES;
+				ENABLE_PREVIEWS = NO;
+				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMate/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ChillMate;
@@ -551,7 +659,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -573,11 +681,12 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 210;
+				CURRENT_PROJECT_VERSION = 230;
 				DEVELOPMENT_ASSET_PATHS = "\"ChillMate/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UCZEZS4VJ6;
-				ENABLE_PREVIEWS = YES;
+				ENABLE_PREVIEWS = NO;
+				ENABLE_TESTABILITY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMate/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ChillMate;
@@ -597,7 +706,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -610,6 +719,21 @@
 			};
 			name = Release;
 		};
+		A9D7835C599E568B0DA643F6 /* Release configuration for PBXNativeTarget "ChillMateUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bijthijs.chillmate.uitests;
+				PRODUCT_NAME = ChillMateUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = ChillMate;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		E66F00000000000000000042 /* Debug configuration for PBXNativeTarget "ChillMateLiveActivityExtension" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -618,7 +742,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 210;
+				CURRENT_PROJECT_VERSION = 230;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UCZEZS4VJ6;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -631,7 +755,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.LiveActivityExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -653,7 +777,7 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 210;
+				CURRENT_PROJECT_VERSION = 230;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = UCZEZS4VJ6;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -666,7 +790,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.LiveActivityExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -686,16 +810,16 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 210;
+				CURRENT_PROJECT_VERSION = 230;
 				DEVELOPMENT_TEAM = UCZEZS4VJ6;
-				ENABLE_PREVIEWS = YES;
+				ENABLE_PREVIEWS = NO;
 				EXCLUDED_ARCHS = arm64e;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMateWatchApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ChillMate;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.BIJTHIJS.ChillMate;
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -714,10 +838,10 @@
 				CODE_SIGN_IDENTITY = "Apple Distribution";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 210;
+				CURRENT_PROJECT_VERSION = 230;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=watchos*]" = UCZEZS4VJ6;
-				ENABLE_PREVIEWS = YES;
+				ENABLE_PREVIEWS = NO;
 				EXCLUDED_ARCHS = arm64e;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ChillMateWatchApp/Info.plist;
@@ -725,7 +849,7 @@
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.BIJTHIJS.ChillMate;
-				MARKETING_VERSION = 2.1.0;
+				MARKETING_VERSION = 2.1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -742,6 +866,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5D5BDD94A69E37C6789CE4B6 /* Build configuration list for PBXNativeTarget "ChillMateUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A9D7835C599E568B0DA643F6 /* Release configuration for PBXNativeTarget "ChillMateUITests" */,
+				0671BE32FD8C38B0D6F717CA /* Debug configuration for PBXNativeTarget "ChillMateUITests" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		A11B00000000000000000023 /* Build configuration list for PBXNativeTarget "ChillMate" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

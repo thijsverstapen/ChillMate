@@ -122,13 +122,13 @@ enum AdministrationRoute: String, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .sniffed:
-            "Nasal"
+            String(localized: "Nasal")
         case .injected:
-            "Injection"
+            String(localized: "Injection")
         case .swallowed:
-            "Oral"
+            String(localized: "Oral")
         case .smoked:
-            "Inhaled"
+            String(localized: "Inhaled")
         }
     }
 
@@ -359,11 +359,11 @@ enum RedoseDecision: String, CaseIterable, Identifiable {
     var displayTitle: String {
         switch self {
         case .undecided:
-            "Not answered"
+            String(localized: "Not answered")
         case .redosed:
-            "Logged more"
+            String(localized: "Logged more")
         case .avoided:
-            "Paused or stopped"
+            String(localized: "Paused or stopped")
         }
     }
 }
@@ -389,6 +389,7 @@ enum DrugTimerLiveActivityController {
                 pushType: nil
             )
             timer.liveActivityID = activity.id
+            UserDefaults.standard.set(true, forKey: "hasActiveDrugTimer")
         } catch {
             timer.liveActivityID = ""
             print("[ChillMate] Live Activity request failed: \(error)")
@@ -429,6 +430,11 @@ enum DrugTimerLiveActivityController {
                 ActivityContent(state: contentState, staleDate: now),
                 dismissalPolicy: .immediate
             )
+        }
+        
+        let hasOtherActivities = Activity<DrugTimerActivityAttributes>.activities.contains { $0.id != timer.liveActivityID }
+        if !hasOtherActivities {
+            UserDefaults.standard.set(false, forKey: "hasActiveDrugTimer")
         }
     }
 }

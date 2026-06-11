@@ -55,24 +55,29 @@ struct AppLockView<Content: View>: View {
             }
         }
         .onChange(of: scenePhase) { _, newPhase in
-            if lockRequired, newPhase != .active {
-                if backgroundedAt == nil { backgroundedAt = .now }
-            }
+            // While the Face ID / system auth dialog is on screen the scene briefly
+            // turns .inactive. Ignoring phase changes during authentication, and
+            // only treating a real .background as "the user left the app", prevents
+            // the endless lock → prompt → lock loop behind the Face ID wall.
+            guard lockRequired, !isAuthenticating else { return }
 
-            if lockRequired, newPhase == .active {
-                let elapsed = backgroundedAt.map { Date.now.timeIntervalSince($0) } ?? 0
+            switch newPhase {
+            case .background:
+                if backgroundedAt == nil { backgroundedAt = .now }
+            case .active:
+                guard let leftAt = backgroundedAt else { return }
+                backgroundedAt = nil
+                let elapsed = Date.now.timeIntervalSince(leftAt)
                 let threshold = Double(autoLockMinutes) * 60
                 if autoLockMinutes == 0 || elapsed >= threshold {
                     isUnlocked = false
                     pinCode = ""
+                    if requiresFaceID {
+                        Task { await unlockWithFaceID() }
+                    }
                 }
-                backgroundedAt = nil
-            }
-
-            if requiresFaceID, newPhase == .active, !isUnlocked {
-                Task {
-                    await unlockWithFaceID()
-                }
+            default:
+                break
             }
         }
         .onChange(of: requiresFaceID) { _, isRequired in
@@ -93,7 +98,7 @@ struct AppLockView<Content: View>: View {
         defer { isAuthenticating = false }
 
         do {
-            let success = try await AppAuthenticator.authenticate(reason: "Unlock ChillMate")
+            let success = try await AppAuthenticator.authenticate(reason: String(localized: "Unlock ChillMate"))
             isUnlocked = success
             message = success ? nil : "Could not unlock ChillMate."
         } catch {
@@ -113,7 +118,7 @@ struct AppLockView<Content: View>: View {
             message = nil
         } else {
             pinCode = ""
-            message = "That PIN did not match."
+            message = String(localized: "That PIN did not match.")
         }
     }
 }
@@ -224,7 +229,7 @@ enum AppAuthenticationError: LocalizedError {
     case unavailable
 
     var errorDescription: String? {
-        "Face ID is not available on this device."
+        String(localized: "Face ID is not available on this device.")
     }
 }
 

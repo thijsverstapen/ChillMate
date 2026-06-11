@@ -11,6 +11,7 @@ final class WatchConnectivityService: NSObject {
 
     func activate() {
         guard WCSession.isSupported() else { return }
+        guard WCSession.default.activationState == .notActivated else { return }
         WCSession.default.delegate = self
         WCSession.default.activate()
     }
@@ -98,6 +99,7 @@ extension WatchConnectivityService: WCSessionDelegate {
 
     nonisolated func sessionDidBecomeInactive(_ session: WCSession) {}
     nonisolated func sessionDidDeactivate(_ session: WCSession) {
+        guard WCSession.default.isPaired else { return }
         WCSession.default.activate()
     }
 }
