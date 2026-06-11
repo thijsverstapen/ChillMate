@@ -2538,7 +2538,7 @@ private struct TimelineRow: View {
                         .foregroundStyle(Color.chillSecondary)
                 } else {
                     FlowLayout(spacing: 8) {
-                        ForEach(entry.substances, id: \.self) { substance in
+                        ForEach(Array(entry.substances.enumerated()), id: \.offset) { _, substance in
                             Text(substance)
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(Color.chillText)

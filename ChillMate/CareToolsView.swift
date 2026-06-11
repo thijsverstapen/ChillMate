@@ -1206,9 +1206,10 @@ private struct PartnerSessionModeCard: View {
                     }
 
                     FlowLayout(spacing: 8) {
-                        ForEach(groupMemberNames, id: \.self) { name in
+                        ForEach(Array(groupMemberNames.enumerated()), id: \.offset) { index, name in
                             Button {
-                                groupMemberNames.removeAll { $0 == name }
+                                guard groupMemberNames.indices.contains(index) else { return }
+                                groupMemberNames.remove(at: index)
                             } label: {
                                 Label(name, systemImage: "xmark.circle.fill")
                                     .font(.caption.weight(.semibold))

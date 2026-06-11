@@ -64,7 +64,10 @@ enum ChillMateModelContainer {
         }
 
         let schema = appSchema
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .private("iCloud.com.codex.ChillMate"))
+        // In-memory recovery store is a local last resort; CloudKit is intentionally
+        // omitted because SwiftData rejects combining it with isStoredInMemoryOnly,
+        // which would make this fallback fail exactly when it's needed most.
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: schema, configurations: [configuration])
         LocalSecurityService.applyFileProtection()
         recoveryContainer = container

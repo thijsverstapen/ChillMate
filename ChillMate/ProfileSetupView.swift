@@ -1017,6 +1017,7 @@ struct ProfileSetupView: View {
                         SetupWizardFooter(
                             step: setupStep,
                             canAdvance: footerCanAdvance,
+                            reason: footerDisabledReason,
                             onBack: goToPreviousStep,
                             onNext: goToNextStep
                         )
@@ -1444,6 +1445,25 @@ struct ProfileSetupView: View {
         }
     }
 
+    /// Explains why the footer's primary action is blocked, so a swipe-ahead
+    /// never leaves the user with a mystery-disabled button.
+    private var footerDisabledReason: String? {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch setupStep {
+        case .basicDetails:
+            if trimmedName.isEmpty { return String(localized: "Enter your name to continue.") }
+            if calculatedAge < 18 { return String(localized: "You must be 18 or older to use ChillMate.") }
+            return nil
+        case .featuresAndPermissions:
+            if trimmedName.isEmpty { return String(localized: "Add your name on the first step to finish.") }
+            if calculatedAge < 18 { return String(localized: "You must be 18 or older to use ChillMate.") }
+            if !hasAgreed { return String(localized: "Please read and agree to the statement to finish.") }
+            return nil
+        default:
+            return nil
+        }
+    }
+
     private func goToNextStep() {
         switch setupStep {
         case .basicDetails:
@@ -1718,6 +1738,7 @@ private struct SetupWizardProgressBar: View {
 private struct SetupWizardFooter: View {
     let step: ProfileSetupStep
     let canAdvance: Bool
+    let reason: String?
     let onBack: () -> Void
     let onNext: () -> Void
 
@@ -1725,27 +1746,39 @@ private struct SetupWizardFooter: View {
     private var isLast: Bool { step == .featuresAndPermissions }
 
     var body: some View {
-        HStack(spacing: 12) {
-            if !isFirst {
-                Button(action: onBack) {
-                    Label("Back", systemImage: "chevron.left")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(ChillPillButtonStyle(prominent: false))
+        VStack(spacing: 8) {
+            if let reason, !canAdvance {
+                Text(reason)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .transition(.opacity)
             }
 
-            GlassActionButton(prominent: true, action: onNext) {
-                Label(
-                    isLast ? String(localized: "Create account") : String(localized: "Continue"),
-                    systemImage: isLast ? "person.crop.circle.badge.checkmark" : "arrow.right.circle.fill"
-                )
-                .font(.headline)
-                .frame(maxWidth: .infinity)
+            HStack(spacing: 12) {
+                if !isFirst {
+                    Button(action: onBack) {
+                        Label("Back", systemImage: "chevron.left")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(ChillPillButtonStyle(prominent: false))
+                }
+
+                GlassActionButton(prominent: true, action: onNext) {
+                    Label(
+                        isLast ? String(localized: "Create account") : String(localized: "Continue"),
+                        systemImage: isLast ? "person.crop.circle.badge.checkmark" : "arrow.right.circle.fill"
+                    )
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                }
+                .disabled(!canAdvance)
+                .opacity(canAdvance ? 1 : 0.55)
             }
-            .disabled(!canAdvance)
-            .opacity(canAdvance ? 1 : 0.55)
         }
+        .animation(.easeInOut(duration: 0.2), value: reason)
     }
 }
 

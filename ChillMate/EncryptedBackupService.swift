@@ -450,7 +450,7 @@ private struct ChillMateBackupArchive: Codable {
     }
 
     private func mergeNightEntries(into context: ModelContext) throws {
-        var existing = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<NightEntry>()).map { ($0.id, $0) })
+        var existing = Dictionary(try context.fetch(FetchDescriptor<NightEntry>()).map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         for dto in nightEntries {
             if let entry = existing[dto.id] {
                 dto.apply(to: entry)
@@ -463,7 +463,7 @@ private struct ChillMateBackupArchive: Codable {
     }
 
     private func mergeProfiles(into context: ModelContext) throws {
-        var existing = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<UserProfile>()).map { ($0.id, $0) })
+        var existing = Dictionary(try context.fetch(FetchDescriptor<UserProfile>()).map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         for dto in profiles {
             if let profile = existing[dto.id] {
                 dto.apply(to: profile)
@@ -476,7 +476,7 @@ private struct ChillMateBackupArchive: Codable {
     }
 
     private func mergeSTDTests(into context: ModelContext) throws {
-        var existing = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<STDTestRecord>()).map { ($0.id, $0) })
+        var existing = Dictionary(try context.fetch(FetchDescriptor<STDTestRecord>()).map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         for dto in stdTests {
             if let record = existing[dto.id] {
                 dto.apply(to: record)
@@ -489,7 +489,7 @@ private struct ChillMateBackupArchive: Codable {
     }
 
     private func mergeDrugTimers(into context: ModelContext) throws {
-        var existing = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<DrugDoseTimerRecord>()).map { ($0.id, $0) })
+        var existing = Dictionary(try context.fetch(FetchDescriptor<DrugDoseTimerRecord>()).map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         for dto in drugTimers {
             if let record = existing[dto.id] {
                 dto.apply(to: record)
@@ -502,7 +502,7 @@ private struct ChillMateBackupArchive: Codable {
     }
 
     private func mergeSaferPlans(into context: ModelContext) throws {
-        var existing = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<SaferSessionPlan>()).map { ($0.id, $0) })
+        var existing = Dictionary(try context.fetch(FetchDescriptor<SaferSessionPlan>()).map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         for dto in saferPlans {
             if let plan = existing[dto.id] {
                 dto.apply(to: plan)
@@ -515,7 +515,7 @@ private struct ChillMateBackupArchive: Codable {
     }
 
     private func mergeRiskChecks(into context: ModelContext) throws {
-        var existing = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<RiskCheckRecord>()).map { ($0.id, $0) })
+        var existing = Dictionary(try context.fetch(FetchDescriptor<RiskCheckRecord>()).map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         for dto in riskChecks {
             if let record = existing[dto.id] {
                 dto.apply(to: record)
@@ -528,7 +528,7 @@ private struct ChillMateBackupArchive: Codable {
     }
 
     private func mergeJournals(into context: ModelContext) throws {
-        var existing = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<JournalEntry>()).map { ($0.id, $0) })
+        var existing = Dictionary(try context.fetch(FetchDescriptor<JournalEntry>()).map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         for dto in journals {
             if let journal = existing[dto.id] {
                 dto.apply(to: journal)
