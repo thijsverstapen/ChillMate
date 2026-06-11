@@ -13,6 +13,9 @@ xcuserdata/
 # macOS
 .DS_Store
 
+# StoreKit config lives in ChillMate/ChillMate.storekit; ignore a stray root copy
+/ChillMate.storekit
+
 # Swift Package Manager
 .swiftpm/
 .build/
