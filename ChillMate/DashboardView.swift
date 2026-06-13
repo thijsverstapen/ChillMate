@@ -20,11 +20,12 @@ struct DashboardView: View {
 
     @State private var isShowingLogSheet = false
     @State private var isShowingCalendar = false
-    @State private var activeCarePage: CareToolPage?
     @State private var isPrivacyScreenActive = false
+    @Binding var careNavPath: [CareToolPage]
     let openCalendarTab: (() -> Void)?
 
-    init(openCalendarTab: (() -> Void)? = nil) {
+    init(careNavPath: Binding<[CareToolPage]>, openCalendarTab: (() -> Void)? = nil) {
+        self._careNavPath = careNavPath
         self.openCalendarTab = openCalendarTab
     }
 
@@ -50,10 +51,39 @@ struct DashboardView: View {
         return cachedMetrics!
     }
 
+    @ViewBuilder
+    private func careDestination(_ page: CareToolPage) -> some View {
+        careLeaf(page)
+            .navigationTitle("")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .tabBar)
+    }
+
+    @ViewBuilder
+    private func careLeaf(_ page: CareToolPage) -> some View {
+        switch page {
+        case .safetyAutopilot: SafetyAutopilotView()
+        case .saferPlanning: SaferSessionPlanView()
+        case .stdTests: STDTestsView()
+        case .drugTimers: DrugTimerView()
+        case .emergency: EmergencyNetherlandsView()
+        case .panicSupport: PanicSupportView()
+        case .drugInfo: DrugInfoView()
+        case .aftercare: AftercareView()
+        case .combinationRisk: CombinationRiskCheckerView()
+        case .consentBoundaries: ConsentBoundariesView()
+        case .recoveryMode: RecoveryModeView()
+        case .privateInsights: PrivateInsightsView()
+        case .helperBridge: ProfessionalHelperBridgeView()
+        case .drugChecking: DrugCheckingEducationView()
+        }
+    }
+
     var body: some View {
         let metrics = dashboardMetrics
 
-        NavigationStack {
+        NavigationStack(path: $careNavPath) {
             ZStack {
                 DashboardBackdrop(score: metrics.dailyScore.displayValue)
 
@@ -73,7 +103,7 @@ struct DashboardView: View {
                                     journalEntries: journalEntries,
                                     metrics: metrics,
                                     log: { isShowingLogSheet = true },
-                                    openCare: { activeCarePage = $0 },
+                                    openCare: { careNavPath.append($0) },
                                     openCalendar: openCalendar
                                 )
 
@@ -113,16 +143,16 @@ struct DashboardView: View {
 
                                 if metrics.realityCheckActive {
                                     RealityCheckCard {
-                                        activeCarePage = .panicSupport
+                                        careNavPath.append(.panicSupport)
                                     }
                                 }
 
                                 CareToolsSection { page in
-                                    activeCarePage = page
+                                    careNavPath.append(page)
                                 }
 
                                 InsightsToolsSection { page in
-                                    activeCarePage = page
+                                    careNavPath.append(page)
                                 }
 
                                 MedicalSafetyDisclaimerCard(compact: true)
@@ -194,40 +224,8 @@ struct DashboardView: View {
             .fullScreenCover(isPresented: $isShowingCalendar) {
                 CalendarOverviewView()
             }
-            .fullScreenCover(item: $activeCarePage) { page in
-                switch page {
-                // Modal-only pages keep their own NavigationStack.
-                case .saferPlanning:
-                    SaferSessionPlanView()
-                case .stdTests:
-                    STDTestsView()
-                case .drugTimers:
-                    DrugTimerView()
-                case .emergency:
-                    EmergencyNetherlandsView()
-                case .panicSupport:
-                    PanicSupportView()
-                case .drugInfo:
-                    DrugInfoView()
-                case .aftercare:
-                    AftercareView()
-                case .combinationRisk:
-                    CombinationRiskCheckerView()
-                case .consentBoundaries:
-                    ConsentBoundariesView()
-                // Pages shared with the More hub are de-nested; host them in a
-                // navigation stack with a close control for this modal context.
-                case .safetyAutopilot:
-                    CareCoverHost { SafetyAutopilotView() }
-                case .recoveryMode:
-                    CareCoverHost { RecoveryModeView() }
-                case .privateInsights:
-                    CareCoverHost { PrivateInsightsView() }
-                case .helperBridge:
-                    CareCoverHost { ProfessionalHelperBridgeView() }
-                case .drugChecking:
-                    CareCoverHost { DrugCheckingEducationView() }
-                }
+            .navigationDestination(for: CareToolPage.self) { page in
+                careDestination(page)
             }
             .fullScreenCover(isPresented: $isPrivacyScreenActive) {
                 PrivacyShieldView(dismiss: { isPrivacyScreenActive = false })

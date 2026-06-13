@@ -91,14 +91,14 @@ enum AppTab: String {
 
 private struct MainTabView: View {
     @State private var selectedTab: AppTab = .home
-    @State private var activeCarePage: CareToolPage?
+    @State private var careNavPath: [CareToolPage] = []
     @State private var isShowingShortcutLog = false
     @AppStorage("pendingAppDestination") private var pendingAppDestination = ""
     @AppStorage("lastSelectedTab") private var lastSelectedTab = AppTab.home.rawValue
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            DashboardView(openCalendarTab: {
+            DashboardView(careNavPath: $careNavPath, openCalendarTab: {
                 selectedTab = .calendar
             })
             .tabItem {
@@ -131,41 +131,6 @@ private struct MainTabView: View {
                 .tag(AppTab.more)
         }
         .tint(.chillPrimary)
-        .fullScreenCover(item: $activeCarePage) { page in
-            switch page {
-            // Modal-only pages keep their own NavigationStack.
-            case .saferPlanning:
-                SaferSessionPlanView()
-            case .stdTests:
-                STDTestsView()
-            case .drugTimers:
-                DrugTimerView()
-            case .emergency:
-                EmergencyNetherlandsView()
-            case .drugInfo:
-                DrugInfoView()
-            case .aftercare:
-                AftercareView()
-            case .combinationRisk:
-                CombinationRiskCheckerView()
-            case .panicSupport:
-                PanicSupportView()
-            case .consentBoundaries:
-                ConsentBoundariesView()
-            // Pages shared with the More hub are de-nested; host them in a
-            // navigation stack with a close control for this modal context.
-            case .safetyAutopilot:
-                CareCoverHost { SafetyAutopilotView() }
-            case .recoveryMode:
-                CareCoverHost { RecoveryModeView() }
-            case .privateInsights:
-                CareCoverHost { PrivateInsightsView() }
-            case .helperBridge:
-                CareCoverHost { ProfessionalHelperBridgeView() }
-            case .drugChecking:
-                CareCoverHost { DrugCheckingEducationView() }
-            }
-        }
         .fullScreenCover(isPresented: $isShowingShortcutLog) {
             LogNightSheet()
         }
@@ -201,16 +166,16 @@ private struct MainTabView: View {
             isShowingShortcutLog = true
         case .saferPlan:
             selectedTab = .home
-            activeCarePage = .saferPlanning
+            careNavPath = [.saferPlanning]
         case .timers:
             selectedTab = .home
-            activeCarePage = .drugTimers
+            careNavPath = [.drugTimers]
         case .emergency:
             selectedTab = .home
-            activeCarePage = .emergency
+            careNavPath = [.emergency]
         case .panic:
             selectedTab = .home
-            activeCarePage = .panicSupport
+            careNavPath = [.panicSupport]
         case .journal:
             selectedTab = .journal
         case .safeRoute:

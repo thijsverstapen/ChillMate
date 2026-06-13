@@ -1441,6 +1441,9 @@
         }
       }
     },
+    "Add your name on the first step to finish." : {
+
+    },
     "Affects serotonin" : {
       "localizations" : {
         "nl" : {
@@ -5576,6 +5579,9 @@
           }
         }
       }
+    },
+    "Enter your name to continue." : {
+
     },
     "Every Chill in the last 14 days has either a log or a skipped check-in." : {
       "localizations" : {
@@ -11371,6 +11377,9 @@
         }
       }
     },
+    "Please read and agree to the statement to finish." : {
+
+    },
     "Poppers" : {
       "localizations" : {
         "nl" : {
@@ -16940,6 +16949,9 @@
           }
         }
       }
+    },
+    "You must be 18 or older to use ChillMate." : {
+
     },
     "You need to read and agree to the statement above before you can create your account and use ChillMate." : {
       "extractionState" : "stale",

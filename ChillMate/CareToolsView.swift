@@ -158,7 +158,7 @@ struct STDTestsView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -231,25 +231,14 @@ struct STDTestsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        attemptDismiss()
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: saveTest) {
+                        Text("Save").font(.headline.weight(.semibold))
                     }
+                    .foregroundStyle(Color.chillPrimary)
                 }
             }
-            .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
-                dismiss()
-            }
-            .edgeSwipeBack(attemptDismiss)
             .endEditingOnTap()
-        }
-    }
-
-    private func attemptDismiss() {
-        if hasUnsavedChanges {
-            isShowingDiscardWarning = true
-        } else {
-            dismiss()
         }
     }
 
@@ -749,7 +738,7 @@ struct SaferSessionPlanView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -875,30 +864,21 @@ struct SaferSessionPlanView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        attemptDismiss()
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: savePlan) {
+                        Text("Save").font(.headline.weight(.semibold))
                     }
+                    .foregroundStyle(Color.chillPrimary)
+                    .disabled(!canSavePlan)
+                    .opacity(canSavePlan ? 1 : 0.5)
                 }
-            }
-            .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
-                dismiss()
             }
             .onChange(of: plannedDate) { _, newDate in
                 if endingDate <= newDate {
                     endingDate = Calendar.current.date(byAdding: .hour, value: 4, to: newDate) ?? newDate.addingTimeInterval(4 * 60 * 60)
                 }
             }
-            .edgeSwipeBack(attemptDismiss)
             .endEditingOnTap()
-        }
-    }
-
-    private func attemptDismiss() {
-        if hasUnsavedChanges {
-            isShowingDiscardWarning = true
-        } else {
-            dismiss()
         }
     }
 
@@ -1416,7 +1396,7 @@ struct DrugTimerView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -1528,14 +1508,14 @@ struct DrugTimerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        attemptDismiss()
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: startTimer) {
+                        Text("Start").font(.headline.weight(.semibold))
                     }
+                    .foregroundStyle(Color.chillPrimary)
+                    .disabled(!canStartTimer)
+                    .opacity(canStartTimer ? 1 : 0.5)
                 }
-            }
-            .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
-                dismiss()
             }
             .onReceive(NotificationCenter.default.publisher(for: .chillMateRefreshTimers)) { _ in
                 Task { @MainActor in
@@ -1544,16 +1524,7 @@ struct DrugTimerView: View {
                     }
                 }
             }
-            .edgeSwipeBack(attemptDismiss)
             .endEditingOnTap()
-        }
-    }
-
-    private func attemptDismiss() {
-        if hasUnsavedChanges {
-            isShowingDiscardWarning = true
-        } else {
-            dismiss()
         }
     }
 
@@ -2028,7 +1999,7 @@ struct CombinationRiskCheckerView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -2190,25 +2161,14 @@ struct CombinationRiskCheckerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        attemptDismiss()
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: saveRiskCheck) {
+                        Text("Save").font(.headline.weight(.semibold))
                     }
+                    .foregroundStyle(Color.chillPrimary)
                 }
             }
-            .discardChangesDialog(isPresented: $isShowingDiscardWarning) {
-                dismiss()
-            }
-            .edgeSwipeBack(attemptDismiss)
             .endEditingOnTap()
-        }
-    }
-
-    private func attemptDismiss() {
-        if hasUnsavedChanges {
-            isShowingDiscardWarning = true
-        } else {
-            dismiss()
         }
     }
 
@@ -2844,7 +2804,7 @@ struct DrugInfoView: View {
     @Environment(\.openURL) private var openURL
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -2911,14 +2871,6 @@ struct DrugInfoView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        dismiss()
-                    }
-                }
-            }
-            .edgeSwipeToDismiss()
         }
     }
 }
@@ -2972,7 +2924,7 @@ struct EmergencyNetherlandsView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -3100,14 +3052,6 @@ struct EmergencyNetherlandsView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        dismiss()
-                    }
-                }
-            }
-            .edgeSwipeToDismiss()
             .endEditingOnTap()
         }
     }
@@ -3221,7 +3165,7 @@ struct AftercareView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -3265,14 +3209,6 @@ struct AftercareView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        dismiss()
-                    }
-                }
-            }
-            .edgeSwipeToDismiss()
             .endEditingOnTap()
         }
     }
@@ -3729,7 +3665,7 @@ struct PanicSupportView: View {
     ]
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -3862,14 +3798,6 @@ struct PanicSupportView: View {
                 .scrollIndicators(.hidden)
             }
             .navigationTitle("")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        dismiss()
-                    }
-                }
-            }
-            .edgeSwipeToDismiss()
         }
     }
 
@@ -5556,7 +5484,7 @@ struct ConsentBoundariesView: View {
     @AppStorage("consentExitPlan") private var exitPlan = ""
 
     var body: some View {
-        NavigationStack {
+        Group {
             ZStack {
                 DashboardBackdrop()
 
@@ -5590,12 +5518,6 @@ struct ConsentBoundariesView: View {
                 .scrollDismissesKeyboard(.interactively)
             }
             .navigationTitle("")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton { dismiss() }
-                }
-            }
-            .edgeSwipeToDismiss()
             .endEditingOnTap()
         }
     }
