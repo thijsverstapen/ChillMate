@@ -208,8 +208,28 @@ final class NotificationService {
     }
 
     func scheduleDailyAffirmations() {
+        scheduleDailyAffirmations(using: Self.affirmationMessagePool)
+    }
+
+    /// Reschedules the weekly affirmations, first trying to generate fresh ones
+    /// entirely on-device with Apple's FoundationModels. Falls back to the
+    /// curated static pool whenever the model is unavailable (older device,
+    /// Apple Intelligence off, Simulator) or returns too few usable lines.
+    func scheduleDailyAffirmationsUsingOnDeviceModel(languageCode: String) async {
+        var pool = await OnDeviceAffirmationService.generateAffirmations(count: 7, languageCode: languageCode) ?? []
+        if pool.count < 3 {
+            // Not enough trustworthy on-device output: use the curated pool.
+            pool = Self.affirmationMessagePool
+        } else if pool.count < 7 {
+            // Top up so all seven slots have distinct-enough text.
+            pool += Self.affirmationMessagePool
+        }
+        scheduleDailyAffirmations(using: pool)
+    }
+
+    private func scheduleDailyAffirmations(using pool: [String]) {
         clearDailyAffirmations()
-        let pool = Self.affirmationMessagePool
+        guard !pool.isEmpty else { return }
         let jitterMinutes = [3, -7, 11, -4, 8, -12, 5]
         let stride = max(1, pool.count / 7)
 

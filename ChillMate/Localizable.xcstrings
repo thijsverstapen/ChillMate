@@ -17401,6 +17401,86 @@
           }
         }
       }
+    },
+    "Age confirmed with Apple" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leeftijd bevestigd met Apple"
+          }
+        }
+      }
+    },
+    "Confirm you're 18 or older" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevestig dat je 18 jaar of ouder bent"
+          }
+        }
+      }
+    },
+    "Verified privately through your Apple Account." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privé geverifieerd via je Apple Account."
+          }
+        }
+      }
+    },
+    "Optional. Uses Apple's age range, never your birthdate." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optioneel. Gebruikt de leeftijdscategorie van Apple, nooit je geboortedatum."
+          }
+        }
+      }
+    },
+    "Age confirmed with your Apple Account." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leeftijd bevestigd met je Apple Account."
+          }
+        }
+      }
+    },
+    "Your Apple Account indicates you are under 18." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je Apple Account geeft aan dat je jonger dan 18 bent."
+          }
+        }
+      }
+    },
+    "No problem. Your date of birth will be used instead." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen probleem. Je geboortedatum wordt dan gebruikt."
+          }
+        }
+      }
+    },
+    "Apple's age check isn't available here. Your date of birth will be used." : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De leeftijdscontrole van Apple is hier niet beschikbaar. Je geboortedatum wordt gebruikt."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

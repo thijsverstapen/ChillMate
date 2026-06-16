@@ -7,6 +7,10 @@ import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
+#if canImport(DeclaredAgeRange)
+@preconcurrency import DeclaredAgeRange
+#endif
+
 struct AppHomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
@@ -131,6 +135,9 @@ private struct MainTabView: View {
                 .tag(AppTab.more)
         }
         .tint(.chillPrimary)
+        // iOS 26: let the Liquid Glass tab bar shrink as content scrolls up,
+        // giving more room to the page and a more native feel.
+        .tabBarMinimizeBehavior(.onScrollDown)
         .fullScreenCover(isPresented: $isShowingShortcutLog) {
             LogNightSheet()
         }
@@ -857,6 +864,79 @@ private enum ProfileSetupStep: Int, CaseIterable, Identifiable {
     var id: Int { rawValue }
 }
 
+/// Optional, privacy-preserving 18+ confirmation backed by Apple's
+/// `DeclaredAgeRange`. It augments the self-entered date of birth: the app never
+/// receives a birthdate from Apple, only a coarse age-range signal the user
+/// explicitly chooses to share.
+struct AgeAssuranceRow: View {
+    let verified: Bool
+    let underage: Bool
+    let isChecking: Bool
+    let message: String?
+    let action: () -> Void
+
+    private var icon: String {
+        if verified { return "checkmark.seal.fill" }
+        if underage { return "exclamationmark.triangle.fill" }
+        return "person.badge.shield.checkmark"
+    }
+
+    private var iconTint: Color {
+        if verified { return .chillIconGreen }
+        if underage { return .chillIconRed }
+        return .chillPrimary
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(iconTint)
+                    .frame(width: 30, height: 30)
+                    .glassSurface(radius: 15, tint: iconTint.opacity(0.14))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verified ? "Age confirmed with Apple" : "Confirm you're 18 or older")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.chillText)
+                    Text(verified
+                        ? String(localized: "Verified privately through your Apple Account.")
+                        : String(localized: "Optional. Uses Apple's age range, never your birthdate."))
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 8)
+
+                if !verified {
+                    Button(action: action) {
+                        if isChecking {
+                            ProgressView().tint(Color.chillPrimary)
+                        } else {
+                            Text("Confirm")
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(Color.chillPrimary)
+                        }
+                    }
+                    .disabled(isChecking)
+                }
+            }
+
+            if let message {
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(underage ? .red : Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 4)
+    }
+}
+
 struct ProfileSetupView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
@@ -911,6 +991,17 @@ struct ProfileSetupView: View {
     @State private var isImportingBackup = false
     @State private var isRestoringICloudBackup = false
     @State private var isShowingTrustedContactPicker = false
+
+    // MARK: Age assurance (DeclaredAgeRange)
+    /// Set once Apple's age-range signal confirms 18+, so we don't re-prompt.
+    @AppStorage("ageAssuranceVerifiedAdult") private var ageAssuranceVerifiedAdult = false
+    /// True only when Apple positively reports the account is under 18.
+    @State private var ageAssuranceUnderage = false
+    @State private var isCheckingAgeRange = false
+    @State private var ageAssuranceMessage: String?
+    #if canImport(DeclaredAgeRange)
+    @Environment(\.requestAgeRange) private var requestAgeRange
+    #endif
 
     private var canCreate: Bool {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && calculatedAge >= 18
@@ -1116,6 +1207,18 @@ struct ProfileSetupView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.vertical, 8)
                         }
+
+                        #if canImport(DeclaredAgeRange)
+                        ProfileSetupRowDivider()
+
+                        AgeAssuranceRow(
+                            verified: ageAssuranceVerifiedAdult,
+                            underage: ageAssuranceUnderage,
+                            isChecking: isCheckingAgeRange,
+                            message: ageAssuranceMessage,
+                            action: { Task { await verifyAgeWithAppleAccount() } }
+                        )
+                        #endif
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
@@ -1399,6 +1502,39 @@ struct ProfileSetupView: View {
         )
     }
 
+    #if canImport(DeclaredAgeRange)
+    /// Asks Apple for a privacy-preserving age-range signal (18+ gate). The app
+    /// only learns whether the account is 18+ or under — never a birthdate.
+    /// Declining, or any error (Simulator / unsupported region throws
+    /// `.notAvailable`), simply falls back to the self-entered date of birth.
+    @MainActor
+    private func verifyAgeWithAppleAccount() async {
+        isCheckingAgeRange = true
+        defer { isCheckingAgeRange = false }
+        do {
+            let response = try await requestAgeRange(ageGates: 18)
+            switch response {
+            case .sharing(let range):
+                if let lower = range.lowerBound, lower >= 18 {
+                    ageAssuranceVerifiedAdult = true
+                    ageAssuranceUnderage = false
+                    ageAssuranceMessage = String(localized: "Age confirmed with your Apple Account.")
+                } else {
+                    ageAssuranceVerifiedAdult = false
+                    ageAssuranceUnderage = true
+                    ageAssuranceMessage = String(localized: "Your Apple Account indicates you are under 18.")
+                }
+            case .declinedSharing:
+                ageAssuranceMessage = String(localized: "No problem. Your date of birth will be used instead.")
+            @unknown default:
+                ageAssuranceMessage = nil
+            }
+        } catch {
+            ageAssuranceMessage = String(localized: "Apple's age check isn't available here. Your date of birth will be used.")
+        }
+    }
+    #endif
+
     private var footerCanAdvance: Bool {
         switch setupStep {
         case .basicDetails:
@@ -1417,10 +1553,12 @@ struct ProfileSetupView: View {
         switch setupStep {
         case .basicDetails:
             if trimmedName.isEmpty { return String(localized: "Enter your name to continue.") }
+            if ageAssuranceUnderage { return String(localized: "Your Apple Account indicates you are under 18.") }
             if calculatedAge < 18 { return String(localized: "You must be 18 or older to use ChillMate.") }
             return nil
         case .featuresAndPermissions:
             if trimmedName.isEmpty { return String(localized: "Add your name on the first step to finish.") }
+            if ageAssuranceUnderage { return String(localized: "Your Apple Account indicates you are under 18.") }
             if calculatedAge < 18 { return String(localized: "You must be 18 or older to use ChillMate.") }
             if !hasAgreed { return String(localized: "Please read and agree to the statement to finish.") }
             return nil

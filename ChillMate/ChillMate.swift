@@ -67,7 +67,17 @@ struct ChillMateApp: App {
         }
 
         if dailyAffirmationsEnabled {
-            NotificationService.shared.scheduleDailyAffirmations()
+            // Regenerate affirmations on-device at most once per day so fresh,
+            // personalized text is used when Apple Intelligence is available,
+            // without running the model on every foreground.
+            let lastAffirmationDay = Date(timeIntervalSince1970: UserDefaults.standard.double(forKey: "lastAffirmationScheduleDay"))
+            if lastAffirmationDay < today {
+                UserDefaults.standard.set(today.timeIntervalSince1970, forKey: "lastAffirmationScheduleDay")
+                let language = UserDefaults.standard.string(forKey: "appLanguage") ?? "en"
+                Task {
+                    await NotificationService.shared.scheduleDailyAffirmationsUsingOnDeviceModel(languageCode: language)
+                }
+            }
         } else {
             NotificationService.shared.clearDailyAffirmations()
         }

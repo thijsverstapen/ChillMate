@@ -279,18 +279,35 @@ struct GlassSurfaceModifier: ViewModifier {
     let interactive: Bool
 
     func body(content: Content) -> some View {
-        // Use dark ultraThinMaterial so our white text stays white.
-        // iOS 26's .glassEffect creates vibrancy that inverts content to dark-on-light;
-        // forcing .dark colorScheme on a material gives proper dark frosted glass instead.
-        content
-            .background(
-                RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .fill(.ultraThinMaterial)
-            )
+        // Dark frosted glass: an ultraThinMaterial under a forced dark colour
+        // scheme keeps our white text white. (iOS 26's .glassEffect applies
+        // vibrancy that would invert content to dark-on-light on this UI.)
+        //
+        // `tint` and `interactive` were previously accepted but ignored; they
+        // now render, matching iOS 26 tinted/interactive glass:
+        //  - tint: a soft colour wash over the frosted material.
+        //  - interactive: a brighter, top-lit specular rim so tappable
+        //    surfaces read as raised.
+        let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+        return content
+            .background {
+                ZStack {
+                    shape.fill(.ultraThinMaterial)
+                    shape.fill(tint)
+                }
+            }
             .environment(\.colorScheme, .dark)
             .overlay {
-                RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .stroke(.white.opacity(0.12), lineWidth: 0.5)
+                shape.strokeBorder(
+                    LinearGradient(
+                        colors: interactive
+                            ? [.white.opacity(0.30), .white.opacity(0.08)]
+                            : [.white.opacity(0.12), .white.opacity(0.12)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ),
+                    lineWidth: interactive ? 0.75 : 0.5
+                )
             }
     }
 }

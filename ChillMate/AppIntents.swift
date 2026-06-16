@@ -100,7 +100,8 @@ struct ChillMateShortcuts: AppShortcutsProvider {
             intent: LogHydrationIntent(),
             phrases: [
                 "Log hydration in \(.applicationName)",
-                "I drank water in \(.applicationName)"
+                "I drank water in \(.applicationName)",
+                "Log water in \(.applicationName)"
             ],
             shortTitle: "Log hydration",
             systemImageName: "drop.fill"
@@ -109,7 +110,8 @@ struct ChillMateShortcuts: AppShortcutsProvider {
             intent: LogSkippedNightIntent(),
             phrases: [
                 "Log nothing happened in \(.applicationName)",
-                "Check in with \(.applicationName)"
+                "Check in with \(.applicationName)",
+                "Log a clear night in \(.applicationName)"
             ],
             shortTitle: "Log nothing happened",
             systemImageName: "moon.zzz.fill"
@@ -118,20 +120,38 @@ struct ChillMateShortcuts: AppShortcutsProvider {
             intent: OpenSafeRouteIntent(),
             phrases: [
                 "Get me home with \(.applicationName)",
-                "Safe route in \(.applicationName)"
+                "Safe route in \(.applicationName)",
+                "Take me home with \(.applicationName)"
             ],
             shortTitle: "Safe route home",
             systemImageName: "location.fill"
         )
         AppShortcut(
             intent: OpenLogSheetIntent(),
-            phrases: ["Log a Chill in \(.applicationName)"],
+            phrases: [
+                "Log a Chill in \(.applicationName)",
+                "Start a log in \(.applicationName)",
+                "Record a session in \(.applicationName)"
+            ],
             shortTitle: "Log a Chill",
             systemImageName: "plus.circle.fill"
         )
         AppShortcut(
+            intent: OpenTimersIntent(),
+            phrases: [
+                "Open timers in \(.applicationName)",
+                "Show my check-in timers in \(.applicationName)"
+            ],
+            shortTitle: "Check-in timers",
+            systemImageName: "timer"
+        )
+        AppShortcut(
             intent: OpenEmergencyIntent(),
-            phrases: ["Open emergency in \(.applicationName)"],
+            phrases: [
+                "Open emergency in \(.applicationName)",
+                "Show emergency info in \(.applicationName)",
+                "I need help in \(.applicationName)"
+            ],
             shortTitle: "Emergency info",
             systemImageName: "sos.circle.fill"
         )
