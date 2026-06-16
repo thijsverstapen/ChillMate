@@ -53,11 +53,19 @@ struct DashboardView: View {
 
     @ViewBuilder
     private func careDestination(_ page: CareToolPage) -> some View {
-        careLeaf(page)
+        let leaf = careLeaf(page)
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar(.hidden, for: .tabBar)
+        // iOS 27: collapse the nav bar as the user scrolls down into a care page.
+        // Trailing Save/Start actions stay reachable because they use
+        // .topBarPinnedTrailing (see CareToolsView). iOS 26 keeps the static bar.
+        if #available(iOS 27.0, *) {
+            leaf.toolbarMinimizeBehavior(.onScrollDown, for: .navigationBar)
+        } else {
+            leaf
+        }
     }
 
     @ViewBuilder

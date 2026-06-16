@@ -5,6 +5,17 @@ import SwiftData
 import SwiftUI
 import UIKit
 
+/// `.topBarPinnedTrailing` on iOS 27+, where it keeps a primary action pinned to
+/// the trailing edge even as the navigation bar minimizes on scroll. Falls back
+/// to `.topBarTrailing` on iOS 26 so the app still runs there unchanged.
+private var chillPinnedTrailingPlacement: ToolbarItemPlacement {
+    if #available(iOS 27.0, *) {
+        return .topBarPinnedTrailing
+    } else {
+        return .topBarTrailing
+    }
+}
+
 enum CareToolPage: String, Identifiable {
     case safetyAutopilot
     case saferPlanning
@@ -231,7 +242,7 @@ struct STDTestsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: chillPinnedTrailingPlacement) {
                     Button(action: saveTest) {
                         Text("Save").font(.headline.weight(.semibold))
                     }
@@ -864,7 +875,7 @@ struct SaferSessionPlanView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: chillPinnedTrailingPlacement) {
                     Button(action: savePlan) {
                         Text("Save").font(.headline.weight(.semibold))
                     }
@@ -1508,7 +1519,7 @@ struct DrugTimerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: chillPinnedTrailingPlacement) {
                     Button(action: startTimer) {
                         Text("Start").font(.headline.weight(.semibold))
                     }
@@ -2161,7 +2172,7 @@ struct CombinationRiskCheckerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: chillPinnedTrailingPlacement) {
                     Button(action: saveRiskCheck) {
                         Text("Save").font(.headline.weight(.semibold))
                     }
