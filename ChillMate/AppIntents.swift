@@ -2,6 +2,34 @@ import AppIntents
 import SwiftData
 import SwiftUI
 
+// MARK: - Hydration log (shared daily flag)
+
+/// Single source of truth for the lightweight "drank water today" flag, shared
+/// across the app, the widgets/Live Activity, and Siri via the App Group. It is
+/// date-stamped so it naturally resets each day. Previously each surface wrote
+/// its own dead key (`widgetHydrationLogged`) or posted an unobserved
+/// notification, so "log hydration" recorded nothing; this unifies them.
+enum HydrationLog {
+    static let appGroup = "group.com.codex.ChillMate"
+    static let key = "lastHydrationLogDate"
+
+    private static var store: UserDefaults { UserDefaults(suiteName: appGroup) ?? .standard }
+
+    static func markLoggedNow() {
+        store.set(Date.now.timeIntervalSince1970, forKey: key)
+    }
+
+    static var loggedDate: Date? {
+        let stamp = store.double(forKey: key)
+        return stamp > 0 ? Date(timeIntervalSince1970: stamp) : nil
+    }
+
+    static var isLoggedToday: Bool {
+        guard let loggedDate else { return false }
+        return Calendar.current.isDateInToday(loggedDate)
+    }
+}
+
 // MARK: - Log Hydration
 
 struct LogHydrationIntent: AppIntent {
@@ -11,6 +39,9 @@ struct LogHydrationIntent: AppIntent {
 
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
         await MainActor.run {
+            // Persist the daily flag (works even when the app isn't running) and
+            // post for any live UI to refresh immediately.
+            HydrationLog.markLoggedNow()
             NotificationCenter.default.post(name: .watchDidLogHydration, object: nil)
         }
         return .result(value: "Hydration logged in ChillMate.")
@@ -25,10 +56,23 @@ struct LogSkippedNightIntent: AppIntent {
     static let openAppWhenRun = false
 
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
-        await MainActor.run {
-            UserDefaults.standard.set("quickSkip", forKey: "pendingQuickAction")
+        // Write directly to the shared store so this works whether or not the app
+        // is in the foreground. (It previously set a `pendingQuickAction` key that
+        // nothing ever read, so nothing was logged.)
+        let message = await MainActor.run { () -> String in
+            let context = ChillMateModelContainer.container().mainContext
+            let startOfToday = Calendar.current.startOfDay(for: .now)
+            let descriptor = FetchDescriptor<NightEntry>(
+                predicate: #Predicate { $0.date >= startOfToday }
+            )
+            if let existing = try? context.fetch(descriptor), !existing.isEmpty {
+                return "You already have an entry logged for today."
+            }
+            context.insert(NightEntry(date: .now, hadSex: false, skippedNight: true, substances: []))
+            try? context.save()
+            return "Logged a clear night in ChillMate."
         }
-        return .result(value: "Logged in ChillMate.")
+        return .result(value: message)
     }
 }
 

@@ -21,6 +21,7 @@ struct DashboardView: View {
     @State private var isShowingLogSheet = false
     @State private var isShowingCalendar = false
     @State private var isPrivacyScreenActive = false
+    @State private var hydrationLoggedToday = false
     @Binding var careNavPath: [CareToolPage]
     let openCalendarTab: (() -> Void)?
 
@@ -155,6 +156,21 @@ struct DashboardView: View {
                                     careNavPath.append(page)
                                 }
 
+                                if hydrationLoggedToday {
+                                    HStack(spacing: 10) {
+                                        Image(systemName: "drop.fill")
+                                            .font(.subheadline.weight(.bold))
+                                            .foregroundStyle(Color.chillSecondaryBlue)
+                                        Text("Water logged today")
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundStyle(Color.chillText)
+                                        Spacer(minLength: 0)
+                                    }
+                                    .padding(14)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .glassSurface(radius: 22, tint: Color.chillSecondaryBlue.opacity(0.10))
+                                }
+
                                 MedicalSafetyDisclaimerCard(compact: true)
                             }
                             .frame(width: contentWidth, alignment: .leading)
@@ -171,6 +187,7 @@ struct DashboardView: View {
             .onAppear {
                 lastDailyRecoveryScore = metrics.dailyScore.displayValue
                 updateWidgetData(metrics: metrics)
+                hydrationLoggedToday = HydrationLog.isLoggedToday
             }
             .onChange(of: metrics.dailyScore.displayValue) { _, value in
                 lastDailyRecoveryScore = value
@@ -185,6 +202,12 @@ struct DashboardView: View {
             }
             .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestQuickSkip)) { _ in
                 quickSkip()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .watchDidLogHydration)) { _ in
+                // Persist the watch's hydration tap (the relay was previously
+                // unobserved) and reflect it immediately.
+                HydrationLog.markLoggedNow()
+                hydrationLoggedToday = true
             }
             .task(id: healthKitHRVReadEnabled) {
                 guard healthKitHRVReadEnabled else { return }
