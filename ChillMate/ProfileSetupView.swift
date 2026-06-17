@@ -1162,6 +1162,8 @@ struct ProfileSetupView: View {
                             Picker("Language", selection: $appLanguage) {
                                 Text("English").tag("en")
                                 Text("Nederlands (Dutch)").tag("nl")
+                                Text(verbatim: "Español").tag("es")
+                                Text(verbatim: "Deutsch").tag("de")
                             }
                         }
 
