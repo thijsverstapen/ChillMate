@@ -88,6 +88,9 @@ enum OnDeviceAffirmationService {
     private static func languageName(for code: String) -> String {
         switch code.lowercased().prefix(2) {
         case "nl": return "Dutch"
+        case "es": return "Spanish"
+        case "de": return "German"
+        case "fr": return "French"
         default: return "English"
         }
     }
