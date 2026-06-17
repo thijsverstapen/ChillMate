@@ -1194,7 +1194,7 @@ struct ProfileSetupView: View {
                         ProfileSetupRowDivider()
 
                         ProfileSetupDateRow(
-                            title: "Date of birth (\(calculatedAge))",
+                            title: String(localized: "Date of birth (\(calculatedAge))"),
                             date: $dateOfBirth,
                             systemImage: "calendar"
                         )
