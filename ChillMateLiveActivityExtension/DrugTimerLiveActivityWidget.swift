@@ -9,8 +9,11 @@ struct WidgetLogHydrationIntent: AppIntent {
     static let openAppWhenRun = false
 
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
+        // Shared contract with the app's HydrationLog: a date-stamped daily flag in
+        // the App Group (key "lastHydrationLogDate"). Previously wrote a dead
+        // "widgetHydrationLogged" boolean that nothing read.
         let defaults = UserDefaults(suiteName: "group.com.codex.ChillMate") ?? .standard
-        defaults.set(true, forKey: "widgetHydrationLogged")
+        defaults.set(Date.now.timeIntervalSince1970, forKey: "lastHydrationLogDate")
         return .result(value: "Logged.")
     }
 }

@@ -17481,6 +17481,16 @@
           }
         }
       }
+    },
+    "Water logged today" : {
+      "localizations" : {
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vandaag water geregistreerd"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

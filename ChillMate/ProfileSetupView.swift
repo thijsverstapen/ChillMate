@@ -995,8 +995,10 @@ struct ProfileSetupView: View {
     // MARK: Age assurance (DeclaredAgeRange)
     /// Set once Apple's age-range signal confirms 18+, so we don't re-prompt.
     @AppStorage("ageAssuranceVerifiedAdult") private var ageAssuranceVerifiedAdult = false
-    /// True only when Apple positively reports the account is under 18.
-    @State private var ageAssuranceUnderage = false
+    /// True only when Apple positively reports the account is under 18. Persisted
+    /// so the 18+ block survives an app relaunch (a determined relaunch must not
+    /// silently clear an authoritative under-18 signal).
+    @AppStorage("ageAssuranceUnderage") private var ageAssuranceUnderage = false
     @State private var isCheckingAgeRange = false
     @State private var ageAssuranceMessage: String?
     #if canImport(DeclaredAgeRange)
