@@ -2917,8 +2917,9 @@ struct EmergencyNetherlandsView: View {
     @AppStorage("trustedContactName") private var trustedContactName = ""
     @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
     @AppStorage("trustedContactMessage") private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
-    @AppStorage("localEmergencyNumber") private var localEmergencyNumber = "112"
+    @AppStorage("localEmergencyNumber") private var localEmergencyNumber = ""
     @AppStorage("localHealthcareContact") private var localHealthcareContact = ""
+    @AppStorage("country") private var country = "Netherlands"
 
     @State private var isFetchingLocation = false
     @State private var locationMessage: String?
@@ -2926,12 +2927,12 @@ struct EmergencyNetherlandsView: View {
 
     private var emergencyNumber: String {
         let trimmed = localEmergencyNumber.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "112" : trimmed
+        return trimmed.isEmpty ? SupportResource.emergencyNumber(for: country) : trimmed
     }
 
     private var healthcareContactLabel: String {
         let trimmed = localHealthcareContact.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "GP, huisarts, or GGD" : trimmed
+        return trimmed.isEmpty ? SupportResource.healthcareLabel(for: country) : trimmed
     }
 
     var body: some View {
@@ -3052,7 +3053,7 @@ struct EmergencyNetherlandsView: View {
                         .padding(16)
                         .glassSurface(radius: 28, tint: .black.opacity(0.04))
 
-                        NetherlandsHarmReductionResourcesCard()
+                        CountrySupportLinksCard(country: country)
                     }
                     .padding(20)
                     .padding(.bottom, 36)
@@ -3125,30 +3126,31 @@ struct EmergencyNetherlandsView: View {
     }
 }
 
-private struct NetherlandsHarmReductionResourcesCard: View {
-    private let links: [(String, String)] = [
-        ("GGD sexual health", "https://www.ggd.nl"),
-        ("Drugsinfo substance information", "https://www.drugsinfo.nl"),
-        ("Jellinek alcohol and drugs support", "https://www.jellinek.nl"),
-        ("Government.nl emergency number 112", "https://www.government.nl/topics/emergency-number-112")
-    ]
+private struct CountrySupportLinksCard: View {
+    let country: String
+
+    private var links: [SupportResource] {
+        SupportResource.resources(for: country).filter {
+            $0.url != nil && $0.url?.scheme != "tel"
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            CareSectionTitle(title: String(localized: "Netherlands support links"), symbol: "mappin.and.ellipse")
+            CareSectionTitle(title: String(localized: "Support links"), symbol: "mappin.and.ellipse")
 
-            Text("Use these for non-urgent sexual health, substance information, and harm-reduction support. For immediate danger, use 112.")
+            Text("Use these for non-urgent sexual health, substance information, and harm-reduction support. For immediate danger, call your local emergency number.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            ForEach(links, id: \.0) { link in
-                if let url = URL(string: link.1) {
+            ForEach(links) { link in
+                if let url = link.url {
                     Link(destination: url) {
                         HStack(spacing: 10) {
                             Image(systemName: "link.circle.fill")
                                 .foregroundStyle(Color.chillSecondaryBlue)
-                            Text(link.0)
+                            Text(link.title)
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(Color.chillText)
                             Spacer()
@@ -3622,7 +3624,7 @@ private struct EmergencyContactEditSheet: View {
                         Label("Emergency number", systemImage: "phone.fill")
                             .font(.headline)
                             .foregroundStyle(Color.chillText)
-                        Text("Default is 112 (Netherlands / EU). Change to your local emergency number.")
+                        Text("Leave blank to use your country default (112 across the EU, 999 in the UK), or enter your local emergency number.")
                             .font(.caption)
                             .foregroundStyle(Color.chillSecondary)
                         TextField("e.g. 911 or 999", text: $emergencyNumber)
@@ -5042,6 +5044,17 @@ private struct SupportResource: Identifiable {
         case "Netherlands", "Other": return netherlands
         default: return international
         }
+    }
+
+    /// Primary emergency number for the country (112 across the EU, 999 in the UK).
+    static func emergencyNumber(for country: String) -> String {
+        country == "United Kingdom" ? "999" : "112"
+    }
+
+    /// Fallback label for the non-urgent sexual-health contact when the user has
+    /// not set their own.
+    static func healthcareLabel(for country: String) -> String {
+        (country == "Netherlands" || country == "Other") ? "GP, huisarts, or GGD" : "GP or sexual-health clinic"
     }
 }
 
