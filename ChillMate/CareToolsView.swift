@@ -1915,7 +1915,7 @@ private struct RedoseNudgeCard: View {
                 .font(.caption.weight(.bold))
                 .foregroundStyle(Color.chillText)
 
-            Text("Check-in progress: \(Int((progress * 100).rounded()))%")
+            Text("Check-in progress: \(progress.formatted(.percent.precision(.fractionLength(0))))")
                 .font(.caption.weight(.bold))
                 .foregroundStyle(.orange)
 
@@ -5086,7 +5086,7 @@ private struct LatestDoseReminder: View {
             Label("Earlier log reminder", systemImage: "clock.arrow.circlepath")
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
-            Text("\(timer.substanceName) was logged at \(timer.startedAt.formatted(date: .abbreviated, time: .shortened)). Check-in progress: \(Int(timer.effectProgress(at: .now) * 100))%.")
+            Text("\(timer.substanceName) was logged at \(timer.startedAt.formatted(date: .abbreviated, time: .shortened)). Check-in progress: \(timer.effectProgress(at: .now).formatted(.percent.precision(.fractionLength(0)))).")
                 .font(.callout)
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)

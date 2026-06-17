@@ -3085,7 +3085,7 @@ private struct ProfileEditView: View {
 
                         VStack(spacing: 0) {
                             ProfileSetupDateRow(
-                                title: "Date of birth (\(profile.calculatedAge))",
+                                title: String(localized: "Date of birth (\(profile.calculatedAge))"),
                                 date: $profile.dateOfBirth,
                                 systemImage: "calendar"
                             )
