@@ -135,9 +135,6 @@ private struct MainTabView: View {
                 .tag(AppTab.more)
         }
         .tint(.chillPrimary)
-        // iOS 26: let the Liquid Glass tab bar shrink as content scrolls up,
-        // giving more room to the page and a more native feel.
-        .tabBarMinimizeBehavior(.onScrollDown)
         .fullScreenCover(isPresented: $isShowingShortcutLog) {
             LogNightSheet()
         }
