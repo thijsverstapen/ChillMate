@@ -6,7 +6,7 @@ recommend substance use, or give dosage advice.
 
 ---
 
-## Version 3.0 (build 301)
+## Version 3.0 (build 302)
 
 Release date: 18 June 2026
 Minimum OS: iOS 26 (built and verified against the iOS 27 SDK)
@@ -15,13 +15,19 @@ Version 3.0 is a large modernization and reach update. It adopts the newest iOS
 frameworks, adds three more languages, makes every help resource match the
 country you choose, and triples the size of the daily affirmation library.
 
-Build 301 follows the first 3.0 upload (build 300) with two changes:
+Builds 301 and 302 follow the first 3.0 upload (build 300) with fixes:
 
 - The tab bar now stays fully visible instead of minimizing to a single icon
   while scrolling.
 - You can change your country directly in Edit Profile, not only during setup.
   Changing it updates your default emergency number and the support resources
   shown across the app.
+- Profile picker values (country, sex, role, language) now read in white.
+- The Edit Profile button is a clean circle, and its title no longer sits
+  under the back button.
+- The Risk checker shows a single, full-width safety notice instead of two.
+- Privacy dashboard and Settings cards use a softer, less tinted glass so they
+  match the rest of the app.
 
 ### Languages
 

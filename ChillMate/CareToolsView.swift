@@ -6297,7 +6297,7 @@ private struct PrivacyReceiptRow: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .glassSurface(radius: 22, tint: .white.opacity(0.28))
+        .glassSurface(radius: 22, tint: .black.opacity(0.04))
     }
 }
 

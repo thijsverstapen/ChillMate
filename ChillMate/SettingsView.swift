@@ -990,7 +990,7 @@ private struct SettingsCategoryCard: View {
                 .foregroundStyle(Color.chillSecondary)
         }
         .padding(16)
-        .glassSurface(radius: 26, tint: .white.opacity(0.30), interactive: true)
+        .glassSurface(radius: 26, tint: .black.opacity(0.04), interactive: true)
     }
 }
 
