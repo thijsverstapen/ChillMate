@@ -3017,6 +3017,7 @@ private struct ProfileEditView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
+    @AppStorage("country") private var country = "Netherlands"
     @Bindable var profile: UserProfile
 
     private var palette: DailyScorePalette {
@@ -3099,6 +3100,28 @@ private struct ProfileEditView: View {
                                 systemImage: "house.fill",
                                 axis: .vertical
                             )
+
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupPickerRow(title: String(localized: "Country"), systemImage: "mappin.and.ellipse") {
+                                Picker("Country", selection: $country) {
+                                    Text("Netherlands").tag("Netherlands")
+                                    Text("Belgium").tag("Belgium")
+                                    Text("Germany").tag("Germany")
+                                    Text("United Kingdom").tag("United Kingdom")
+                                    Text("France").tag("France")
+                                    Text("Spain").tag("Spain")
+                                    Text("Other").tag("Other")
+                                }
+                            }
+
+                            Text("Sets your default emergency number and the support resources shown across the app.")
+                                .font(.caption)
+                                .foregroundStyle(palette.heroSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 16)
+                                .padding(.top, 6)
 
                             ProfileSetupRowDivider()
 
