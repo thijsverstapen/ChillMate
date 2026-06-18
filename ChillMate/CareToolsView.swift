@@ -2019,8 +2019,6 @@ struct CombinationRiskCheckerView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .glassSurface(radius: 20, tint: .orange.opacity(0.08))
 
-                        ClinicalReviewNoticeCard()
-
                         VStack(alignment: .leading, spacing: 14) {
                             CareSectionTitle(title: String(localized: "Current meds"), symbol: "pills.circle.fill")
 
@@ -3560,6 +3558,7 @@ struct ClinicalReviewNoticeCard: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .glassSurface(radius: 24, tint: Color.chillMint.opacity(0.08))
     }
 }
