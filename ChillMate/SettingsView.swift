@@ -170,7 +170,7 @@ struct SettingsView: View {
                             }
                             .foregroundStyle(Color.chillSecondary)
                             .padding(16)
-                            .glassSurface(radius: 22, tint: .white.opacity(0.26))
+                            .glassSurface(radius: 22, tint: .black.opacity(0.04))
                         }
 
                         if let message {
@@ -179,7 +179,7 @@ struct SettingsView: View {
                                 .foregroundStyle(Color.chillSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
                                 .padding(16)
-                                .glassSurface(radius: 22, tint: .white.opacity(0.26))
+                                .glassSurface(radius: 22, tint: .black.opacity(0.04))
                         }
                     }
                     .padding(20)
@@ -405,7 +405,7 @@ struct SettingsView: View {
                             .foregroundStyle(Color.chillSecondary)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding(16)
-                            .glassSurface(radius: 22, tint: .white.opacity(0.26))
+                            .glassSurface(radius: 22, tint: .black.opacity(0.04))
                     }
                 }
                 .padding(20)
@@ -958,7 +958,7 @@ private struct SettingsToggleCard: View {
         }
         .tint(.chillPrimary)
         .padding(16)
-        .glassSurface(radius: 28, tint: .white.opacity(0.30), interactive: true)
+        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
     }
 }
 
@@ -1091,7 +1091,7 @@ private struct PrivacyDashboardCard: View {
             }
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: .white.opacity(0.30))
+        .glassSurface(radius: 28, tint: .black.opacity(0.04))
     }
 }
 
@@ -1459,7 +1459,7 @@ private struct PINLockCard: View {
             }
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: .white.opacity(0.30), interactive: true)
+        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
     }
 }
 
@@ -1508,7 +1508,7 @@ private struct PINSetupView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     .padding(22)
-                    .glassSurface(radius: 34, tint: .white.opacity(0.28), interactive: true)
+                    .glassSurface(radius: 34, tint: .black.opacity(0.04), interactive: true)
 
                     VStack(spacing: 12) {
                         SecureField("New PIN", text: $pin)
@@ -1522,7 +1522,7 @@ private struct PINSetupView: View {
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(Color.chillText)
                     .padding(16)
-                    .glassSurface(radius: 24, tint: .white.opacity(0.30), interactive: true)
+                    .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
                     .onChange(of: pin) { _, newValue in
                         pin = String(newValue.filter(\.isNumber).prefix(8))
                     }
@@ -1696,7 +1696,7 @@ private struct BackgroundLibraryCard: View {
             }
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: .white.opacity(0.30), interactive: true)
+        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
     }
 }
 
@@ -1950,7 +1950,7 @@ private struct DeleteAccountConfirmationView: View {
                         .font(.title3.weight(.bold))
                         .foregroundStyle(Color.chillText)
                         .padding(16)
-                        .glassSurface(radius: 24, tint: .white.opacity(0.30), interactive: true)
+                        .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
 
                     if let errorMessage {
                         Text(errorMessage)
