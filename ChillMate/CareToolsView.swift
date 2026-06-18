@@ -4461,7 +4461,7 @@ private struct JournalMonthCalendarSheet: View {
                     .datePickerStyle(.graphical)
                     .tint(Color.chillPrimary)
                     .padding(8)
-                    .glassSurface(radius: 24, tint: .white.opacity(0.28))
+                    .glassSurface(radius: 24, tint: .black.opacity(0.04))
 
                     Spacer(minLength: 0)
                 }
@@ -4808,7 +4808,7 @@ struct EmergencyCardView: View {
                             }
                         }
                         .padding(18)
-                        .glassSurface(radius: 30, tint: .white.opacity(0.24), interactive: true)
+                        .glassSurface(radius: 30, tint: .black.opacity(0.04), interactive: true)
 
                         HStack(spacing: 10) {
                             Link(destination: URL(string: "tel://112")!) {
@@ -5655,7 +5655,7 @@ private struct BoundaryPromptField: View {
                 .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
         }
         .padding(16)
-        .glassSurface(radius: 26, tint: .white.opacity(0.28), interactive: true)
+        .glassSurface(radius: 26, tint: .black.opacity(0.04), interactive: true)
     }
 }
 
@@ -5930,7 +5930,7 @@ struct ProfessionalHelperBridgeView: View {
                             .textSelection(.enabled)
                             .padding(16)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .glassSurface(radius: 26, tint: .white.opacity(0.32))
+                            .glassSurface(radius: 26, tint: .black.opacity(0.04))
 
                         ShareLink(item: summary) {
                             Label("Share private summary", systemImage: "square.and.arrow.up.fill")
@@ -6181,7 +6181,7 @@ private struct LegalInfoCard: View {
             }
         }
         .padding(16)
-        .glassSurface(radius: 26, tint: .white.opacity(0.26), interactive: true)
+        .glassSurface(radius: 26, tint: .black.opacity(0.04), interactive: true)
     }
 }
 
@@ -6491,7 +6491,7 @@ struct UnifiedTimelineView: View {
                                 .foregroundStyle(Color.chillSecondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(16)
-                                .glassSurface(radius: 24, tint: .white.opacity(0.24))
+                                .glassSurface(radius: 24, tint: .black.opacity(0.04))
                         } else {
                             LazyVStack(spacing: 10) {
                                 ForEach(Array(events.prefix(80))) { event in
@@ -6715,7 +6715,7 @@ struct RecentlyDeletedView: View {
                                 .foregroundStyle(Color.chillSecondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(16)
-                                .glassSurface(radius: 24, tint: .white.opacity(0.24))
+                                .glassSurface(radius: 24, tint: .black.opacity(0.04))
                         } else {
                             VStack(spacing: 10) { ForEach(items) { RecentlyDeletedRow(item: $0) } }
                             GlassActionButton(prominent: false) {

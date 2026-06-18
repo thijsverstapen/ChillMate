@@ -6,7 +6,7 @@ recommend substance use, or give dosage advice.
 
 ---
 
-## Version 3.0 (build 302)
+## Version 3.0 (build 303)
 
 Release date: 18 June 2026
 Minimum OS: iOS 26 (built and verified against the iOS 27 SDK)
@@ -15,8 +15,11 @@ Version 3.0 is a large modernization and reach update. It adopts the newest iOS
 frameworks, adds three more languages, makes every help resource match the
 country you choose, and triples the size of the daily affirmation library.
 
-Builds 301 and 302 follow the first 3.0 upload (build 300) with fixes:
+Builds 301 to 303 follow the first 3.0 upload (build 300) with fixes:
 
+- iPad: the onboarding screens no longer overlap the Next button. The intro
+  text sizes naturally and the content sits in a centered, readable column on
+  larger screens (App Store Guideline 4 fix).
 - The tab bar now stays fully visible instead of minimizing to a single icon
   while scrolling.
 - You can change your country directly in Edit Profile, not only during setup.
@@ -26,8 +29,9 @@ Builds 301 and 302 follow the first 3.0 upload (build 300) with fixes:
 - The Edit Profile button is a clean circle, and its title no longer sits
   under the back button.
 - The Risk checker shows a single, full-width safety notice instead of two.
-- Privacy dashboard and Settings cards use a softer, less tinted glass so they
-  match the rest of the app.
+- Container cards across the app (Privacy, Settings, setup, care tools) use a
+  softer, less tinted glass for a consistent look.
+- Tip prices show in the local currency (euro for the Netherlands storefront).
 
 ### Languages
 

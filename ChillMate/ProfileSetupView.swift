@@ -438,7 +438,7 @@ private struct MoreHubView: View {
                                 .foregroundStyle(Color.chillSecondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(16)
-                                .glassSurface(radius: 24, tint: .white.opacity(0.24))
+                                .glassSurface(radius: 24, tint: .black.opacity(0.04))
                         }
 
                         ForEach(filteredPages) { page in
@@ -1272,7 +1272,7 @@ struct ProfileSetupView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
-                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                    .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
                 }
     }
 
@@ -1327,7 +1327,7 @@ struct ProfileSetupView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
-                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                    .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
                 }
     }
 
@@ -1386,7 +1386,7 @@ struct ProfileSetupView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
-                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                    .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
                 }
 
                 VStack(alignment: .leading, spacing: 16) {
@@ -1465,7 +1465,7 @@ struct ProfileSetupView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
-                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                    .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
                 }
 
                 VStack(alignment: .leading, spacing: 16) {
@@ -1519,7 +1519,7 @@ struct ProfileSetupView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
-                    .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+                    .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
                 }
 
                 ProfileSetupMedicationSection(
@@ -2090,14 +2090,14 @@ private struct ProfilePermissionsPage: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 6)
-            .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+            .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
 
             if isChecking {
                 Label("Checking permission", systemImage: "hourglass")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
                     .padding(14)
-                    .glassSurface(radius: 20, tint: .white.opacity(0.26))
+                    .glassSurface(radius: 20, tint: .black.opacity(0.04))
             }
 
             if let message {
@@ -2106,7 +2106,7 @@ private struct ProfilePermissionsPage: View {
                     .foregroundStyle(Color.chillSecondary)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(14)
-                    .glassSurface(radius: 20, tint: .white.opacity(0.26))
+                    .glassSurface(radius: 20, tint: .black.opacity(0.04))
             }
 
             VStack(alignment: .leading, spacing: 12) {
@@ -2357,7 +2357,7 @@ struct ProfileSetupMedicationSection: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 6)
-            .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+            .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
         }
     }
 
@@ -2524,6 +2524,8 @@ private struct IntroBottomControls: View {
                 }
             }
         }
+        .frame(maxWidth: 600)
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -2642,8 +2644,7 @@ private struct IntroSlideView: View {
     var body: some View {
         GeometryReader { proxy in
             let topPadding = max(proxy.safeAreaInsets.top + 16, 58)
-            let heroHeight = min(max(proxy.size.height * 0.40, 300), 358)
-            let textHeight = min(max(proxy.size.height * 0.25, 192), 228)
+            let heroHeight = min(max(proxy.size.height * 0.34, 230), 330)
 
             TimelineView(.animation) { ctx in
                 let rawPhase = ctx.date.timeIntervalSinceReferenceDate
@@ -2677,10 +2678,10 @@ private struct IntroSlideView: View {
                         Spacer(minLength: 0)
 
                         IntroTextBlock(page: page, isVisible: textVisible)
-                            .frame(height: textHeight, alignment: .topLeading)
                             .padding(.horizontal, 24)
                             .padding(.bottom, 196)
                     }
+                    .frame(maxWidth: 600)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
@@ -3511,7 +3512,7 @@ private struct ProfileIntroTile: View {
             Spacer(minLength: 0)
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: .white.opacity(0.28), interactive: true)
+        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
     }
 }
 

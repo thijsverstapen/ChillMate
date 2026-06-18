@@ -465,7 +465,7 @@ private struct DailyScoreStatusPill: View {
         .frame(minHeight: 82)
         .padding(.horizontal, 10)
         .padding(.vertical, 10)
-        .glassSurface(radius: 24, tint: .white.opacity(0.24), interactive: true)
+        .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(score.isActive ? "Daily score \(score.value), \(score.label)" : "Daily score inactive. Make a substance-related log to activate daily score.")
     }
@@ -743,7 +743,7 @@ struct CalendarOverviewView: View {
                             }
                         }
                         .padding(16)
-                        .glassSurface(radius: 28, tint: .white.opacity(0.20), interactive: true)
+                        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
 
                         VStack(alignment: .leading, spacing: 12) {
                             SectionTitle(
@@ -1699,7 +1699,7 @@ private struct HelpResourceCard: View {
             }
         }
         .padding(16)
-        .glassSurface(radius: 28, tint: .white.opacity(0.30))
+        .glassSurface(radius: 28, tint: .black.opacity(0.04))
     }
 }
 
