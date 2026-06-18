@@ -2896,14 +2896,14 @@ struct ProfileOverviewView: View {
                         Button {
                             isShowingProfileEditor = true
                         } label: {
-                            Label("Edit", systemImage: "pencil")
-                                .font(.headline)
+                            Image(systemName: "pencil")
+                                .font(.headline.weight(.bold))
+                                .frame(width: 36, height: 36)
                         }
                         .buttonStyle(ChillPlainButtonStyle())
                         .foregroundStyle(Color.chillText)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
                         .glassSurface(radius: 18, tint: .white.opacity(0.28), interactive: true)
+                        .accessibilityLabel("Edit")
                     }
                 }
             }
@@ -3082,7 +3082,7 @@ private struct ProfileEditView: View {
                                 .foregroundStyle(palette.heroSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
-                        .padding(.top, 8)
+                        .padding(.top, 44)
 
                         VStack(spacing: 0) {
                             ProfileSetupDateRow(

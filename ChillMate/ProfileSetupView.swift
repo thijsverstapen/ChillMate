@@ -3713,7 +3713,7 @@ struct ProfileSetupPickerRow<Content: View>: View {
 
                 content
                     .pickerStyle(.menu)
-                    .tint(.chillPrimary)
+                    .tint(Color.chillText)
                     .font(.body.weight(.semibold))
                     .fixedSize()
             }
