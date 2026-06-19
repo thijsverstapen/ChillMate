@@ -6,7 +6,7 @@ recommend substance use, or give dosage advice.
 
 ---
 
-## Version 3.0 (build 303)
+## Version 3.0 (build 304)
 
 Release date: 18 June 2026
 Minimum OS: iOS 26 (built and verified against the iOS 27 SDK)
