@@ -129,22 +129,32 @@ private enum ChillBackgroundImageCache {
 /// Without this, an edge-swipe on a tab root that never pushes drags the content off to reveal
 /// the blank window background and rubber-bands back (an iOS 26 glitch). The gesture is
 /// re-enabled automatically once the stack actually pushes a view, so it is safe on any tab root.
-private struct RootSwipeBackDisabler: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> Controller { Controller() }
-    func updateUIViewController(_ controller: Controller, context: Context) { controller.applyState() }
+private struct RootSwipeBackDisabler: UIViewRepresentable {
+    func makeUIView(context: Context) -> NavigationGestureProbe { NavigationGestureProbe() }
+    func updateUIView(_ uiView: NavigationGestureProbe, context: Context) { uiView.applyState() }
 
-    final class Controller: UIViewController {
+    // A zero-size probe: SwiftUI's NavigationStack is backed by a UINavigationController that is
+    // NOT reachable via a child view controller's `navigationController`, but it IS reachable by
+    // walking the UIResponder chain from a view inside the stack's content.
+    final class NavigationGestureProbe: UIView {
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            applyState()
+            DispatchQueue.main.async { [weak self] in self?.applyState() }
+        }
+
         func applyState() {
-            guard let nav = navigationController else { return }
-            nav.interactivePopGestureRecognizer?.isEnabled = nav.viewControllers.count > 1
-        }
-        override func viewWillAppear(_ animated: Bool) {
-            super.viewWillAppear(animated)
-            applyState()
-        }
-        override func didMove(toParent parent: UIViewController?) {
-            super.didMove(toParent: parent)
-            applyState()
+            var responder: UIResponder? = self
+            while let current = responder {
+                if let nav = current as? UINavigationController {
+                    // Suppress the interactive back-swipe while the stack is at its root, where
+                    // there is nothing to pop — the source of the iOS 26 slide-to-blank glitch.
+                    // It re-enables automatically once a child view is pushed.
+                    nav.interactivePopGestureRecognizer?.isEnabled = nav.viewControllers.count > 1
+                    return
+                }
+                responder = current.next
+            }
         }
     }
 }
