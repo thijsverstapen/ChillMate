@@ -135,6 +135,12 @@ struct SettingsView: View {
         DailyScorePalette(score: lastDailyRecoveryScore)
     }
 
+    private var appVersionText: String {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        return "ChillMate \(version) (\(build))"
+    }
+
     var body: some View {
         ZStack {
             DashboardBackdrop()
@@ -181,6 +187,13 @@ struct SettingsView: View {
                                 .padding(16)
                                 .glassSurface(radius: 22, tint: .black.opacity(0.04))
                         }
+
+                        Text(appVersionText)
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(Color.chillTertiary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 4)
+                            .accessibilityLabel(Text("App version \(appVersionText)"))
                     }
                     .padding(20)
                     .padding(.bottom, 28)
