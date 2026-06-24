@@ -219,6 +219,7 @@ struct MailComposeView: UIViewControllerRepresentable {
 
     func updateUIViewController(_ controller: MFMailComposeViewController, context: Context) {}
 
+    @MainActor
     final class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
         let onFinish: (MFMailComposeResult) -> Void
 
@@ -226,9 +227,13 @@ struct MailComposeView: UIViewControllerRepresentable {
             self.onFinish = onFinish
         }
 
-        func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-            onFinish(result)
-            controller.dismiss(animated: true)
+        nonisolated func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+            // The delegate requirement is nonisolated, but UIKit always calls it
+            // on the main thread, so hop back onto the main actor to finish up.
+            MainActor.assumeIsolated {
+                onFinish(result)
+                controller.dismiss(animated: true)
+            }
         }
     }
 }

@@ -46,7 +46,8 @@ struct FirstLaunchSplashView: View {
             object: item,
             queue: .main
         ) { _ in
-            finishOnce()
+            // Delivered on the main queue (queue: .main above).
+            MainActor.assumeIsolated { finishOnce() }
         }
 
         player.replaceCurrentItem(with: item)
@@ -56,7 +57,7 @@ struct FirstLaunchSplashView: View {
 
         // Safety net: if playback stalls or can't start, continue anyway.
         DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-            finishOnce()
+            MainActor.assumeIsolated { finishOnce() }
         }
     }
 
