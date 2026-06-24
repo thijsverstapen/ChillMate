@@ -16,6 +16,7 @@ struct LogNightSheet: View {
 
     @State private var startDate = Date.now
     @State private var endDate = Date.now.addingTimeInterval(60 * 60)
+    @State private var saveHaptic = 0
     @State private var mode: LogMode = .tracked
     @State private var selectedSubstances: Set<Substance> = []
     @State private var partnerCount = 1
@@ -120,6 +121,8 @@ struct LogNightSheet: View {
                         .pickerStyle(.segmented)
                         .padding(4)
                         .glassSurface(radius: 22, tint: .black.opacity(0.04), interactive: true)
+                        .sensoryFeedback(.impact(weight: .medium), trigger: saveHaptic)
+                        .disablesRootSwipeBack()
 
                         if mode == .tracked {
                             TimeFrameCard(startDate: $startDate, endDate: $endDate)
@@ -303,9 +306,9 @@ struct LogNightSheet: View {
         )
 
         modelContext.insert(entry)
-        try? modelContext.save()
+        modelContext.saveChanges()
 
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        saveHaptic += 1
 
         if healthKitAutoSync {
             let snapshot = HealthLogSnapshot(entry: entry)
@@ -323,7 +326,7 @@ struct LogNightSheet: View {
                     await MainActor.run {
                         entryRef.sleptYet = true
                         entryRef.sleepHours = hours
-                        try? ctx.save()
+                        ctx.saveChanges()
                         if hours >= 7 {
                             NotificationService.shared.schedulePositiveSleepNotification(hours: hours)
                         }
@@ -1178,7 +1181,8 @@ private struct SleepCheckCard: View {
     }
 }
 
-final class LocationLookupService: NSObject, CLLocationManagerDelegate, @unchecked Sendable {
+@MainActor
+final class LocationLookupService: NSObject, CLLocationManagerDelegate {
     static let shared = LocationLookupService()
 
     private let manager = CLLocationManager()
@@ -1274,47 +1278,57 @@ final class LocationLookupService: NSObject, CLLocationManagerDelegate, @uncheck
         return uniqueParts.prefix(2).joined(separator: ", ")
     }
 
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        guard let continuation = authorizationContinuation else {
-            return
-        }
+    nonisolated func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        // CLLocationManager delivers callbacks on the thread its manager was created on.
+        // The manager is created in this @MainActor type's init, so callbacks arrive on main.
+        // Read the Sendable status here so the non-Sendable manager isn't captured into the hop.
+        let status = manager.authorizationStatus
+        MainActor.assumeIsolated {
+            guard let continuation = authorizationContinuation else {
+                return
+            }
 
-        switch manager.authorizationStatus {
-        case .authorizedAlways, .authorizedWhenInUse:
-            authorizationContinuation = nil
-            continuation.resume()
-        case .denied, .restricted:
-            authorizationContinuation = nil
-            continuation.resume(throwing: LocationLookupError.permissionDenied)
-        case .notDetermined:
-            break
-        @unknown default:
-            authorizationContinuation = nil
-            continuation.resume(throwing: LocationLookupError.permissionDenied)
-        }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let continuation = locationContinuation else {
-            return
-        }
-
-        locationContinuation = nil
-
-        if let location = locations.last {
-            continuation.resume(returning: location)
-        } else {
-            continuation.resume(throwing: LocationLookupError.locationUnavailable)
+            switch status {
+            case .authorizedAlways, .authorizedWhenInUse:
+                authorizationContinuation = nil
+                continuation.resume()
+            case .denied, .restricted:
+                authorizationContinuation = nil
+                continuation.resume(throwing: LocationLookupError.permissionDenied)
+            case .notDetermined:
+                break
+            @unknown default:
+                authorizationContinuation = nil
+                continuation.resume(throwing: LocationLookupError.permissionDenied)
+            }
         }
     }
 
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        guard let continuation = locationContinuation else {
-            return
-        }
+    nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        MainActor.assumeIsolated {
+            guard let continuation = locationContinuation else {
+                return
+            }
 
-        locationContinuation = nil
-        continuation.resume(throwing: error)
+            locationContinuation = nil
+
+            if let location = locations.last {
+                continuation.resume(returning: location)
+            } else {
+                continuation.resume(throwing: LocationLookupError.locationUnavailable)
+            }
+        }
+    }
+
+    nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        MainActor.assumeIsolated {
+            guard let continuation = locationContinuation else {
+                return
+            }
+
+            locationContinuation = nil
+            continuation.resume(throwing: error)
+        }
     }
 }
 

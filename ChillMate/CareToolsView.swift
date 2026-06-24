@@ -5,35 +5,6 @@ import SwiftData
 import SwiftUI
 import UIKit
 
-enum CareToolPage: String, Identifiable {
-    case safetyAutopilot
-    case saferPlanning
-    case stdTests
-    case drugTimers
-    case emergency
-    case panicSupport
-    case drugInfo
-    case aftercare
-    case combinationRisk
-    case consentBoundaries
-    case recoveryMode
-    case privateInsights
-    case helperBridge
-    case drugChecking
-
-    var id: String { rawValue }
-}
-
-struct CareToolDefinition: Identifiable {
-    let page: CareToolPage
-    let title: String
-    let subtitle: String
-    let symbol: String
-    let tint: Color
-
-    var id: String { page.id }
-}
-
 struct CareToolsSection: View {
     let open: (CareToolPage) -> Void
 
@@ -252,7 +223,7 @@ struct STDTestsView: View {
             notes: notes.trimmingCharacters(in: .whitespacesAndNewlines)
         )
         modelContext.insert(record)
-        try? modelContext.save()
+        modelContext.saveChanges()
 
         Task {
             if (try? await NotificationService.shared.requestAuthorization()) == true {
@@ -319,7 +290,7 @@ private struct STDTestCard: View {
                         detail: test.testDate.formatted(date: .abbreviated, time: .omitted)
                     )
                     modelContext.delete(test)
-                    try? modelContext.save()
+                    modelContext.saveChanges()
                 } label: {
                     Image(systemName: "trash.fill")
                 }
@@ -380,7 +351,7 @@ private struct STDTestCard: View {
             test.foundSTIs
         } set: { newValue in
             test.foundSTIs = newValue
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
     }
 
@@ -389,7 +360,7 @@ private struct STDTestCard: View {
             STDResultStatus(rawValue: test[keyPath: keyPath]) ?? .pending
         } set: { newValue in
             test[keyPath: keyPath] = newValue.rawValue
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
     }
 
@@ -918,7 +889,7 @@ struct SaferSessionPlanView: View {
             aftercareReminderForEveryone: aftercareReminderForEveryone
         )
         modelContext.insert(plan)
-        try? modelContext.save()
+        modelContext.saveChanges()
 
         Task {
             if (try? await NotificationService.shared.requestAuthorization()) == true {
@@ -1323,7 +1294,7 @@ private struct SaferPlanCard: View {
                     detail: plan.plannedDate.formatted(date: .abbreviated, time: .shortened)
                 )
                 modelContext.delete(plan)
-                try? modelContext.save()
+                modelContext.saveChanges()
             } label: {
                 Image(systemName: "trash.fill")
             }
@@ -1350,6 +1321,7 @@ struct DrugTimerView: View {
     @State private var startedAt = Date.now
     @State private var doseNote = ""
     @State private var isShowingDiscardWarning = false
+    @State private var saveHaptic = 0
 
     private let timerSubstances = Substance.allCases.filter { $0 != .unknown && $0 != .other }
 
@@ -1408,6 +1380,7 @@ struct DrugTimerView: View {
                             symbol: "timer",
                             tint: Color.chillSecondaryBlue
                         )
+                        .sensoryFeedback(.impact(flexibility: .rigid), trigger: saveHaptic)
 
                         MedicalSafetyDisclaimerCard(compact: true)
 
@@ -1541,11 +1514,11 @@ struct DrugTimerView: View {
             personName: timerScope == .others ? selectedTrackedPerson.trimmingCharacters(in: .whitespacesAndNewlines) : "",
             doseNote: doseNote.trimmingCharacters(in: .whitespacesAndNewlines)
         )
-        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+        saveHaptic += 1
         modelContext.insert(timer)
-        try? modelContext.save()
+        modelContext.saveChanges()
         DrugTimerLiveActivityController.start(for: timer)
-        try? modelContext.save()
+        modelContext.saveChanges()
 
         Task {
             if (try? await NotificationService.shared.requestAuthorization()) == true {
@@ -1649,24 +1622,31 @@ private struct TimerPeopleManager: View {
 
                 FlowLayout(spacing: 8) {
                     ForEach(people, id: \.self) { person in
-                        Button {
-                            selectedPerson = person
-                        } label: {
-                            HStack(spacing: 6) {
-                                Text(person)
-                                Image(systemName: selectedPerson == person ? "checkmark.circle.fill" : "circle")
-                                Image(systemName: "xmark.circle.fill")
-                                    .onTapGesture {
-                                        removePerson(person)
-                                    }
+                        HStack(spacing: 6) {
+                            Button {
+                                selectedPerson = person
+                            } label: {
+                                HStack(spacing: 6) {
+                                    Text(person)
+                                    Image(systemName: selectedPerson == person ? "checkmark.circle.fill" : "circle")
+                                }
                             }
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Color.chillText)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .glassSurface(radius: 14, tint: (selectedPerson == person ? Color.chillSecondaryBlue : Color.black).opacity(0.10), interactive: true)
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(Text("Select \(person)"))
+
+                            Button {
+                                removePerson(person)
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(Text("Remove \(person)"))
                         }
-                        .buttonStyle(ChillPlainButtonStyle())
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillText)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .glassSurface(radius: 14, tint: (selectedPerson == person ? Color.chillSecondaryBlue : Color.black).opacity(0.10), interactive: true)
                     }
                 }
             }
@@ -1840,7 +1820,7 @@ private struct DrugTimerCard: View {
                         detail: timer.startedAt.formatted(date: .abbreviated, time: .shortened)
                     )
                     modelContext.delete(timer)
-                    try? modelContext.save()
+                    modelContext.saveChanges()
                 } label: {
                     Image(systemName: "trash.fill")
                 }
@@ -1875,7 +1855,7 @@ private struct DrugTimerCard: View {
     private func saveRedoseDecision(_ decision: RedoseDecision) {
         timer.redoseDecision = decision.rawValue
         timer.redoseDecisionAt = .now
-        try? modelContext.save()
+        modelContext.saveChanges()
         Task {
             await DrugTimerLiveActivityController.update(timer, now: now)
         }
@@ -2189,7 +2169,7 @@ struct CombinationRiskCheckerView: View {
             warnings: assessment.interactionWarnings
         )
         modelContext.insert(record)
-        try? modelContext.save()
+        modelContext.saveChanges()
         selectedSubstances = []
         medicationText = ""
         medicationDosage = ""
@@ -2225,7 +2205,7 @@ private struct RiskCheckRecordCard: View {
                         detail: record.createdAt.formatted(date: .abbreviated, time: .shortened)
                     )
                     modelContext.delete(record)
-                    try? modelContext.save()
+                    modelContext.saveChanges()
                 } label: {
                     Image(systemName: "trash.fill")
                 }
@@ -2345,42 +2325,6 @@ private struct RiskLevelRow: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .glassSurface(radius: 20, tint: level.tint.opacity(0.08))
-    }
-}
-
-enum CombinationTiming: String, CaseIterable, Identifiable {
-    case sameSession = "Same session"
-    case withinSixHours = "6 h"
-    case withinDay = "24 h"
-
-    var id: String { rawValue }
-}
-
-enum RiskLevel {
-    case lower
-    case caution
-    case high
-
-    var label: String {
-        switch self {
-        case .lower:
-            String(localized: "No known")
-        case .caution:
-            String(localized: "Caution")
-        case .high:
-            String(localized: "High")
-        }
-    }
-
-    var tint: Color {
-        switch self {
-        case .lower:
-            Color.chillMint
-        case .caution:
-            .orange
-        case .high:
-            .red
-        }
     }
 }
 
@@ -2624,176 +2568,6 @@ private struct CombinationAssessment {
         }
 
         return warnings
-    }
-}
-
-private struct MedicationRiskMatch: Hashable {
-    let category: MedicationRiskCategory
-    let matchedTerm: String
-}
-
-private enum MedicationRiskCategory: String, CaseIterable {
-    case serotonergic
-    case maoi
-    case sedative
-    case opioid
-    case nitrateLike
-    case alphaBlocker
-    case stimulantMedication
-    case ritonavirBooster
-
-    var label: String {
-        switch self {
-        case .serotonergic:
-            String(localized: "Affects serotonin")
-        case .maoi:
-            String(localized: "MAOI")
-        case .sedative:
-            String(localized: "Sedative")
-        case .opioid:
-            String(localized: "Opioid")
-        case .nitrateLike:
-            String(localized: "Nitrate-like")
-        case .alphaBlocker:
-            String(localized: "Alpha blocker")
-        case .stimulantMedication:
-            String(localized: "Stimulant medication")
-        case .ritonavirBooster:
-            String(localized: "Ritonavir/cobicistat")
-        }
-    }
-
-    var aliases: [String] {
-        switch self {
-        case .serotonergic:
-            [
-                "ssri", "snri", "tramadol", "lithium", "linezolid", "mirtazapine", "venlafaxine",
-                "fluoxetine", "sertraline", "citalopram", "escitalopram", "paroxetine", "duloxetine",
-                "vortioxetine", "dextromethorphan", "sumatriptan", "triptan", "st johns wort"
-            ]
-        case .maoi:
-            ["maoi", "phenelzine", "tranylcypromine", "moclobemide", "selegiline"]
-        case .sedative:
-            [
-                "benzodiazepine", "benzo", "diazepam", "alprazolam", "lorazepam", "oxazepam",
-                "temazepam", "zolpidem", "zopiclone", "pregabalin", "gabapentin", "baclofen", "quetiapine"
-            ]
-        case .opioid:
-            ["opioid", "opiate", "oxycodone", "morphine", "fentanyl", "codeine", "methadone", "buprenorphine", "tramadol"]
-        case .nitrateLike:
-            ["nitrate", "nitroglycerin", "glyceryl trinitrate", "isosorbide", "mononitrate", "dinitrate", "nicorandil", "riociguat"]
-        case .alphaBlocker:
-            ["alpha blocker", "tamsulosin", "doxazosin", "alfuzosin", "prazosin", "terazosin"]
-        case .stimulantMedication:
-            [
-                "methylphenidate", "ritalin", "concerta", "dexamfetamine", "dexamphetamine",
-                "lisdexamfetamine", "vyvanse", "elvanse", "adderall", "modafinil", "bupropion"
-            ]
-        case .ritonavirBooster:
-            ["ritonavir", "cobicistat"]
-        }
-    }
-}
-
-private enum MedicationRiskDatabase {
-    static func matches(in text: String) -> [MedicationRiskMatch] {
-        let normalizedText = normalized(text)
-        guard !normalizedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return []
-        }
-
-        var matches: [MedicationRiskMatch] = []
-
-        for category in MedicationRiskCategory.allCases {
-            for alias in category.aliases {
-                let normalizedAlias = normalized(alias)
-                if contains(normalizedAlias, in: normalizedText) {
-                    matches.append(MedicationRiskMatch(category: category, matchedTerm: alias))
-                    break
-                }
-            }
-        }
-
-        return matches
-    }
-
-    private static func normalized(_ value: String) -> String {
-        value
-            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil)
-            .lowercased()
-            .replacingOccurrences(of: "[^a-z0-9]+", with: " ", options: .regularExpression)
-    }
-
-    private static func contains(_ alias: String, in text: String) -> Bool {
-        let paddedText = " \(text) "
-        let paddedAlias = " \(alias) "
-        return paddedText.contains(paddedAlias)
-    }
-}
-
-private struct MedicationSuggestion: Identifiable {
-    let id: String
-    let name: String
-    let detail: String
-    let dosage: String?
-    let effectiveHours: Double?
-}
-
-private enum MedicationSuggestionDatabase {
-    static func suggestions(for query: String, savedMedications: [ProfileMedication]) -> [MedicationSuggestion] {
-        let normalizedQuery = normalized(query)
-        guard normalizedQuery.count >= 2 else {
-            return []
-        }
-
-        var suggestions: [MedicationSuggestion] = []
-
-        for medication in savedMedications where matches(medication.name, query: normalizedQuery) {
-            suggestions.append(
-                MedicationSuggestion(
-                    id: "saved-\(medication.id.uuidString)",
-                    name: medication.name,
-                    detail: medication.timingSummary,
-                    dosage: medication.dosage,
-                    effectiveHours: medication.effectiveHours
-                )
-            )
-        }
-
-        let knownNames = MedicationRiskCategory.allCases
-            .flatMap(\.aliases)
-            .map { $0.capitalized }
-            .sorted()
-
-        for name in knownNames where matches(name, query: normalizedQuery) {
-            let id = "known-\(normalized(name))"
-            guard !suggestions.contains(where: { $0.id == id || normalized($0.name) == normalized(name) }) else {
-                continue
-            }
-            suggestions.append(
-                MedicationSuggestion(
-                    id: id,
-                    name: name,
-                    detail: String(localized: "Common interaction category"),
-                    dosage: nil,
-                    effectiveHours: nil
-                )
-            )
-        }
-
-        return Array(suggestions.prefix(6))
-    }
-
-    private static func matches(_ value: String, query: String) -> Bool {
-        normalized(value).contains(query)
-    }
-
-    private static func normalized(_ value: String) -> String {
-        value
-            .folding(options: [.diacriticInsensitive, .caseInsensitive], locale: nil)
-            .lowercased()
-            .replacingOccurrences(of: "[^a-z0-9]+", with: " ", options: .regularExpression)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
@@ -3348,7 +3122,7 @@ private struct AftercareEntryCard: View {
                     entry.sleptYet = true
                     entry.sleepHours = entry.aftercareSleepHours
                 }
-                try? modelContext.save()
+                modelContext.saveChanges()
             } label: {
                 Label("Save aftercare", systemImage: "checkmark.heart.fill")
                     .font(.headline)
@@ -3381,7 +3155,7 @@ private struct AftercareEntryCard: View {
                 entry.aftercareSleepHours = hours
                 entry.sleptYet = true
                 entry.sleepHours = hours
-                try? modelContext.save()
+                modelContext.saveChanges()
 
                 if hours >= 6, (try? await NotificationService.shared.requestAuthorization()) == true {
                     NotificationService.shared.schedulePositiveSleepNotification(hours: hours)
@@ -3678,6 +3452,7 @@ struct PanicSupportView: View {
                             symbol: "lungs.fill",
                             tint: Color.chillPrimary
                         )
+                        .sensoryFeedback(.impact(flexibility: .soft), trigger: breathStep)
 
                         VStack(spacing: 18) {
                             ZStack {
@@ -3809,7 +3584,6 @@ struct PanicSupportView: View {
                 while isBreathing {
                     await MainActor.run {
                         breathStep = (breathStep + 1) % breathingSteps.count
-                        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
                     }
                     try? await Task.sleep(for: .seconds(4))
                 }
@@ -3859,6 +3633,7 @@ struct SafeRouteHomeView: View {
                             symbol: "location.fill",
                             tint: Color.chillMint
                         )
+                        .disablesRootSwipeBack()
 
                         VStack(alignment: .leading, spacing: 12) {
                             CareSectionTitle(title: String(localized: "Destination"), symbol: "map.fill")
@@ -4179,550 +3954,6 @@ private enum RouteSearchService {
 private extension LoggedLocation {
     var locationMessage: String {
         "\(name.isEmpty ? "Current location" : name) • \(coordinateSummary)"
-    }
-}
-
-struct JournalView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
-
-    @State private var date = Date.now
-    @State private var rememberClearly = ""
-    @State private var uncomfortableMoments = ""
-    @State private var consentConcerns = ""
-    @State private var regrets = ""
-    @State private var feelsGoodAbout = ""
-    @State private var selectedPhotos: [PhotosPickerItem] = []
-    @State private var photoData: [Data] = []
-    @State private var isShowingMorePrompts = false
-    @State private var isEditing = false
-    @State private var isShowingMonthCalendar = false
-
-    private var selectedJournalEntry: JournalEntry? {
-        journalEntries.first { Calendar.current.isDate($0.date, inSameDayAs: date) }
-    }
-
-    /// Drives whether the day shows a read-only overview or the editable form.
-    private var mode: JournalMode {
-        if selectedJournalEntry == nil { return .new }
-        return isEditing ? .editing : .viewing
-    }
-
-    var body: some View {
-        let photoCount = photoData.count
-        let photoPickerTitle = photoCount == 0 ? "Add photos" : "\(photoCount) photo\(photoCount == 1 ? "" : "s")"
-
-        NavigationStack {
-            ZStack {
-                DashboardBackdrop()
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        PageHeader(
-                            title: String(localized: "Journal"),
-                            subtitle: String(localized: "Pick a day, write the few things you want to remember, and come back anytime to edit."),
-                            symbol: "book.closed.fill",
-                            tint: Color.chillPrimary
-                        )
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            JournalWeekStrip(selectedDate: $date, entries: journalEntries)
-                                .disabled(mode == .editing)
-
-                            HStack(spacing: 10) {
-                                Text(date.formatted(.dateTime.weekday(.wide).day().month(.wide)))
-                                    .font(.headline)
-                                    .foregroundStyle(Color.chillText)
-
-                                Spacer(minLength: 0)
-
-                                Button {
-                                    isShowingMonthCalendar = true
-                                } label: {
-                                    Image(systemName: "calendar")
-                                        .font(.subheadline.weight(.bold))
-                                        .foregroundStyle(Color.chillPrimary)
-                                        .frame(width: 34, height: 34)
-                                        .background(Color.chillPrimary.opacity(0.14), in: Circle())
-                                        .contentShape(Circle())
-                                }
-                                .buttonStyle(ChillPlainButtonStyle())
-                                .disabled(mode == .editing)
-                                .opacity(mode == .editing ? 0.4 : 1)
-                                .accessibilityLabel("Open month calendar")
-
-                                JournalStatusPill(mode: mode)
-                            }
-
-                            if mode == .viewing, let entry = selectedJournalEntry {
-                                // ── Read-only overview of the saved day ──
-                                JournalEntryOverview(entry: entry)
-
-                                HStack(spacing: 10) {
-                                    GlassActionButton(prominent: true, action: beginEditing) {
-                                        Label("Edit entry", systemImage: "pencil")
-                                            .font(.headline)
-                                            .frame(maxWidth: .infinity)
-                                    }
-
-                                    GlassActionButton(prominent: false, tint: .red, action: deleteJournalEntry) {
-                                        Image(systemName: "trash.fill")
-                                    }
-                                    .accessibilityLabel("Delete entry")
-                                }
-                            } else {
-                                // ── Editable form (new entry, or editing an existing one) ──
-                                JournalPromptField(title: String(localized: "What do you remember?"), text: $rememberClearly)
-                                JournalPromptField(title: String(localized: "How do you feel about it now?"), text: $feelsGoodAbout)
-                                JournalPromptField(title: String(localized: "Any safety or consent concerns?"), text: $consentConcerns)
-
-                                DisclosureGroup(isExpanded: $isShowingMorePrompts) {
-                                    VStack(spacing: 10) {
-                                        JournalPromptField(title: String(localized: "Any uncomfortable moments?"), text: $uncomfortableMoments)
-                                        JournalPromptField(title: String(localized: "Regrets or loose ends"), text: $regrets)
-                                    }
-                                    .padding(.top, 8)
-                                } label: {
-                                    Label("Any regrets?", systemImage: "chevron.down.circle.fill")
-                                        .font(.subheadline.weight(.bold))
-                                        .foregroundStyle(Color.chillText)
-                                }
-                                .tint(Color.chillPrimary)
-                                .padding(12)
-                                .background(.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-
-                                HStack(spacing: 10) {
-                                    PhotosPicker(selection: $selectedPhotos, maxSelectionCount: 6, matching: .images) {
-                                        Label(photoPickerTitle, systemImage: "photo.on.rectangle.angled")
-                                            .frame(maxWidth: .infinity)
-                                    }
-                                    .buttonStyle(ChillPillButtonStyle(prominent: false))
-                                    .onChange(of: selectedPhotos) { _, items in
-                                        loadPhotos(items)
-                                    }
-                                }
-
-                                HStack(spacing: 10) {
-                                    GlassActionButton(prominent: true, action: saveJournalEntry) {
-                                        Label(mode == .editing ? "Save changes" : "Save journal", systemImage: "checkmark.circle.fill")
-                                            .font(.headline)
-                                            .frame(maxWidth: .infinity)
-                                    }
-
-                                    if mode == .editing {
-                                        GlassActionButton(prominent: false, action: cancelEditing) {
-                                            Text("Cancel")
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-                .scrollDismissesKeyboard(.interactively)
-            }
-            .navigationTitle("")
-            .endEditingOnTap()
-            .onAppear(perform: loadSelectedJournalEntry)
-            .onChange(of: date) { _, _ in
-                isEditing = false
-                loadSelectedJournalEntry()
-            }
-            .sheet(isPresented: $isShowingMonthCalendar) {
-                JournalMonthCalendarSheet(date: $date)
-            }
-        }
-    }
-
-    private func loadPhotos(_ items: [PhotosPickerItem]) {
-        Task {
-            var loaded: [Data] = []
-            for item in items {
-                if let data = try? await item.loadTransferable(type: Data.self) {
-                    let optimizedData = await Task.detached(priority: .utility) {
-                        ChillImageOptimizer.downsampledJPEGData(from: data, maxPixelSize: 1200, compressionQuality: 0.80)
-                    }.value
-                    loaded.append(optimizedData)
-                }
-            }
-            await MainActor.run {
-                photoData = loaded
-            }
-        }
-    }
-
-    private func saveJournalEntry() {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-
-        if let entry = selectedJournalEntry {
-            entry.rememberClearly = rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines)
-            entry.uncomfortableMoments = uncomfortableMoments.trimmingCharacters(in: .whitespacesAndNewlines)
-            entry.consentConcerns = consentConcerns.trimmingCharacters(in: .whitespacesAndNewlines)
-            entry.regrets = regrets.trimmingCharacters(in: .whitespacesAndNewlines)
-            entry.feelsGoodAbout = feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines)
-            entry.photos = photoData
-            try? modelContext.save()
-            SpotlightService.shared.indexJournalEntry(entry)
-        } else {
-            let entry = JournalEntry(
-                date: date,
-                rememberClearly: rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines),
-                uncomfortableMoments: uncomfortableMoments.trimmingCharacters(in: .whitespacesAndNewlines),
-                consentConcerns: consentConcerns.trimmingCharacters(in: .whitespacesAndNewlines),
-                regrets: regrets.trimmingCharacters(in: .whitespacesAndNewlines),
-                feelsGoodAbout: feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines),
-                photos: photoData
-            )
-            modelContext.insert(entry)
-            try? modelContext.save()
-            SpotlightService.shared.indexJournalEntry(entry)
-        }
-
-        // Saved → drop back to the read-only overview for the day.
-        withAnimation(.snappy) { isEditing = false }
-    }
-
-    private func beginEditing() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        loadSelectedJournalEntry()
-        withAnimation(.snappy) { isEditing = true }
-    }
-
-    private func cancelEditing() {
-        loadSelectedJournalEntry() // discard unsaved edits
-        withAnimation(.snappy) { isEditing = false }
-    }
-
-    private func deleteJournalEntry() {
-        guard let entry = selectedJournalEntry else { return }
-        UINotificationFeedbackGenerator().notificationOccurred(.warning)
-        SpotlightService.shared.removeJournalEntry(entry)
-        modelContext.delete(entry)
-        try? modelContext.save()
-        isEditing = false
-        loadSelectedJournalEntry()
-    }
-
-    private func loadSelectedJournalEntry() {
-        guard let entry = selectedJournalEntry else {
-            rememberClearly = ""
-            uncomfortableMoments = ""
-            consentConcerns = ""
-            regrets = ""
-            feelsGoodAbout = ""
-            selectedPhotos = []
-            photoData = []
-            return
-        }
-
-        rememberClearly = entry.rememberClearly
-        uncomfortableMoments = entry.uncomfortableMoments
-        consentConcerns = entry.consentConcerns
-        regrets = entry.regrets
-        feelsGoodAbout = entry.feelsGoodAbout
-        selectedPhotos = []
-        photoData = entry.photos
-    }
-}
-
-/// A quick month-view calendar so a day can be found without scrolling the strip.
-private struct JournalMonthCalendarSheet: View {
-    @Binding var date: Date
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                DashboardBackdrop()
-
-                VStack(spacing: 16) {
-                    DatePicker(
-                        "",
-                        selection: $date,
-                        in: ...Date.now,
-                        displayedComponents: .date
-                    )
-                    .datePickerStyle(.graphical)
-                    .tint(Color.chillPrimary)
-                    .padding(8)
-                    .glassSurface(radius: 24, tint: .black.opacity(0.04))
-
-                    Spacer(minLength: 0)
-                }
-                .padding(20)
-            }
-            .navigationTitle("Pick a date")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .fontWeight(.bold)
-                }
-            }
-        }
-        .preferredColorScheme(.dark)
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
-    }
-}
-
-private struct JournalWeekStrip: View {
-    @Binding var selectedDate: Date
-    let entries: [JournalEntry]
-
-    private var calendar: Calendar { .current }
-
-    /// A rolling range of days the user can scroll horizontally through (roughly
-    /// the last ten weeks up to the end of the current week). This replaces the
-    /// old static single-week row and the separate date picker.
-    private var days: [Date] {
-        let today = calendar.startOfDay(for: Date.now)
-        let startSeed = calendar.date(byAdding: .weekOfYear, value: -9, to: today) ?? today
-        guard let startInterval = calendar.dateInterval(of: .weekOfYear, for: startSeed),
-              let endInterval = calendar.dateInterval(of: .weekOfYear, for: today) else {
-            return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: today) }
-        }
-
-        var result: [Date] = []
-        var day = startInterval.start
-        while day < endInterval.end {
-            result.append(day)
-            guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
-            day = next
-        }
-        return result
-    }
-
-    var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(days, id: \.self) { day in
-                        dayCell(day).id(day)
-                    }
-                }
-                .padding(.horizontal, 2)
-                .padding(.vertical, 2)
-            }
-            .onAppear {
-                DispatchQueue.main.async { scroll(to: selectedDate, with: proxy, animated: false) }
-            }
-            .onChange(of: selectedDate) { _, newValue in
-                scroll(to: newValue, with: proxy, animated: true)
-            }
-        }
-    }
-
-    private func dayCell(_ day: Date) -> some View {
-        let isSelected = calendar.isDate(day, inSameDayAs: selectedDate)
-        let hasEntry = entries.contains { calendar.isDate($0.date, inSameDayAs: day) }
-
-        return Button {
-            selectedDate = day
-        } label: {
-            VStack(spacing: 4) {
-                Text(day.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(isSelected ? .white.opacity(0.80) : Color.chillSecondary)
-                Text(day.formatted(.dateTime.day()))
-                    .font(.subheadline.weight(.bold))
-                    .monospacedDigit()
-                    .foregroundStyle(isSelected ? .white : Color.chillText)
-                Circle()
-                    .fill(hasEntry ? (isSelected ? .white.opacity(0.72) : Color.chillMint) : .clear)
-                    .frame(width: 5, height: 5)
-            }
-            .frame(width: 46, height: 58)
-            .background(
-                isSelected ? Color.chillPrimary : Color.clear,
-                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
-            )
-        }
-        .buttonStyle(ChillPlainButtonStyle())
-        .accessibilityLabel("\(day.formatted(date: .complete, time: .omitted))\(hasEntry ? ", journal entry saved" : "")")
-    }
-
-    private func scroll(to date: Date, with proxy: ScrollViewProxy, animated: Bool) {
-        let target = calendar.startOfDay(for: date)
-        if animated {
-            withAnimation(.snappy) { proxy.scrollTo(target, anchor: .center) }
-        } else {
-            proxy.scrollTo(target, anchor: .center)
-        }
-    }
-}
-
-private enum JournalMode { case new, viewing, editing }
-
-private struct JournalStatusPill: View {
-    let mode: JournalMode
-
-    private var content: (title: String, symbol: String, tint: Color) {
-        switch mode {
-        case .new: ("New", "plus.circle.fill", Color.chillSecondaryBlue)
-        case .viewing: ("Saved", "checkmark.seal.fill", Color.chillMint)
-        case .editing: ("Editing", "pencil.circle.fill", Color.chillPrimary)
-        }
-    }
-
-    var body: some View {
-        let c = content
-        Label(c.title, systemImage: c.symbol)
-            .font(.caption.weight(.bold))
-            .foregroundStyle(c.tint)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(c.tint.opacity(0.12), in: Capsule())
-    }
-}
-
-/// Read-only summary of a saved journal day — shown instead of the input form
-/// once a day has an entry, so a saved day reads as a finished overview rather
-/// than a blank form that looks like it still needs input.
-private struct JournalEntryOverview: View {
-    let entry: JournalEntry
-
-    private var answeredPrompts: [(prompt: String, answer: String)] {
-        [
-            ("What do you remember?", entry.rememberClearly),
-            ("How do you feel about it now?", entry.feelsGoodAbout),
-            ("Any safety or consent concerns?", entry.consentConcerns),
-            ("Any uncomfortable moments?", entry.uncomfortableMoments),
-            ("Regrets or loose ends", entry.regrets)
-        ].filter { !$0.1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            if answeredPrompts.isEmpty && entry.photos.isEmpty {
-                Text("No details saved for this day yet. Tap Edit to add some.")
-                    .font(.subheadline)
-                    .foregroundStyle(Color.chillSecondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                ForEach(Array(answeredPrompts.enumerated()), id: \.offset) { _, item in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(item.prompt)
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(Color.chillSecondary)
-                        Text(item.answer)
-                            .font(.subheadline)
-                            .foregroundStyle(Color.chillText)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-
-            if !entry.photos.isEmpty {
-                ScrollView(.horizontal) {
-                    HStack(spacing: 8) {
-                        ForEach(Array(entry.photos.enumerated()), id: \.offset) { _, data in
-                            if let image = UIImage(data: data) {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 72, height: 72)
-                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                            }
-                        }
-                    }
-                }
-                .scrollIndicators(.hidden)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(14)
-        .background(.black.opacity(0.04), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-    }
-}
-
-private struct JournalPromptField: View {
-    let title: String
-    @Binding var text: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(Color.chillMint)
-
-            TextField(title, text: $text, axis: .vertical)
-                .lineLimit(1...3)
-                .textFieldStyle(.plain)
-                .foregroundStyle(Color.chillText)
-                .padding(12)
-                .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
-        }
-    }
-}
-
-private struct JournalEntryCard: View {
-    @Environment(\.modelContext) private var modelContext
-    let entry: JournalEntry
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(entry.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
-
-                Spacer()
-
-                Button(role: .destructive) {
-                    RecentlyDeletedStore.record(
-                        kind: "Journal",
-                        title: String(localized: "Journal entry"),
-                        detail: entry.date.formatted(date: .abbreviated, time: .omitted)
-                    )
-                    modelContext.delete(entry)
-                    try? modelContext.save()
-                } label: {
-                    Image(systemName: "trash.fill")
-                }
-                .buttonStyle(ChillPlainButtonStyle())
-                .foregroundStyle(Color.chillSecondary)
-            }
-
-            JournalLine(title: String(localized: "Clear memory"), value: entry.rememberClearly)
-            JournalLine(title: String(localized: "Uncomfortable"), value: entry.uncomfortableMoments)
-            JournalLine(title: String(localized: "Consent"), value: entry.consentConcerns)
-            JournalLine(title: String(localized: "Regrets"), value: entry.regrets)
-            JournalLine(title: String(localized: "Good"), value: entry.feelsGoodAbout)
-
-            if !entry.photos.isEmpty {
-                Text("\(entry.photos.count) picture\(entry.photos.count == 1 ? "" : "s")")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillPrimary)
-            }
-        }
-        .padding(16)
-        .glassSurface(radius: 24, tint: .black.opacity(0.04))
-    }
-}
-
-private struct JournalLine: View {
-    let title: String
-    let value: String
-
-    var body: some View {
-        if !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
-                Text(value)
-                    .font(.caption)
-                    .foregroundStyle(Color.chillText)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
     }
 }
 
@@ -6015,165 +5246,6 @@ private struct DrugCheckingPrincipleCard: View {
     }
 }
 
-struct PrivacyPolicyView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        Group {
-            ZStack {
-                DashboardBackdrop()
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 14) {
-                        PageHeader(
-                            title: String(localized: "Privacy Policy"),
-                            subtitle: String(localized: "Plain-language privacy summary."),
-                            symbol: "hand.raised.square.fill",
-                            tint: Color.chillIconTeal
-                        )
-
-                        LegalInfoCard(
-                            title: String(localized: "What ChillMate can save"),
-                            symbol: "tray.full.fill",
-                            rows: [
-                                String(localized: "Your profile, photo, medication notes, trusted contact, home address, settings, and preferences."),
-                                String(localized: "Private logs, sleep notes, STI test records, plans, journal entries, risk checks, check-ins, and emergency-card details."),
-                                String(localized: "Optional information you choose to add from Apple Health, Contacts, Photos, or Location Services.")
-                            ]
-                        )
-
-                        LegalInfoCard(
-                            title: String(localized: "How it is used"),
-                            symbol: "lock.shield.fill",
-                            rows: [
-                                String(localized: "To show your private overview, reminders, aftercare prompts, STI follow-ups, emergency shortcuts, and wellbeing reflections."),
-                                String(localized: "To sync with Apple Health only for categories you approve in iOS settings."),
-                                String(localized: "To create encrypted backups only when backup features are enabled.")
-                            ]
-                        )
-
-                        LegalInfoCard(
-                            title: String(localized: "What ChillMate does not do"),
-                            symbol: "eye.slash.fill",
-                            rows: [
-                                String(localized: "No ads, no selling personal information, and no sharing health or sexual-health details for marketing."),
-                                String(localized: "No medical diagnosis, treatment decisions, dosage advice, or confirmation that a substance, amount, or combination is safe."),
-                                String(localized: "Messages to contacts are created only when you choose to send them.")
-                            ]
-                        )
-
-                        LegalInfoCard(
-                            title: String(localized: "Control and deletion"),
-                            symbol: "trash.fill",
-                            rows: [
-                                String(localized: "You can delete logs, plans, STI tests, timers, risk checks, journal entries, and account data inside the app."),
-                                String(localized: "iOS permission controls remain available in Settings for Health, Location, Notifications, Contacts, and Photos."),
-                                String(localized: "If you need urgent help, do not wait for the app. Call local emergency services.")
-                            ]
-                        )
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-            }
-            .navigationTitle("")
-        }
-    }
-}
-
-struct TermsOfUseView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        Group {
-            ZStack {
-                DashboardBackdrop()
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 14) {
-                        PageHeader(
-                            title: String(localized: "Terms"),
-                            subtitle: String(localized: "Use ChillMate as a private wellbeing and reflection tool."),
-                            symbol: "doc.text.fill",
-                            tint: Color.chillIconPurple
-                        )
-
-                        MedicalSafetyDisclaimerCard()
-
-                        LegalInfoCard(
-                            title: String(localized: "Age and app use"),
-                            symbol: "18.circle.fill",
-                            rows: [
-                                String(localized: "ChillMate is intended for adults only."),
-                                String(localized: "ChillMate is for adults only. You are responsible for the information you save and who you share it with."),
-                                String(localized: "You are responsible for deciding what information you save and who you share it with.")
-                            ]
-                        )
-
-                        LegalInfoCard(
-                            title: String(localized: "Safety boundaries"),
-                            symbol: "exclamationmark.triangle.fill",
-                            rows: [
-                                String(localized: "ChillMate does not encourage substance use, sex, or mixing substances."),
-                                String(localized: "ChillMate does not provide dosing, medical, legal, or emergency-services advice."),
-                                String(localized: "Emergency guidance is intentionally simple: if there is immediate danger, call local emergency services.")
-                            ]
-                        )
-
-                        LegalInfoCard(
-                            title: String(localized: "Professional support"),
-                            symbol: "person.text.rectangle.fill",
-                            rows: [
-                                String(localized: "Use Support for Dutch sexual-health, crisis, addiction-care, and practical support resources."),
-                                String(localized: "For STI, PrEP, PEP, medication, mental-health, or substance concerns, contact a GP, GGD, pharmacist, clinician, counselor, or other qualified professional."),
-                                String(localized: "The app can help organize notes for a conversation, but it cannot replace that conversation.")
-                            ]
-                        )
-
-                        LegalInfoCard(
-                            title: String(localized: "Information & sources"),
-                            symbol: "checkmark.seal.fill",
-                            rows: [
-                                String(localized: "All wellbeing and harm-reduction information in ChillMate is compiled from verified, official public-health sources."),
-                                String(localized: "It is reviewed and updated from time to time as those sources change or new information becomes available."),
-                                String(localized: "ChillMate and its maker are not liable in any way for any decision, action, or outcome based on the app. Always confirm anything important with a qualified professional or official service.")
-                            ]
-                        )
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-            }
-            .navigationTitle("")
-        }
-    }
-}
-
-private struct LegalInfoCard: View {
-    let title: String
-    let symbol: String
-    let rows: [String]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Label(title, systemImage: symbol)
-                .font(.headline)
-                .foregroundStyle(Color.chillText)
-
-            ForEach(rows, id: \.self) { row in
-                Label(row, systemImage: "checkmark.circle.fill")
-                    .font(.callout)
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .padding(16)
-        .glassSurface(radius: 26, tint: .black.opacity(0.04), interactive: true)
-    }
-}
-
 struct PrivacyReceiptView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage("requiresFaceID") private var requiresFaceID = false
@@ -6842,39 +5914,6 @@ private struct WeeklyPrompt: View {
         }
         .padding(12)
         .background(.white.opacity(0.20), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-    }
-}
-
-struct RecentlyDeletedItem: Codable, Identifiable {
-    var id = UUID()
-    var kind: String
-    var title: String
-    var detail: String
-    var deletedAt: Date
-}
-
-enum RecentlyDeletedStore {
-    private static let key = "recentlyDeletedItems"
-
-    static func items() -> [RecentlyDeletedItem] {
-        guard let data = UserDefaults.standard.data(forKey: key),
-              let items = try? JSONDecoder().decode([RecentlyDeletedItem].self, from: data) else {
-            return []
-        }
-        return items.sorted { $0.deletedAt > $1.deletedAt }
-    }
-
-    static func record(kind: String, title: String, detail: String, deletedAt: Date = .now) {
-        var current = items()
-        current.insert(RecentlyDeletedItem(kind: kind, title: title, detail: detail, deletedAt: deletedAt), at: 0)
-        current = Array(current.prefix(40))
-        if let data = try? JSONEncoder().encode(current) {
-            UserDefaults.standard.set(data, forKey: key)
-        }
-    }
-
-    static func clear() {
-        UserDefaults.standard.removeObject(forKey: key)
     }
 }
 

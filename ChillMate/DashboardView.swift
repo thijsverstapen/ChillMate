@@ -22,6 +22,7 @@ struct DashboardView: View {
     @State private var isShowingCalendar = false
     @State private var isPrivacyScreenActive = false
     @State private var hydrationLoggedToday = false
+    @State private var quickSkipHaptic = 0
     @Binding var careNavPath: [CareToolPage]
     let openCalendarTab: (() -> Void)?
 
@@ -218,7 +219,6 @@ struct DashboardView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(role: .destructive) {
-                        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                         Task {
                             _ = try? EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext)
                         }
@@ -232,6 +232,7 @@ struct DashboardView: View {
                     }
                     .buttonStyle(ChillPlainButtonStyle())
                     .accessibilityLabel("Panic close app")
+                    .sensoryFeedback(trigger: isPrivacyScreenActive) { _, active in active ? .impact(weight: .heavy) : nil }
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -253,6 +254,7 @@ struct DashboardView: View {
             .fullScreenCover(isPresented: $isPrivacyScreenActive) {
                 PrivacyShieldView(dismiss: { isPrivacyScreenActive = false })
             }
+            .sensoryFeedback(.success, trigger: quickSkipHaptic)
         }
     }
 
@@ -273,7 +275,6 @@ struct DashboardView: View {
     }
 
     private func quickSkip() {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         let entry = NightEntry(
             date: .now,
             hadSex: false,
@@ -281,8 +282,8 @@ struct DashboardView: View {
             substances: []
         )
         modelContext.insert(entry)
-        try? modelContext.save()
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        modelContext.saveChanges()
+        quickSkipHaptic += 1
     }
 }
 
@@ -641,10 +642,10 @@ struct CalendarOverviewView: View {
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
     private let calendar = Calendar.current
-    let showsDoneButton: Bool
+    let showsBackButton: Bool
 
-    init(showsDoneButton: Bool = true) {
-        self.showsDoneButton = showsDoneButton
+    init(showsBackButton: Bool = true) {
+        self.showsBackButton = showsBackButton
     }
 
     private var monthTitle: String {
@@ -679,6 +680,7 @@ struct CalendarOverviewView: View {
                             symbol: "calendar",
                             tint: Color.chillPrimary
                         )
+                        .disablesRootSwipeBack()
 
                         VStack(alignment: .leading, spacing: 16) {
                             HStack {
@@ -803,7 +805,7 @@ struct CalendarOverviewView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                if showsDoneButton {
+                if showsBackButton {
                     ToolbarItem(placement: .topBarLeading) {
                         BackChevronButton {
                             dismiss()
@@ -827,7 +829,7 @@ struct CalendarOverviewView: View {
             detail: entry.date.formatted(date: .abbreviated, time: .shortened)
         )
         modelContext.delete(entry)
-        try? modelContext.save()
+        modelContext.saveChanges()
     }
 }
 
@@ -1097,7 +1099,6 @@ private struct RecoveryStreakBadge: View {
 
             if isMilestoneDay || days >= 30 {
                 Button {
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     isShowingMilestoneShare = true
                 } label: {
                     Label("Share \(displayText) milestone", systemImage: "square.and.arrow.up")
@@ -1115,6 +1116,7 @@ private struct RecoveryStreakBadge: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
+        .sensoryFeedback(trigger: isShowingMilestoneShare) { _, presented in presented ? .impact(weight: .medium) : nil }
     }
 
     private var encouragement: String {
@@ -1624,6 +1626,7 @@ private struct ProfessionalHelpView: View {
                         Text(String(localized: "Talk to someone"))
                             .font(.largeTitle.bold())
                             .foregroundStyle(palette.heroText)
+                            .disablesRootSwipeBack()
 
                         Text(String(localized: "A professional helper can talk through sex, substances, sleep, PrEP, consent, and safety without judgment."))
                             .font(.callout)
@@ -1928,7 +1931,6 @@ private struct WellnessScoreRow: View {
 
     var body: some View {
         Button {
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
             isShowingFactors = true
         } label: {
             HStack(spacing: 16) {
@@ -1996,6 +1998,7 @@ private struct WellnessScoreRow: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
+        .sensoryFeedback(trigger: isShowingFactors) { _, presented in presented ? .impact(weight: .light) : nil }
     }
 }
 
@@ -2802,10 +2805,10 @@ struct ProfileOverviewView: View {
     @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var isShowingProfileEditor = false
-    let showsDoneButton: Bool
+    let showsBackButton: Bool
 
-    init(showsDoneButton: Bool = true) {
-        self.showsDoneButton = showsDoneButton
+    init(showsBackButton: Bool = true) {
+        self.showsBackButton = showsBackButton
     }
 
     private var profile: UserProfile? {
@@ -2916,18 +2919,14 @@ struct ProfileOverviewView: View {
                 return
             }
 
-            let optimizedData = await Task.detached(priority: .utility) {
-                ChillImageOptimizer.downsampledJPEGData(from: data, maxPixelSize: 640, compressionQuality: 0.84)
-            }.value
+            let optimizedData = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 640, compressionQuality: 0.84)
 
-            await MainActor.run {
-                guard let profile = profiles.first else {
-                    return
-                }
-
-                profile.profileImageData = optimizedData
-                try? modelContext.save()
+            guard let profile = profiles.first else {
+                return
             }
+
+            profile.profileImageData = optimizedData
+            modelContext.saveChanges()
         }
     }
 }
@@ -3005,9 +3004,7 @@ private struct ProfilePhotoHeader: View {
                 return
             }
 
-            let optimizedData = await Task.detached(priority: .utility) {
-                ChillImageOptimizer.downsampledJPEGData(from: profileImageData, maxPixelSize: 640, compressionQuality: 0.84)
-            }.value
+            let optimizedData = await ChillImageOptimizer.downsampledJPEG(from: profileImageData, maxPixelSize: 640, compressionQuality: 0.84)
             profileImage = UIImage(data: optimizedData)
         }
     }
@@ -3029,7 +3026,7 @@ private struct ProfileEditView: View {
             ProfileSex(rawValue: profile.sex) ?? .male
         } set: { value in
             profile.sex = value.rawValue
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
     }
 
@@ -3038,7 +3035,7 @@ private struct ProfileEditView: View {
             SexualRole(rawValue: profile.sexualRole) ?? .notApplicable
         } set: { value in
             profile.sexualRole = value.rawValue
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
     }
 
@@ -3047,7 +3044,7 @@ private struct ProfileEditView: View {
             PrEPSchedule(rawValue: profile.prepSchedule) ?? .daily
         } set: { value in
             profile.prepSchedule = value.rawValue
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
     }
 
@@ -3068,6 +3065,7 @@ private struct ProfileEditView: View {
                             Text("Edit profile")
                                 .font(.largeTitle.bold())
                                 .foregroundStyle(palette.heroText)
+                                .disablesRootSwipeBack()
 
                             Text("These details keep your overview and timer estimates personal.")
                                 .font(.callout)
@@ -3216,22 +3214,22 @@ private struct ProfileEditView: View {
         .endEditingOnTap()
         .onChange(of: profile.dateOfBirth) { _, _ in
             profile.age = profile.calculatedAge
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
         .onChange(of: profile.weightKg) { _, _ in
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
         .onChange(of: profile.heightCm) { _, _ in
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
         .onChange(of: profile.homeAddress) { _, _ in
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
         .onChange(of: profile.isOnPrEP) { _, _ in
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
         .onChange(of: profile.prepStartDate) { _, _ in
-            try? modelContext.save()
+            modelContext.saveChanges()
         }
     }
 }
@@ -3342,7 +3340,7 @@ private struct ProfileMedicationEditor: View {
         var medications = profile.medications
         medications.append(medication)
         profile.medications = medications
-        try? modelContext.save()
+        modelContext.saveChanges()
         name = ""
         dosage = ""
         takenAt = .now
@@ -3353,7 +3351,7 @@ private struct ProfileMedicationEditor: View {
         var medications = profile.medications
         medications.removeAll { $0.id == medication.id }
         profile.medications = medications
-        try? modelContext.save()
+        modelContext.saveChanges()
     }
 }
 
@@ -3674,6 +3672,8 @@ struct PrivacyShieldView: View {
                 showUnlockButton = true
             }
         }
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(Text("Show unlock"))
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
     }

@@ -96,9 +96,7 @@ struct DashboardBackdrop: View {
                 return
             }
 
-            let optimizedData = await Task.detached(priority: .utility) {
-                ChillImageOptimizer.downsampledJPEGData(from: data, maxPixelSize: 1400)
-            }.value
+            let optimizedData = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 1400)
 
             guard let image = UIImage(data: optimizedData) else {
                 decodedBackgroundImage = nil
@@ -124,6 +122,37 @@ private enum ChillBackgroundImageCache {
             images.removeValue(forKey: firstKey)
         }
         images[key] = image
+    }
+}
+
+/// Suppresses the spurious interactive "swipe-back" on a NavigationStack that is at its root.
+/// Without this, an edge-swipe on a tab root that never pushes drags the content off to reveal
+/// the blank window background and rubber-bands back (an iOS 26 glitch). The gesture is
+/// re-enabled automatically once the stack actually pushes a view, so it is safe on any tab root.
+private struct RootSwipeBackDisabler: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> Controller { Controller() }
+    func updateUIViewController(_ controller: Controller, context: Context) { controller.applyState() }
+
+    final class Controller: UIViewController {
+        func applyState() {
+            guard let nav = navigationController else { return }
+            nav.interactivePopGestureRecognizer?.isEnabled = nav.viewControllers.count > 1
+        }
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            applyState()
+        }
+        override func didMove(toParent parent: UIViewController?) {
+            super.didMove(toParent: parent)
+            applyState()
+        }
+    }
+}
+
+extension View {
+    /// Apply inside a tab-root `NavigationStack` to suppress the at-root back-swipe glitch.
+    func disablesRootSwipeBack() -> some View {
+        background(RootSwipeBackDisabler())
     }
 }
 
@@ -155,6 +184,14 @@ enum ChillImageOptimizer {
         }
 
         return image.jpegData(compressionQuality: compressionQuality) ?? data
+    }
+
+    /// Off-main-actor convenience wrapper used across the app to downsample picked images.
+    /// Centralizes the previously-duplicated `Task.detached { downsampledJPEGData(...) }.value` pattern.
+    static func downsampledJPEG(from data: Data, maxPixelSize: CGFloat, compressionQuality: CGFloat = 0.82) async -> Data {
+        await Task.detached(priority: .utility) {
+            downsampledJPEGData(from: data, maxPixelSize: maxPixelSize, compressionQuality: compressionQuality)
+        }.value
     }
 }
 
@@ -495,6 +532,7 @@ struct CareCoverHost<Content: View>: View {
                         BackChevronButton { dismiss() }
                     }
                 }
+                .disablesRootSwipeBack()
         }
     }
 }
@@ -539,6 +577,8 @@ struct LiquidGlassAlertModifier: ViewModifier {
                             .onTapGesture {
                                 isPresented = false
                             }
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityLabel(Text("Dismiss"))
 
                         VStack(alignment: .leading, spacing: 18) {
                             HStack(alignment: .top, spacing: 14) {

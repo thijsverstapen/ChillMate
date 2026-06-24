@@ -61,10 +61,6 @@ final class WatchConnectivityService: NSObject {
     }
 }
 
-private struct WCPhoneContextBox: @unchecked Sendable {
-    let dict: [String: Any]
-}
-
 extension WatchConnectivityService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard activationState == .activated else { return }
@@ -74,26 +70,20 @@ extension WatchConnectivityService: WCSessionDelegate {
     }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-        let box = WCPhoneContextBox(dict: message)
+        let hydrationLogged = message["hydrationLogged"] as? Bool == true
+        let quickSkipRequested = message["quickSkipRequested"] as? Bool == true
         Task { @MainActor in
-            if box.dict["hydrationLogged"] as? Bool == true {
-                WatchConnectivityService.shared.logHydrationFromWatch()
-            }
-            if box.dict["quickSkipRequested"] as? Bool == true {
-                WatchConnectivityService.shared.requestQuickSkipFromWatch()
-            }
+            if hydrationLogged { WatchConnectivityService.shared.logHydrationFromWatch() }
+            if quickSkipRequested { WatchConnectivityService.shared.requestQuickSkipFromWatch() }
         }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
-        let box = WCPhoneContextBox(dict: applicationContext)
+        let hydrationLogged = applicationContext["hydrationLogged"] as? Bool == true
+        let quickSkipRequested = applicationContext["quickSkipRequested"] as? Bool == true
         Task { @MainActor in
-            if box.dict["hydrationLogged"] as? Bool == true {
-                WatchConnectivityService.shared.logHydrationFromWatch()
-            }
-            if box.dict["quickSkipRequested"] as? Bool == true {
-                WatchConnectivityService.shared.requestQuickSkipFromWatch()
-            }
+            if hydrationLogged { WatchConnectivityService.shared.logHydrationFromWatch() }
+            if quickSkipRequested { WatchConnectivityService.shared.requestQuickSkipFromWatch() }
         }
     }
 

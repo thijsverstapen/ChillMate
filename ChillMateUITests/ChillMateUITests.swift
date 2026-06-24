@@ -1,5 +1,6 @@
 import XCTest
 
+@MainActor
 class ChillMateUITests: XCTestCase {
 
     override func setUpWithError() throws {

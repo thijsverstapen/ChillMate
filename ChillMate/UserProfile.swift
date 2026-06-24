@@ -17,7 +17,7 @@ final class UserProfile {
     var heightCm: Double = 175
     var homeAddress: String = ""
     var medicationsData: Data = Data("[]".utf8)
-    var profileImageData: Data?
+    @Attribute(.externalStorage) var profileImageData: Data?
     var createdAt: Date = Date.now
 
     init(

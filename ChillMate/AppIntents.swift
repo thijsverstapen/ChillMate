@@ -69,7 +69,7 @@ struct LogSkippedNightIntent: AppIntent {
                 return "You already have an entry logged for today."
             }
             context.insert(NightEntry(date: .now, hadSex: false, skippedNight: true, substances: []))
-            try? context.save()
+            context.saveChanges()
             return "Logged a clear night in ChillMate."
         }
         return .result(value: message)

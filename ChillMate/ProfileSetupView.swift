@@ -110,7 +110,7 @@ private struct MainTabView: View {
             }
             .tag(AppTab.home)
 
-            CalendarOverviewView(showsDoneButton: false)
+            CalendarOverviewView(showsBackButton: false)
                 .tabItem {
                 Label("Calendar", systemImage: "calendar")
             }
@@ -499,11 +499,11 @@ private struct MoreHubView: View {
     private func moreHubDestination(_ page: MoreHubPage) -> some View {
         switch page {
         case .settings:
-            SettingsView(showsDoneButton: true)
+            SettingsView(showsBackButton: true)
         case .supportDeveloper:
             SupportDeveloperView()
         case .profile:
-            ProfileOverviewView(showsDoneButton: true)
+            ProfileOverviewView(showsBackButton: true)
         case .safetyAutopilot:
             SafetyAutopilotView()
         case .privacyReceipt:
@@ -753,6 +753,7 @@ struct SupportDeveloperView: View {
                          isLoadingProducts ? String(localized: "Loading…") :
                          String(localized: "Leave a \(priceLabel) tip"))
                         .font(.headline.weight(.bold))
+                        .sensoryFeedback(trigger: isPurchasing) { _, purchasing in purchasing ? .impact(weight: .medium) : nil }
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -782,7 +783,6 @@ struct SupportDeveloperView: View {
             return
         }
 
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         isPurchasing = true
         Task {
             defer { isPurchasing = false }
@@ -1647,10 +1647,8 @@ struct ProfileSetupView: View {
         guard let item else { return }
         Task {
             guard let data = try? await item.loadTransferable(type: Data.self) else { return }
-            let optimized = await Task.detached(priority: .utility) {
-                ChillImageOptimizer.downsampledJPEGData(from: data, maxPixelSize: 640, compressionQuality: 0.84)
-            }.value
-            await MainActor.run { profileImageData = optimized }
+            let optimized = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 640, compressionQuality: 0.84)
+            profileImageData = optimized
         }
     }
 
@@ -1681,7 +1679,7 @@ struct ProfileSetupView: View {
         )
 
         modelContext.insert(profile)
-        try? modelContext.save()
+        modelContext.saveChanges()
     }
 
     private func requestHealthPermission() {

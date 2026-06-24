@@ -256,7 +256,7 @@ final class JournalEntry {
     var consentConcerns: String = ""
     var regrets: String = ""
     var feelsGoodAbout: String = ""
-    var photoDataBlobs: Data = Data("[]".utf8)
+    @Attribute(.externalStorage) var photoDataBlobs: Data = Data("[]".utf8)
     var createdAt: Date = Date.now
 
     init(

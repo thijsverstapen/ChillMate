@@ -125,10 +125,10 @@ struct SettingsView: View {
     @State private var encryptedBackupURL: URL?
     @State private var isShowingBackupImporter = false
 
-    let showsDoneButton: Bool
+    let showsBackButton: Bool
 
-    init(showsDoneButton: Bool = true) {
-        self.showsDoneButton = showsDoneButton
+    init(showsBackButton: Bool = true) {
+        self.showsBackButton = showsBackButton
     }
 
     private var palette: DailyScorePalette {
@@ -827,15 +827,10 @@ struct SettingsView: View {
                 return
             }
 
-            let optimizedData = await Task.detached(priority: .utility) {
-                ChillImageOptimizer.downsampledJPEGData(from: data, maxPixelSize: 1400, compressionQuality: 0.84)
-            }.value
-
-            await MainActor.run {
-                appBackgroundPhotoData = optimizedData.base64EncodedString()
-                appBackgroundStyle = ChillBackgroundStyle.photo.rawValue
-                message = String(localized: "Background photo updated.")
-            }
+            let optimizedData = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 1400, compressionQuality: 0.84)
+            appBackgroundPhotoData = optimizedData.base64EncodedString()
+            appBackgroundStyle = ChillBackgroundStyle.photo.rawValue
+            message = String(localized: "Background photo updated.")
         }
     }
 
@@ -1131,15 +1126,7 @@ private struct HealthPermissionToggleLine: View {
     let requestScope: (HealthKitPermissionScope) -> Void
 
     var body: some View {
-        Toggle(isOn: Binding(
-            get: { isOn },
-            set: { newValue in
-                isOn = newValue
-                if newValue {
-                    requestScope(scope)
-                }
-            }
-        )) {
+        Toggle(isOn: $isOn) {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: scope.symbolName)
                     .font(.system(size: 15, weight: .bold))
@@ -1158,6 +1145,11 @@ private struct HealthPermissionToggleLine: View {
             }
         }
         .tint(Color.chillPrimary)
+        .onChange(of: isOn) { _, newValue in
+            if newValue {
+                requestScope(scope)
+            }
+        }
     }
 }
 
@@ -1496,6 +1488,7 @@ private struct PINSetupView: View {
                             .foregroundStyle(Color.chillPrimary)
                             .frame(width: 72, height: 72)
                             .glassSurface(radius: 36, tint: Color.chillPrimary.opacity(0.16))
+                            .disablesRootSwipeBack()
 
                         Text(isChangingExistingPIN ? String(localized: "Change your PIN") : String(localized: "Set a PIN"))
                             .font(.largeTitle.bold())
@@ -1929,6 +1922,7 @@ private struct DeleteAccountConfirmationView: View {
                             .foregroundStyle(.red)
                             .frame(width: 72, height: 72)
                             .glassSurface(radius: 36, tint: .red.opacity(0.14))
+                            .disablesRootSwipeBack()
 
                         Text("Final delete check")
                             .font(.largeTitle.bold())
