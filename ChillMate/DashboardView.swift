@@ -663,157 +663,169 @@ struct CalendarOverviewView: View {
     }
 
     var body: some View {
+        if showsBackButton {
+            // Presented as a modal cover (e.g. from the dashboard): keep an owned
+            // NavigationStack so the back chevron has a toolbar to live in. The
+            // cover never pushes, so the edge swipe acts as a dismiss, not a pop.
+            NavigationStack {
+                calendarContent
+                    .navigationTitle("")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbarBackground(.hidden, for: .navigationBar)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            BackChevronButton {
+                                dismiss()
+                            }
+                        }
+                    }
+                    .edgeSwipeToDismiss()
+            }
+        } else {
+            // Used as a tab root: render WITHOUT a NavigationStack so there is no
+            // interactive pop gesture that can slide the screen to a blank state.
+            calendarContent
+        }
+    }
+
+    @ViewBuilder
+    private var calendarContent: some View {
         let data = monthData
         let selectedKey = calendar.startOfDay(for: selectedDay)
         let selectedEntries = data.entriesByDay[selectedKey] ?? []
         let selectedJournalEntries = data.journalEntriesByDay[selectedKey] ?? []
 
-        NavigationStack {
-            ZStack {
-                DashboardBackdrop()
+        ZStack {
+            DashboardBackdrop()
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        PageHeader(
-                            title: String(localized: "Calendar"),
-                            subtitle: String(localized: "Tap a day to see logs, skipped Chills, substances, and notes in one place."),
-                            symbol: "calendar",
-                            tint: Color.chillPrimary
-                        )
-                        .disablesRootSwipeBack()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    PageHeader(
+                        title: String(localized: "Calendar"),
+                        subtitle: String(localized: "Tap a day to see logs, skipped Chills, substances, and notes in one place."),
+                        symbol: "calendar",
+                        tint: Color.chillPrimary
+                    )
+                    .disablesRootSwipeBack()
 
-                        VStack(alignment: .leading, spacing: 16) {
-                            HStack {
-                                Button {
-                                    changeMonth(by: -1)
-                                } label: {
-                                    Image(systemName: "chevron.left")
-                                        .frame(width: 38, height: 38)
-                                }
-                                .buttonStyle(.bordered)
-                                .tint(Color.chillPrimary)
+                    VStack(alignment: .leading, spacing: 16) {
+                        HStack {
+                            Button {
+                                changeMonth(by: -1)
+                            } label: {
+                                Image(systemName: "chevron.left")
+                                    .frame(width: 38, height: 38)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(Color.chillPrimary)
 
-                                Spacer()
+                            Spacer()
 
-                                Text(monthTitle)
-                                    .font(.title3.bold())
-                                    .foregroundStyle(Color.chillText)
+                            Text(monthTitle)
+                                .font(.title3.bold())
+                                .foregroundStyle(Color.chillText)
 
-                                Spacer()
+                            Spacer()
 
-                                Button {
-                                    changeMonth(by: 1)
-                                } label: {
-                                    Image(systemName: "chevron.right")
-                                        .frame(width: 38, height: 38)
-                                }
-                                .buttonStyle(.bordered)
-                                .tint(Color.chillPrimary)
+                            Button {
+                                changeMonth(by: 1)
+                            } label: {
+                                Image(systemName: "chevron.right")
+                                    .frame(width: 38, height: 38)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(Color.chillPrimary)
+                        }
+
+                        LazyVGrid(columns: columns, spacing: 8) {
+                            ForEach(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], id: \.self) { label in
+                                Text(label)
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(Color.chillSecondary)
+                                    .frame(maxWidth: .infinity)
                             }
 
-                            LazyVGrid(columns: columns, spacing: 8) {
-                                ForEach(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], id: \.self) { label in
-                                    Text(label)
-                                        .font(.caption.weight(.bold))
-                                        .foregroundStyle(Color.chillSecondary)
-                                        .frame(maxWidth: .infinity)
-                                }
+                            ForEach(0..<data.leadingBlankCount, id: \.self) { _ in
+                                Color.clear
+                                    .frame(height: 48)
+                            }
 
-                                ForEach(0..<data.leadingBlankCount, id: \.self) { _ in
-                                    Color.clear
-                                        .frame(height: 48)
-                                }
-
-                                ForEach(data.monthDays, id: \.self) { day in
-                                    let dayKey = calendar.startOfDay(for: day)
-                                    CalendarDayCell(
-                                        day: day,
-                                        summary: data.daySummaries[dayKey] ?? .empty,
-                                        isSelected: calendar.isDate(day, inSameDayAs: selectedDay)
-                                    ) {
-                                        selectedDay = day
-                                    }
+                            ForEach(data.monthDays, id: \.self) { day in
+                                let dayKey = calendar.startOfDay(for: day)
+                                CalendarDayCell(
+                                    day: day,
+                                    summary: data.daySummaries[dayKey] ?? .empty,
+                                    isSelected: calendar.isDate(day, inSameDayAs: selectedDay)
+                                ) {
+                                    selectedDay = day
                                 }
                             }
                         }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
+                    }
+                    .padding(16)
+                    .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
 
-                        VStack(alignment: .leading, spacing: 12) {
-                            SectionTitle(
-                                title: selectedDay.formatted(.dateTime.weekday(.wide).month(.wide).day()),
-                                symbol: "calendar.badge.clock"
-                            )
+                    VStack(alignment: .leading, spacing: 12) {
+                        SectionTitle(
+                            title: selectedDay.formatted(.dateTime.weekday(.wide).month(.wide).day()),
+                            symbol: "calendar.badge.clock"
+                        )
 
-                            if selectedEntries.isEmpty {
-                                EmptyGlassState(text: String(localized: "No entries for this day."))
-                            } else {
-                                ForEach(selectedEntries) { entry in
+                        if selectedEntries.isEmpty {
+                            EmptyGlassState(text: String(localized: "No entries for this day."))
+                        } else {
+                            ForEach(selectedEntries) { entry in
+                                TimelineRow(entry: entry, delete: delete)
+                            }
+                        }
+
+                        if !selectedJournalEntries.isEmpty {
+                            VStack(alignment: .leading, spacing: 10) {
+                                SectionTitle(title: String(localized: "Journal"), symbol: "book.closed.fill")
+
+                                ForEach(selectedJournalEntries) { entry in
+                                    CalendarJournalCard(entry: entry)
+                                }
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        SectionTitle(title: "Substance tags in \(monthTitle)", symbol: "pills.fill")
+
+                        if data.monthlySubstanceCounts.isEmpty {
+                            EmptyGlassState(text: String(localized: "No substance tags in this month."))
+                        } else {
+                            LazyVStack(spacing: 12) {
+                                ForEach(data.monthlySubstanceCounts.prefix(8), id: \.name) { item in
+                                    SubstanceBar(name: item.name, count: item.count, maxCount: data.monthlySubstanceCounts.first?.count ?? 1)
+                                }
+                            }
+                            .padding(16)
+                            .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
+                        }
+                    }
+
+                    DrugDoseHistoryGraph(timers: data.monthTimers, entries: data.monthEntries, monthDays: data.monthDays)
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        SectionTitle(title: String(localized: "Month timeline"), symbol: "list.bullet.rectangle")
+
+                        if data.monthEntries.isEmpty {
+                            EmptyGlassState(text: String(localized: "No entries in this month."))
+                        } else {
+                            LazyVStack(spacing: 12) {
+                                ForEach(data.monthEntries) { entry in
                                     TimelineRow(entry: entry, delete: delete)
                                 }
                             }
-
-                            if !selectedJournalEntries.isEmpty {
-                                VStack(alignment: .leading, spacing: 10) {
-                                    SectionTitle(title: String(localized: "Journal"), symbol: "book.closed.fill")
-
-                                    ForEach(selectedJournalEntries) { entry in
-                                        CalendarJournalCard(entry: entry)
-                                    }
-                                }
-                            }
-                        }
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            SectionTitle(title: "Substance tags in \(monthTitle)", symbol: "pills.fill")
-
-                            if data.monthlySubstanceCounts.isEmpty {
-                                EmptyGlassState(text: String(localized: "No substance tags in this month."))
-                            } else {
-                                LazyVStack(spacing: 12) {
-                                    ForEach(data.monthlySubstanceCounts.prefix(8), id: \.name) { item in
-                                        SubstanceBar(name: item.name, count: item.count, maxCount: data.monthlySubstanceCounts.first?.count ?? 1)
-                                    }
-                                }
-                                .padding(16)
-                                .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
-                            }
-                        }
-
-                        DrugDoseHistoryGraph(timers: data.monthTimers, entries: data.monthEntries, monthDays: data.monthDays)
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            SectionTitle(title: String(localized: "Month timeline"), symbol: "list.bullet.rectangle")
-
-                            if data.monthEntries.isEmpty {
-                                EmptyGlassState(text: String(localized: "No entries in this month."))
-                            } else {
-                                LazyVStack(spacing: 12) {
-                                    ForEach(data.monthEntries) { entry in
-                                        TimelineRow(entry: entry, delete: delete)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-            }
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbar {
-                if showsBackButton {
-                    ToolbarItem(placement: .topBarLeading) {
-                        BackChevronButton {
-                            dismiss()
                         }
                     }
                 }
+                .padding(20)
+                .padding(.bottom, 36)
             }
-            .edgeSwipeToDismiss(enabled: showsBackButton)
+            .scrollIndicators(.hidden)
         }
     }
 

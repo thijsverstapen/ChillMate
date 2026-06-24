@@ -34,6 +34,8 @@
 		D55F00000000000000000001 /* CareModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000011 /* CareModels.swift */; };
 		D55F00000000000000000002 /* CareToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000012 /* CareToolsView.swift */; };
 		D55F00000000000000000007 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000017 /* FeedbackView.swift */; };
+		D55F00000000000000000008 /* FirstLaunchSplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000018 /* FirstLaunchSplashView.swift */; };
+		D55F00000000000000000009 /* FirstLaunchSplash.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000019 /* FirstLaunchSplash.mp4 */; };
 		D55F00000000000000000003 /* CareToolsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000013 /* CareToolsModels.swift */; };
 		D55F00000000000000000004 /* MedicationRiskData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000014 /* MedicationRiskData.swift */; };
 		D55F00000000000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000015 /* JournalView.swift */; };
@@ -135,6 +137,8 @@
 		D55F00000000000000000011 /* CareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareModels.swift; sourceTree = "<group>"; };
 		D55F00000000000000000012 /* CareToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsView.swift; sourceTree = "<group>"; };
 		D55F00000000000000000017 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
+		D55F00000000000000000018 /* FirstLaunchSplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchSplashView.swift; sourceTree = "<group>"; };
+		D55F00000000000000000019 /* FirstLaunchSplash.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = FirstLaunchSplash.mp4; sourceTree = "<group>"; };
 		D55F00000000000000000013 /* CareToolsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsModels.swift; sourceTree = "<group>"; };
 		D55F00000000000000000014 /* MedicationRiskData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationRiskData.swift; sourceTree = "<group>"; };
 		D55F00000000000000000015 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
@@ -239,6 +243,8 @@
 				D55F00000000000000000011 /* CareModels.swift */,
 				D55F00000000000000000012 /* CareToolsView.swift */,
 				D55F00000000000000000017 /* FeedbackView.swift */,
+				D55F00000000000000000018 /* FirstLaunchSplashView.swift */,
+				D55F00000000000000000019 /* FirstLaunchSplash.mp4 */,
 				D55F00000000000000000016 /* LegalViews.swift */,
 				D55F00000000000000000015 /* JournalView.swift */,
 				D55F00000000000000000014 /* MedicationRiskData.swift */,
@@ -461,6 +467,7 @@
 				A11B00000000000000000007 /* Assets.xcassets in Resources */,
 				F99C00000000000000000002 /* Localizable.xcstrings in Resources */,
 				B33D00000000000000000001 /* LaunchScreen.storyboard in Resources */,
+				D55F00000000000000000009 /* FirstLaunchSplash.mp4 in Resources */,
 			);
 		};
 		E46AEAD8B5369DDDBE5AE54A /* Resources */ = {
@@ -518,6 +525,7 @@
 				D55F00000000000000000001 /* CareModels.swift in Sources */,
 				D55F00000000000000000002 /* CareToolsView.swift in Sources */,
 				D55F00000000000000000007 /* FeedbackView.swift in Sources */,
+				D55F00000000000000000008 /* FirstLaunchSplashView.swift in Sources */,
 				D55F00000000000000000006 /* LegalViews.swift in Sources */,
 				D55F00000000000000000005 /* JournalView.swift in Sources */,
 				D55F00000000000000000004 /* MedicationRiskData.swift in Sources */,

@@ -12,7 +12,6 @@ struct FeedbackView: View {
 
     @State private var topic: FeedbackTopic = .bug
     @State private var message = ""
-    @State private var replyEmail = ""
     @State private var isShowingMailComposer = false
     @State private var statusMessage: String?
     @State private var isShowingNoMailAlert = false
@@ -39,10 +38,6 @@ struct FeedbackView: View {
     private var emailBody: String {
         var lines = [trimmedMessage, "", "", "----------"]
         lines.append("Topic: \(topic.rawValue)")
-        let trimmedReply = replyEmail.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !trimmedReply.isEmpty {
-            lines.append("Reply to: \(trimmedReply)")
-        }
         lines.append("App: ChillMate \(appVersion) (\(appBuild))")
         lines.append("iOS: \(UIDevice.current.systemVersion)")
         lines.append("Device: \(UIDevice.current.model)")
@@ -86,22 +81,6 @@ struct FeedbackView: View {
                         TextField("Share as much detail as you like", text: $message, axis: .vertical)
                             .lineLimit(5...)
                             .textFieldStyle(.plain)
-                            .foregroundStyle(Color.chillText)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .glassSurface(radius: 24, tint: .black.opacity(0.04))
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Your email (optional)")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.chillText)
-
-                        TextField("So I can reply to you", text: $replyEmail)
-                            .textFieldStyle(.plain)
-                            .keyboardType(.emailAddress)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
                             .foregroundStyle(Color.chillText)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -156,7 +135,6 @@ struct FeedbackView: View {
                 case .sent:
                     statusMessage = String(localized: "Thanks, your feedback was sent.")
                     message = ""
-                    replyEmail = ""
                 case .failed:
                     statusMessage = String(localized: "That didn't send. Please try again.")
                 default:

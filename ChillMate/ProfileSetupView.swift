@@ -19,11 +19,21 @@ struct AppHomeView: View {
     @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
     @AppStorage("lastICloudBackupStatus") private var lastICloudBackupStatus = ""
     @AppStorage("lastICloudBackupTimestamp") private var lastICloudBackupTimestamp = 0.0
+    @AppStorage("hasShownFirstLaunchSplash") private var hasShownFirstLaunchSplash = false
     @State private var didAttemptRecoveryRestore = false
 
     var body: some View {
         Group {
-            if profiles.isEmpty {
+            if !hasShownFirstLaunchSplash {
+                // First launch ever: play the animated splash once, then fall
+                // through to onboarding. Every later launch skips straight past.
+                FirstLaunchSplashView {
+                    withAnimation(.easeInOut(duration: 0.45)) {
+                        hasShownFirstLaunchSplash = true
+                    }
+                }
+                .transition(.opacity)
+            } else if profiles.isEmpty {
                 ProfileSetupView()
             } else {
                 MainTabView()
@@ -99,6 +109,12 @@ private struct MainTabView: View {
     @State private var isShowingShortcutLog = false
     @AppStorage("pendingAppDestination") private var pendingAppDestination = ""
     @AppStorage("lastSelectedTab") private var lastSelectedTab = AppTab.home.rawValue
+    @AppStorage("lastBackgroundedAt") private var lastBackgroundedAt = 0.0
+    @Environment(\.scenePhase) private var scenePhase
+
+    /// After at least this long in the background, reopening the app returns to
+    /// the Home tab instead of restoring whichever tab the user last viewed.
+    private let backgroundResetThreshold: TimeInterval = 5 * 60
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -148,13 +164,40 @@ private struct MainTabView: View {
         .onChange(of: selectedTab) { _, tab in
             lastSelectedTab = tab.rawValue
         }
+        .onChange(of: scenePhase) { _, phase in
+            switch phase {
+            case .background:
+                lastBackgroundedAt = Date.now.timeIntervalSince1970
+            case .active:
+                // A notification/shortcut destination takes priority; otherwise,
+                // returning after a long absence snaps back to Home.
+                if pendingAppDestination.isEmpty, shouldResetToHomeAfterBackground() {
+                    selectedTab = .home
+                }
+            default:
+                break
+            }
+        }
     }
 
     private func restoreLastTabIfNeeded() {
-        guard pendingAppDestination.isEmpty, let tab = AppTab(rawValue: lastSelectedTab) else {
+        guard pendingAppDestination.isEmpty else { return }
+
+        // Coming back after a long time away should feel like a fresh start.
+        if shouldResetToHomeAfterBackground() {
+            selectedTab = .home
             return
         }
+
+        guard let tab = AppTab(rawValue: lastSelectedTab) else { return }
         selectedTab = tab
+    }
+
+    /// True when the app has spent at least `backgroundResetThreshold` in the
+    /// background since it was last foregrounded.
+    private func shouldResetToHomeAfterBackground() -> Bool {
+        guard lastBackgroundedAt > 0 else { return false }
+        return Date.now.timeIntervalSince1970 - lastBackgroundedAt > backgroundResetThreshold
     }
 
     private func applyPendingDestination() {
@@ -509,13 +552,16 @@ private struct MoreHubView: View {
     private func moreHubDestination(_ page: MoreHubPage) -> some View {
         switch page {
         case .settings:
-            SettingsView(showsBackButton: true)
+            // Pushed onto the More stack: rely on the system back button.
+            // Passing a custom chevron here would stack on top of the system
+            // one (two overlapping chevrons during the swipe-back).
+            SettingsView(showsBackButton: false)
         case .supportDeveloper:
             SupportDeveloperView()
         case .feedback:
-            FeedbackView(showsBackButton: true)
+            FeedbackView(showsBackButton: false)
         case .profile:
-            ProfileOverviewView(showsBackButton: true)
+            ProfileOverviewView(showsBackButton: false)
         case .safetyAutopilot:
             SafetyAutopilotView()
         case .privacyReceipt:
