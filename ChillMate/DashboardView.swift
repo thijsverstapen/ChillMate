@@ -813,7 +813,7 @@ struct CalendarOverviewView: View {
                     }
                 }
             }
-            .edgeSwipeToDismiss()
+            .edgeSwipeToDismiss(enabled: showsBackButton)
         }
     }
 

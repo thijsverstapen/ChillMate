@@ -691,19 +691,27 @@ private struct EndEditingOnTapModifier: ViewModifier {
 
 private struct EdgeSwipeDismissModifier: ViewModifier {
     @Environment(\.dismiss) private var dismiss
+    let enabled: Bool
 
+    @ViewBuilder
     func body(content: Content) -> some View {
-        content
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 20, coordinateSpace: .local)
-                    .onEnded { value in
-                        let isFromLeftEdge = value.startLocation.x < 24
-                        let isRightSwipe = value.translation.width > 80 && abs(value.translation.height) < 60
-                        if isFromLeftEdge && isRightSwipe {
-                            dismiss()
+        if enabled {
+            content
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                        .onEnded { value in
+                            let isFromLeftEdge = value.startLocation.x < 24
+                            let isRightSwipe = value.translation.width > 80 && abs(value.translation.height) < 60
+                            if isFromLeftEdge && isRightSwipe {
+                                dismiss()
+                            }
                         }
-                    }
-            )
+                )
+        } else {
+            // On a tab root there is nothing to dismiss; the extra edge gesture only
+            // conflicts with the navigation layer, so it is left off entirely.
+            content
+        }
     }
 }
 
@@ -727,6 +735,6 @@ private struct EdgeSwipeActionModifier: ViewModifier {
 
 extension View {
     func endEditingOnTap() -> some View { modifier(EndEditingOnTapModifier()) }
-    func edgeSwipeToDismiss() -> some View { modifier(EdgeSwipeDismissModifier()) }
+    func edgeSwipeToDismiss(enabled: Bool = true) -> some View { modifier(EdgeSwipeDismissModifier(enabled: enabled)) }
     func edgeSwipeBack(_ action: @escaping () -> Void) -> some View { modifier(EdgeSwipeActionModifier(action: action)) }
 }

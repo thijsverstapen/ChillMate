@@ -22,6 +22,7 @@ struct ChillMateApp: App {
                 AppHomeView()
             }
             .modelContainer(ChillMateModelContainer.container())
+            .preferredColorScheme(.dark)
             .onAppear {
                 recordAppUse()
                 refreshPrivacyAndNotificationState()
