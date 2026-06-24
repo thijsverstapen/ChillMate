@@ -33,6 +33,7 @@
 		C44E00000000000000000003 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E00000000000000000013 /* NotificationService.swift */; };
 		D55F00000000000000000001 /* CareModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000011 /* CareModels.swift */; };
 		D55F00000000000000000002 /* CareToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000012 /* CareToolsView.swift */; };
+		D55F00000000000000000007 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000017 /* FeedbackView.swift */; };
 		D55F00000000000000000003 /* CareToolsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000013 /* CareToolsModels.swift */; };
 		D55F00000000000000000004 /* MedicationRiskData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000014 /* MedicationRiskData.swift */; };
 		D55F00000000000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000015 /* JournalView.swift */; };
@@ -133,6 +134,7 @@
 		C85331B142C2356AE703C063 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		D55F00000000000000000011 /* CareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareModels.swift; sourceTree = "<group>"; };
 		D55F00000000000000000012 /* CareToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsView.swift; sourceTree = "<group>"; };
+		D55F00000000000000000017 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
 		D55F00000000000000000013 /* CareToolsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsModels.swift; sourceTree = "<group>"; };
 		D55F00000000000000000014 /* MedicationRiskData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationRiskData.swift; sourceTree = "<group>"; };
 		D55F00000000000000000015 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 				C44E00000000000000000013 /* NotificationService.swift */,
 				D55F00000000000000000011 /* CareModels.swift */,
 				D55F00000000000000000012 /* CareToolsView.swift */,
+				D55F00000000000000000017 /* FeedbackView.swift */,
 				D55F00000000000000000016 /* LegalViews.swift */,
 				D55F00000000000000000015 /* JournalView.swift */,
 				D55F00000000000000000014 /* MedicationRiskData.swift */,
@@ -514,6 +517,7 @@
 				C44E00000000000000000003 /* NotificationService.swift in Sources */,
 				D55F00000000000000000001 /* CareModels.swift in Sources */,
 				D55F00000000000000000002 /* CareToolsView.swift in Sources */,
+				D55F00000000000000000007 /* FeedbackView.swift in Sources */,
 				D55F00000000000000000006 /* LegalViews.swift in Sources */,
 				D55F00000000000000000005 /* JournalView.swift in Sources */,
 				D55F00000000000000000004 /* MedicationRiskData.swift in Sources */,

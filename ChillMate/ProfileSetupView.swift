@@ -194,6 +194,7 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
     case profile = "Profile"
     case settings = "Settings"
     case supportDeveloper = "Support the developer"
+    case feedback = "Feedback"
     case safetyAutopilot = "Safety autopilot"
     case privacyReceipt = "Privacy"
     case privacyTimeline = "Privacy timeline"
@@ -217,6 +218,7 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         .profile,
         .settings,
         .supportDeveloper,
+        .feedback,
         .privacyReceipt,
         .emergencyCard,
         .supportDirectory
@@ -262,6 +264,8 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             String(localized: "Craving delay")
         case .drugChecking:
             String(localized: "Checking info")
+        case .feedback:
+            String(localized: "Feedback")
         }
     }
 
@@ -305,6 +309,8 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             String(localized: "Pause for 10 minutes before deciding")
         case .drugChecking:
             String(localized: "Testing and support information")
+        case .feedback:
+            String(localized: "Report a bug, share an idea, or ask a question")
         }
     }
 
@@ -348,6 +354,8 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             "pause.circle.fill"
         case .drugChecking:
             "checkmark.seal.text.page.fill"
+        case .feedback:
+            "envelope.fill"
         }
     }
 
@@ -391,6 +399,8 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             Color.chillPrimary
         case .drugChecking:
             Color.chillIconAmber
+        case .feedback:
+            Color.chillIconTeal
         }
     }
 }
@@ -502,6 +512,8 @@ private struct MoreHubView: View {
             SettingsView(showsBackButton: true)
         case .supportDeveloper:
             SupportDeveloperView()
+        case .feedback:
+            FeedbackView(showsBackButton: true)
         case .profile:
             ProfileOverviewView(showsBackButton: true)
         case .safetyAutopilot:
