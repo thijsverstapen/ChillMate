@@ -2446,6 +2446,7 @@ private struct ProfileIntroductionView: View {
     @State private var activePage = 0
     @State private var isCompleting = false
     @State private var slideDirection: OnboardingSlideDirection = .forward
+    @State private var dragX: CGFloat = 0
 
     private let pages = IntroPage.all
     private var currentPage: IntroPage {
@@ -2462,7 +2463,8 @@ private struct ProfileIntroductionView: View {
             unsafe IntroSlideView(
                 page: currentPage,
                 index: activePage,
-                isCompleting: isCompleting
+                isCompleting: isCompleting,
+                parallax: dragX
             )
             .id(activePage)
             .transition(
@@ -2492,10 +2494,15 @@ private struct ProfileIntroductionView: View {
             .animation(.easeInOut(duration: 0.28), value: isCompleting)
         }
         .gesture(
-            DragGesture(minimumDistance: 28)
+            DragGesture(minimumDistance: 18)
+                .onChanged { val in
+                    dragX = val.translation.width
+                }
                 .onEnded { val in
-                    if val.translation.width < -60 { advance() }
-                    else if val.translation.width > 60 { goBack() }
+                    let width = val.translation.width
+                    withAnimation(.spring(response: 0.42, dampingFraction: 0.90)) { dragX = 0 }
+                    if width < -60 { advance() }
+                    else if width > 60 { goBack() }
                 }
         )
         .sensoryFeedback(.impact(weight: .light), trigger: activePage)
@@ -2623,20 +2630,20 @@ private struct IntroPage {
     let animation: IntroAnimationKind
 
     static let fallback = IntroPage(
-        eyebrow: String(localized: "Summary"),
-        title: String(localized: "A clear look at your last 3 months"),
-        subtitle: String(localized: "See Chills, sleep, substances, and aftercare in one private overview."),
+        eyebrow: String(localized: "Your overview"),
+        title: String(localized: "Your last 3 months, at a glance"),
+        subtitle: String(localized: "See Chills, sleep, substances, and aftercare in one private overview. After your first log, the app's mood gently follows your wellbeing score."),
         animation: .summary
     )
 
     static let all = [
-        fallback,
         IntroPage(
-            eyebrow: String(localized: "Daily score"),
-            title: String(localized: "The app mood follows your day"),
-            subtitle: String(localized: "After your first substance-related log, ChillMate gently adapts the background to your recovery and wellbeing score."),
-            animation: .background
+            eyebrow: String(localized: "Welcome"),
+            title: String(localized: "Welcome to ChillMate"),
+            subtitle: String(localized: "A calm, private space to track Chills, stay safer, and recover softer. Let's set it up together."),
+            animation: .welcome
         ),
+        fallback,
         IntroPage(
             eyebrow: String(localized: "Log a Chill"),
             title: String(localized: "Save the parts you want to remember"),
@@ -2650,9 +2657,9 @@ private struct IntroPage {
             animation: .care
         ),
         IntroPage(
-            eyebrow: String(localized: "Privacy"),
-            title: String(localized: "Private by default"),
-            subtitle: String(localized: "Lock ChillMate with Face ID or a PIN. Your local data can stay encrypted on this iPhone."),
+            eyebrow: String(localized: "Privacy & quick hide"),
+            title: String(localized: "Private, locked, quick to hide"),
+            subtitle: String(localized: "Lock ChillMate with Face ID or a PIN and keep local data encrypted on this iPhone. The red stop button on Home instantly hides the screen; tap it to resume."),
             animation: .privacy
         ),
         IntroPage(
@@ -2660,12 +2667,6 @@ private struct IntroPage {
             title: String(localized: "Reflection, not medical advice"),
             subtitle: String(localized: "Information here comes from verified, official sources, updated over time as they change. It is not medical advice. ChillMate and its maker are not liable for how it is used."),
             animation: .notice
-        ),
-        IntroPage(
-            eyebrow: String(localized: "Quick exit"),
-            title: String(localized: "Back to iPhone Home"),
-            subtitle: String(localized: "This means the iPhone Home Screen. The red exit button closes ChillMate quickly."),
-            animation: .exit
         ),
         IntroPage(
             eyebrow: String(localized: "Ready"),
@@ -2677,13 +2678,12 @@ private struct IntroPage {
 }
 
 private enum IntroAnimationKind {
+    case welcome
     case summary
-    case background
     case log
     case care
     case privacy
     case notice
-    case exit
     case ready
 }
 
@@ -2692,6 +2692,7 @@ private struct IntroSlideView: View {
     let page: IntroPage
     let index: Int
     let isCompleting: Bool
+    var parallax: CGFloat = 0
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
     @AppStorage("chillReducedMotion") private var chillReducedMotion = false
     @State private var checkmarkInPlace = false
@@ -2706,10 +2707,13 @@ private struct IntroSlideView: View {
                 let rawPhase = ctx.date.timeIntervalSinceReferenceDate
                     .truncatingRemainder(dividingBy: .pi * 2)
                 let phase = (reduceSystemMotion || chillReducedMotion) ? 0.22 : rawPhase
+                // Finger-following parallax: far layers move least, near layers most.
+                let pOffset: CGFloat = (reduceSystemMotion || chillReducedMotion) ? 0 : parallax
 
                 ZStack {
                     IntroAtmosphere(kind: page.animation, index: index, phase: phase)
                         .ignoresSafeArea()
+                        .offset(x: pOffset * 0.05)
 
                     VStack(alignment: .leading, spacing: 0) {
                         OnboardingTopBar(checkmarkInPlace: checkmarkInPlace || isCompleting)
@@ -2730,12 +2734,14 @@ private struct IntroSlideView: View {
                         .scaleEffect(isCompleting ? 1.16 : 1)
                         .blur(radius: isCompleting ? 6 : 0)
                         .animation(.spring(response: 0.56, dampingFraction: 0.76), value: isCompleting)
+                        .offset(x: pOffset * 0.16)
 
                         Spacer(minLength: 0)
 
                         IntroTextBlock(page: page, isVisible: textVisible)
                             .padding(.horizontal, 24)
                             .padding(.bottom, 196)
+                            .offset(x: pOffset * 0.10)
                     }
                     .frame(maxWidth: 600)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -2814,38 +2820,60 @@ private struct IntroTextBlock: View {
 
 private struct IntroRootBackground: View {
     let kind: IntroAnimationKind
+    @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
+    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
 
     var body: some View {
-        MeshGradient(
-            width: 3,
-            height: 3,
-            points: [
-                [0, 0], [0.5, 0], [1, 0],
-                [0, 0.5], [0.5, 0.5], [1, 0.5],
-                [0, 1], [0.5, 1], [1, 1]
-            ],
-            colors: meshColors,
-            smoothsColors: true
-        )
-        .overlay {
-            LinearGradient(
-                colors: [.black.opacity(0.06), .black.opacity(0.18), .black.opacity(0.64)],
-                startPoint: .top,
-                endPoint: .bottom
+        TimelineView(.animation) { ctx in
+            let t = (reduceSystemMotion || chillReducedMotion)
+                ? 0
+                : ctx.date.timeIntervalSinceReferenceDate
+            MeshGradient(
+                width: 3,
+                height: 3,
+                points: meshPoints(t),
+                colors: meshColors,
+                smoothsColors: true
             )
+            .overlay {
+                LinearGradient(
+                    colors: [.black.opacity(0.06), .black.opacity(0.18), .black.opacity(0.64)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
         }
         .animation(.easeInOut(duration: 0.54), value: kind)
     }
 
+    // Corners stay pinned; edge mid-points slide along their own edge and the
+    // centre drifts in both axes, so the gradient morphs like a slow liquid.
+    private func meshPoints(_ t: TimeInterval) -> [SIMD2<Float>] {
+        func wob(_ base: Float, speed: Double, amp: Float, phase: Double) -> Float {
+            base + Float(sin(t * speed + phase)) * amp
+        }
+        return [
+            SIMD2<Float>(0, 0),
+            SIMD2<Float>(wob(0.5, speed: 0.43, amp: 0.07, phase: 0.0), 0),
+            SIMD2<Float>(1, 0),
+            SIMD2<Float>(0, wob(0.5, speed: 0.37, amp: 0.07, phase: 1.3)),
+            SIMD2<Float>(wob(0.5, speed: 0.31, amp: 0.09, phase: 2.1), wob(0.5, speed: 0.35, amp: 0.08, phase: 0.7)),
+            SIMD2<Float>(1, wob(0.5, speed: 0.41, amp: 0.07, phase: 3.0)),
+            SIMD2<Float>(0, 1),
+            SIMD2<Float>(wob(0.5, speed: 0.39, amp: 0.07, phase: 4.2), 1),
+            SIMD2<Float>(1, 1),
+        ]
+    }
+
     private var meshColors: [Color] {
         switch kind {
+        case .welcome:
+            [Color.chillDarkBackground, Color.chillPrimary.opacity(0.94), Color.chillMint.opacity(0.72),
+             Color.chillDarkBackground, Color.chillPrimary.opacity(0.56), Color.chillMint.opacity(0.40),
+             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .summary:
             [Color.chillDarkBackground, Color.chillPrimary.opacity(0.88), Color.chillMint.opacity(0.66),
              Color.chillDarkBackground, Color.chillPrimary.opacity(0.52), Color.chillMint.opacity(0.38),
-             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
-        case .background:
-            [Color.chillDarkBackground, Color.chillPrimary.opacity(0.92), Color.chillMint.opacity(0.60),
-             Color.chillDarkBackground, Color.chillPrimary.opacity(0.54), Color.chillMint.opacity(0.32),
              Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .log:
             [Color.chillDarkBackground, Color.chillIconPink.opacity(0.72), Color.chillSecondaryBlue.opacity(0.72),
@@ -2862,10 +2890,6 @@ private struct IntroRootBackground: View {
         case .notice:
             [Color.chillDarkBackground, Color.chillIconOrange.opacity(0.70), Color.chillPrimary.opacity(0.70),
              Color.chillDarkBackground, Color.chillIconOrange.opacity(0.32), Color.chillPrimary.opacity(0.36),
-             Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
-        case .exit:
-            [Color.chillDarkBackground, Color.chillSurfaceDark, Color.chillPrimary.opacity(0.60),
-             Color.chillDarkBackground, Color.chillSurfaceDark.opacity(0.70), Color.chillPrimary.opacity(0.28),
              Color.chillDarkBackground, Color.chillDarkBackground, Color.chillDarkBackground]
         case .ready:
             [Color.chillDarkBackground, Color.chillPrimary.opacity(0.92), Color.chillMint.opacity(0.72),
@@ -2915,13 +2939,12 @@ private struct IntroAtmosphere: View {
 
     private var symbol: String {
         switch kind {
+        case .welcome: "sparkles"
         case .summary: "chart.bar.xaxis"
-        case .background: "circle.lefthalf.filled"
         case .log: "heart.text.square.fill"
         case .care: "checkmark.shield.fill"
         case .privacy: "lock.shield.fill"
         case .notice: "exclamationmark.triangle.fill"
-        case .exit: "xmark.octagon.fill"
         case .ready: "person.crop.circle.badge.checkmark"
         }
     }
@@ -2937,10 +2960,10 @@ private struct IntroAtmosphere: View {
     private func accent(for item: Int) -> Color {
         let colors: [Color]
         switch kind {
+        case .welcome:
+            colors = [Color.chillPrimary, Color.chillMint, Color.chillSecondaryBlue]
         case .summary:
             colors = [Color.chillPrimary, Color.chillMint, Color.chillSecondaryBlue]
-        case .background:
-            colors = [Color.chillPrimary, Color.chillSecondaryBlue, Color.chillMint]
         case .log:
             colors = [Color.chillSecondaryBlue, Color.chillPrimary, Color.chillMint]
         case .care:
@@ -2949,8 +2972,6 @@ private struct IntroAtmosphere: View {
             colors = [Color.chillPrimary, Color.chillSecondaryBlue, Color.chillMint]
         case .notice:
             colors = [Color.chillPrimary, Color.chillSecondaryBlue, Color.chillMint]
-        case .exit:
-            colors = [Color.chillPrimary, Color.chillSurfaceDark, Color.chillSecondaryBlue]
         case .ready:
             colors = [Color.chillPrimary, Color.chillMint, Color.chillSecondaryBlue]
         }
@@ -3013,13 +3034,12 @@ private struct IntroHeroScene: View {
     var body: some View {
         ZStack {
             switch kind {
+            case .welcome:   welcomeScene
             case .summary:   summaryScene
-            case .background: scoreScene
             case .log:       logScene
             case .care:      careScene
             case .privacy:   privacyScene
             case .notice:    noticeScene
-            case .exit:      quickExitScene
             case .ready:     readyScene
             }
         }
@@ -3040,6 +3060,37 @@ private struct IntroHeroScene: View {
                 withAnimation { appeared = true }
             }
         }
+    }
+
+    // MARK: – Welcome: logomark bloom (continues the launch splash)
+
+    private var welcomeScene: some View {
+        ZStack {
+            // Soft glow halo, echoing the splash's final beat.
+            Circle()
+                .fill(RadialGradient(
+                    colors: [Color.chillPrimary.opacity(0.55), .clear],
+                    center: .center, startRadius: 4, endRadius: 150))
+                .frame(width: 300, height: 300)
+                .blur(radius: 22)
+                .scaleEffect(appeared ? 1 + bob(0, amount: 0.03) : 0.6)
+                .opacity(appeared ? 1 : 0)
+                .animation(.spring(response: 0.80, dampingFraction: 0.82), value: appeared)
+
+            // Gentle breathing brand ring.
+            Circle()
+                .stroke(LinearGradient.chillBrand, lineWidth: 2)
+                .frame(width: 208, height: 208)
+                .scaleEffect(appeared ? 1 + bob(1, amount: 0.04) : 0.72)
+                .opacity(appeared ? 0.65 : 0)
+                .animation(.spring(response: 0.90, dampingFraction: 0.84).delay(0.05), value: appeared)
+
+            // The app logomark, blooming in just like the launch splash.
+            ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 150)
+                .scaleEffect(appeared ? 1 : 0.7)
+                .animation(.spring(response: 0.70, dampingFraction: 0.72), value: appeared)
+        }
+        .shadow(color: Color.chillPrimary.opacity(0.34), radius: 30, y: 16)
     }
 
     // MARK: – Summary: animated bar chart + logo
@@ -3078,35 +3129,6 @@ private struct IntroHeroScene: View {
                 .offset(x: 116, y: -48 + bob(2, amount: 4))
                 .opacity(appeared ? 1 : 0)
                 .animation(.spring(response: 0.72, dampingFraction: 0.76).delay(0.20), value: appeared)
-        }
-    }
-
-    // MARK: – Background: score ring with animated counter
-
-    private var scoreScene: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 52, style: .continuous)
-                .fill(LinearGradient.chillBrandDiagonal)
-                .frame(width: 240, height: 240)
-                .rotationEffect(.degrees(8 + bob(2, amount: 2.4)))
-                .shadow(color: Color.chillPrimary.opacity(0.52), radius: 40, y: 20)
-                .overlay {
-                    RoundedRectangle(cornerRadius: 52, style: .continuous)
-                        .stroke(.white.opacity(0.22), lineWidth: 1.2)
-                }
-
-            ScoreRing(progress: appeared ? 0.88 : 0, tint: Color.chillMint)
-                .frame(width: 166, height: 166)
-                .animation(.spring(response: 1.0, dampingFraction: 0.76).delay(0.14), value: appeared)
-
-            VStack(spacing: 2) {
-                IntroScoreCounter(target: appeared ? 88 : 0)
-                Text("steady")
-                    .font(.caption.weight(.heavy))
-                    .foregroundStyle(.white.opacity(0.76))
-                    .opacity(appeared ? 1 : 0)
-                    .animation(.easeIn(duration: 0.30).delay(0.72), value: appeared)
-            }
         }
     }
 
@@ -3231,14 +3253,17 @@ private struct IntroHeroScene: View {
             }
             .offset(y: -6)
 
-            Image(systemName: "lock.shield.fill")
+            // The real "quick hide" control from Home: a red stop button that
+            // instantly drops the privacy shield ("Screen paused"); tap to resume.
+            Image(systemName: "xmark.octagon.fill")
                 .font(.system(size: 40, weight: .black))
-                .foregroundStyle(Color.chillMint)
+                .foregroundStyle(.red)
                 .frame(width: 74, height: 74)
                 .background(Color.chillDarkBackground.opacity(0.74), in: Circle())
-                .overlay { Circle().stroke(Color.chillMint.opacity(0.30), lineWidth: 1) }
+                .overlay { Circle().stroke(.red.opacity(0.34), lineWidth: 1) }
                 .offset(x: 96, y: 102 + bob(1, amount: 3.5))
-                .shadow(color: Color.chillMint.opacity(0.36), radius: 18, y: 8)
+                .scaleEffect(1 + bob(0, amount: 0.05))
+                .shadow(color: .red.opacity(0.42), radius: 18, y: 8)
         }
         .shadow(color: Color.chillPrimary.opacity(0.34), radius: 30, y: 16)
     }
@@ -3276,74 +3301,6 @@ private struct IntroHeroScene: View {
             }
         }
         .rotationEffect(.degrees(bob(1, amount: 1.2)))
-    }
-
-    // MARK: – Exit: animated phone + home screen slide
-
-    private var quickExitScene: some View {
-        ZStack {
-            // App screen slides left when appeared
-            RoundedRectangle(cornerRadius: 42, style: .continuous)
-                .fill(.white.opacity(0.14))
-                .frame(width: 154, height: 224)
-                .overlay(alignment: .top) {
-                    Capsule()
-                        .fill(.black.opacity(0.68))
-                        .frame(width: 62, height: 17)
-                        .padding(.top, 14)
-                }
-                .overlay {
-                    VStack(spacing: 12) {
-                        Circle()
-                            .fill(LinearGradient(colors: [.red, Color(red:0.88,green:0.08,blue:0.08)], startPoint:.top, endPoint:.bottom))
-                            .frame(width: 48, height: 48)
-                            .overlay {
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 24, weight: .black))
-                                    .foregroundStyle(.white)
-                            }
-                            .shadow(color: .red.opacity(0.54), radius: 14, y: 6)
-                            .scaleEffect(1 + bob(0, amount: 0.044))
-                        ForEach(0..<3, id: \.self) { item in
-                            Capsule()
-                                .fill(.white.opacity(0.20))
-                                .frame(width: CGFloat(74 + item * 14), height: 8)
-                        }
-                    }
-                    .padding(.top, 42)
-                }
-                .offset(x: appeared ? -72 : -24, y: -2)
-                .animation(.spring(response: 0.58, dampingFraction: 0.82).delay(0.08), value: appeared)
-
-            Image(systemName: "arrow.right")
-                .font(.system(size: 24, weight: .black))
-                .foregroundStyle(Color.chillMint)
-                .frame(width: 52, height: 52)
-                .background(.white.opacity(0.14), in: Circle())
-                .overlay { Circle().stroke(.white.opacity(0.22), lineWidth: 1) }
-                .offset(x: 10, y: 10)
-
-            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .fill(Color.chillDarkBackground.opacity(0.74))
-                .frame(width: 128, height: 164)
-                .overlay {
-                    VStack(spacing: 10) {
-                        ForEach(0..<3, id: \.self) { row in
-                            HStack(spacing: 10) {
-                                ForEach(0..<3, id: \.self) { col in
-                                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                        .fill(homeIconColor(row: row, col: col))
-                                        .frame(width: 22, height: 22)
-                                }
-                            }
-                        }
-                        Capsule().fill(.white.opacity(0.52)).frame(width: 58, height: 5)
-                    }
-                }
-                .offset(x: appeared ? 88 : 46, y: 42)
-                .opacity(appeared ? 1 : 0.38)
-                .animation(.spring(response: 0.58, dampingFraction: 0.82).delay(0.10), value: appeared)
-        }
     }
 
     // MARK: – Ready: sparkle orbit + person + logo bounce
@@ -3391,42 +3348,12 @@ private struct IntroHeroScene: View {
 
     // MARK: – Helpers
 
-    private func homeIconColor(row: Int, col: Int) -> Color {
-        let palette: [Color] = [
-            .chillPrimary, .chillSecondaryBlue, .chillMint,
-            .chillIconPink, .chillIconAmber, .chillIconTeal,
-            .chillIconPurple, .chillAccentTeal, .chillSecondaryBlue
-        ]
-        return palette[(row * 3 + col) % palette.count]
-    }
-
     private func bob(_ item: Int, amount: CGFloat) -> CGFloat {
         let raw = (phase * (0.30 + Double(item) * 0.035) + Double(item) * 0.27)
             .truncatingRemainder(dividingBy: 2)
         let normalized = raw < 0 ? raw + 2 : raw
         let tri = normalized <= 1 ? normalized : 2 - normalized
         return CGFloat(tri * 2 - 1) * amount
-    }
-}
-
-// MARK: – Animated score counter
-
-@MainActor
-private struct IntroScoreCounter: View {
-    let target: Int
-    @State private var displayed = 0
-
-    var body: some View {
-        Text("\(displayed)")
-            .font(.system(size: 54, weight: .black, design: .rounded))
-            .foregroundStyle(.white)
-            .contentTransition(.numericText(value: Double(displayed)))
-            .onAppear { animateTo(target) }
-            .onChange(of: target) { _, val in animateTo(val) }
-    }
-
-    private func animateTo(_ val: Int) {
-        withAnimation(.spring(response: 1.2, dampingFraction: 0.80)) { displayed = val }
     }
 }
 
