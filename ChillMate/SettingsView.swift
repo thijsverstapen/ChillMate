@@ -206,6 +206,10 @@ struct SettingsView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: SettingsSectionPage.self) { page in
                 settingsPage(page)
+                    // Status banners belong to the screen that created them. Clear
+                    // any leftover message when opening a section so it doesn't
+                    // follow the user onto unrelated settings pages.
+                    .onAppear { message = nil }
             }
             .onChange(of: requiresFaceID) { _, isOn in
                 faceIDLockChanged(isOn)
