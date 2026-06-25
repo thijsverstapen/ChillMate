@@ -321,6 +321,10 @@ struct LiquidGlassGroup<Content: View>: View {
 }
 
 struct GlassSurfaceModifier: ViewModifier {
+    /// The single surface colour used by every glass container in the app.
+    /// Changing this one value restyles every card/sheet/row consistently.
+    static let surfaceTint = Color.black.opacity(0.04)
+
     let radius: CGFloat
     let tint: Color
     let interactive: Bool
@@ -330,17 +334,19 @@ struct GlassSurfaceModifier: ViewModifier {
         // scheme keeps our white text white. (iOS 26's .glassEffect applies
         // vibrancy that would invert content to dark-on-light on this UI.)
         //
-        // `tint` and `interactive` were previously accepted but ignored; they
-        // now render, matching iOS 26 tinted/interactive glass:
-        //  - tint: a soft colour wash over the frosted material.
-        //  - interactive: a brighter, top-lit specular rim so tappable
-        //    surfaces read as raised.
+        // EVERY container in the app uses ONE uniform surface colour. The
+        // per-call `tint` is accepted for source compatibility but deliberately
+        // NOT rendered: letting each card tint itself turned containers a
+        // different colour on every screen. Selection / active / checked states
+        // are shown by borders, checkmarks, and switches, not by the surface.
+        // `interactive` still renders a brighter, top-lit rim so tappable
+        // surfaces read as raised.
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
         return content
             .background {
                 ZStack {
                     shape.fill(.ultraThinMaterial)
-                    shape.fill(tint)
+                    shape.fill(Self.surfaceTint)
                 }
             }
             .environment(\.colorScheme, .dark)
