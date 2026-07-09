@@ -25,6 +25,14 @@ struct JournalView: View {
     @State private var journalHaptic: SensoryFeedback?
     @State private var journalHapticTick = 0
 
+    /// When false, the view renders its content without its own NavigationStack so
+    /// it can be embedded inside the History tab's stack (no nested stacks).
+    let embedsOwnStack: Bool
+
+    init(embedsOwnStack: Bool = true) {
+        self.embedsOwnStack = embedsOwnStack
+    }
+
     private var selectedJournalEntry: JournalEntry? {
         journalEntries.first { Calendar.current.isDate($0.date, inSameDayAs: date) }
     }
@@ -36,11 +44,22 @@ struct JournalView: View {
     }
 
     var body: some View {
-        let photoCount = photoData.count
-        let photoPickerTitle = photoCount == 0 ? "Add photos" : "\(photoCount) photo\(photoCount == 1 ? "" : "s")"
+        if embedsOwnStack {
+            NavigationStack { journalContent }
+        } else {
+            journalContent
+        }
+    }
 
-        NavigationStack {
-            ZStack {
+    @ViewBuilder
+    private var journalContent: some View {
+        // Local `let` (not a main-actor property) so the @Sendable PhotosPicker
+        // label closure can capture it by value without a concurrency warning.
+        let photoPickerTitle = photoData.count == 0
+            ? String(localized: "Add photos")
+            : "\(photoData.count) photo\(photoData.count == 1 ? "" : "s")"
+
+        ZStack {
                 DashboardBackdrop()
 
                 ScrollView {
@@ -165,7 +184,6 @@ struct JournalView: View {
             .sheet(isPresented: $isShowingMonthCalendar) {
                 JournalMonthCalendarSheet(date: $date)
             }
-        }
     }
 
     private func loadPhotos(_ items: [PhotosPickerItem]) {
@@ -255,6 +273,55 @@ struct JournalView: View {
         feelsGoodAbout = entry.feelsGoodAbout
         selectedPhotos = []
         photoData = entry.photos
+    }
+}
+
+enum HistorySegment: String, CaseIterable, Identifiable {
+    case calendar
+    case journal
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .calendar: String(localized: "Calendar")
+        case .journal: String(localized: "Journal")
+        }
+    }
+}
+
+/// The merged "History" tab: one navigation stack that shows either the calendar
+/// overview or the journal, switched by a segmented control. Both children render
+/// stack-free content, so nothing nests (which would blank the screen).
+struct HistoryTabView: View {
+    @Binding var segment: HistorySegment
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                DashboardBackdrop()
+
+                VStack(spacing: 0) {
+                    Picker("", selection: $segment) {
+                        ForEach(HistorySegment.allCases) { seg in
+                            Text(seg.title).tag(seg)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 10)
+                    .padding(.bottom, 4)
+                    .disablesRootSwipeBack()
+
+                    switch segment {
+                    case .calendar:
+                        CalendarOverviewView(showsBackButton: false)
+                    case .journal:
+                        JournalView(embedsOwnStack: false)
+                    }
+                }
+            }
+        }
     }
 }
 

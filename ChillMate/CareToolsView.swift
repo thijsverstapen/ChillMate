@@ -5,96 +5,137 @@ import SwiftData
 import SwiftUI
 import UIKit
 
-struct CareToolsSection: View {
+/// The single grouped tool section on Home: four full-width "moment" rows (before,
+/// during, after, reflect) that replaced the old twelve-card grids. `groups` is
+/// passed in already ordered so the caller can promote the current moment to the top,
+/// and `highlightedPage` marks that moment with a "Now" badge and a live hint.
+struct MomentGroupsSection: View {
+    let groups: [CareToolGroup]
+    var highlightedPage: CareToolPage? = nil
+    var highlightHint: String? = nil
     let open: (CareToolPage) -> Void
-
-    private let tools: [CareToolDefinition] = [
-        CareToolDefinition(page: .safetyAutopilot, title: String(localized: "Safety autopilot"), subtitle: String(localized: "Helper summary & checking info"), symbol: "sparkles.rectangle.stack.fill", tint: Color.chillSecondaryBlue),
-        CareToolDefinition(page: .emergency, title: String(localized: "Emergency Information"), subtitle: String(localized: "112, trusted contact, and location message"), symbol: "sos.circle.fill", tint: Color.chillIconRed),
-        CareToolDefinition(page: .panicSupport, title: String(localized: "Panic support"), subtitle: String(localized: "Breathing, contact, and grounding"), symbol: "lungs.fill", tint: Color.chillIconPurple),
-        CareToolDefinition(page: .saferPlanning, title: String(localized: "Plan"), subtitle: String(localized: "Before-Chill checklist"), symbol: "checkmark.shield.fill", tint: Color.chillMint),
-        CareToolDefinition(page: .drugTimers, title: String(localized: "Check-ins"), subtitle: String(localized: "Recovery reminders"), symbol: "timer", tint: Color.chillIconAmber),
-        CareToolDefinition(page: .aftercare, title: String(localized: "Aftercare"), subtitle: String(localized: "Check in tomorrow"), symbol: "heart.text.square.fill", tint: Color.chillIconPink),
-        CareToolDefinition(page: .stdTests, title: String(localized: "STI tests"), subtitle: String(localized: "Dates and results"), symbol: "cross.case.fill", tint: Color.chillIconTeal),
-        CareToolDefinition(page: .recoveryMode, title: String(localized: "Recovery mode"), subtitle: String(localized: "Goals and cravings"), symbol: "figure.mind.and.body", tint: Color.chillIconGreen)
-    ]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {            CareSectionTitle(title: String(localized: "Care tools"), symbol: "heart.text.square.fill")
-
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                ForEach(tools) { tool in
-                    CareToolCard(tool: tool, open: open)
-                }
-            }
-        }
-    }
-}
-
-
-
-struct InsightsToolsSection: View {
-    let open: (CareToolPage) -> Void
-
-    private let tools: [CareToolDefinition] = [
-        CareToolDefinition(page: .combinationRisk, title: String(localized: "Risk checker"), subtitle: String(localized: "Safety signals"), symbol: "exclamationmark.shield.fill", tint: Color.chillIconOrange),
-        CareToolDefinition(page: .drugInfo, title: String(localized: "Substance info"), subtitle: String(localized: "Safety reference"), symbol: "pills.fill", tint: Color.chillIconPurple),
-        CareToolDefinition(page: .consentBoundaries, title: String(localized: "Boundaries"), subtitle: String(localized: "Consent and exit plan"), symbol: "hand.raised.fill", tint: Color.chillIconTeal),
-        CareToolDefinition(page: .privateInsights, title: String(localized: "Insights"), subtitle: String(localized: "Private patterns"), symbol: "chart.xyaxis.line", tint: Color.chillSecondaryBlue)
-    ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            CareSectionTitle(title: String(localized: "Insights"), symbol: "chart.xyaxis.line")
+            CareSectionTitle(title: String(localized: "Your tools"), symbol: "square.grid.2x2.fill")
 
-            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                ForEach(tools) { tool in
-                    CareToolCard(tool: tool, open: open)
+            VStack(spacing: 8) {
+                ForEach(groups) { group in
+                    ToolRow(
+                        title: group.title,
+                        subtitle: group.subtitle,
+                        symbol: group.symbol,
+                        tint: group.tint,
+                        isHighlighted: group.page == highlightedPage,
+                        hint: group.page == highlightedPage ? highlightHint : nil
+                    ) {
+                        open(group.page)
+                    }
                 }
             }
         }
     }
 }
 
-private struct CareToolCard: View {
-    let tool: CareToolDefinition
+/// The shared full-width tool container used everywhere tools are listed — the Home
+/// "moment" groups and every group landing page — so tool containers look identical
+/// across pages: colored icon, title (with an optional "Now" badge), a subtitle or
+/// live hint, and a chevron.
+struct ToolRow: View {
+    let title: String
+    let subtitle: String
+    let symbol: String
+    let tint: Color
+    var isHighlighted: Bool = false
+    var hint: String? = nil
+    let open: () -> Void
+
+    var body: some View {
+        Button(action: open) {
+            HStack(spacing: 14) {
+                Image(systemName: symbol)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(tint)
+                    .frame(width: 46, height: 46)
+                    .background(tint.opacity(0.20), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 6) {
+                        Text(title)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(Color.chillText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                        if isHighlighted {
+                            Text("Now")
+                                .font(.caption2.weight(.heavy))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 2)
+                                .background(tint, in: Capsule())
+                        }
+                    }
+                    Text(hint ?? subtitle)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(hint == nil ? Color.chillSecondary : tint)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(Color.chillTertiary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .glassSurface(radius: 22, tint: tint.opacity(isHighlighted ? 0.20 : 0.10), interactive: true)
+        }
+        .buttonStyle(ChillPlainButtonStyle())
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("\(title). \(hint ?? subtitle)"))
+    }
+}
+
+/// Landing page pushed when a Home "moment" card is tapped. Lists that group's
+/// member tools, each of which pushes onto the same navigation stack.
+struct CareToolGroupView: View {
+    let group: CareToolGroup
     let open: (CareToolPage) -> Void
 
     var body: some View {
-        Button {
-            open(tool.page)
-        } label: {
-            VStack(alignment: .leading, spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(tool.tint.opacity(0.20))
-                        .frame(width: 42, height: 42)
-                    Image(systemName: tool.symbol)
-                        .font(.system(size: 18, weight: .black))
-                        .foregroundStyle(tool.tint)
-                        .symbolRenderingMode(.hierarchical)
-                }
-                .shadow(color: tool.tint.opacity(0.40), radius: 8, y: 3)
+        ZStack {
+            DashboardBackdrop()
 
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(tool.title)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Color.chillText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.68)
-                    Text(tool.subtitle)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.chillSecondary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.76)
-                        .fixedSize(horizontal: false, vertical: true)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    PageHeader(
+                        title: group.title,
+                        subtitle: group.subtitle,
+                        symbol: group.symbol,
+                        tint: group.tint
+                    )
+
+                    VStack(spacing: 8) {
+                        ForEach(group.members) { member in
+                            let tool = CareToolCatalog.definition(for: member)
+                            ToolRow(
+                                title: tool.title,
+                                subtitle: tool.subtitle,
+                                symbol: tool.symbol,
+                                tint: tool.tint
+                            ) {
+                                open(member)
+                            }
+                        }
+                    }
                 }
+                .padding(20)
+                .padding(.bottom, 36)
             }
-            .frame(maxWidth: .infinity, minHeight: 96, alignment: .topLeading)
-            .padding(14)
+            .scrollIndicators(.hidden)
         }
-        .buttonStyle(ChillPlainButtonStyle())
-        .glassSurface(radius: 24, tint: .clear, interactive: true)
     }
 }
 
@@ -3732,8 +3773,9 @@ struct SafeRouteHomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
+        // No own NavigationStack: this is always pushed onto Home's stack (from the
+        // "While you’re out" group), so wrapping it would nest stacks and blank out.
+        ZStack {
                 DashboardBackdrop()
 
                 ScrollView {
@@ -3744,7 +3786,6 @@ struct SafeRouteHomeView: View {
                             symbol: "location.fill",
                             tint: Color.chillMint
                         )
-                        .disablesRootSwipeBack()
 
                         VStack(alignment: .leading, spacing: 12) {
                             CareSectionTitle(title: String(localized: "Destination"), symbol: "map.fill")
@@ -3879,7 +3920,6 @@ struct SafeRouteHomeView: View {
             .onChange(of: destination) { _, newValue in
                 searchDestinationSuggestions(for: newValue)
             }
-        }
     }
 
     private func searchDestinationSuggestions(for query: String) {

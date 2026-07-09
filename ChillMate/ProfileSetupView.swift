@@ -106,15 +106,14 @@ struct AppHomeView: View {
 
 enum AppTab: String {
     case home
-    case calendar
-    case safeRoute
-    case journal
+    case history
     case more
 }
 
 private struct MainTabView: View {
     @State private var selectedTab: AppTab = .home
     @State private var careNavPath: [CareToolPage] = []
+    @State private var historySegment: HistorySegment = .calendar
     @State private var isShowingShortcutLog = false
     @AppStorage("pendingAppDestination") private var pendingAppDestination = ""
     @AppStorage("lastSelectedTab") private var lastSelectedTab = AppTab.home.rawValue
@@ -128,30 +127,19 @@ private struct MainTabView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             DashboardView(careNavPath: $careNavPath, openCalendarTab: {
-                selectedTab = .calendar
+                historySegment = .calendar
+                selectedTab = .history
             })
             .tabItem {
                 Label("Home", systemImage: "house.fill")
             }
             .tag(AppTab.home)
 
-            CalendarOverviewView(showsBackButton: false)
+            HistoryTabView(segment: $historySegment)
                 .tabItem {
-                Label("Calendar", systemImage: "calendar")
-            }
-            .tag(AppTab.calendar)
-
-            SafeRouteHomeView()
-                .tabItem {
-                    Label("Route", systemImage: "location.fill")
+                    Label("History", systemImage: "clock.arrow.circlepath")
                 }
-                .tag(AppTab.safeRoute)
-
-            JournalView()
-                .tabItem {
-                    Label("Journal", systemImage: "book.closed.fill")
-                }
-                .tag(AppTab.journal)
+                .tag(AppTab.history)
 
             MoreHubView()
                 .tabItem {
@@ -233,9 +221,11 @@ private struct MainTabView: View {
             selectedTab = .home
             careNavPath = [.panicSupport]
         case .journal:
-            selectedTab = .journal
+            historySegment = .journal
+            selectedTab = .history
         case .safeRoute:
-            selectedTab = .safeRoute
+            selectedTab = .home
+            careNavPath = [.groupDuring, .safeRoute]
         case .combinationRisk:
             selectedTab = .home
             careNavPath = [.combinationRisk]
@@ -2020,6 +2010,8 @@ private struct SetupWizardFooter: View {
                     Button(action: onBack) {
                         Label("Back", systemImage: "chevron.left")
                             .font(.headline)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(ChillPillButtonStyle(prominent: false))
@@ -2031,6 +2023,8 @@ private struct SetupWizardFooter: View {
                         systemImage: isLast ? "person.crop.circle.badge.checkmark" : "arrow.right.circle.fill"
                     )
                     .font(.headline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                     .frame(maxWidth: .infinity)
                 }
                 .disabled(!canAdvance)
@@ -2104,6 +2098,10 @@ private struct ProfilePermissionsPage: View {
     @Binding var locationServicesChecked: Bool
     @Binding var iCloudBackupEnabled: Bool
     @AppStorage("discreetNotifications") private var discreetNotifications = false
+    @AppStorage("weekendSafetyEnabled") private var weekendSafetyEnabled = false
+    @AppStorage("safetyCheckInsEnabled") private var safetyCheckInsEnabled = false
+    @AppStorage("weeklyDigestEnabled") private var weeklyDigestEnabled = false
+    @AppStorage("stiReminderEnabled") private var stiReminderEnabled = false
     let message: String?
     let isChecking: Bool
     let requestHealth: () -> Void
@@ -2149,6 +2147,68 @@ private struct ProfilePermissionsPage: View {
                         symbol: "eye.slash.fill",
                         isOn: discreetNotifications,
                         action: { discreetNotifications.toggle() }
+                    )
+
+                    ProfileSetupRowDivider()
+
+                    PermissionSetupCard(
+                        title: String(localized: "Night safety check-ins"),
+                        subtitle: String(localized: "On weekend nights (12–6 am), a discreet “you okay?” with one-tap help."),
+                        symbol: "moon.stars.fill",
+                        isOn: weekendSafetyEnabled,
+                        action: {
+                            weekendSafetyEnabled.toggle()
+                            if weekendSafetyEnabled {
+                                NotificationService.shared.scheduleWeekendSafetyCheckIns()
+                            } else {
+                                NotificationService.shared.clearWeekendSafetyCheckIns()
+                            }
+                        }
+                    )
+
+                    ProfileSetupRowDivider()
+
+                    PermissionSetupCard(
+                        title: String(localized: "Session safety check-ins"),
+                        subtitle: String(localized: "While a dose timer runs, more noticeable check-ins with fast help."),
+                        symbol: "shield.lefthalf.filled",
+                        isOn: safetyCheckInsEnabled,
+                        action: { safetyCheckInsEnabled.toggle() }
+                    )
+
+                    ProfileSetupRowDivider()
+
+                    PermissionSetupCard(
+                        title: String(localized: "Weekly summary"),
+                        subtitle: String(localized: "A Sunday-evening digest of your streak and score."),
+                        symbol: "calendar.badge.clock",
+                        isOn: weeklyDigestEnabled,
+                        action: {
+                            weeklyDigestEnabled.toggle()
+                            if weeklyDigestEnabled {
+                                NotificationService.shared.scheduleWeeklySummary(streak: 0, score: 0)
+                            } else {
+                                NotificationService.shared.clearWeeklySummary()
+                            }
+                        }
+                    )
+
+                    ProfileSetupRowDivider()
+
+                    PermissionSetupCard(
+                        title: String(localized: "STI test reminders"),
+                        subtitle: String(localized: "A gentle reminder to test on a regular schedule."),
+                        symbol: "cross.case.fill",
+                        isOn: stiReminderEnabled,
+                        action: {
+                            stiReminderEnabled.toggle()
+                            if stiReminderEnabled {
+                                let dueDate = Calendar.current.date(byAdding: .month, value: 3, to: .now) ?? .now
+                                NotificationService.shared.scheduleSTIReminder(dueDate: dueDate)
+                            } else {
+                                NotificationService.shared.clearSTIReminder()
+                            }
+                        }
                     )
                 }
 
@@ -2583,6 +2643,8 @@ private struct IntroBottomControls: View {
     let action: () -> Void
     @State private var shimmerPhase: CGFloat = -0.4
     @State private var isPressed = false
+    @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
+    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -2632,6 +2694,9 @@ private struct IntroBottomControls: View {
             .padding(.horizontal, 22)
             .padding(.bottom, 24)
             .onAppear {
+                // Gate the endless shimmer sweep behind Reduce Motion, like the rest
+                // of the intro. Left off, shimmerPhase stays parked off-screen left.
+                guard !reduceSystemMotion, !chillReducedMotion else { return }
                 withAnimation(.linear(duration: 2.6).repeatForever(autoreverses: false).delay(1.0)) {
                     shimmerPhase = 1.4
                 }
@@ -2701,9 +2766,9 @@ private struct IntroPage {
             animation: .log
         ),
         IntroPage(
-            eyebrow: String(localized: "Care tools"),
-            title: String(localized: "Plan safer and recover softer"),
-            subtitle: String(localized: "Use plans, check-ins, safety information, STI reminders, emergency shortcuts, reflection, and aftercare."),
+            eyebrow: String(localized: "Your tools"),
+            title: String(localized: "Grouped by the moment"),
+            subtitle: String(localized: "Everything sits under four moments: plan before you go, stay safe while you’re out, check in with aftercare and health, then see your patterns. The one you need rises to the top."),
             animation: .care
         ),
         IntroPage(
@@ -3214,42 +3279,51 @@ private struct IntroHeroScene: View {
 
     // MARK: – Care: real circular orbit
 
+    /// Teaches the four Home "moments" — the same icons, colours, and order the
+    /// user meets on the dashboard — so the layout feels familiar on first open.
     private var careScene: some View {
-        ZStack {
-            // Orbit track rings
-            ForEach(0..<2, id: \.self) { ring in
-                Circle()
-                    .stroke(.white.opacity(0.07 + Double(ring) * 0.04), lineWidth: 1.0)
-                    .frame(width: CGFloat(194 + ring * 46), height: CGFloat(194 + ring * 46))
-            }
+        let moments: [(title: String, symbol: String, tint: Color)] = [
+            (String(localized: "Before you go"), "checkmark.shield.fill", .chillSecondaryBlue),
+            (String(localized: "While you’re out"), "timer", Color(red: 251/255, green: 146/255, blue: 60/255)),
+            (String(localized: "Aftercare & health"), "heart.text.square.fill", .chillMint),
+            (String(localized: "Your patterns"), "chart.xyaxis.line", .chillPrimary)
+        ]
 
-            let orbitSymbols = ["timer", "pills.fill", "checkmark.shield.fill", "cross.case.fill", "phone.fill", "figure.mind.and.body"]
-            let orbitTints: [Color] = [
-                Color(red: 251/255, green: 146/255, blue: 60/255),  // warm orange
-                .chillSecondaryBlue,
-                .chillMint,
-                .chillAccentTeal,
-                Color(red: 244/255, green: 114/255, blue: 182/255), // bright pink
-                .chillPrimary
-            ]
+        return ZStack {
+            RoundedRectangle(cornerRadius: 40, style: .continuous)
+                .fill(.white.opacity(0.10))
+                .frame(width: 268, height: 272)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 40, style: .continuous)
+                        .stroke(.white.opacity(0.22), lineWidth: 1.1)
+                }
 
-            // Rotating container: orbit speed ~18°/s
-            ForEach(0..<6, id: \.self) { i in
-                CareOrbitIcon(symbol: orbitSymbols[i], tint: orbitTints[i])
-                    .offset(y: -105)
-                    // Counter-rotate icon itself so it stays upright
-                    .rotationEffect(.degrees(-(phase * 18).truncatingRemainder(dividingBy: 360)))
-                    // Place icon on the orbit ring at its angle + rotate the whole ring
-                    .rotationEffect(.degrees(Double(i) * 60 + (phase * 18).truncatingRemainder(dividingBy: 360)), anchor: .center)
-                    .scaleEffect(appeared ? 1 : 0.18)
+            VStack(spacing: 12) {
+                ForEach(Array(moments.enumerated()), id: \.offset) { i, moment in
+                    HStack(spacing: 12) {
+                        Image(systemName: moment.symbol)
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundStyle(moment.tint)
+                            .frame(width: 38, height: 38)
+                            .background(moment.tint.opacity(0.22), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+
+                        Text(moment.title)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+
+                        Spacer(minLength: 0)
+                    }
+                    .frame(width: 212, alignment: .leading)
                     .opacity(appeared ? 1 : 0)
-                    .animation(.spring(response: 0.58, dampingFraction: 0.66).delay(Double(i) * 0.07), value: appeared)
+                    .offset(x: appeared ? 0 : -26)
+                    .animation(.spring(response: 0.52, dampingFraction: 0.78).delay(Double(i) * 0.10 + 0.12), value: appeared)
+                }
             }
-
-            ChillMateOnboardingLogo(checkmarkInPlace: checkmarkInPlace, size: 104)
-                .scaleEffect(appeared ? 1 + bob(0, amount: 0.022) : 0.60)
-                .animation(.spring(response: 0.72, dampingFraction: 0.70), value: appeared)
+            .offset(y: bob(1, amount: 2.0))
         }
+        .shadow(color: Color.chillPrimary.opacity(0.30), radius: 26, y: 14)
     }
 
     // MARK: – Privacy: ping rings + face ID
@@ -3498,27 +3572,6 @@ private struct TimelinePill: View {
         .overlay {
             Capsule().stroke(.white.opacity(0.18), lineWidth: 1)
         }
-    }
-}
-
-private struct CareOrbitIcon: View {
-    let symbol: String
-    let tint: Color
-
-    var body: some View {
-        Image(systemName: symbol)
-            .font(.system(size: 22, weight: .bold))
-            .foregroundStyle(tint)
-            .frame(width: 54, height: 54)
-            .background(
-                LinearGradient(
-                    colors: [tint.opacity(0.28), tint.opacity(0.10)],
-                    startPoint: .topLeading, endPoint: .bottomTrailing
-                ),
-                in: Circle()
-            )
-            .overlay { Circle().stroke(.white.opacity(0.24), lineWidth: 1) }
-            .shadow(color: tint.opacity(0.36), radius: 10, y: 4)
     }
 }
 

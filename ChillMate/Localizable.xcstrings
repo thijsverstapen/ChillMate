@@ -1,202 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Your setup" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dein Setup"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu configuración"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ta configuration"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jouw setup"
-          }
-        }
-      }
-    },
-    "Help & safety" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hilfe & Sicherheit"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ayuda y seguridad"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aide et sécurité"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hulp & veiligheid"
-          }
-        }
-      }
-    },
-    "About the app" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Über die App"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sobre la app"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "À propos de l'app"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Over de app"
-          }
-        }
-      }
-    },
-    "iCloud backup is paused. Sign in to iCloud with iCloud Drive on to resume." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud-Backup ist pausiert. Melde dich bei iCloud an und aktiviere iCloud Drive, um fortzufahren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La copia en iCloud está en pausa. Inicia sesión en iCloud con iCloud Drive activado para continuar."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La sauvegarde iCloud est en pause. Connecte-toi à iCloud avec iCloud Drive activé pour reprendre."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud-back-up is gepauzeerd. Log in bij iCloud met iCloud Drive aan om verder te gaan."
-          }
-        }
-      }
-    },
-    "This week, in a few words" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Diese Woche, in wenigen Worten"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esta semana, en pocas palabras"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cette semaine, en quelques mots"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deze week, in het kort"
-          }
-        }
-      }
-    },
-    "Writing your private reflection…" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deine private Reflexion wird geschrieben…"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escribiendo tu reflexión privada…"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rédaction de ta réflexion privée…"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je privéreflectie wordt geschreven…"
-          }
-        }
-      }
-    },
-    "Generated on this iPhone from this week's counts only. Nothing leaves your device." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf diesem iPhone erstellt, nur aus den Zahlen dieser Woche. Nichts verlässt dein Gerät."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generado en este iPhone solo a partir de los números de esta semana. Nada sale de tu dispositivo."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Généré sur cet iPhone à partir des chiffres de la semaine uniquement. Rien ne quitte ton appareil."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gemaakt op deze iPhone, alleen op basis van de cijfers van deze week. Niets verlaat je toestel."
-          }
-        }
-      }
-    },
     "" : {
 
     },
@@ -235,6 +39,7 @@
     },
     "·" : {
       "comment" : "A period used to separate two items in a list.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "de" : {
@@ -595,6 +400,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ is gelogd om %@. Check-in-voortgang: %@."
+          }
+        }
+      }
+    },
+    "%@. %@" : {
+      "comment" : "A combined accessibility title and description for the row.",
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@. %2$@"
           }
         }
       }
@@ -1117,6 +934,7 @@
     },
     "%lldd clear" : {
       "comment" : "A number of days of streak of a wellness score.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "de" : {
@@ -1506,6 +1324,7 @@
       }
     },
     "112, trusted contact, and location message" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2056,6 +1875,10 @@
           }
         }
       }
+    },
+    "A dose timer is running" : {
+      "comment" : "A hint that a dose timer is currently active.",
+      "isCommentAutoGenerated" : true
     },
     "A few supports are missing. Consider adding limits, water, transport, and a person you can call before you start." : {
       "localizations" : {
@@ -2801,6 +2624,10 @@
         }
       }
     },
+    "A private, on-device summary" : {
+      "comment" : "Title of a weekly reflection card.",
+      "isCommentAutoGenerated" : true
+    },
     "A professional helper can talk through sex, substances, sleep, PrEP, consent, and safety without judgment." : {
       "comment" : "A description of the benefits of seeking support from a professional.",
       "isCommentAutoGenerated" : true,
@@ -3365,6 +3192,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Een weg naar huis is gepland voor de Chill begint."
+          }
+        }
+      }
+    },
+    "About the app" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über die App"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre la app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos de l'app"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over de app"
           }
         }
       }
@@ -4039,6 +3894,10 @@
         }
       }
     },
+    "Add photos" : {
+      "comment" : "A button that adds photos to a journal entry.",
+      "isCommentAutoGenerated" : true
+    },
     "Add profile picture" : {
       "comment" : "A button that displays a sheet for adding a profile photo.",
       "isCommentAutoGenerated" : true,
@@ -4512,6 +4371,10 @@
           }
         }
       }
+    },
+    "Aftercare & health" : {
+      "comment" : "Title for a group of care tools focused on post-care support and health.",
+      "isCommentAutoGenerated" : true
     },
     "Aftercare is incomplete. Drink water slowly and eat something gentle if you can." : {
       "localizations" : {
@@ -6369,6 +6232,10 @@
         }
       }
     },
+    "Before you go" : {
+      "comment" : "Title for a group of care tools that are shown on the Home screen.",
+      "isCommentAutoGenerated" : true
+    },
     "Before you start" : {
       "localizations" : {
         "de" : {
@@ -7591,6 +7458,7 @@
       }
     },
     "Care tools" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7988,6 +7856,10 @@
         }
       }
     },
+    "Check in on last night" : {
+      "comment" : "A hint to the user that they should check in on their last night of tracking.",
+      "isCommentAutoGenerated" : true
+    },
     "Check in tomorrow" : {
       "localizations" : {
         "de" : {
@@ -8225,6 +8097,10 @@
           }
         }
       }
+    },
+    "Check-in timers · safe route home" : {
+      "comment" : "Tool title for the \"While you're out\" care tool group.",
+      "isCommentAutoGenerated" : true
     },
     "Check-in tone" : {
       "comment" : "A label displayed above a picker that lets the user choose a tone for check-in notifications.",
@@ -12047,6 +11923,7 @@
     },
     "Daily score %@. Tap to see breakdown." : {
       "comment" : "A button that shows a tooltip with the daily score and its breakdown.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "de" : {
@@ -12152,6 +12029,10 @@
           }
         }
       }
+    },
+    "Daily score not active yet. Log a night to activate." : {
+      "comment" : "A description of the daily score, when the user has not yet logged a night.",
+      "isCommentAutoGenerated" : true
     },
     "DanceSafe" : {
       "localizations" : {
@@ -12356,6 +12237,14 @@
           }
         }
       }
+    },
+    "day" : {
+      "comment" : "Abbreviation for a day.",
+      "isCommentAutoGenerated" : true
+    },
+    "days" : {
+      "comment" : "Plural form of \"day\".",
+      "isCommentAutoGenerated" : true
     },
     "days since logged substance use" : {
       "comment" : "A label that describes the number of days since the user last logged substance use.",
@@ -15365,6 +15254,10 @@
         }
       }
     },
+    "Everything sits under four moments: plan before you go, stay safe while you’re out, check in with aftercare and health, then see your patterns. The one you need rises to the top." : {
+      "comment" : "Text describing how data is organized in the app.",
+      "isCommentAutoGenerated" : true
+    },
     "Everything you saved, in one place" : {
       "localizations" : {
         "de" : {
@@ -16835,6 +16728,34 @@
         }
       }
     },
+    "Generated on this iPhone from this week's counts only. Nothing leaves your device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem iPhone erstellt, nur aus den Zahlen dieser Woche. Nichts verlässt dein Gerät."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generado en este iPhone solo a partir de los números de esta semana. Nada sale de tu dispositivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Généré sur cet iPhone à partir des chiffres de la semaine uniquement. Rien ne quitte ton appareil."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemaakt op deze iPhone, alleen op basis van de cijfers van deze week. Niets verlaat je toestel."
+          }
+        }
+      }
+    },
     "Genital" : {
       "localizations" : {
         "de" : {
@@ -17058,6 +16979,14 @@
           }
         }
       }
+    },
+    "Get help now" : {
+      "comment" : "A button that can be tapped to get help.",
+      "isCommentAutoGenerated" : true
+    },
+    "Get help now. Breathing, grounding, or call emergency services." : {
+      "comment" : "A description of the Get Help Now button.",
+      "isCommentAutoGenerated" : true
     },
     "Get me home now" : {
       "localizations" : {
@@ -17807,6 +17736,10 @@
         }
       }
     },
+    "Grouped by the moment" : {
+      "comment" : "A description of how the app groups its data.",
+      "isCommentAutoGenerated" : true
+    },
     "Hard no" : {
       "localizations" : {
         "de" : {
@@ -17870,6 +17803,10 @@
           }
         }
       }
+    },
+    "Heading out? Set up first" : {
+      "comment" : "Hint to the user that they should set up their care plan before heading out.",
+      "isCommentAutoGenerated" : true
     },
     "Health" : {
       "localizations" : {
@@ -18195,6 +18132,34 @@
         }
       }
     },
+    "Help & safety" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe & Sicherheit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda y seguridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide et sécurité"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hulp & veiligheid"
+          }
+        }
+      }
+    },
     "Helper summary" : {
       "localizations" : {
         "de" : {
@@ -18230,6 +18195,7 @@
       }
     },
     "Helper summary & checking info" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -18256,6 +18222,10 @@
           }
         }
       }
+    },
+    "Helper summary and checking info" : {
+      "comment" : "Tooltip text for the \"Safety autopilot\" card.",
+      "isCommentAutoGenerated" : true
     },
     "Helpful professional routes" : {
       "localizations" : {
@@ -18461,6 +18431,14 @@
         }
       }
     },
+    "Hide details" : {
+      "comment" : "Text displayed in a button that hides the details of a monthly summary.",
+      "isCommentAutoGenerated" : true
+    },
+    "Hide monthly details" : {
+      "comment" : "Button label to hide the details of a month.",
+      "isCommentAutoGenerated" : true
+    },
     "High" : {
       "localizations" : {
         "de" : {
@@ -18544,6 +18522,10 @@
           }
         }
       }
+    },
+    "History" : {
+      "comment" : "A tab that shows the user's history.",
+      "isCommentAutoGenerated" : true
     },
     "HIV" : {
       "localizations" : {
@@ -20022,6 +20004,34 @@
         }
       }
     },
+    "iCloud backup is paused. Sign in to iCloud with iCloud Drive on to resume." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-Backup ist pausiert. Melde dich bei iCloud an und aktiviere iCloud Drive, um fortzufahren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La copia en iCloud está en pausa. Inicia sesión en iCloud con iCloud Drive activado para continuar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sauvegarde iCloud est en pause. Connecte-toi à iCloud avec iCloud Drive activé pour reprendre."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-back-up is gepauzeerd. Log in bij iCloud met iCloud Drive aan om verder te gaan."
+          }
+        }
+      }
+    },
     "iCloud Drive is not available. Sign in to iCloud and make sure iCloud Drive is on." : {
       "localizations" : {
         "de" : {
@@ -21186,6 +21196,10 @@
           }
         }
       }
+    },
+    "Insights · recovery · weekly reflection" : {
+      "comment" : "Tooltip text for the \"Your patterns\" group.",
+      "isCommentAutoGenerated" : true
     },
     "Interaction warnings" : {
       "comment" : "A heading for a list of warnings about the interaction of substances.",
@@ -23397,6 +23411,10 @@
         }
       }
     },
+    "Log to activate" : {
+      "comment" : "Label for the daily score tile when the score is not yet active.",
+      "isCommentAutoGenerated" : true
+    },
     "Logged" : {
       "localizations" : {
         "de" : {
@@ -23678,6 +23696,7 @@
       }
     },
     "Make a log to activate" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -24890,6 +24909,10 @@
           }
         }
       }
+    },
+    "Morning check-in · STI tests" : {
+      "comment" : "Title for the \"Aftercare & health\" care tool group.",
+      "isCommentAutoGenerated" : true
     },
     "Morning-after check-in" : {
       "localizations" : {
@@ -27279,6 +27302,10 @@
         }
       }
     },
+    "Now" : {
+      "comment" : "A label that indicates that the moment is currently happening.",
+      "isCommentAutoGenerated" : true
+    },
     "Numb" : {
       "localizations" : {
         "de" : {
@@ -27334,6 +27361,10 @@
           }
         }
       }
+    },
+    "Numbers, contact, and location message" : {
+      "comment" : "Text displayed in the emergency information section of the app.",
+      "isCommentAutoGenerated" : true
     },
     "Off" : {
       "comment" : "A button that turns off a feature.",
@@ -30244,6 +30275,10 @@
         }
       }
     },
+    "Plan · combos · substances · boundaries" : {
+      "comment" : "Subtitle for the \"Before you go\" care tool group.",
+      "isCommentAutoGenerated" : true
+    },
     "Plan before the next Chill" : {
       "localizations" : {
         "de" : {
@@ -30365,6 +30400,7 @@
       }
     },
     "Plan safer and recover softer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -30391,6 +30427,10 @@
           }
         }
       }
+    },
+    "Plan transport and share location" : {
+      "comment" : "Subtitle for the safe route home care tool.",
+      "isCommentAutoGenerated" : true
     },
     "Plan transport, share where you are, or open a get-me-home flow quickly. Search an address, choose transit, driving, or cycling, then open Maps or message your trusted contact." : {
       "localizations" : {
@@ -32792,6 +32832,14 @@
         }
       }
     },
+    "Recovery streak" : {
+      "comment" : "Label for the recovery streak stat.",
+      "isCommentAutoGenerated" : true
+    },
+    "Recovery streak %lld days. Tap to open your calendar." : {
+      "comment" : "A button that opens the user's calendar, highlighting the streak of days in which they've been sober.",
+      "isCommentAutoGenerated" : true
+    },
     "Reduce ChillMate animations" : {
       "localizations" : {
         "de" : {
@@ -34104,6 +34152,7 @@
     },
     "Route" : {
       "comment" : "A tab for the route view.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "de" : {
@@ -36680,6 +36729,10 @@
         }
       }
     },
+    "Share with a professional" : {
+      "comment" : "Title of a card that shows a summary of your data to a",
+      "isCommentAutoGenerated" : true
+    },
     "Shared safety plan" : {
       "comment" : "A label for a text field that lets the user enter a shared safety plan.",
       "isCommentAutoGenerated" : true,
@@ -36841,6 +36894,14 @@
           }
         }
       }
+    },
+    "Show details" : {
+      "comment" : "Button label to show/hide details.",
+      "isCommentAutoGenerated" : true
+    },
+    "Show monthly details" : {
+      "comment" : "Button label to show the details of the current month.",
+      "isCommentAutoGenerated" : true
     },
     "Show unlock" : {
       "localizations" : {
@@ -41793,6 +41854,34 @@
         }
       }
     },
+    "This week, in a few words" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Woche, in wenigen Worten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta semana, en pocas palabras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette semaine, en quelques mots"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze week, in het kort"
+          }
+        }
+      }
+    },
     "This will delete your profile and every log stored by ChillMate on this device." : {
       "localizations" : {
         "de" : {
@@ -42304,6 +42393,14 @@
           }
         }
       }
+    },
+    "Today’s score" : {
+      "comment" : "Label for the daily score.",
+      "isCommentAutoGenerated" : true
+    },
+    "Today’s score %lld. Tap to see the breakdown." : {
+      "comment" : "A button that opens a sheet showing the breakdown of the user's score.",
+      "isCommentAutoGenerated" : true
     },
     "Today's small care is tomorrow's steadier ground." : {
       "localizations" : {
@@ -43562,6 +43659,7 @@
       }
     },
     "Use plans, check-ins, safety information, STI reminders, emergency shortcuts, reflection, and aftercare." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -45147,6 +45245,9 @@
         }
       }
     },
+    "Where to test your drugs" : {
+
+    },
     "While a dose timer is running, send more noticeable check-ins with a one-tap way to reach your trusted contact or emergency services if something feels wrong." : {
       "localizations" : {
         "de" : {
@@ -45174,6 +45275,10 @@
           }
         }
       }
+    },
+    "While you’re out" : {
+      "comment" : "Title for the \"While you’re out\" group on the Home screen.",
+      "isCommentAutoGenerated" : true
     },
     "Who can I contact?" : {
       "localizations" : {
@@ -45559,6 +45664,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Schrijf op wat je wilt, wat verboden terrein is, hoe iemand moet inchecken en hoe je weg kunt. Dit blijft op het apparaat."
+          }
+        }
+      }
+    },
+    "Writing your private reflection…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine private Reflexion wird geschrieben…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribiendo tu reflexión privada…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rédaction de ta réflexion privée…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je privéreflectie wordt geschreven…"
           }
         }
       }
@@ -49566,6 +49699,10 @@
         }
       }
     },
+    "Your patterns" : {
+      "comment" : "Title for a section of the app that shows your recovery patterns.",
+      "isCommentAutoGenerated" : true
+    },
     "Your patterns over time" : {
       "localizations" : {
         "de" : {
@@ -50016,6 +50153,34 @@
         }
       }
     },
+    "Your setup" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Setup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu configuración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta configuration"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouw setup"
+          }
+        }
+      }
+    },
     "Your steadiness is built from nights exactly like this." : {
       "localizations" : {
         "de" : {
@@ -50099,6 +50264,10 @@
           }
         }
       }
+    },
+    "Your tools" : {
+      "comment" : "Title of the section that lists the user's care tools.",
+      "isCommentAutoGenerated" : true
     },
     "Your week in ChillMate" : {
       "localizations" : {

@@ -80,6 +80,12 @@ struct DashboardView: View {
         case .privateInsights: PrivateInsightsView()
         case .helperBridge: ProfessionalHelperBridgeView()
         case .drugChecking: DrugCheckingEducationView()
+        case .safeRoute: SafeRouteHomeView()
+        case .weeklyReflection: WeeklyReflectionView()
+        case .groupBefore, .groupDuring, .groupAfter, .groupPatterns:
+            if let group = CareToolGroup.homeGroups.first(where: { $0.page == page }) {
+                CareToolGroupView(group: group) { careNavPath.append($0) }
+            }
         }
     }
 
@@ -98,6 +104,10 @@ struct DashboardView: View {
                             HeaderSummaryView(width: proxy.size.width, dailyScore: metrics.dailyScore)
 
                             VStack(alignment: .leading, spacing: 22) {
+                                GetHelpNowBar(escalated: shouldEscalateHelp) {
+                                    careNavPath.append(.panicSupport)
+                                }
+
                                 TodayFocusCard(
                                     entries: entries,
                                     plans: plans,
@@ -150,11 +160,11 @@ struct DashboardView: View {
                                     }
                                 }
 
-                                CareToolsSection { page in
-                                    careNavPath.append(page)
-                                }
-
-                                InsightsToolsSection { page in
+                                MomentGroupsSection(
+                                    groups: orderedToolGroups,
+                                    highlightedPage: currentMoment?.page,
+                                    highlightHint: currentMoment?.hint
+                                ) { page in
                                     careNavPath.append(page)
                                 }
 
@@ -278,6 +288,58 @@ struct DashboardView: View {
         } else {
             isShowingCalendar = true
         }
+    }
+
+    /// The current session "moment", used to promote the most relevant tool group to
+    /// the top of Home and annotate it with a live hint. `nil` ⇒ the calm default
+    /// order (which matches the mockup exactly).
+    private var currentMoment: (page: CareToolPage, hint: String)? {
+        let now = Date.now
+
+        // Mid-session: a dose timer is still counting down.
+        if timers.contains(where: { $0.endsAt > now }) {
+            return (.groupDuring, String(localized: "A dose timer is running"))
+        }
+
+        // Morning after a tracked event whose aftercare check-in is still open.
+        if entries.contains(where: { entryNeedsAftercare($0, now: now) }) {
+            return (.groupAfter, String(localized: "Check in on last night"))
+        }
+
+        // Evening or the small hours: most people set up before heading out.
+        let hour = Calendar.current.component(.hour, from: now)
+        if hour >= 18 || hour < 4 {
+            return (.groupBefore, String(localized: "Heading out? Set up first"))
+        }
+
+        return nil
+    }
+
+    /// `CareToolGroup.homeGroups`, but with the current moment moved to the top.
+    private var orderedToolGroups: [CareToolGroup] {
+        let base = CareToolGroup.homeGroups
+        guard let lead = currentMoment?.page,
+              let index = base.firstIndex(where: { $0.page == lead }) else {
+            return base
+        }
+        var reordered = base
+        reordered.insert(reordered.remove(at: index), at: 0)
+        return reordered
+    }
+
+    /// Whether the "Get help now" bar should visibly escalate (pulsing ring). True on
+    /// distress signals or in the small hours, when a crisis is likeliest.
+    private var shouldEscalateHelp: Bool {
+        let m = dashboardMetrics
+        if m.realityCheckActive || m.healthWarningCount > 3 { return true }
+        let hour = Calendar.current.component(.hour, from: .now)
+        return hour >= 0 && hour < 5
+    }
+
+    private func entryNeedsAftercare(_ entry: NightEntry, now: Date) -> Bool {
+        guard entry.isTrackedEvent, entry.aftercareCompletedAt == nil else { return false }
+        let age = now.timeIntervalSince(entry.endDate)
+        return age >= 6 * 60 * 60 && age <= 36 * 60 * 60
     }
 
     private func updateWidgetData(metrics: DashboardMetrics) {
@@ -1922,6 +1984,56 @@ private struct SmartNextAction {
     }
 }
 
+/// Always-visible crisis affordance pinned near the top of Home: a solid red bar,
+/// so the one path that must never be hunted for is the loudest thing on screen.
+/// `escalated` adds a pulsing ring when signals suggest the user may be in distress.
+private struct GetHelpNowBar: View {
+    var escalated: Bool = false
+    let open: () -> Void
+
+    /// A deep, saturated red (matching the emergency-call button) that keeps white
+    /// text readable — the icon-tint `chillIconRed` is too light for a solid fill.
+    private let barRed = Color(red: 216 / 255, green: 52 / 255, blue: 52 / 255)
+
+    /// 0 → 1 continuous driver for the pulsing ring (a Bool doesn't oscillate
+    /// reliably under `repeatForever`).
+    @State private var pulse: CGFloat = 0
+
+    var body: some View {
+        Button(action: open) {
+            HStack(spacing: 9) {
+                Image(systemName: "cross.case.fill")
+                Text("Get help now")
+            }
+            .font(.headline.weight(.bold))
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(barRed)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .strokeBorder(Color.white.opacity(escalated ? (0.25 + 0.6 * pulse) : 0), lineWidth: 2)
+            )
+            .shadow(color: barRed.opacity(escalated ? 0.55 : 0.28), radius: escalated ? 18 : 9, y: 4)
+        }
+        .buttonStyle(ChillPlainButtonStyle())
+        .accessibilityLabel(Text("Get help now. Breathing, grounding, or call emergency services."))
+        .onAppear { syncPulse() }
+        .onChange(of: escalated) { _, _ in syncPulse() }
+    }
+
+    private func syncPulse() {
+        if escalated {
+            withAnimation(.easeInOut(duration: 1.15).repeatForever(autoreverses: true)) { pulse = 1 }
+        } else {
+            withAnimation(.easeOut(duration: 0.3)) { pulse = 0 }
+        }
+    }
+}
+
 private struct MetricsGrid: View {
     let trackedCount: Int
     let skippedCount: Int
@@ -1931,21 +2043,74 @@ private struct MetricsGrid: View {
     let recoveryStreakDays: Int
     let openRecoveryStreak: () -> Void
 
+    @State private var showDetails = false
+    @State private var isShowingFactors = false
+
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 2)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            WellnessScoreRow(score: dailyScore, recoveryStreakDays: recoveryStreakDays, action: openRecoveryStreak)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                Button(action: openRecoveryStreak) {
+                    StatTile(
+                        value: "\(recoveryStreakDays)",
+                        unit: recoveryStreakDays == 1 ? String(localized: "day") : String(localized: "days"),
+                        label: String(localized: "Recovery streak"),
+                        showsChevron: false
+                    )
+                }
+                .buttonStyle(ChillPlainButtonStyle())
+                .accessibilityLabel(Text("Recovery streak \(recoveryStreakDays) days. Tap to open your calendar."))
 
-            LazyVGrid(columns: columns, spacing: 8) {
-                MetricCard(title: String(localized: "Logged"), value: "\(trackedCount)", caption: String(localized: "with sex or substances"), symbol: "heart.text.square.fill", tint: Color.chillIconPink)
-                MetricCard(title: String(localized: "Skipped"), value: "\(skippedCount)", caption: String(localized: "all-clear check-ins"), symbol: "moon.zzz.fill", tint: Color.chillIconPurple)
-                MetricCard(title: String(localized: "Substances"), value: "\(substanceCount)", caption: String(localized: "tags across logs"), symbol: "pills.fill", tint: Color.chillSecondaryBlue)
-                MetricCard(title: String(localized: "Sleep"), value: sleepValue, caption: sleepCaption, symbol: "bed.double.fill", tint: Color.chillIconAmber)
+                Button { isShowingFactors = true } label: {
+                    StatTile(
+                        value: dailyScore.isActive ? "\(dailyScore.value)" : dailyScore.emoji,
+                        unit: nil,
+                        label: dailyScore.isActive ? String(localized: "Today’s score") : String(localized: "Log to activate"),
+                        showsChevron: true
+                    )
+                }
+                .buttonStyle(ChillPlainButtonStyle())
+                .accessibilityLabel(dailyScore.isActive ? Text("Today’s score \(dailyScore.value). Tap to see the breakdown.") : Text("Daily score not active yet. Log a night to activate."))
             }
+
+            if showDetails {
+                LazyVGrid(columns: columns, spacing: 8) {
+                    MetricCard(title: String(localized: "Logged"), value: "\(trackedCount)", caption: String(localized: "with sex or substances"), symbol: "heart.text.square.fill", tint: Color.chillIconPink)
+                    MetricCard(title: String(localized: "Skipped"), value: "\(skippedCount)", caption: String(localized: "all-clear check-ins"), symbol: "moon.zzz.fill", tint: Color.chillIconPurple)
+                    MetricCard(title: String(localized: "Substances"), value: "\(substanceCount)", caption: String(localized: "tags across logs"), symbol: "pills.fill", tint: Color.chillSecondaryBlue)
+                    MetricCard(title: String(localized: "Sleep"), value: sleepValue, caption: sleepCaption, symbol: "bed.double.fill", tint: Color.chillIconAmber)
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+
+            Button {
+                withAnimation(.snappy) { showDetails.toggle() }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(showDetails ? String(localized: "Hide details") : String(localized: "Show details"))
+                        .font(.caption.weight(.bold))
+                    Image(systemName: showDetails ? "chevron.up" : "chevron.down")
+                        .font(.caption2.weight(.bold))
+                }
+                .foregroundStyle(Color.chillPrimary)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+            }
+            .buttonStyle(ChillPlainButtonStyle())
+            .accessibilityLabel(showDetails ? Text("Hide monthly details") : Text("Show monthly details"))
         }
         .padding(12)
         .glassSurface(radius: 28, tint: .clear)
+        .sheet(isPresented: $isShowingFactors) {
+            ScoreFactorsSheet(score: dailyScore, openCalendar: {
+                isShowingFactors = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { openRecoveryStreak() }
+            })
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
+        .sensoryFeedback(trigger: isShowingFactors) { _, presented in presented ? .impact(weight: .light) : nil }
     }
 
     private var sleepValue: String {
@@ -1959,83 +2124,43 @@ private struct MetricsGrid: View {
     }
 }
 
-private struct WellnessScoreRow: View {
-    let score: DailyRecoveryScore
-    let recoveryStreakDays: Int
-    let action: () -> Void
-
-    @State private var isShowingFactors = false
+/// One flat metric tile in the two-up summary row (recovery streak / today's score),
+/// matching the mockup's stat cards.
+private struct StatTile: View {
+    let value: String
+    let unit: String?
+    let label: String
+    let showsChevron: Bool
 
     var body: some View {
-        Button {
-            isShowingFactors = true
-        } label: {
-            HStack(spacing: 16) {
-                ZStack {
-                    Circle()
-                        .stroke(Color.chillPrimary.opacity(0.14), lineWidth: 10)
-                    Circle()
-                        .trim(from: 0, to: score.isActive ? CGFloat(score.value) / 100 : 1)
-                        .stroke(
-                            score.isActive
-                                ? LinearGradient.chillBrand
-                                : LinearGradient(colors: [Color.chillPrimary.opacity(0.60), Color.chillSecondaryBlue.opacity(0.40)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                            style: StrokeStyle(lineWidth: 10, lineCap: .round)
-                        )
-                        .rotationEffect(.degrees(-90))
-                        .shadow(color: Color.chillPrimary.opacity(0.32), radius: 8)
-
-                    Text(score.isActive ? "\(score.value)" : score.emoji)
-                        .font(.system(size: score.isActive ? 19 : 22, weight: .black, design: .rounded))
-                        .foregroundStyle(Color.chillText)
-                        .monospacedDigit()
-                        .contentTransition(.numericText())
-                }
-                .frame(width: 58, height: 58)
-                .animation(.spring(response: 0.7, dampingFraction: 0.82), value: score.value)
-
-                VStack(alignment: .leading, spacing: 5) {
-                    HStack(spacing: 6) {
-                        Text(String(localized: "Daily score"))
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.chillText)
-                        if recoveryStreakDays > 0 {
-                            Text(String(localized: "·"))
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(Color.chillTertiary)
-                            Text(String(localized: "\(recoveryStreakDays)d clear"))
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(LinearGradient.chillBrand)
-                        }
-                    }
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
-
-                    Text(score.isActive ? score.label.capitalized : String(localized: "Make a log to activate"))
-                        .font(.caption.weight(.semibold))
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Text(value)
+                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color.chillText)
+                    .monospacedDigit()
+                    .contentTransition(.numericText())
+                if let unit {
+                    Text(unit)
+                        .font(.subheadline.weight(.bold))
                         .foregroundStyle(Color.chillSecondary)
-                        .lineLimit(1)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                Image(systemName: "info.circle")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.chillTertiary)
+                Spacer(minLength: 0)
+                if showsChevron {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color.chillTertiary)
+                }
             }
-            .padding(14)
-            .glassSurface(radius: 22, tint: .clear, interactive: true)
+            Text(label)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
-        .buttonStyle(ChillPlainButtonStyle())
-        .accessibilityLabel("Daily score \(score.isActive ? "\(score.value), \(score.label)" : "inactive"). Tap to see breakdown.")
-        .sheet(isPresented: $isShowingFactors) {
-            ScoreFactorsSheet(score: score, openCalendar: {
-                isShowingFactors = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { action() }
-            })
-            .presentationDetents([.medium, .large])
-            .presentationDragIndicator(.visible)
-        }
-        .sensoryFeedback(trigger: isShowingFactors) { _, presented in presented ? .impact(weight: .light) : nil }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .glassSurface(radius: 20, tint: .clear, interactive: true)
     }
 }
 
