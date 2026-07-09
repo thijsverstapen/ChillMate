@@ -30,6 +30,8 @@ final class NotificationService {
     enum ActionIdentifier {
         static let logNow = "CHILLMATE_LOG_NOW"
         static let snooze = "CHILLMATE_SNOOZE"
+        static let getHelp = "CHILLMATE_GET_HELP"
+        static let imSafe = "CHILLMATE_IM_SAFE"
     }
 
     private let center = UNUserNotificationCenter.current()
@@ -72,8 +74,10 @@ final class NotificationService {
     }
 
     var checkInHour: Int {
-        let stored = UserDefaults.standard.integer(forKey: "checkInHour")
-        return stored == 0 ? 10 : stored
+        // Respect an explicitly-set hour (including midnight, 0). Only fall back to
+        // 10:00 when the user has never chosen a time.
+        guard UserDefaults.standard.object(forKey: "checkInHour") != nil else { return 10 }
+        return UserDefaults.standard.integer(forKey: "checkInHour")
     }
 
     var checkInMinute: Int {
@@ -99,7 +103,8 @@ final class NotificationService {
         discreetTitle: String = "ChillMate",
         discreetBody: String = "Private check-in. Open ChillMate for details.",
         destination: NotificationDestination? = nil,
-        categoryIdentifier: String? = nil
+        categoryIdentifier: String? = nil,
+        interruptionLevel: UNNotificationInterruptionLevel = .passive
     ) -> UNMutableNotificationContent {
         let content = UNMutableNotificationContent()
         content.title = discreetNotificationsEnabled ? discreetTitle : title
@@ -111,7 +116,7 @@ final class NotificationService {
         if let categoryIdentifier {
             content.categoryIdentifier = categoryIdentifier
         }
-        content.interruptionLevel = .passive
+        content.interruptionLevel = interruptionLevel
         return content
     }
 
@@ -138,7 +143,23 @@ final class NotificationService {
             intentIdentifiers: [],
             options: []
         )
-        center.setNotificationCategories([checkInCategory, riskCategory])
+        let getHelpAction = UNNotificationAction(
+            identifier: ActionIdentifier.getHelp,
+            title: String(localized: "Get help"),
+            options: [.foreground]
+        )
+        let imSafeAction = UNNotificationAction(
+            identifier: ActionIdentifier.imSafe,
+            title: String(localized: "I'm safe"),
+            options: []
+        )
+        let safetyCheckInCategory = UNNotificationCategory(
+            identifier: "SAFETY_CHECKIN",
+            actions: [imSafeAction, getHelpAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        center.setNotificationCategories([checkInCategory, riskCategory, safetyCheckInCategory])
     }
 
     func snoozeCurrentCheckIn() {
@@ -689,7 +710,7 @@ final class NotificationService {
         let reminders: [(Date, String, String)] = [
             (firstDoseDate, "PrEP reminder", "If around-sex PrEP is prescribed for you, follow the schedule your clinician gave you."),
             (firstDoseDate.addingTimeInterval(24 * 60 * 60), "PrEP follow-up", "Follow your prescribed PrEP follow-up instructions at the planned time."),
-            (firstDoseDate.addingTimeInterval(48 * 60 * 60), "PrEP follow-up", "Use your prescribed PrEP plan. Contact a clinician or GGD if you are unsure.")
+            (firstDoseDate.addingTimeInterval(48 * 60 * 60), "PrEP follow-up", "Use your prescribed PrEP plan. Contact a clinician or sexual-health service if you are unsure.")
         ]
 
         let identifiers = reminders.indices.map { "chillmate.prep.\(planID.uuidString).\($0)" }
@@ -715,6 +736,12 @@ final class NotificationService {
     func scheduleSessionCheckIns(id: UUID, startsAt startDate: Date, endsAt endDate: Date, destination: NotificationDestination) {
         clearSessionCheckIns(id: id)
 
+        // Opt-in "safety check-ins": more assertive (active vs passive) and carrying
+        // a one-tap "Get help" action that routes to the trusted contact / emergency.
+        let safetyMode = UserDefaults.standard.bool(forKey: "safetyCheckInsEnabled")
+        let category = safetyMode ? "SAFETY_CHECKIN" : "CHECKIN"
+        let level: UNNotificationInterruptionLevel = safetyMode ? .active : .passive
+
         let firstDate = max(Date.now, startDate).addingTimeInterval(90 * 60)
         guard firstDate < endDate else {
             return
@@ -726,11 +753,12 @@ final class NotificationService {
 
         while date < endDate, index < maxCheckIns {
             let content = notificationContent(
-                title: String(localized: "Gentle safety check"),
+                title: safetyMode ? String(localized: "Safety check-in") : String(localized: "Gentle safety check"),
                 body: checkInMessages[index % checkInMessages.count],
                 discreetBody: String(localized: "A private safety check is available."),
                 destination: destination,
-                categoryIdentifier: "CHECKIN"
+                categoryIdentifier: category,
+                interruptionLevel: level
             )
 
             let request = UNNotificationRequest(
@@ -743,12 +771,64 @@ final class NotificationService {
             date = date.addingTimeInterval(90 * 60)
             index += 1
         }
+
+        // Escalation: an explicit, more assertive prompt at the planned session end
+        // that routes straight to help if the person hasn't checked in.
+        if safetyMode, index < maxCheckIns {
+            let endContent = notificationContent(
+                title: String(localized: "Are you okay?"),
+                body: String(localized: "Your session timer has ended. Tap Get help to reach your trusted contact or emergency services, or I'm safe to dismiss."),
+                discreetBody: String(localized: "A private safety check is available."),
+                destination: .emergency,
+                categoryIdentifier: "SAFETY_CHECKIN",
+                interruptionLevel: .active
+            )
+            let endRequest = UNNotificationRequest(
+                identifier: sessionCheckInIdentifier(id: id, index: index),
+                content: endContent,
+                trigger: UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval(for: endDate), repeats: false)
+            )
+            center.add(endRequest)
+        }
     }
 
     func clearSessionCheckIns(id: UUID) {
         center.removePendingNotificationRequests(
             withIdentifiers: (0..<48).map { sessionCheckInIdentifier(id: id, index: $0) }
         )
+    }
+
+    /// The redose window opens at 40% of the effect duration. Schedule a local
+    /// notification at that moment so the "pause before more" nudge fires in the
+    /// background too (the Live Activity flag can't flip without a push token).
+    func scheduleRedoseNudge(id: UUID, startsAt: Date, durationHours: Double) {
+        let identifier = redoseNudgeIdentifier(id: id)
+        center.removePendingNotificationRequests(withIdentifiers: [identifier])
+
+        let fireDate = startsAt.addingTimeInterval(durationHours * 3600 * 0.40)
+        guard fireDate > .now else { return }
+
+        let content = notificationContent(
+            title: String(localized: "Pause before redosing"),
+            body: String(localized: "You are partway through the effect window. If more is on your mind, pause first: are you safe, hydrated, and still choosing what protects tomorrow?"),
+            discreetBody: String(localized: "A private timing check is available."),
+            destination: .timers,
+            categoryIdentifier: "CHECKIN"
+        )
+
+        center.add(UNNotificationRequest(
+            identifier: identifier,
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval(for: fireDate), repeats: false)
+        ))
+    }
+
+    func clearRedoseNudge(id: UUID) {
+        center.removePendingNotificationRequests(withIdentifiers: [redoseNudgeIdentifier(id: id)])
+    }
+
+    private func redoseNudgeIdentifier(id: UUID) -> String {
+        "chillmate.redose.\(id.uuidString)"
     }
 
     private func schedulePostPlanRedoseCheck(planID: UUID, date: Date) {
@@ -852,9 +932,9 @@ private extension NotificationService {
         case 4...6:
             return "You have logged \(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person."
         case 7...9:
-            return "ChillMate has logged \(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, GGD, or GP can help, without judgment."
+            return "ChillMate has logged \(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, sexual-health service, or GP can help, without judgment."
         default:
-            return "You have logged \(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, GGD, or counselor can support you."
+            return "You have logged \(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, sexual-health service, or counselor can support you."
         }
     }
 }
@@ -868,6 +948,7 @@ enum NotificationDestination: String {
     case panic
     case journal
     case safeRoute
+    case combinationRisk
 }
 
 enum HealthWarning {

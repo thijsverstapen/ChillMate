@@ -5,8 +5,29 @@ import Foundation
 final class SpotlightService {
     static let shared = SpotlightService()
     private let domainIdentifier = "com.codex.ChillMate.journal"
+    private let toolDomainIdentifier = "com.codex.ChillMate.tools"
+
+    /// Identifier used both as the Spotlight uniqueIdentifier and as the routing key
+    /// handled in the app scene (see `onContinueUserActivity` in ChillMateApp).
+    static let riskCheckerItemID = "tool-combinationRisk"
 
     private init() {}
+
+    /// Index the always-available tools so they surface in Spotlight search.
+    func indexTools() {
+        let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
+        attributeSet.title = String(localized: "Risk checker")
+        attributeSet.contentDescription = String(localized: "Check how substances and medication combine before you mix.")
+        attributeSet.keywords = ["risk", "combination", "mix", "interaction", "medication", "safety", "ChillMate"]
+
+        let item = CSSearchableItem(
+            uniqueIdentifier: Self.riskCheckerItemID,
+            domainIdentifier: toolDomainIdentifier,
+            attributeSet: attributeSet
+        )
+        item.expirationDate = .distantFuture
+        CSSearchableIndex.default().indexSearchableItems([item])
+    }
 
     func indexJournalEntry(_ entry: JournalEntry) {
         let contentHash = (entry.rememberClearly + entry.feelsGoodAbout + entry.regrets).hashValue

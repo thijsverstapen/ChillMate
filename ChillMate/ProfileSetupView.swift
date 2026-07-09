@@ -77,20 +77,29 @@ struct AppHomeView: View {
 
     @MainActor
     private func refreshOnDeviceRecoverySnapshot() async {
+        // The two backups fail independently. A shared catch used to blame the
+        // on-device snapshot whenever the iCloud save threw (e.g. iCloud Drive
+        // unavailable), surfacing a persistent, misleading error status on every
+        // backgrounding.
         do {
             if try EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext) {
                 lastOnDeviceRecoveryStatus = "Encrypted on-device recovery backup updated."
             }
-            if iCloudBackupEnabled {
-                let date = try ICloudBackupService.shared.saveLatestBackup(localContext: modelContext)
-                lastICloudBackupTimestamp = date.timeIntervalSince1970
-                lastICloudBackupStatus = "Encrypted iCloud backup updated."
-            }
         } catch {
             lastOnDeviceRecoveryStatus = "Encrypted on-device recovery backup could not update."
-            if iCloudBackupEnabled {
-                lastICloudBackupStatus = "Encrypted iCloud backup could not update."
-            }
+        }
+
+        guard iCloudBackupEnabled else { return }
+        do {
+            let date = try ICloudBackupService.shared.saveLatestBackup(localContext: modelContext)
+            lastICloudBackupTimestamp = date.timeIntervalSince1970
+            lastICloudBackupStatus = "Encrypted iCloud backup updated."
+        } catch {
+            // Signed out of iCloud is an expected state, not a failure worth an
+            // alarming banner; keep the wording calm and actionable.
+            lastICloudBackupStatus = ICloudBackupService.shared.isAvailable
+                ? "Encrypted iCloud backup could not update."
+                : String(localized: "iCloud backup is paused. Sign in to iCloud with iCloud Drive on to resume.")
         }
     }
 }
@@ -227,6 +236,9 @@ private struct MainTabView: View {
             selectedTab = .journal
         case .safeRoute:
             selectedTab = .safeRoute
+        case .combinationRisk:
+            selectedTab = .home
+            careNavPath = [.combinationRisk]
         }
 
         pendingAppDestination = ""
@@ -265,6 +277,14 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         .privacyReceipt,
         .emergencyCard,
         .supportDirectory
+    ]
+
+    /// Compact grouping for the hub's default (non-searching) state. Search still
+    /// spans every page, including the ones not surfaced here.
+    static let groupedSections: [MoreHubSection] = [
+        MoreHubSection(title: String(localized: "Your setup"), pages: [.profile, .settings, .privacyReceipt]),
+        MoreHubSection(title: String(localized: "Help & safety"), pages: [.emergencyCard, .supportDirectory]),
+        MoreHubSection(title: String(localized: "About the app"), pages: [.supportDeveloper, .feedback])
     ]
 
     var title: String {
@@ -329,7 +349,7 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         case .securityHealth:
             String(localized: "See which privacy options are on")
         case .helperBridge:
-            String(localized: "A simple summary for a GP, GGD, or helper")
+            String(localized: "A simple summary for a GP or helper")
         case .recoveryMode:
             String(localized: "Goals, cravings, and a fresh start")
         case .privateInsights:
@@ -448,6 +468,12 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
     }
 }
 
+private struct MoreHubSection: Identifiable {
+    let title: String
+    let pages: [MoreHubPage]
+    var id: String { title }
+}
+
 private struct MoreHubView: View {
     @State private var searchText = ""
 
@@ -494,39 +520,25 @@ private struct MoreHubView: View {
                                 .glassSurface(radius: 24, tint: .black.opacity(0.04))
                         }
 
-                        ForEach(filteredPages) { page in
-                            NavigationLink(value: page) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: page.symbol)
-                                        .font(.system(size: 17, weight: .black))
-                                        .foregroundStyle(page.tint)
-                                        .frame(width: 36, height: 36)
-                                        .background(page.tint.opacity(0.14), in: Circle())
+                        if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            // Compact grouped layout for browsing; search stays flat.
+                            ForEach(MoreHubPage.groupedSections) { section in
+                                Text(section.title)
+                                    .font(.caption.weight(.bold))
+                                    .textCase(.uppercase)
+                                    .foregroundStyle(Color.chillSecondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.leading, 6)
+                                    .padding(.top, 8)
 
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(page.title)
-                                            .font(.subheadline.weight(.bold))
-                                            .foregroundStyle(Color.chillText)
-                                        Text(page.subtitle)
-                                            .font(.caption2.weight(.semibold))
-                                            .foregroundStyle(Color.chillSecondary)
-                                            .lineLimit(1)
-                                            .minimumScaleFactor(0.74)
-                                    }
-
-                                    Spacer(minLength: 0)
-
-                                    Image(systemName: "chevron.right")
-                                        .font(.caption.weight(.bold))
-                                        .foregroundStyle(Color.chillSecondary)
+                                ForEach(section.pages) { page in
+                                    moreHubRow(page)
                                 }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 11)
-                                .contentShape(Rectangle())
                             }
-                            .buttonStyle(ChillPlainButtonStyle())
-                            .glassSurface(radius: 20, tint: page.tint.opacity(0.07), interactive: true)
+                        } else {
+                            ForEach(filteredPages) { page in
+                                moreHubRow(page)
+                            }
                         }
                     }
                 }
@@ -546,6 +558,41 @@ private struct MoreHubView: View {
                 .toolbar(.hidden, for: .tabBar)
         }
         }
+    }
+
+    private func moreHubRow(_ page: MoreHubPage) -> some View {
+        NavigationLink(value: page) {
+            HStack(spacing: 12) {
+                Image(systemName: page.symbol)
+                    .font(.system(size: 17, weight: .black))
+                    .foregroundStyle(page.tint)
+                    .frame(width: 36, height: 36)
+                    .background(page.tint.opacity(0.14), in: Circle())
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(page.title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                    Text(page.subtitle)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.74)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillSecondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(ChillPlainButtonStyle())
+        .glassSurface(radius: 20, tint: page.tint.opacity(0.07), interactive: true)
     }
 
     @ViewBuilder
@@ -1278,8 +1325,11 @@ struct ProfileSetupView: View {
                                 Text("Belgium").tag("Belgium")
                                 Text("Germany").tag("Germany")
                                 Text("United Kingdom").tag("United Kingdom")
+                                Text("Ireland").tag("Ireland")
                                 Text("France").tag("France")
                                 Text("Spain").tag("Spain")
+                                Text("United States").tag("United States")
+                                Text("Australia").tag("Australia")
                                 Text("Other").tag("Other")
                             }
                         }

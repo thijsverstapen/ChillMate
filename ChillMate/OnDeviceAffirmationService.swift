@@ -75,6 +75,64 @@ enum OnDeviceAffirmationService {
         #endif
     }
 
+    /// Generates a short, private weekly reflection from aggregate stats only.
+    /// No substance names, notes, or free text ever reach the model — counts and
+    /// a generic sleep signal only, keeping the same safety stance as the
+    /// affirmations. Returns nil when the model is unavailable or output is
+    /// unusable, so the caller can simply hide the card.
+    static func generateWeeklyReflection(
+        chillCount: Int,
+        substanceLogCount: Int,
+        journalCount: Int,
+        memoryGapCount: Int,
+        averageSleepHours: Double?,
+        languageCode: String
+    ) async -> String? {
+        #if canImport(FoundationModels)
+        guard isAvailable else { return nil }
+
+        let language = languageName(for: languageCode)
+        let sleepLine = averageSleepHours.map {
+            "Average sleep on logged nights: \($0.formatted(.number.precision(.fractionLength(1)))) hours."
+        } ?? "No sleep data recorded."
+
+        let instructions = """
+        You write a short weekly reflection for ChillMate, a private wellbeing \
+        and harm-reduction companion used by adults (18+).
+
+        Rules you must always follow:
+        - Two or three short sentences, under 320 characters in total.
+        - Warm, non-judgmental, second person ("you"). Notice patterns without praise or blame.
+        - Never give medical, dosage, drug, treatment, or diagnostic advice.
+        - Never name or refer to specific substances.
+        - Never make promises about outcomes or recovery.
+        - Write entirely in \(language).
+        """
+
+        let prompt = """
+        Write this week's reflection from these numbers alone:
+        - Nights logged with a session: \(chillCount)
+        - Nights that included substance use: \(substanceLogCount)
+        - Journal entries written: \(journalCount)
+        - Memory gaps reported: \(memoryGapCount)
+        - \(sleepLine)
+        Reply with plain text only: no headings, bullets, or quotes.
+        """
+
+        do {
+            let session = LanguageModelSession(instructions: { instructions })
+            let response = try await session.respond(to: prompt)
+            let text = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !text.isEmpty, text.count <= 600 else { return nil }
+            return text
+        } catch {
+            return nil
+        }
+        #else
+        return nil
+        #endif
+    }
+
     /// Strips stray leading bullets / numbering / quotes the model may emit.
     private static func cleanLine(_ raw: String) -> String {
         var line = raw.trimmingCharacters(in: .whitespacesAndNewlines)

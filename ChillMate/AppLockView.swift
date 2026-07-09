@@ -2,12 +2,14 @@ import CommonCrypto
 import CryptoKit
 import LocalAuthentication
 import SwiftUI
+import UIKit
 
 struct AppLockView<Content: View>: View {
     @AppStorage("requiresFaceID") private var requiresFaceID = false
     @AppStorage("requiresPIN") private var requiresPIN = false
     @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
     @AppStorage("autoLockMinutes") private var autoLockMinutes = 0
+    @AppStorage("screenPrivacyEnabled") private var screenPrivacyEnabled = true
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var isUnlocked = false
@@ -15,6 +17,19 @@ struct AppLockView<Content: View>: View {
     @State private var isAuthenticating = false
     @State private var pinCode = ""
     @State private var backgroundedAt: Date?
+    @State private var showAppSwitcherCover = false
+    @State private var isScreenCaptured = false
+
+    private var showPrivacyCover: Bool {
+        screenPrivacyEnabled && (showAppSwitcherCover || isScreenCaptured)
+    }
+
+    private func screenIsCaptured() -> Bool {
+        let scene = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first
+        return scene?.screen.isCaptured ?? false
+    }
 
     private let content: Content
 
@@ -44,15 +59,37 @@ struct AppLockView<Content: View>: View {
                     unlockWithPIN: unlockWithPIN
                 )
             }
+
+            if showPrivacyCover {
+                PrivacyCoverView(isRecording: isScreenCaptured)
+                    .transition(.opacity)
+            }
         }
+        .animation(.easeInOut(duration: 0.18), value: showPrivacyCover)
         .task {
             if localEncryptionEnabled {
                 LocalSecurityService.applyFileProtection()
             }
 
+            isScreenCaptured = screenIsCaptured()
+
             if requiresFaceID {
                 await unlockWithFaceID()
             }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            // Cover the App Switcher snapshot and any backgrounded state so a glance
+            // at open apps never reveals the log. Skipped while the system auth sheet
+            // is up (it briefly makes the scene .inactive).
+            switch newPhase {
+            case .active:
+                showAppSwitcherCover = false
+            default:
+                if !isAuthenticating { showAppSwitcherCover = true }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIScreen.capturedDidChangeNotification)) { _ in
+            isScreenCaptured = screenIsCaptured()
         }
         .onChange(of: scenePhase) { _, newPhase in
             // While the Face ID / system auth dialog is on screen the scene briefly
@@ -201,6 +238,36 @@ struct LockScreen: View {
             .padding(28)
             .frame(maxWidth: 360)
         }
+    }
+}
+
+/// Full-screen branded cover that hides log content from the App Switcher snapshot
+/// and from active screen recording / mirroring. No sensitive data is drawn.
+struct PrivacyCoverView: View {
+    let isRecording: Bool
+
+    var body: some View {
+        ZStack {
+            DashboardBackdrop()
+
+            VStack(spacing: 16) {
+                ChillMateBrandMark(size: 76)
+
+                Text("ChillMate")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(.white)
+
+                if isRecording {
+                    Label("Hidden while your screen is being recorded", systemImage: "record.circle")
+                        .font(.footnote.weight(.semibold))
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.white.opacity(0.78))
+                        .padding(.horizontal, 32)
+                }
+            }
+            .padding(28)
+        }
+        .ignoresSafeArea()
     }
 }
 

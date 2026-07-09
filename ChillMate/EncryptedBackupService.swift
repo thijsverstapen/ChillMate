@@ -813,6 +813,7 @@ private struct STDTestDTO: Codable {
     var foundSTIs: [String]
     var notes: String
     var createdAt: Date
+    var resultPhotoData: Data?
 
     init(_ record: STDTestRecord) {
         id = record.id
@@ -823,6 +824,7 @@ private struct STDTestDTO: Codable {
         foundSTIs = record.foundSTIs
         notes = record.notes
         createdAt = record.createdAt
+        resultPhotoData = record.resultPhotoData
     }
 
     func model() -> STDTestRecord {
@@ -834,7 +836,8 @@ private struct STDTestDTO: Codable {
             analResult: STDResultStatus(rawValue: analResult) ?? .pending,
             foundSTIs: foundSTIs,
             notes: notes,
-            createdAt: createdAt
+            createdAt: createdAt,
+            resultPhotoData: resultPhotoData
         )
     }
 
@@ -846,6 +849,7 @@ private struct STDTestDTO: Codable {
         record.foundSTIs = foundSTIs
         record.notes = notes
         record.createdAt = createdAt
+        record.resultPhotoData = resultPhotoData
     }
 }
 

@@ -1,7 +1,206 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Your setup" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Setup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu configuración"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta configuration"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouw setup"
+          }
+        }
+      }
+    },
+    "Help & safety" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe & Sicherheit"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda y seguridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide et sécurité"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hulp & veiligheid"
+          }
+        }
+      }
+    },
+    "About the app" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Über die App"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre la app"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À propos de l'app"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Over de app"
+          }
+        }
+      }
+    },
+    "iCloud backup is paused. Sign in to iCloud with iCloud Drive on to resume." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-Backup ist pausiert. Melde dich bei iCloud an und aktiviere iCloud Drive, um fortzufahren."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La copia en iCloud está en pausa. Inicia sesión en iCloud con iCloud Drive activado para continuar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sauvegarde iCloud est en pause. Connecte-toi à iCloud avec iCloud Drive activé pour reprendre."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-back-up is gepauzeerd. Log in bij iCloud met iCloud Drive aan om verder te gaan."
+          }
+        }
+      }
+    },
+    "This week, in a few words" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese Woche, in wenigen Worten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta semana, en pocas palabras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette semaine, en quelques mots"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze week, in het kort"
+          }
+        }
+      }
+    },
+    "Writing your private reflection…" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine private Reflexion wird geschrieben…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escribiendo tu reflexión privada…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rédaction de ta réflexion privée…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je privéreflectie wordt geschreven…"
+          }
+        }
+      }
+    },
+    "Generated on this iPhone from this week's counts only. Nothing leaves your device." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem iPhone erstellt, nur aus den Zahlen dieser Woche. Nichts verlässt dein Gerät."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generado en este iPhone solo a partir de los números de esta semana. Nada sale de tu dispositivo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Généré sur cet iPhone à partir des chiffres de la semaine uniquement. Rien ne quitte ton appareil."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemaakt op deze iPhone, alleen op basis van de cijfers van deze week. Niets verlaat je toestel."
+          }
+        }
+      }
+    },
     "" : {
+
+    },
+    "—" : {
 
     },
     ", score %lld" : {
@@ -1194,6 +1393,34 @@
         }
       }
     },
+    "30 days" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Tage"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 jours"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 dagen"
+          }
+        }
+      }
+    },
     "48-hour check-in" : {
       "localizations" : {
         "de" : {
@@ -1218,6 +1445,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "48-uurs check-in"
+          }
+        }
+      }
+    },
+    "90 days" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "90 Tage"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "90 días"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "90 jours"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "90 dagen"
           }
         }
       }
@@ -2834,58 +3089,58 @@
         }
       }
     },
-    "A simple summary for a GP, GGD, or helper" : {
+    "A simple summary for a GP or helper" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eine einfache Zusammenfassung für Hausarzt, GGD oder eine Ansprechperson"
+            "value" : "Eine einfache Zusammenfassung für einen Arzt oder Helfer"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un resumen sencillo para un médico de cabecera, el GGD o un profesional de ayuda"
+            "value" : "Un resumen sencillo para un médico o alguien de apoyo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un résumé simple pour un médecin traitant, le GGD ou un professionnel d'aide"
+            "value" : "Un résumé simple pour un médecin ou un accompagnant"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Een eenvoudige samenvatting voor huisarts, GGD of hulpverlener"
+            "value" : "Een eenvoudige samenvatting voor een huisarts of hulpverlener"
           }
         }
       }
     },
-    "A simple summary to share with a GP, GGD, or helper" : {
+    "A simple summary to share with a GP or helper" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eine einfache Zusammenfassung zum Teilen mit Hausarzt, GGD oder einer Ansprechperson"
+            "value" : "Eine einfache Zusammenfassung für einen Arzt oder Helfer"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un resumen sencillo para compartir con un médico de cabecera, el GGD o un profesional de ayuda"
+            "value" : "Un resumen sencillo para compartir con un médico o alguien de apoyo"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un résumé simple à partager avec un médecin traitant, le GGD ou un professionnel d'aide"
+            "value" : "Un résumé simple à partager avec un médecin ou un accompagnant"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Een eenvoudige samenvatting om te delen met huisarts, GGD of hulpverlener"
+            "value" : "Een eenvoudige samenvatting om te delen met een huisarts of hulpverlener"
           }
         }
       }
@@ -3756,6 +4011,34 @@
         }
       }
     },
+    "Add photo of result" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto des Ergebnisses hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir foto del resultado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter une photo du résultat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto van resultaat toevoegen"
+          }
+        }
+      }
+    },
     "Add profile picture" : {
       "comment" : "A button that displays a sheet for adding a profile photo.",
       "isCommentAutoGenerated" : true,
@@ -4140,6 +4423,62 @@
         }
       }
     },
+    "After clear nights" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Nächten ohne Konsum"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tras noches sin consumo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après les nuits sans conso"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na schone nachten"
+          }
+        }
+      }
+    },
+    "After substance nights" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Konsum-Nächten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tras noches con sustancias"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après les nuits avec substances"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na nachten met middelen"
+          }
+        }
+      }
+    },
     "Aftercare" : {
       "localizations" : {
         "de" : {
@@ -4382,6 +4721,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Alcohol"
+          }
+        }
+      }
+    },
+    "Alcohol and Drug Foundation" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcohol and Drug Foundation"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcohol and Drug Foundation"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcohol and Drug Foundation"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alcohol and Drug Foundation"
           }
         }
       }
@@ -5326,6 +5693,34 @@
         }
       }
     },
+    "Are you okay?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles okay?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Estás bien?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ça va ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gaat het?"
+          }
+        }
+      }
+    },
     "Around sex" : {
       "localizations" : {
         "de" : {
@@ -5616,6 +6011,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voeg je huidige locatie toe aan deze privélog."
+          }
+        }
+      }
+    },
+    "Australia" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Australien"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Australia"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Australie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Australië"
           }
         }
       }
@@ -6860,7 +7283,36 @@
         }
       }
     },
+    "Call emergency services %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notruf %@ anrufen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Llamar a emergencias %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appeler les secours %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bel hulpdiensten %@"
+          }
+        }
+      }
+    },
     "Call emergency services 112" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -7354,6 +7806,34 @@
         }
       }
     },
+    "Change result photo" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnisfoto ändern"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar la foto del resultado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer la photo du résultat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resultaatfoto wijzigen"
+          }
+        }
+      }
+    },
     "Change your PIN" : {
       "comment" : "A title for a screen that allows the user to change their PIN.",
       "isCommentAutoGenerated" : true,
@@ -7420,6 +7900,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wijzigingen worden automatisch opgeslagen."
+          }
+        }
+      }
+    },
+    "Check a combination" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kombination prüfen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprobar una combinación"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifier une combinaison"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combinatie checken"
+          }
+        }
+      }
+    },
+    "Check how substances and medication combine before you mix." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prüfe vor dem Mischen, wie Substanzen und Medikamente zusammenwirken."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comprueba cómo se combinan las sustancias y la medicación antes de mezclar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifie comment les substances et les médicaments se combinent avant de mélanger."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bekijk hoe middelen en medicatie samengaan voordat je mengt."
           }
         }
       }
@@ -8670,6 +9206,34 @@
         }
       }
     },
+    "ChillMate private summary" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate private Zusammenfassung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumen privado de ChillMate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Résumé privé ChillMate"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate privésamenvatting"
+          }
+        }
+      }
+    },
     "ChillMate saves an encrypted backup file to your iCloud Drive. Your data is encrypted before it leaves the app." : {
       "comment" : "A description of how the backup is encrypted.",
       "isCommentAutoGenerated" : true,
@@ -9260,6 +9824,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stad"
+          }
+        }
+      }
+    },
+    "Clear" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ohne Konsum"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin consumo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sans conso"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schoon"
           }
         }
       }
@@ -10212,74 +10804,58 @@
         }
       }
     },
-    "Consent can be changed or withdrawn at any time. If a memory gap or consent concern appears later, use panic support, trusted contact, GGD, CSG, or emergency help." : {
-      "comment" : "A description of consent.",
-      "isCommentAutoGenerated" : true,
+    "Consent can be changed or withdrawn at any time. If a memory gap or consent concern appears later, use panic support, a trusted contact, a sexual-health service, a sexual-assault support centre, or emergency help." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Einvernehmen kann jederzeit geändert oder zurückgezogen werden. Wenn später eine Erinnerungslücke oder ein Bedenken zum Einvernehmen auftaucht, nutze die Panik-Hilfe, den Vertrauenskontakt, GGD, CSG oder Notfallhilfe."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Consent can be changed or withdrawn at any time. If a memory gap or consent concern appears later, use panic support, trusted contact, GGD, CSG, or emergency help."
+            "value" : "Einwilligung kann jederzeit geändert oder zurückgenommen werden. Wenn später eine Erinnerungslücke oder ein Zweifel an der Einwilligung auftaucht, nutze Panik-Hilfe, eine Vertrauensperson, eine Beratungsstelle für sexuelle Gesundheit, eine Fachstelle bei sexualisierter Gewalt oder den Notruf."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El consentimiento puede cambiarse o retirarse en cualquier momento. Si más tarde aparece una laguna de memoria o una preocupación sobre el consentimiento, usa el apoyo de pánico, el contacto de confianza, el GGD, el CSG o la ayuda de emergencia."
+            "value" : "El consentimiento puede cambiarse o retirarse en cualquier momento. Si más tarde aparece una laguna de memoria o una duda sobre el consentimiento, usa el apoyo de pánico, una persona de confianza, un servicio de salud sexual, un centro de atención a agresiones sexuales o la ayuda de emergencia."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Le consentement peut être modifié ou retiré à tout moment. Si un trou de mémoire ou une inquiétude de consentement apparaît plus tard, utilise le soutien en cas de panique, le contact de confiance, le GGD, le CSG ou l'aide d'urgence."
+            "value" : "Le consentement peut être modifié ou retiré à tout moment. Si un trou de mémoire ou un doute sur le consentement apparaît plus tard, utilise l'aide panique, une personne de confiance, un service de santé sexuelle, un centre d'aide aux victimes de violences sexuelles ou les secours."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Toestemming kan op elk moment worden veranderd of ingetrokken. Als er later een geheugengat of zorg over toestemming opduikt, gebruik dan paniekhulp, vertrouwenscontact, GGD, CSG of noodhulp."
+            "value" : "Toestemming kan altijd worden aangepast of ingetrokken. Als er later een geheugengat of twijfel over toestemming ontstaat, gebruik dan paniekhulp, een vertrouwde contactpersoon, een soa-poli, een Centrum Seksueel Geweld of noodhulp."
           }
         }
       }
     },
-    "Contact GGD, huisarts, or hospital as soon as possible. PEP works best when started quickly and is generally time limited to 72 hours." : {
-      "comment" : "A warning about the importance of getting tested for HIV.",
-      "isCommentAutoGenerated" : true,
+    "Contact a sexual-health service, GP, or hospital as soon as possible. PEP works best when started quickly and is generally time limited to 72 hours." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kontaktiere GGD, Hausarzt (huisarts) oder Krankenhaus so schnell wie möglich. PEP wirkt am besten, wenn sie früh begonnen wird, und ist in der Regel auf 72 Stunden begrenzt."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contact GGD, huisarts, or hospital as soon as possible. PEP works best when started quickly and is generally time limited to 72 hours."
+            "value" : "Wende dich so schnell wie möglich an eine Beratungsstelle für sexuelle Gesundheit, einen Arzt oder ein Krankenhaus. PEP wirkt am besten, wenn früh begonnen, und ist meist auf 72 Stunden begrenzt."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contacta con el GGD, el huisarts o el hospital lo antes posible. La PEP funciona mejor cuanto antes se empiece y suele estar limitada a 72 horas."
+            "value" : "Contacta cuanto antes con un servicio de salud sexual, un médico o un hospital. La PEP funciona mejor si se empieza pronto y suele estar limitada a 72 horas."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contacte le GGD, le huisarts ou l'hôpital dès que possible. La PEP est plus efficace lorsqu'elle est commencée rapidement et est généralement limitée à 72 heures."
+            "value" : "Contacte dès que possible un service de santé sexuelle, un médecin ou un hôpital. La PEP est plus efficace si elle est commencée tôt et est généralement limitée à 72 heures."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neem zo snel mogelijk contact op met de GGD, huisarts of het ziekenhuis. PEP werkt het best als het snel wordt gestart en is meestal beperkt tot 72 uur."
+            "value" : "Neem zo snel mogelijk contact op met een soa-poli, huisarts of ziekenhuis. PEP werkt het best als je er snel mee begint en is meestal beperkt tot 72 uur."
           }
         }
       }
@@ -10623,6 +11199,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Land"
+          }
+        }
+      }
+    },
+    "Cover the app in the App Switcher and while your screen is being recorded or mirrored, so a quick glance never reveals your log." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verdeckt die App im App-Umschalter und während dein Bildschirm aufgenommen oder übertragen wird, damit ein kurzer Blick dein Logbuch nie preisgibt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cubre la app en el selector de apps y mientras se graba o duplica tu pantalla, para que un vistazo rápido nunca revele tu registro."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masque l'app dans le sélecteur d'apps et pendant l'enregistrement ou la recopie de ton écran, pour qu'un coup d'œil ne révèle jamais ton journal."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbergt de app in de app-kiezer en terwijl je scherm wordt opgenomen of gedeeld, zodat een snelle blik je logboek nooit onthult."
           }
         }
       }
@@ -10995,6 +11599,34 @@
         }
       }
     },
+    "Current clear streak" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktuelle Serie ohne Konsum"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Racha actual sin consumo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Série actuelle sans consommation"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Huidige reeks zonder gebruik"
+          }
+        }
+      }
+    },
     "Current medication" : {
       "localizations" : {
         "de" : {
@@ -11281,6 +11913,34 @@
         }
       }
     },
+    "Daily check-in time" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit für tägliche Erinnerung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora del control diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heure du point quotidien"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tijd voor dagelijkse check-in"
+          }
+        }
+      }
+    },
     "Daily PrEP needs about 7 days to reach maximum protection for receptive anal sex. Until then, use extra protection and follow medical advice." : {
       "localizations" : {
         "de" : {
@@ -11489,6 +12149,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dagscore inactief. Maak een middelengerelateerde log om de dagscore te activeren."
+          }
+        }
+      }
+    },
+    "DanceSafe" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DanceSafe"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DanceSafe"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DanceSafe"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DanceSafe"
           }
         }
       }
@@ -12883,6 +13571,34 @@
         }
       }
     },
+    "Drogues Info Service" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drogues Info Service"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drogues Info Service"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drogues Info Service"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drogues Info Service"
+          }
+        }
+      }
+    },
     "Drug information & harm reduction" : {
       "localizations" : {
         "de" : {
@@ -12939,6 +13655,34 @@
         }
       }
     },
+    "drugcom.de" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "drugcom.de"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "drugcom.de"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "drugcom.de"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "drugcom.de"
+          }
+        }
+      }
+    },
     "Drugs Infolijn" : {
       "localizations" : {
         "de" : {
@@ -12963,6 +13707,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Drugs Infolijn"
+          }
+        }
+      }
+    },
+    "Drugs.ie" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugs.ie"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugs.ie"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugs.ie"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Drugs.ie"
           }
         }
       }
@@ -14379,6 +15151,34 @@
         }
       }
     },
+    "Energy Control" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Energy Control"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Energy Control"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Energy Control"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Energy Control"
+          }
+        }
+      }
+    },
     "English" : {
       "localizations" : {
         "de" : {
@@ -14885,6 +15685,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Exporteren als CSV"
+          }
+        }
+      }
+    },
+    "Export as PDF" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als PDF exportieren"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar como PDF"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporter en PDF"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exporteren als PDF"
           }
         }
       }
@@ -15571,30 +16399,30 @@
         }
       }
     },
-    "Follow the exact timing and amount from your prescriber or GGD." : {
+    "Follow the exact timing and amount from your prescriber or sexual-health service." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Halte dich genau an Zeitpunkt und Menge deiner verschreibenden Person oder des GGD."
+            "value" : "Halte dich genau an Zeitpunkt und Menge, die dein Arzt oder deine Beratungsstelle für sexuelle Gesundheit angibt."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sigue el momento y la cantidad exactos que indique tu prescriptor o el GGD."
+            "value" : "Sigue exactamente el horario y la cantidad que te indique quien te lo receta o un servicio de salud sexual."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Suis le moment et la quantité exacts indiqués par ton prescripteur ou le GGD."
+            "value" : "Respecte précisément le moment et la quantité indiqués par ton prescripteur ou un service de santé sexuelle."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Volg de exacte timing en hoeveelheid van je voorschrijver of GGD."
+            "value" : "Volg precies de timing en hoeveelheid van je voorschrijver of de soa-poli."
           }
         }
       }
@@ -15691,30 +16519,30 @@
         }
       }
     },
-    "For STI, PrEP, PEP, medication, mental-health, or substance concerns, contact a GP, GGD, pharmacist, clinician, counselor, or other qualified professional." : {
+    "For STI, PrEP, PEP, medication, mental-health, or substance concerns, contact a GP, sexual-health service, pharmacist, clinician, counselor, or other qualified professional." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bei Fragen zu STI, PrEP, PEP, Medikamenten, psychischer Gesundheit oder Substanzen wende dich an Hausarzt, GGD, Apotheker, Ärztin, Beratung oder eine andere qualifizierte Fachperson."
+            "value" : "Bei Fragen zu STI, PrEP, PEP, Medikamenten, psychischer Gesundheit oder Substanzen wende dich an einen Arzt, eine Beratungsstelle für sexuelle Gesundheit, eine Apotheke, eine Fachkraft, einen Berater oder eine andere qualifizierte Fachperson."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Para temas de ITS, PrEP, PEP, medicación, salud mental o sustancias, contacta con un médico de cabecera, el GGD, un farmacéutico, un clínico, un consejero u otro profesional cualificado."
+            "value" : "Para dudas sobre ITS, PrEP, PEP, medicación, salud mental o sustancias, contacta con un médico, un servicio de salud sexual, una farmacia, personal clínico, un consejero u otro profesional cualificado."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pour des questions d'IST, de PrEP, de PEP, de médication, de santé mentale ou de substances, contacte un médecin traitant, le GGD, un pharmacien, un clinicien, un conseiller ou un autre professionnel qualifié."
+            "value" : "Pour toute question sur les IST, la PrEP, la PEP, les médicaments, la santé mentale ou les substances, contacte un médecin, un service de santé sexuelle, une pharmacie, un soignant, un conseiller ou un autre professionnel qualifié."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Voor zorgen over soa, PrEP, PEP, medicatie, mentale gezondheid of middelen, neem contact op met een huisarts, GGD, apotheker, arts, hulpverlener of andere gekwalificeerde professional."
+            "value" : "Voor vragen over soa's, PrEP, PEP, medicatie, mentale gezondheid of middelen, neem contact op met een huisarts, soa-poli, apotheek, zorgverlener, hulpverlener of andere gekwalificeerde professional."
           }
         }
       }
@@ -16199,6 +17027,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Duitsland"
+          }
+        }
+      }
+    },
+    "Get help" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe holen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar ayuda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obtenir de l'aide"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hulp zoeken"
           }
         }
       }
@@ -17545,6 +18401,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Hé, bedankt dat je ChillMate gebruikt 👋"
+          }
+        }
+      }
+    },
+    "Hidden while your screen is being recorded" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verborgen, während dein Bildschirm aufgenommen wird"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oculto mientras se graba tu pantalla"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masqué pendant l'enregistrement de ton écran"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verborgen terwijl je scherm wordt opgenomen"
+          }
+        }
+      }
+    },
+    "Hide contents from screenshots" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhalte vor Screenshots verbergen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocultar el contenido en las capturas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masquer le contenu des captures d'écran"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhoud verbergen voor schermafbeeldingen"
           }
         }
       }
@@ -18905,6 +19817,34 @@
         }
       }
     },
+    "I'm safe" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mir geht's gut"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estoy bien"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je suis en sécurité"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ik ben veilig"
+          }
+        }
+      }
+    },
     "iCloud" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -19228,8 +20168,37 @@
         }
       }
     },
+    "If any of these are happening, do not wait for the app. Call %@ or your local emergency number." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn eines davon passiert, warte nicht auf die App. Ruf %@ oder deine örtliche Notrufnummer an."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si ocurre algo de esto, no esperes a la app. Llama al %@ o a tu número de emergencias local."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si l'un de ces signes apparaît, n'attends pas l'app. Appelle le %@ ou ton numéro d'urgence local."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als een van deze dingen gebeurt, wacht dan niet op de app. Bel %@ of je lokale alarmnummer."
+          }
+        }
+      }
+    },
     "If any of these are happening, do not wait for the app. Call 112 in the Netherlands or your local emergency number." : {
       "comment" : "A warning message that appears when the user has selected one or more emergency red flags.",
+      "extractionState" : "stale",
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "de" : {
@@ -19264,30 +20233,30 @@
         }
       }
     },
-    "If anything feels unclear, contact your prescriber, GGD, or pharmacist before relying on the plan." : {
+    "If anything feels unclear, contact your prescriber, a sexual-health service, or pharmacist before relying on the plan." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Wenn etwas unklar ist, kontaktiere deine verschreibende Person, GGD oder Apotheker, bevor du dich auf den Plan verlässt."
+            "value" : "Wenn etwas unklar ist, wende dich an deinen Arzt, eine Beratungsstelle für sexuelle Gesundheit oder eine Apotheke, bevor du dich auf den Plan verlässt."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si algo no está claro, contacta con tu prescriptor, el GGD o tu farmacéutico antes de confiar en el plan."
+            "value" : "Si algo no queda claro, contacta con quien te lo receta, un servicio de salud sexual o una farmacia antes de confiar en el plan."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Si quelque chose n'est pas clair, contacte ton prescripteur, le GGD ou ton pharmacien avant de te fier au plan."
+            "value" : "Si quelque chose n'est pas clair, contacte ton prescripteur, un service de santé sexuelle ou une pharmacie avant de te fier au plan."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Als iets onduidelijk voelt, neem dan contact op met je voorschrijver, GGD of apotheker voor je op het plan vertrouwt."
+            "value" : "Als iets onduidelijk is, neem dan contact op met je voorschrijver, de soa-poli of de apotheek voordat je op het plan vertrouwt."
           }
         }
       }
@@ -20370,6 +21339,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "iPhone-herstelback-up"
+          }
+        }
+      }
+    },
+    "Ireland" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Irland"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Irlanda"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Irlande"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ierland"
           }
         }
       }
@@ -25430,6 +26427,34 @@
         }
       }
     },
+    "No sleep found in Apple Health for this window yet." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diesen Zeitraum wurde in Apple Health noch kein Schlaf gefunden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún no se encontró sueño en Apple Health para este periodo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun sommeil trouvé dans Apple Santé pour cette période pour le moment."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog geen slaap gevonden in Apple Health voor deze periode."
+          }
+        }
+      }
+    },
     "No source" : {
       "localizations" : {
         "de" : {
@@ -27542,6 +28567,34 @@
         }
       }
     },
+    "Opens the risk checker in ChillMate to check how substances and medication combine." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet den Risiko-Checker in ChillMate, um zu prüfen, wie Substanzen und Medikamente zusammenwirken."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre el comprobador de riesgos en ChillMate para ver cómo se combinan las sustancias y la medicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvre le vérificateur de risques dans ChillMate pour voir comment les substances et les médicaments se combinent."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opent de risicochecker in ChillMate om te zien hoe middelen en medicatie samengaan."
+          }
+        }
+      }
+    },
     "Opens the safe route home screen in ChillMate." : {
       "comment" : "Title of the intent to open the safe route home screen.",
       "isCommentAutoGenerated" : true,
@@ -28271,6 +29324,34 @@
         }
       }
     },
+    "Pause before redosing" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vor dem Nachlegen kurz innehalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pausa antes de repetir dosis"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause avant de reprendre une dose"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pauzeer voor je bijneemt"
+          }
+        }
+      }
+    },
     "Pause complete. Decide slowly." : {
       "comment" : "A message displayed in the \"Pause\" mode of the \"Delay\" feature.",
       "isCommentAutoGenerated" : true,
@@ -28747,6 +29828,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Persoon"
+          }
+        }
+      }
+    },
+    "Personal best" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Persönlicher Rekord"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Récord personal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Record personnel"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Persoonlijk record"
           }
         }
       }
@@ -29961,30 +31070,30 @@
         }
       }
     },
-    "Prepare private talking points for a GP, GGD, therapist, addiction-care worker, or trusted professional. You decide whether to share it." : {
+    "Prepare private talking points for a GP, sexual-health service, therapist, addiction-care worker, or trusted professional. You decide whether to share it." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bereite private Gesprächspunkte für Hausarzt, GGD, Therapeut, Suchthilfe oder eine Vertrauensperson vor. Du entscheidest, ob du sie teilst."
+            "value" : "Bereite private Gesprächspunkte für einen Arzt, eine Beratungsstelle für sexuelle Gesundheit, einen Therapeuten, eine Suchtberatung oder eine andere Vertrauensperson vor. Du entscheidest, ob du sie teilst."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prepara puntos de conversación privados para un médico de cabecera, el GGD, un terapeuta, un profesional de atención a las adicciones o un profesional de confianza. Tú decides si compartirlo."
+            "value" : "Prepara puntos de conversación privados para un médico, un servicio de salud sexual, un terapeuta, un profesional de adicciones u otra persona de confianza. Tú decides si compartirlos."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Prépare des points de discussion privés pour un médecin traitant, le GGD, un thérapeute, un intervenant en addiction ou un professionnel de confiance. Tu décides de le partager ou non."
+            "value" : "Prépare des points de discussion privés pour un médecin, un service de santé sexuelle, un thérapeute, un intervenant en addiction ou un autre professionnel de confiance. Tu décides si tu les partages."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bereid privégesprekspunten voor voor een huisarts, GGD, therapeut, verslavingszorgmedewerker of vertrouwde professional. Jij bepaalt of je het deelt."
+            "value" : "Bereid privé-gesprekspunten voor een huisarts, soa-poli, therapeut, verslavingszorg of andere vertrouwde professional voor. Jij bepaalt of je ze deelt."
           }
         }
       }
@@ -31321,6 +32430,34 @@
         }
       }
     },
+    "Recent nights" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letzte Nächte"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noches recientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuits récentes"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recente nachten"
+          }
+        }
+      }
+    },
     "Recently deleted" : {
       "localizations" : {
         "de" : {
@@ -32087,6 +33224,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Locatie verwijderen"
+          }
+        }
+      }
+    },
+    "Remove result photo" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ergebnisfoto entfernen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar la foto del resultado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la photo du résultat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resultaatfoto verwijderen"
           }
         }
       }
@@ -33163,6 +34328,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Veiligheidsgrenzen"
+          }
+        }
+      }
+    },
+    "Safety check-in" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicherheits-Check-in"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Control de seguridad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Point sécurité"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veiligheidscheck"
+          }
+        }
+      }
+    },
+    "Safety check-ins during sessions" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicherheits-Check-ins während Sessions"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Controles de seguridad durante las sesiones"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Points sécurité pendant les sessions"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veiligheidschecks tijdens sessies"
           }
         }
       }
@@ -34369,38 +35590,30 @@
         }
       }
     },
-    "Sending a warning is voluntary. Review and edit every message before it leaves Messages. A GP, GGD, or sexual-health clinic can also help with partner notification." : {
-      "comment" : "A warning message that appears in the STI warning message panel.",
-      "isCommentAutoGenerated" : true,
+    "Sending a warning is voluntary. Review and edit every message before it leaves Messages. A GP or sexual-health clinic can also help with partner notification." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eine Warnung zu senden ist freiwillig. Prüfe und bearbeite jede Nachricht, bevor sie Nachrichten verlässt. Auch Hausarzt, GGD oder eine Praxis für sexuelle Gesundheit können bei der Partnerbenachrichtigung helfen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sending a warning is voluntary. Review and edit every message before it leaves Messages. A GP, GGD, or sexual-health clinic can also help with partner notification."
+            "value" : "Eine Warnung zu senden ist freiwillig. Prüfe und bearbeite jede Nachricht, bevor sie Nachrichten verlässt. Auch ein Arzt oder eine Beratungsstelle für sexuelle Gesundheit kann bei der Partnerbenachrichtigung helfen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enviar un aviso es voluntario. Revisa y edita cada mensaje antes de que salga de Mensajes. Un médico de cabecera, el GGD o una clínica de salud sexual también pueden ayudar con la notificación a parejas."
+            "value" : "Enviar un aviso es voluntario. Revisa y edita cada mensaje antes de que salga de Mensajes. Un médico o un servicio de salud sexual también pueden ayudar con la notificación a la pareja."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envoyer un avertissement est volontaire. Relis et modifie chaque message avant qu'il ne quitte Messages. Un médecin traitant, le GGD ou une clinique de santé sexuelle peuvent aussi aider à prévenir les partenaires."
+            "value" : "Envoyer un avertissement est volontaire. Vérifie et modifie chaque message avant qu'il ne quitte Messages. Un médecin ou un service de santé sexuelle peut aussi aider pour la notification aux partenaires."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Een waarschuwing sturen is vrijwillig. Bekijk en bewerk elk bericht voor het Berichten verlaat. Een huisarts, GGD of soa-kliniek kan ook helpen met het waarschuwen van partners."
+            "value" : "Een waarschuwing sturen is vrijwillig. Bekijk en bewerk elk bericht voordat het Berichten verlaat. Een huisarts of soa-poli kan ook helpen bij het informeren van partners."
           }
         }
       }
@@ -36081,6 +37294,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "slaap niet gelogd"
+          }
+        }
+      }
+    },
+    "Sleep patterns" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlafmuster"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patrones de sueño"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Habitudes de sommeil"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slaappatronen"
           }
         }
       }
@@ -38976,6 +40217,34 @@
         }
       }
     },
+    "Talk to FRANK" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Talk to FRANK"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Talk to FRANK"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Talk to FRANK"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Talk to FRANK"
+          }
+        }
+      }
+    },
     "Talk to someone" : {
       "comment" : "A title for a section of a screen that provides information about resources for talking to a healthcare professional.",
       "isCommentAutoGenerated" : true,
@@ -40616,6 +41885,34 @@
         }
       }
     },
+    "Time window" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeitraum"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periodo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Période"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Periode"
+          }
+        }
+      }
+    },
     "Timeline" : {
       "localizations" : {
         "de" : {
@@ -41710,6 +43007,34 @@
         }
       }
     },
+    "United States" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vereinigte Staaten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estados Unidos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "États-Unis"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verenigde Staten"
+          }
+        }
+      }
+    },
     "Unknown" : {
       "localizations" : {
         "de" : {
@@ -42298,30 +43623,30 @@
         }
       }
     },
-    "Use Support for Dutch sexual-health, crisis, addiction-care, and practical support resources." : {
+    "Use Support to find sexual-health, crisis, addiction-care, and practical support resources near you." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nutze Support für niederländische Ressourcen zu sexueller Gesundheit, Krisen, Suchthilfe und praktischer Unterstützung."
+            "value" : "Nutze „Support“, um Angebote für sexuelle Gesundheit, Krisen, Suchtberatung und praktische Unterstützung in deiner Nähe zu finden."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Usa Soporte para recursos de salud sexual, crisis, atención a las adicciones y apoyo práctico en los Países Bajos."
+            "value" : "Usa Support para encontrar recursos de salud sexual, crisis, atención a adicciones y apoyo práctico cerca de ti."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Utilise Soutien pour les ressources néerlandaises de santé sexuelle, de crise, de soins en addiction et de soutien pratique."
+            "value" : "Utilise Support pour trouver des ressources de santé sexuelle, de crise, d'addiction et de soutien pratique près de chez toi."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Gebruik Hulp voor Nederlandse bronnen voor seksuele gezondheid, crisis, verslavingszorg en praktische steun."
+            "value" : "Gebruik Support om hulpbronnen voor seksuele gezondheid, crisis, verslavingszorg en praktische steun bij jou in de buurt te vinden."
           }
         }
       }
@@ -42490,6 +43815,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gebruik workoutcontext later om valse stresswaarschuwingen te voorkomen."
+          }
+        }
+      }
+    },
+    "Used" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konsumiert"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consumo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conso"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gebruikt"
           }
         }
       }
@@ -43732,6 +45085,34 @@
         }
       }
     },
+    "When the private daily reminder arrives." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wann die private tägliche Erinnerung kommt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuándo llega el recordatorio diario privado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quand le rappel quotidien privé arrive."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wanneer de privé dagelijkse herinnering komt."
+          }
+        }
+      }
+    },
     "Where do you want to go?" : {
       "localizations" : {
         "de" : {
@@ -43762,6 +45143,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Waar wil je heen?"
+          }
+        }
+      }
+    },
+    "While a dose timer is running, send more noticeable check-ins with a one-tap way to reach your trusted contact or emergency services if something feels wrong." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solange ein Dosis-Timer läuft, deutlichere Check-ins senden – mit einer Ein-Tipp-Möglichkeit, deine Vertrauensperson oder den Notruf zu erreichen, falls sich etwas falsch anfühlt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mientras un temporizador de dosis esté activo, envía controles más visibles con una forma de contactar con un toque a tu persona de confianza o a emergencias si algo va mal."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tant qu'un minuteur de dose tourne, envoie des points de contrôle plus visibles avec un accès en un geste à ta personne de confiance ou aux secours si quelque chose ne va pas."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terwijl een dosistimer loopt, stuur duidelijkere check-ins met één tik naar je vertrouwenscontact of de hulpdiensten als er iets niet goed voelt."
           }
         }
       }
@@ -45450,6 +46859,34 @@
         }
       }
     },
+    "You are partway through the effect window. If more is on your mind, pause first: are you safe, hydrated, and still choosing what protects tomorrow?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du bist mitten im Wirkfenster. Wenn du an mehr denkst, halte kurz inne: Bist du sicher, hydriert und wählst du noch, was dich morgen schützt?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estás a mitad de la ventana de efecto. Si piensas en más, para primero: ¿estás a salvo, hidratado y sigues eligiendo lo que te protege mañana?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu es au milieu de la fenêtre d'effet. Si tu penses à en reprendre, fais d'abord une pause : es-tu en sécurité, hydraté et choisis-tu encore ce qui te protège demain ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je zit middenin het effectvenster. Als je aan meer denkt, pauzeer dan eerst: ben je veilig, gehydrateerd en kies je nog wat je morgen beschermt?"
+          }
+        }
+      }
+    },
     "You are responsible for deciding what information you save and who you share it with." : {
       "localizations" : {
         "de" : {
@@ -47116,6 +48553,34 @@
         }
       }
     },
+    "You tend to sleep about %@ hours more after a clear night." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach einer Nacht ohne Konsum schläfst du meist etwa %@ Stunden mehr."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sueles dormir unas %@ horas más tras una noche sin consumo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu dors en général environ %@ heures de plus après une nuit sans conso."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na een schone nacht slaap je meestal zo'n %@ uur langer."
+          }
+        }
+      }
+    },
     "You were the bottom" : {
       "localizations" : {
         "de" : {
@@ -48519,6 +49984,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Je herstelreeks wordt opgebouwd, beslissing voor beslissing, niet in één keer."
+          }
+        }
+      }
+    },
+    "Your session timer has ended. Tap Get help to reach your trusted contact or emergency services, or I'm safe to dismiss." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Session-Timer ist abgelaufen. Tippe auf „Hilfe holen“, um deine Vertrauensperson oder den Notruf zu erreichen, oder auf „Mir geht's gut“, um zu schließen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu temporizador de sesión ha terminado. Toca «Buscar ayuda» para contactar con tu persona de confianza o emergencias, o «Estoy bien» para cerrar."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton minuteur de session est terminé. Touche « Obtenir de l'aide » pour joindre ta personne de confiance ou les secours, ou « Je suis en sécurité » pour fermer."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je sessietimer is afgelopen. Tik op ‘Hulp zoeken’ om je vertrouwenscontact of de hulpdiensten te bereiken, of op ‘Ik ben veilig’ om te sluiten."
           }
         }
       }

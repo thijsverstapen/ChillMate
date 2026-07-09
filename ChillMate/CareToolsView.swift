@@ -113,6 +113,8 @@ struct STDTestsView: View {
     @State private var customSTIName = ""
     @State private var notes = ""
     @State private var isShowingDiscardWarning = false
+    @State private var resultPhotoItem: PhotosPickerItem?
+    @State private var resultPhotoData: Data?
 
     private var hasPositiveSelection: Bool {
         oralResult == .positive || genitalResult == .positive || analResult == .positive
@@ -125,7 +127,8 @@ struct STDTestsView: View {
         analResult != .pending ||
         !foundSTIs.isEmpty ||
         !customSTIName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-        !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+        resultPhotoData != nil
     }
 
     var body: some View {
@@ -169,6 +172,38 @@ struct STDTestsView: View {
                                 .padding(14)
                                 .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
 
+                            // Resolved outside the picker's Sendable label closure;
+                            // also makes the ternary actually hit the string catalog.
+                            let resultPhotoLabel = resultPhotoData == nil
+                                ? String(localized: "Add photo of result")
+                                : String(localized: "Change result photo")
+                            PhotosPicker(selection: $resultPhotoItem, matching: .images) {
+                                Label(resultPhotoLabel, systemImage: "paperclip")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(ChillPillButtonStyle(prominent: false))
+
+                            if let data = resultPhotoData, let image = UIImage(data: data) {
+                                ZStack(alignment: .topTrailing) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(maxWidth: .infinity, maxHeight: 160)
+                                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    Button {
+                                        resultPhotoData = nil
+                                        resultPhotoItem = nil
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.title3)
+                                            .foregroundStyle(.white, .black.opacity(0.5))
+                                            .padding(8)
+                                    }
+                                    .accessibilityLabel("Remove result photo")
+                                }
+                            }
+
                             GlassActionButton(prominent: true, action: saveTest) {
                                 Label("Save test", systemImage: "checkmark.circle.fill")
                                     .font(.headline)
@@ -177,6 +212,16 @@ struct STDTestsView: View {
                         }
                         .padding(16)
                         .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
+                        .onChange(of: resultPhotoItem) { _, newItem in
+                            guard let newItem else { return }
+                            // The Task inherits the view's main actor, so the @State
+                            // assignment is safe without a MainActor.run hop.
+                            Task {
+                                if let data = try? await newItem.loadTransferable(type: Data.self) {
+                                    resultPhotoData = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 1400, compressionQuality: 0.8)
+                                }
+                            }
+                        }
 
                         VStack(alignment: .leading, spacing: 12) {
                             CareSectionTitle(title: String(localized: "Current and past STI tests"), symbol: "list.bullet.rectangle")
@@ -220,7 +265,8 @@ struct STDTestsView: View {
             genitalResult: genitalResult,
             analResult: analResult,
             foundSTIs: hasPositiveSelection ? foundSTIs : [],
-            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines)
+            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines),
+            resultPhotoData: resultPhotoData
         )
         modelContext.insert(record)
         modelContext.saveChanges()
@@ -239,6 +285,8 @@ struct STDTestsView: View {
         genitalResult = .pending
         analResult = .pending
         testDate = .now
+        resultPhotoData = nil
+        resultPhotoItem = nil
     }
 
     private func warningContacts(for test: STDTestRecord) -> [SexPartnerRecord] {
@@ -341,6 +389,18 @@ private struct STDTestCard: View {
                     .font(.footnote)
                     .foregroundStyle(Color.chillSecondary)
             }
+
+            // Attached result photo. For positive results it stays behind the same
+            // authentication gate as the positive-result details.
+            if let data = test.resultPhotoData,
+               let image = UIImage(data: data),
+               !test.hasPositiveResult || positiveDetailsUnlocked {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: 180)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
         }
         .padding(16)
         .glassSurface(radius: 24, tint: .black.opacity(0.04))
@@ -378,7 +438,7 @@ private struct STDTestCard: View {
         let found = test.foundSTIs.isEmpty ? "an STI" : test.foundSTIs.joined(separator: ", ")
         let areas = positiveAreas
         let areaText = areas.isEmpty ? "" : " The positive result was marked for: \(areas.joined(separator: ", "))."
-        return "Hi \(contact.displayName), I wanted to let you know that I recently had an STI test with a positive result for \(found).\(areaText) It may be a good idea to get tested and contact your GP, GGD, or sexual health clinic. This is a private heads-up from ChillMate."
+        return "Hi \(contact.displayName), I wanted to let you know that I recently had an STI test with a positive result for \(found).\(areaText) It may be a good idea to get tested and contact your GP or a sexual-health clinic. This is a private heads-up from ChillMate."
     }
 
     private var positiveAreas: [String] {
@@ -503,7 +563,7 @@ private struct STIWarningMessagePanel: View {
     var body: some View {
         DisclosureGroup {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Sending a warning is voluntary. Review and edit every message before it leaves Messages. A GP, GGD, or sexual-health clinic can also help with partner notification.")
+                Text("Sending a warning is voluntary. Review and edit every message before it leaves Messages. A GP or sexual-health clinic can also help with partner notification.")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -1200,9 +1260,9 @@ private struct PartnerSessionModeCard: View {
 private struct PrepGuideCard: View {
     private let steps = [
         String(localized: "Use this only for around-sex PrEP when PrEP is not taken daily."),
-        String(localized: "Follow the exact timing and amount from your prescriber or GGD."),
+        String(localized: "Follow the exact timing and amount from your prescriber or sexual-health service."),
         String(localized: "Set reminders from your own prescription instructions."),
-        String(localized: "If anything feels unclear, contact your prescriber, GGD, or pharmacist before relying on the plan.")
+        String(localized: "If anything feels unclear, contact your prescriber, a sexual-health service, or pharmacist before relying on the plan.")
     ]
 
     var body: some View {
@@ -1519,6 +1579,7 @@ struct DrugTimerView: View {
         modelContext.saveChanges()
         DrugTimerLiveActivityController.start(for: timer)
         modelContext.saveChanges()
+        syncTimersToWatch()
 
         Task {
             if (try? await NotificationService.shared.requestAuthorization()) == true {
@@ -1528,6 +1589,11 @@ struct DrugTimerView: View {
                     endsAt: timer.endsAt,
                     destination: .timers
                 )
+                NotificationService.shared.scheduleRedoseNudge(
+                    id: timer.id,
+                    startsAt: timer.startedAt,
+                    durationHours: timer.durationHours
+                )
             }
         }
 
@@ -1535,6 +1601,11 @@ struct DrugTimerView: View {
         selectedAdministrationRoute = nil
         startedAt = .now
         doseNote = ""
+    }
+
+    private func syncTimersToWatch() {
+        let all = (try? modelContext.fetch(FetchDescriptor<DrugDoseTimerRecord>())) ?? []
+        WatchConnectivityService.shared.sendActiveTimers(all)
     }
 
     private func addTrackedPerson() {
@@ -1819,8 +1890,13 @@ private struct DrugTimerCard: View {
                         title: "\(timer.substanceName) timer",
                         detail: timer.startedAt.formatted(date: .abbreviated, time: .shortened)
                     )
+                    NotificationService.shared.clearSessionCheckIns(id: timer.id)
+                    NotificationService.shared.clearRedoseNudge(id: timer.id)
                     modelContext.delete(timer)
                     modelContext.saveChanges()
+                    WatchConnectivityService.shared.sendActiveTimers(
+                        (try? modelContext.fetch(FetchDescriptor<DrugDoseTimerRecord>())) ?? []
+                    )
                 } label: {
                     Image(systemName: "trash.fill")
                 }
@@ -2993,6 +3069,9 @@ private struct AftercareEntryCard: View {
     @Bindable var entry: NightEntry
     @State private var isImportingSleep = false
     @State private var sleepImportMessage = ""
+    @State private var didAutoImportSleep = false
+    @AppStorage("healthKitSleepReadWriteEnabled") private var healthKitSleepReadWriteEnabled = false
+    @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
 
     private var moodBinding: Binding<AftercareMood> {
         Binding {
@@ -3123,6 +3202,17 @@ private struct AftercareEntryCard: View {
                     entry.sleepHours = entry.aftercareSleepHours
                 }
                 modelContext.saveChanges()
+
+                // Mirror the mood to Apple Health's State of Mind when the user
+                // already syncs logs to Health. Failures stay silent — the local
+                // check-in is the source of truth.
+                if healthKitAutoSync {
+                    let mood = AftercareMood(rawValue: entry.aftercareMood) ?? .okay
+                    let completedAt = entry.aftercareCompletedAt ?? .now
+                    Task {
+                        try? await HealthKitService.shared.saveStateOfMind(date: completedAt, mood: mood)
+                    }
+                }
             } label: {
                 Label("Save aftercare", systemImage: "checkmark.heart.fill")
                     .font(.headline)
@@ -3131,6 +3221,15 @@ private struct AftercareEntryCard: View {
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillAccentTeal.opacity(0.08), interactive: true)
+        .task {
+            // Auto-fill sleep from Apple Health once, only when the user granted sleep
+            // reads and no sleep is known yet from any source (never overwrite a value
+            // the user already entered manually or in the log sheet).
+            guard healthKitSleepReadWriteEnabled, !didAutoImportSleep,
+                  !entry.aftercareSleepRecorded, !entry.sleptYet, entry.sleepHours == 0 else { return }
+            didAutoImportSleep = true
+            importSleepFromHealth(autoImport: true)
+        }
     }
 
     private func toggleSymptom(_ symptom: AftercareSymptom) {
@@ -3143,7 +3242,7 @@ private struct AftercareEntryCard: View {
         entry.aftercareSymptoms = symptoms
     }
 
-    private func importSleepFromHealth() {
+    private func importSleepFromHealth(autoImport: Bool = false) {
         isImportingSleep = true
         sleepImportMessage = ""
 
@@ -3151,6 +3250,18 @@ private struct AftercareEntryCard: View {
             do {
                 let end = Calendar.current.date(byAdding: .hour, value: 18, to: entry.endDate) ?? entry.endDate.addingTimeInterval(18 * 60 * 60)
                 let hours = try await HealthKitService.shared.sleepHours(from: entry.endDate, to: end)
+
+                // HealthKit returns 0 (not an error) when the window has no samples —
+                // common for a just-ended or still-ongoing night. Never overwrite an
+                // existing value with 0.
+                guard hours > 0 else {
+                    if !autoImport {
+                        sleepImportMessage = String(localized: "No sleep found in Apple Health for this window yet.")
+                    }
+                    isImportingSleep = false
+                    return
+                }
+
                 entry.aftercareSleepRecorded = true
                 entry.aftercareSleepHours = hours
                 entry.sleptYet = true
@@ -3272,7 +3383,7 @@ struct EmergencyRedFlagCard: View {
                 }
             }
 
-            Text("If any of these are happening, do not wait for the app. Call 112 in the Netherlands or your local emergency number.")
+            Text("If any of these are happening, do not wait for the app. Call \(EmergencyContactInfo.number) or your local emergency number.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -3304,10 +3415,10 @@ struct EmergencyRedFlagCard: View {
             }
 
             Button(role: .destructive) {
-                guard let url = URL(string: "tel://112") else { return }
+                guard let url = EmergencyContactInfo.dialURL else { return }
                 UIApplication.shared.open(url)
             } label: {
-                Label("Call 112", systemImage: "phone.fill")
+                Label("Call \(EmergencyContactInfo.number)", systemImage: "phone.fill")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
             }
@@ -3337,7 +3448,7 @@ struct ClinicalReviewNoticeCard: View {
     }
 }
 
-private struct CareSectionTitle: View {
+struct CareSectionTitle: View {
     let title: String
     let symbol: String
 
@@ -3354,7 +3465,7 @@ private struct CareSectionTitle: View {
     }
 }
 
-private struct CareEmptyState: View {
+struct CareEmptyState: View {
     let text: String
 
     var body: some View {
@@ -3498,7 +3609,7 @@ struct PanicSupportView: View {
                             .opacity(trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.55 : 1)
 
                             Button(role: .destructive, action: callEmergencyServices) {
-                                Label("Call emergency services 112", systemImage: "sos.circle.fill")
+                                Label("Call emergency services \(EmergencyContactInfo.number)", systemImage: "sos.circle.fill")
                                     .font(.headline)
                                     .frame(maxWidth: .infinity)
                             }
@@ -3598,7 +3709,7 @@ struct PanicSupportView: View {
     }
 
     private func callEmergencyServices() {
-        guard let url = URL(string: "tel://112") else { return }
+        guard let url = EmergencyContactInfo.dialURL else { return }
         UIApplication.shared.open(url)
     }
 }
@@ -4031,8 +4142,8 @@ struct EmergencyCardView: View {
                         .glassSurface(radius: 30, tint: .black.opacity(0.04), interactive: true)
 
                         HStack(spacing: 10) {
-                            Link(destination: URL(string: "tel://112")!) {
-                                Label("Call 112", systemImage: "phone.fill")
+                            Link(destination: EmergencyContactInfo.dialURL ?? URL(string: "tel://112")!) {
+                                Label("Call \(EmergencyContactInfo.number)", systemImage: "phone.fill")
                                     .font(.headline)
                                     .frame(maxWidth: .infinity)
                             }
@@ -4103,207 +4214,6 @@ private struct EmergencyCardLine: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-    }
-}
-
-struct NetherlandsSupportDirectoryView: View {
-    @Environment(\.dismiss) private var dismiss
-    @AppStorage("country") private var country = "Netherlands"
-    @State private var query = ""
-
-    private var filteredResources: [SupportResource] {
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else {
-            return SupportResource.resources(for: country)
-        }
-        return SupportResource.resources(for: country).filter {
-            $0.title.localizedCaseInsensitiveContains(trimmed) ||
-            $0.detail.localizedCaseInsensitiveContains(trimmed) ||
-            $0.tags.contains { $0.localizedCaseInsensitiveContains(trimmed) }
-        }
-    }
-
-    var body: some View {
-        Group {
-            ZStack {
-                DashboardBackdrop()
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        PageHeader(
-                            title: String(localized: "Support"),
-                            subtitle: String(localized: "Search offline support options for crisis help, sexual health, drugs, LGBTQ+ support, and practical care."),
-                            symbol: "list.bullet.clipboard.fill",
-                            tint: Color.chillSecondaryBlue
-                        )
-
-                        TextField("Search support", text: $query)
-                            .textFieldStyle(.plain)
-                            .foregroundStyle(Color.chillText)
-                            .padding(14)
-                            .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                        LazyVStack(spacing: 12) {
-                            ForEach(filteredResources) { resource in
-                                SupportResourceCard(resource: resource)
-                            }
-                        }
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-                .scrollDismissesKeyboard(.interactively)
-            }
-            .navigationTitle("")
-            .endEditingOnTap()
-        }
-    }
-}
-
-private struct SupportResource: Identifiable {
-    let id = UUID()
-    let title: String
-    let detail: String
-    let action: String
-    let url: URL?
-    let tags: [String]
-
-    static let netherlands: [SupportResource] = [
-        SupportResource(title: String(localized: "112 emergency"), detail: String(localized: "Immediate danger, unconsciousness, seizure, blue lips, chest pain, severe overheating, or cannot be woken."), action: String(localized: "Call 112"), url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: String(localized: "113 Zelfmoordpreventie"), detail: String(localized: "If you might hurt yourself or cannot stay safe. Call 113 or 0800-0113 in the Netherlands."), action: String(localized: "Open 113.nl"), url: URL(string: "https://www.113.nl"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: String(localized: "GGD sexual health"), detail: String(localized: "STI testing, PrEP, PEP questions, vaccination, and sexual health support."), action: String(localized: "Open ggd.nl"), url: URL(string: "https://www.ggd.nl"), tags: ["sti", "pep", "prep", "ggd"]),
-        SupportResource(title: String(localized: "Huisarts / GP"), detail: String(localized: "Medication interactions, sleep, mental health, substance use, referrals, and urgent medical questions."), action: String(localized: "Call your GP"), url: nil, tags: ["doctor", "huisarts", "medication"]),
-        SupportResource(title: String(localized: "Drugs Infolijn"), detail: String(localized: "Dutch drug information and harm-reduction support from Trimbos."), action: String(localized: "Open drugsinfo.nl"), url: URL(string: "https://www.drugsinfo.nl"), tags: ["drugs", "harm reduction", "trimbos"]),
-        SupportResource(title: String(localized: "Centrum Seksueel Geweld"), detail: String(localized: "Support after sexual assault, coercion, or a consent concern."), action: String(localized: "Open centrumseksueelgeweld.nl"), url: URL(string: "https://centrumseksueelgeweld.nl"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: String(localized: "Jellinek"), detail: String(localized: "Dutch addiction care and information about alcohol, drugs, and chemsex patterns."), action: String(localized: "Open jellinek.nl"), url: URL(string: "https://www.jellinek.nl"), tags: ["addiction", "chemsex", "drugs"]),
-        SupportResource(title: String(localized: "Switchboard LGBT+"), detail: String(localized: "LGBTQ+ listening ear, information, and referral support."), action: String(localized: "Open switchboard.nl"), url: URL(string: "https://switchboard.nl"), tags: ["lgbtq", "queer", "support"])
-    ]
-
-    // Generic, country-neutral fallback shown when the chosen country is not the Netherlands.
-    static let international: [SupportResource] = [
-        SupportResource(title: String(localized: "Emergency services"), detail: String(localized: "Immediate danger, unconsciousness, or someone who cannot be woken. Call your local emergency number now."), action: String(localized: "Call 112"), url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: String(localized: "Crisis & suicide support"), detail: String(localized: "Free, confidential support if you might hurt yourself or cannot stay safe."), action: String(localized: "Open findahelpline.com"), url: URL(string: "https://findahelpline.com"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: String(localized: "Sexual health & STI testing"), detail: String(localized: "Find local STI testing, PrEP, PEP, and sexual health services."), action: String(localized: "Find a clinic"), url: nil, tags: ["sti", "pep", "prep"]),
-        SupportResource(title: String(localized: "Drug information & harm reduction"), detail: String(localized: "Trusted, non-judgmental drug information and harm-reduction support."), action: String(localized: "Open tripsit.me"), url: URL(string: "https://tripsit.me"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: String(localized: "GP or family doctor"), detail: String(localized: "Medication interactions, sleep, mental health, substance use, referrals, and urgent medical questions."), action: String(localized: "Call your GP"), url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: String(localized: "LGBTQ+ support"), detail: String(localized: "LGBTQ+ listening ear, information, and referral support."), action: String(localized: "Find LGBTQ+ support"), url: nil, tags: ["lgbtq", "queer", "support"])
-    ]
-
-    // Shared, country-neutral descriptions reused across countries so only the
-    // org name, number, and URL change per country (no extra strings to translate).
-    private static var genericEmergencyDetail: String { String(localized: "Immediate danger, unconsciousness, or someone who cannot be woken. Call your local emergency number now.") }
-    private static var genericCrisisDetail: String { String(localized: "Free, confidential support if you might hurt yourself or cannot stay safe.") }
-    private static var genericSTIDetail: String { String(localized: "Find local STI testing, PrEP, PEP, and sexual health services.") }
-    private static var genericDrugsDetail: String { String(localized: "Trusted, non-judgmental drug information and harm-reduction support.") }
-    private static var genericGPDetail: String { String(localized: "Medication interactions, sleep, mental health, substance use, referrals, and urgent medical questions.") }
-    private static var genericLGBTQDetail: String { String(localized: "LGBTQ+ listening ear, information, and referral support.") }
-    private static var genericAssaultDetail: String { String(localized: "Support after sexual assault, coercion, or a consent concern.") }
-    private static var gpTitle: String { String(localized: "GP or family doctor") }
-    private static var gpAction: String { String(localized: "Call your GP") }
-
-    static let belgium: [SupportResource] = [
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "Zelfmoordlijn 1813", detail: genericCrisisDetail, action: "Call 1813", url: URL(string: "tel://1813"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Sensoa", detail: genericSTIDetail, action: "Open sensoa.be", url: URL(string: "https://www.sensoa.be"), tags: ["sti", "pep", "prep"]),
-        SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "De DrugLijn", detail: genericDrugsDetail, action: "Open druglijn.be", url: URL(string: "https://www.druglijn.be"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Zorgcentra na Seksueel Geweld", detail: genericAssaultDetail, action: "Open seksueelgeweld.be", url: URL(string: "https://www.seksueelgeweld.be"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "Lumi", detail: genericLGBTQDetail, action: "Open lumi.be", url: URL(string: "https://lumi.be"), tags: ["lgbtq", "queer", "support"])
-    ]
-
-    static let germany: [SupportResource] = [
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "TelefonSeelsorge", detail: genericCrisisDetail, action: "Call 0800 111 0 111", url: URL(string: "tel://08001110111"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Deutsche Aidshilfe", detail: genericSTIDetail, action: "Open aidshilfe.de", url: URL(string: "https://www.aidshilfe.de"), tags: ["sti", "pep", "prep"]),
-        SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "drugcom.de", detail: genericDrugsDetail, action: "Open drugcom.de", url: URL(string: "https://www.drugcom.de"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Hilfetelefon", detail: genericAssaultDetail, action: "Call 116 016", url: URL(string: "tel://116016"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "LSVD+", detail: genericLGBTQDetail, action: "Open lsvd.de", url: URL(string: "https://www.lsvd.de"), tags: ["lgbtq", "queer", "support"])
-    ]
-
-    static let unitedKingdom: [SupportResource] = [
-        SupportResource(title: "999", detail: genericEmergencyDetail, action: "Call 999", url: URL(string: "tel://999"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "Samaritans", detail: genericCrisisDetail, action: "Call 116 123", url: URL(string: "tel://116123"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "NHS sexual health", detail: genericSTIDetail, action: "Open nhs.uk", url: URL(string: "https://www.nhs.uk/live-well/sexual-health/"), tags: ["sti", "pep", "prep"]),
-        SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "FRANK", detail: genericDrugsDetail, action: "Open talktofrank.com", url: URL(string: "https://www.talktofrank.com"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Rape Crisis", detail: genericAssaultDetail, action: "Open rapecrisis.org.uk", url: URL(string: "https://rapecrisis.org.uk"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "Switchboard LGBTQ+", detail: genericLGBTQDetail, action: "Open switchboard.lgbt", url: URL(string: "https://switchboard.lgbt"), tags: ["lgbtq", "queer", "support"])
-    ]
-
-    static let france: [SupportResource] = [
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "3114", detail: genericCrisisDetail, action: "Call 3114", url: URL(string: "tel://3114"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Sida Info Service", detail: genericSTIDetail, action: "Open sida-info-service.org", url: URL(string: "https://www.sida-info-service.org"), tags: ["sti", "pep", "prep"]),
-        SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "Drogues Info Service", detail: genericDrugsDetail, action: "Open drogues-info-service.fr", url: URL(string: "https://www.drogues-info-service.fr"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Viols Femmes Informations", detail: genericAssaultDetail, action: "Call 0800 05 95 95", url: URL(string: "tel://0800059595"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "SOS homophobie", detail: genericLGBTQDetail, action: "Open sos-homophobie.org", url: URL(string: "https://www.sos-homophobie.org"), tags: ["lgbtq", "queer", "support"])
-    ]
-
-    static let spain: [SupportResource] = [
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "024", detail: genericCrisisDetail, action: "Call 024", url: URL(string: "tel://024"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Sanidad (salud sexual)", detail: genericSTIDetail, action: "Open sanidad.gob.es", url: URL(string: "https://www.sanidad.gob.es"), tags: ["sti", "pep", "prep"]),
-        SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "Energy Control", detail: genericDrugsDetail, action: "Open energycontrol.org", url: URL(string: "https://energycontrol.org"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "016 (violencia sexual)", detail: genericAssaultDetail, action: "Call 016", url: URL(string: "tel://016"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "FELGTBI+", detail: genericLGBTQDetail, action: "Open felgtbi.org", url: URL(string: "https://felgtbi.org"), tags: ["lgbtq", "queer", "support"])
-    ]
-
-    static func resources(for country: String) -> [SupportResource] {
-        switch country {
-        case "Belgium": return belgium
-        case "Germany": return germany
-        case "United Kingdom": return unitedKingdom
-        case "France": return france
-        case "Spain": return spain
-        // Netherlands and "Other" both use the Dutch resources.
-        case "Netherlands", "Other": return netherlands
-        default: return international
-        }
-    }
-
-    /// Primary emergency number for the country (112 across the EU, 999 in the UK).
-    static func emergencyNumber(for country: String) -> String {
-        country == "United Kingdom" ? "999" : "112"
-    }
-
-    /// Fallback label for the non-urgent sexual-health contact when the user has
-    /// not set their own.
-    static func healthcareLabel(for country: String) -> String {
-        (country == "Netherlands" || country == "Other") ? "GP, huisarts, or GGD" : "GP or sexual-health clinic"
-    }
-}
-
-private struct SupportResourceCard: View {
-    let resource: SupportResource
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(resource.title)
-                .font(.headline)
-                .foregroundStyle(Color.chillText)
-            Text(resource.detail)
-                .font(.caption)
-                .foregroundStyle(Color.chillSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-            if let url = resource.url {
-                Link(destination: url) {
-                    Label(resource.action, systemImage: resource.url?.scheme == "tel" ? "phone.fill" : "arrow.up.right.square.fill")
-                        .font(.caption.weight(.bold))
-                }
-                .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .chillSecondaryBlue))
-            } else {
-                Text(resource.action)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondaryBlue)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .glassSurface(radius: 24, tint: Color.chillSecondaryBlue.opacity(0.08), interactive: true)
     }
 }
 
@@ -4503,7 +4413,7 @@ struct SafetyAutopilotView: View {
 
                             SafetyAutopilotLinkRow(
                                 title: String(localized: "Helper summary"),
-                                detail: String(localized: "A simple summary to share with a GP, GGD, or helper"),
+                                detail: String(localized: "A simple summary to share with a GP or helper"),
                                 symbol: "doc.text.magnifyingglass",
                                 tint: Color.chillMint
                             ) { showHelperSummary = true }
@@ -4612,7 +4522,7 @@ private struct SafetyAutopilotContext {
             result.append(SafetyAutopilotAction(
                 priority: .urgent,
                 title: String(localized: "PEP window is active"),
-                detail: "It has been less than 72 hours since a log that may include HIV exposure. Contact GGD, your doctor, huisartsenpost, or a hospital now. About \(hours) hours remain.",
+                detail: "It has been less than 72 hours since a log that may include HIV exposure. Contact a sexual-health service, your doctor, an out-of-hours clinic, or a hospital now. About \(hours) hours remain.",
                 symbol: "cross.case.circle.fill"
             ))
         }
@@ -4818,7 +4728,7 @@ struct ConsentBoundariesView: View {
                         BoundaryPromptField(title: String(localized: "Check-in phrase"), placeholder: String(localized: "Example: ask me 'green, yellow, or red?'"), text: $checkInPhrase)
                         BoundaryPromptField(title: String(localized: "Exit plan"), placeholder: String(localized: "Example: I can call my trusted contact, order a ride, or leave with a friend"), text: $exitPlan)
 
-                        Text("Consent can be changed or withdrawn at any time. If a memory gap or consent concern appears later, use panic support, trusted contact, GGD, CSG, or emergency help.")
+                        Text("Consent can be changed or withdrawn at any time. If a memory gap or consent concern appears later, use panic support, a trusted contact, a sexual-health service, a sexual-assault support centre, or emergency help.")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Color.chillSecondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -4951,165 +4861,6 @@ struct RecoveryModeView: View {
     }
 }
 
-struct PrivateInsightsView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
-    @Query(sort: \JournalEntry.date, order: .reverse) private var journals: [JournalEntry]
-
-    private var recentEntries: [NightEntry] {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: .now) ?? .distantPast
-        return entries.filter { $0.date >= cutoff }
-    }
-
-    var body: some View {
-        Group {
-            ZStack {
-                DashboardBackdrop()
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        PageHeader(
-                            title: String(localized: "Private insights"),
-                            subtitle: String(localized: "Patterns are shown as neutral signals, never as judgment. Everything here is calculated locally from your logs."),
-                            symbol: "chart.xyaxis.line",
-                            tint: Color.chillSecondaryBlue
-                        )
-
-                        InsightMetricGrid(entries: recentEntries, timers: timers, journals: journals)
-                        TrendListCard(title: String(localized: "What led to it?"), emptyText: String(localized: "Add trigger tags in logs to build this map."), counts: ChillInsightCalculator.triggerCounts(entries: recentEntries), tint: Color.chillSecondaryBlue)
-                        TrendListCard(title: String(localized: "What changed?"), emptyText: String(localized: "When risky logs increase, reasons you tag will appear here."), counts: ChillInsightCalculator.changeReasonCounts(entries: recentEntries), tint: .orange)
-                        TrendListCard(title: String(localized: "Substances"), emptyText: String(localized: "No substances logged in the selected window."), counts: ChillInsightCalculator.substanceCounts(entries: recentEntries), tint: Color.chillPrimary)
-                        PersonalBaselineCard(entries: recentEntries, timers: timers)
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-            }
-            .navigationTitle("")
-        }
-    }
-}
-
-private struct InsightMetricGrid: View {
-    let entries: [NightEntry]
-    let timers: [DrugDoseTimerRecord]
-    let journals: [JournalEntry]
-
-    var body: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-            InsightMetric(title: String(localized: "Chills"), value: "\(entries.filter { !$0.skippedNight }.count)", symbol: "moon.stars.fill", tint: Color.chillSecondaryBlue)
-            InsightMetric(title: String(localized: "Risky logs"), value: "\(ChillInsightCalculator.riskyLogTrend(entries: entries).recent)", symbol: "exclamationmark.triangle.fill", tint: .orange)
-            InsightMetric(title: String(localized: "Continued"), value: "\(timers.filter { $0.redoseDecision == RedoseDecision.redosed.rawValue }.count)", symbol: "arrow.clockwise.circle.fill", tint: .red)
-            InsightMetric(title: String(localized: "Journal"), value: "\(journals.count)", symbol: "book.closed.fill", tint: Color.chillMint)
-        }
-    }
-}
-
-private struct InsightMetric: View {
-    let title: String
-    let value: String
-    let symbol: String
-    let tint: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: symbol)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(tint)
-            Text(value)
-                .font(.title.bold())
-                .foregroundStyle(Color.chillText)
-            Text(title)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(Color.chillSecondary)
-        }
-        .frame(maxWidth: .infinity, minHeight: 102, alignment: .topLeading)
-        .padding(14)
-        .glassSurface(radius: 24, tint: tint.opacity(0.08))
-    }
-}
-
-private struct PersonalBaselineCard: View {
-    let entries: [NightEntry]
-    let timers: [DrugDoseTimerRecord]
-
-    private var averageSleep: Double {
-        let values = entries.filter(\.sleptYet).map(\.sleepHours)
-        guard !values.isEmpty else { return 0 }
-        return values.reduce(0, +) / Double(values.count)
-    }
-
-    private var lateTimers: Int {
-        timers.filter { Calendar.current.component(.hour, from: $0.startedAt) >= 2 && Calendar.current.component(.hour, from: $0.startedAt) <= 6 }.count
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            CareSectionTitle(title: String(localized: "Your baseline"), symbol: "person.text.rectangle.fill")
-            InsightLine(title: String(localized: "Average logged sleep"), value: averageSleep == 0 ? "Not enough data" : "\(averageSleep.formatted(.number.precision(.fractionLength(1)))) h")
-            InsightLine(title: String(localized: "Late timer starts"), value: "\(lateTimers)")
-            InsightLine(title: String(localized: "Memory gaps"), value: "\(entries.filter(\.reportedMemoryGap).count)")
-            Text("Baseline means “usual for you,” not “good” or “bad.” The app uses this to show when something changes.")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Color.chillSecondary)
-        }
-        .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
-    }
-}
-
-private struct InsightLine: View {
-    let title: String
-    let value: String
-
-    var body: some View {
-        HStack {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color.chillText)
-            Spacer()
-            Text(value)
-                .font(.subheadline.weight(.bold))
-                .foregroundStyle(Color.chillSecondary)
-        }
-    }
-}
-
-private struct TrendListCard: View {
-    let title: String
-    let emptyText: String
-    let counts: [TrendCount]
-    let tint: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            CareSectionTitle(title: title, symbol: "chart.bar.fill")
-
-            if counts.isEmpty {
-                CareEmptyState(text: emptyText)
-            } else {
-                ForEach(counts.prefix(6)) { item in
-                    HStack(spacing: 10) {
-                        Text(item.label)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color.chillText)
-                        Spacer()
-                        Text("\(item.count)")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(tint)
-                    }
-                    .padding(12)
-                    .glassSurface(radius: 18, tint: tint.opacity(0.06))
-                }
-            }
-        }
-        .padding(16)
-        .glassSurface(radius: 28, tint: tint.opacity(0.08))
-    }
-}
-
 struct ProfessionalHelperBridgeView: View {
     @Environment(\.dismiss) private var dismiss
     @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
@@ -5117,6 +4868,8 @@ struct ProfessionalHelperBridgeView: View {
     @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
     @Query(sort: \STDTestRecord.testDate, order: .reverse) private var stiTests: [STDTestRecord]
     @Query(sort: \RiskCheckRecord.createdAt, order: .reverse) private var riskChecks: [RiskCheckRecord]
+
+    @State private var pdfURL: URL?
 
     private var summary: String {
         HelperSummaryBuilder.summary(
@@ -5137,7 +4890,7 @@ struct ProfessionalHelperBridgeView: View {
                     VStack(alignment: .leading, spacing: 18) {
                         PageHeader(
                             title: String(localized: "Helper summary"),
-                            subtitle: String(localized: "Prepare private talking points for a GP, GGD, therapist, addiction-care worker, or trusted professional. You decide whether to share it."),
+                            subtitle: String(localized: "Prepare private talking points for a GP, sexual-health service, therapist, addiction-care worker, or trusted professional. You decide whether to share it."),
                             symbol: "doc.text.magnifyingglass",
                             tint: Color.chillMint
                         )
@@ -5159,6 +4912,15 @@ struct ProfessionalHelperBridgeView: View {
                         }
                         .buttonStyle(ChillPillButtonStyle(prominent: true))
 
+                        if let pdfURL {
+                            ShareLink(item: pdfURL) {
+                                Label("Export as PDF", systemImage: "doc.richtext.fill")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(ChillPillButtonStyle(prominent: false))
+                        }
+
                         EvidenceSourcesSection(title: String(localized: "Helpful professional routes"), sources: EvidenceLibrary.netherlandsSupport)
                     }
                     .padding(20)
@@ -5167,6 +4929,12 @@ struct ProfessionalHelperBridgeView: View {
                 .scrollIndicators(.hidden)
             }
             .navigationTitle("")
+            .task(id: summary) {
+                pdfURL = HealthSummaryPDF.render(
+                    title: String(localized: "ChillMate private summary"),
+                    summary: summary
+                )
+            }
         }
     }
 }
@@ -5441,66 +5209,6 @@ private struct EvidenceSourcesSection: View {
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
-    }
-}
-
-private struct TrendCount: Identifiable {
-    let id = UUID()
-    let label: String
-    let count: Int
-}
-
-private enum ChillInsightCalculator {
-    static func recoveryStreakDays(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
-        guard let latestUse = entries
-            .filter({ !$0.substances.isEmpty })
-            .map(\.date)
-            .max()
-        else {
-            return 0
-        }
-
-        return max(0, calendar.dateComponents([.day], from: calendar.startOfDay(for: latestUse), to: calendar.startOfDay(for: now)).day ?? 0)
-    }
-
-    static func riskyLogTrend(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> (recent: Int, previous: Int) {
-        let recentCutoff = calendar.date(byAdding: .day, value: -21, to: now) ?? now
-        let previousCutoff = calendar.date(byAdding: .day, value: -42, to: now) ?? now
-        var recent = 0
-        var previous = 0
-
-        for entry in entries where !entry.skippedNight && entry.hadSex && !entry.substances.isEmpty {
-            if entry.date >= recentCutoff {
-                recent += 1
-            } else if entry.date >= previousCutoff {
-                previous += 1
-            }
-        }
-
-        return (recent, previous)
-    }
-
-    static func triggerCounts(entries: [NightEntry]) -> [TrendCount] {
-        sortedCounts(entries.flatMap { $0.triggerTags.map(\.rawValue) })
-    }
-
-    static func changeReasonCounts(entries: [NightEntry]) -> [TrendCount] {
-        sortedCounts(entries.flatMap { $0.changeReasons.map(\.rawValue) })
-    }
-
-    static func substanceCounts(entries: [NightEntry]) -> [TrendCount] {
-        sortedCounts(entries.flatMap(\.substances))
-    }
-
-    private static func sortedCounts(_ values: [String]) -> [TrendCount] {
-        Dictionary(grouping: values, by: { $0 })
-            .map { TrendCount(label: $0.key, count: $0.value.count) }
-            .sorted {
-                if $0.count == $1.count {
-                    return $0.label < $1.label
-                }
-                return $0.count > $1.count
-            }
     }
 }
 
@@ -5823,97 +5531,43 @@ private struct RecentlyDeletedRow: View {
     }
 }
 
-struct WeeklyReflectionView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
-    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
+enum HealthSummaryPDF {
+    /// Paginate arbitrary-length summary text into a shareable PDF (A4).
+    /// `UIPrintPageRenderer` + `UISimpleTextPrintFormatter` handles pagination.
+    @MainActor
+    static func render(title: String, summary: String) -> URL? {
+        let body = title + "\n\n" + summary
+        let formatter = UISimpleTextPrintFormatter(text: body)
+        formatter.font = UIFont.systemFont(ofSize: 12)
+        formatter.color = .black
 
-    private var recentEntries: [NightEntry] {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -7, to: .now) ?? .distantPast
-        return entries.filter { $0.date >= cutoff }
-    }
+        let pageRenderer = UIPrintPageRenderer()
+        pageRenderer.addPrintFormatter(formatter, startingAtPageAt: 0)
 
-    private var recentJournals: [JournalEntry] {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -7, to: .now) ?? .distantPast
-        return journalEntries.filter { $0.date >= cutoff }
-    }
+        let pageSize = CGSize(width: 595.2, height: 841.8) // A4 @ 72dpi
+        let margin: CGFloat = 40
+        let paperRect = CGRect(origin: .zero, size: pageSize)
+        let printableRect = paperRect.insetBy(dx: margin, dy: margin)
+        pageRenderer.setValue(NSValue(cgRect: paperRect), forKey: "paperRect")
+        pageRenderer.setValue(NSValue(cgRect: printableRect), forKey: "printableRect")
 
-    var body: some View {
-        Group {
-            ZStack {
-                DashboardBackdrop()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        PageHeader(title: String(localized: "Weekly reflection"), subtitle: String(localized: "A quick look at the last 7 days, made for noticing patterns without judging yourself."), symbol: "calendar.badge.clock", tint: Color.chillIconPurple)
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                            WeeklyReflectionMetric(title: String(localized: "Chills"), value: "\(recentEntries.filter { !$0.skippedNight }.count)", symbol: "heart.text.square.fill", tint: Color.chillIconPink)
-                            WeeklyReflectionMetric(title: String(localized: "Substance logs"), value: "\(recentEntries.filter { !$0.substances.isEmpty }.count)", symbol: "pills.fill", tint: Color.chillSecondaryBlue)
-                            WeeklyReflectionMetric(title: String(localized: "Journals"), value: "\(recentJournals.count)", symbol: "book.closed.fill", tint: Color.chillIconPurple)
-                            WeeklyReflectionMetric(title: String(localized: "Memory gaps"), value: "\(recentEntries.filter(\.reportedMemoryGap).count)", symbol: "questionmark.circle.fill", tint: Color.chillIconOrange)
-                        }
-                        VStack(alignment: .leading, spacing: 10) {
-                            CareSectionTitle(title: String(localized: "Gentle prompts"), symbol: "sparkles")
-                            WeeklyPrompt(text: String(localized: "What felt easier this week than expected?"))
-                            WeeklyPrompt(text: String(localized: "Was there a moment where you needed support sooner?"))
-                            WeeklyPrompt(text: String(localized: "What is one small boundary that would help next time?"))
-                        }
-                        .padding(14)
-                        .glassSurface(radius: 24, tint: Color.chillIconPurple.opacity(0.08))
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-            }
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
+        let data = NSMutableData()
+        UIGraphicsBeginPDFContextToData(data, paperRect, nil)
+        let pageCount = max(1, pageRenderer.numberOfPages)
+        pageRenderer.prepare(forDrawingPages: NSRange(location: 0, length: pageCount))
+        for page in 0..<pageCount {
+            UIGraphicsBeginPDFPage()
+            pageRenderer.drawPage(at: page, in: UIGraphicsGetPDFContextBounds())
         }
-    }
-}
+        UIGraphicsEndPDFContext()
 
-private struct WeeklyReflectionMetric: View {
-    let title: String
-    let value: String
-    let symbol: String
-    let tint: Color
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: symbol)
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(tint)
-                .frame(width: 32, height: 32)
-                .glassSurface(radius: 16, tint: tint.opacity(0.12))
-            VStack(alignment: .leading, spacing: 2) {
-                Text(value).font(.title3.weight(.bold)).foregroundStyle(Color.chillText).monospacedDigit()
-                Text(title).font(.caption.weight(.semibold)).foregroundStyle(Color.chillSecondary).lineLimit(1)
-            }
-            Spacer(minLength: 0)
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("ChillMate-summary.pdf")
+        do {
+            try data.write(to: url)
+            return url
+        } catch {
+            return nil
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, minHeight: 68, alignment: .leading)
-        .glassSurface(radius: 20, tint: tint.opacity(0.08))
-    }
-}
-
-private struct WeeklyPrompt: View {
-    let text: String
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "circle")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(Color.chillIconPurple)
-                .padding(.top, 2)
-            Text(text)
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(Color.chillText)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
-        }
-        .padding(12)
-        .background(.white.opacity(0.20), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
     }
 }
 

@@ -8,6 +8,7 @@ struct DashboardView: View {
     @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
     @AppStorage("lastKnownHRVms") private var lastKnownHRVms: Double = 0
     @AppStorage("healthKitHRVReadEnabled") private var healthKitHRVReadEnabled = false
+    @AppStorage("healthKitHeartRateReadEnabled") private var healthKitHeartRateReadEnabled = false
     @AppStorage("reductionGoalSessions") private var reductionGoalSessions = 0
     @AppStorage("reductionGoalCountSubstanceOnly") private var reductionGoalCountSubstanceOnly = true
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
@@ -210,11 +211,24 @@ struct DashboardView: View {
                 HydrationLog.markLoggedNow()
                 hydrationLoggedToday = true
             }
+            .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestSOS)) { _ in
+                // "Ping my phone" from the Watch Safety screen routes this phone
+                // straight to the country-aware emergency page.
+                UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: "pendingAppDestination")
+            }
             .task(id: healthKitHRVReadEnabled) {
                 guard healthKitHRVReadEnabled else { return }
                 if let hrv = try? await HealthKitService.shared.latestHRV() {
                     lastKnownHRVms = hrv
                 }
+            }
+            .task(id: healthKitHeartRateReadEnabled) {
+                // Relay the latest resting/most-recent heart rate to the Watch so
+                // its elevated-heart-rate warning card has data. Only runs when the
+                // user has already granted heart-rate reads (no surprise prompt).
+                guard healthKitHeartRateReadEnabled else { return }
+                let bpm = (try? await HealthKitService.shared.latestHeartRate()) ?? nil
+                WatchConnectivityService.shared.sendLatestHeartRate(bpm)
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -272,9 +286,20 @@ struct DashboardView: View {
         shared.set(metrics.dailyScore.displayValue, forKey: "lastDailyRecoveryScore")
         shared.set(metrics.dailyScore.isActive, forKey: "widgetScoreIsActive")
         WidgetCenter.shared.reloadAllTimelines()
+
+        WatchConnectivityService.shared.sendMetrics(
+            recoveryStreakDays: metrics.recoveryStreakDays,
+            dailyScore: metrics.dailyScore.displayValue,
+            dailyScoreActive: metrics.dailyScore.isActive
+        )
     }
 
     private func quickSkip() {
+        // Prevent double-logging the same night — e.g. skip tapped twice, or once
+        // on the phone and once from the Watch, or when tonight is already logged.
+        if entries.contains(where: { Calendar.current.isDate($0.date, inSameDayAs: .now) }) {
+            return
+        }
         let entry = NightEntry(
             date: .now,
             hadSex: false,
@@ -1400,7 +1425,7 @@ private struct PEPCountdownCard: View {
                         .foregroundStyle(Color.chillSecondary)
                 }
 
-                Text("Contact GGD, huisarts, or hospital as soon as possible. PEP works best when started quickly and is generally time limited to 72 hours.")
+                Text("Contact a sexual-health service, GP, or hospital as soon as possible. PEP works best when started quickly and is generally time limited to 72 hours.")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -3119,8 +3144,11 @@ private struct ProfileEditView: View {
                                     Text("Belgium").tag("Belgium")
                                     Text("Germany").tag("Germany")
                                     Text("United Kingdom").tag("United Kingdom")
+                                    Text("Ireland").tag("Ireland")
                                     Text("France").tag("France")
                                     Text("Spain").tag("Spain")
+                                    Text("United States").tag("United States")
+                                    Text("Australia").tag("Australia")
                                     Text("Other").tag("Other")
                                 }
                             }

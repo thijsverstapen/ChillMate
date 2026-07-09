@@ -6,6 +6,29 @@ import SwiftUI
 // are `internal` and have no dependency on CareToolsView's private members, so moving
 // them here is behavior-preserving.
 
+/// Country-aware emergency-services number, honoring the user's manual override.
+/// Every supported country uses 112 except the United Kingdom (999); 112 also
+/// works EU-wide as a fallback. Readable from any view or service.
+enum EmergencyContactInfo {
+    static var number: String {
+        let defaults = UserDefaults.standard
+        let override = (defaults.string(forKey: "localEmergencyNumber") ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !override.isEmpty { return override }
+        switch defaults.string(forKey: "country") ?? "Netherlands" {
+        case "United Kingdom": return "999"
+        case "United States": return "911"
+        case "Australia": return "000"
+        default: return "112"
+        }
+    }
+
+    /// A `tel://` URL for the resolved emergency number, or nil if malformed.
+    static var dialURL: URL? {
+        URL(string: "tel://\(number.filter { $0.isNumber || $0 == "+" })")
+    }
+}
+
 enum CareToolPage: String, Identifiable {
     case safetyAutopilot
     case saferPlanning

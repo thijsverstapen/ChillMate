@@ -17,6 +17,11 @@
 		<key>ChillMateWatchApp.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>ChillMateWatchAppWidgetExtension.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
 			<integer>2</integer>
 		</dict>
 		<key>NightCheck.xcscheme_^#shared#^_</key>

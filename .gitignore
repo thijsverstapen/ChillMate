@@ -28,3 +28,6 @@ Carthage/Build/
 *.p8
 *.mobileprovision
 *.p12
+
+# Device-build DerivedData
+DerivedDataDevice/

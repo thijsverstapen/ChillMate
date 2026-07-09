@@ -39,6 +39,12 @@ final class NightEntry {
     var aftercareMood: String = AftercareMood.okay.rawValue
     var aftercareFeeling: String = ""
     var createdAt: Date = Date.now
+    /// 0 = row written by a build before typed child records existed (or not yet
+    /// materialized); 1 = typed records are authoritative for this row. Stored on
+    /// the entry itself so it travels atomically with the parent CloudKit record:
+    /// a synced row from a current build arrives already stamped 1 and is never
+    /// re-materialized, even while its child records are still importing.
+    var typedRecordsVersion: Int = 0
 
     init(
         id: UUID = UUID(),
@@ -115,26 +121,161 @@ final class NightEntry {
         self.aftercareMood = aftercareMood.rawValue
         self.aftercareFeeling = aftercareFeeling
         self.createdAt = createdAt
+        // Blobs are set above; this builds the matching typed child records.
+        materializeTypedRecordsIfNeeded()
     }
 
+    // MARK: Typed relationships
+    //
+    // Substances, partners, and trigger tags are stored as typed child models so
+    // they can participate in #Predicate queries and sync as first-class CloudKit
+    // records. The legacy JSON blobs above are kept and DUAL-WRITTEN by every
+    // setter, which makes the migration safe and reversible:
+    //   - rows written by this version have equal blob + typed data,
+    //   - rows from older builds (or late CloudKit arrivals) have blob-only data,
+    //     which the getters fall back to,
+    //   - the encrypted-backup format (which reads these computed properties)
+    //     stays byte-identical across versions.
+
+    @Relationship(deleteRule: .cascade, inverse: \LoggedSubstanceRecord.entry)
+    var substanceRecords: [LoggedSubstanceRecord]? = nil
+
+    @Relationship(deleteRule: .cascade, inverse: \PartnerDetailRecord.entry)
+    var partnerRecords: [PartnerDetailRecord]? = nil
+
+    @Relationship(deleteRule: .cascade, inverse: \TriggerTagRecord.entry)
+    var triggerRecords: [TriggerTagRecord]? = nil
+
     var substances: [String] {
-        get { NightEntry.decode(substancesData) }
-        set { substancesData = NightEntry.encode(newValue) }
+        get {
+            let typed = NightEntry.dedupedBySortKey(
+                (substanceRecords ?? []).filter { !$0.isInjection },
+                sortIndex: \.sortIndex, key: \.name
+            ).map(\.name)
+            return typed.isEmpty ? NightEntry.decode(substancesData) : typed
+        }
+        set {
+            substancesData = NightEntry.encode(newValue)
+            replaceSubstanceRecords(with: newValue, isInjection: false)
+        }
     }
 
     var injectionSubstances: [String] {
-        get { NightEntry.decode(injectionSubstancesData) }
-        set { injectionSubstancesData = NightEntry.encode(newValue) }
+        get {
+            let typed = NightEntry.dedupedBySortKey(
+                (substanceRecords ?? []).filter(\.isInjection),
+                sortIndex: \.sortIndex, key: \.name
+            ).map(\.name)
+            return typed.isEmpty ? NightEntry.decode(injectionSubstancesData) : typed
+        }
+        set {
+            injectionSubstancesData = NightEntry.encode(newValue)
+            replaceSubstanceRecords(with: newValue, isInjection: true)
+        }
     }
 
     var partnerDetails: [SexPartnerRecord] {
-        get { NightEntry.decodePartners(partnerDetailsData) }
-        set { partnerDetailsData = NightEntry.encodePartners(newValue) }
+        get {
+            let typed = NightEntry.dedupedBySortKey(
+                partnerRecords ?? [],
+                sortIndex: \.sortIndex, key: \.partnerID.uuidString
+            ).map(\.asPartnerRecord)
+            return typed.isEmpty ? NightEntry.decodePartners(partnerDetailsData) : typed
+        }
+        set {
+            partnerDetailsData = NightEntry.encodePartners(newValue)
+            let replaced = partnerRecords ?? []
+            partnerRecords = newValue.enumerated().map { PartnerDetailRecord(partner: $0.element, sortIndex: $0.offset) }
+            for record in replaced {
+                record.modelContext?.delete(record)
+            }
+        }
     }
 
     var triggerTags: [ChillTrigger] {
-        get { NightEntry.decodeTriggers(triggerTagsData) }
-        set { triggerTagsData = NightEntry.encodeTriggers(newValue) }
+        get {
+            let typed = NightEntry.dedupedBySortKey(
+                triggerRecords ?? [],
+                sortIndex: \.sortIndex, key: \.name
+            ).compactMap { ChillTrigger(rawValue: $0.name) }
+            return typed.isEmpty ? NightEntry.decodeTriggers(triggerTagsData) : typed
+        }
+        set {
+            triggerTagsData = NightEntry.encodeTriggers(newValue)
+            let replaced = triggerRecords ?? []
+            triggerRecords = newValue.enumerated().map { TriggerTagRecord(name: $0.element.rawValue, sortIndex: $0.offset) }
+            for record in replaced {
+                record.modelContext?.delete(record)
+            }
+        }
+    }
+
+    /// Sorts child records by sortIndex (key as deterministic tie-break) and drops
+    /// exact (sortIndex, key) duplicates. Duplicates can only arise from a CloudKit
+    /// union after two devices materialized the same legacy row concurrently; a
+    /// legitimate repeated value always has a distinct sortIndex, so this never
+    /// collapses real data. The store self-heals on the entry's next edit (setters
+    /// rewrite children wholesale).
+    private static func dedupedBySortKey<Record>(
+        _ records: [Record],
+        sortIndex: KeyPath<Record, Int>,
+        key: KeyPath<Record, String>
+    ) -> [Record] {
+        var seen = Set<String>()
+        return records
+            .sorted {
+                let a = ($0[keyPath: sortIndex], $0[keyPath: key])
+                let b = ($1[keyPath: sortIndex], $1[keyPath: key])
+                return a < b
+            }
+            .filter { seen.insert("\($0[keyPath: sortIndex])|\($0[keyPath: key])").inserted }
+    }
+
+    private func replaceSubstanceRecords(with names: [String], isInjection: Bool) {
+        let existing = substanceRecords ?? []
+        let replaced = existing.filter { $0.isInjection == isInjection }
+        let kept = existing.filter { $0.isInjection != isInjection }
+        let new = names.enumerated().map {
+            LoggedSubstanceRecord(name: $0.element, isInjection: isInjection, sortIndex: $0.offset)
+        }
+        substanceRecords = kept + new
+        for record in replaced {
+            record.modelContext?.delete(record)
+        }
+    }
+
+    /// Per-entry idempotent materialization of typed records from the legacy JSON
+    /// blobs. Only runs for rows still stamped `typedRecordsVersion == 0`, so a
+    /// CloudKit-synced row from a current build (children possibly still in
+    /// flight) is never re-materialized into duplicates. Only fills empty
+    /// relationships, then stamps the row.
+    func materializeTypedRecordsIfNeeded() {
+        guard typedRecordsVersion == 0 else { return }
+        defer { typedRecordsVersion = 1 }
+
+        if (substanceRecords ?? []).isEmpty {
+            let plain = NightEntry.decode(substancesData)
+            let injected = NightEntry.decode(injectionSubstancesData)
+            if !plain.isEmpty || !injected.isEmpty {
+                substanceRecords =
+                    plain.enumerated().map { LoggedSubstanceRecord(name: $0.element, isInjection: false, sortIndex: $0.offset) } +
+                    injected.enumerated().map { LoggedSubstanceRecord(name: $0.element, isInjection: true, sortIndex: $0.offset) }
+            }
+        }
+
+        if (partnerRecords ?? []).isEmpty {
+            let partners = NightEntry.decodePartners(partnerDetailsData)
+            if !partners.isEmpty {
+                partnerRecords = partners.enumerated().map { PartnerDetailRecord(partner: $0.element, sortIndex: $0.offset) }
+            }
+        }
+
+        if (triggerRecords ?? []).isEmpty {
+            let triggers = NightEntry.decodeTriggers(triggerTagsData)
+            if !triggers.isEmpty {
+                triggerRecords = triggers.enumerated().map { TriggerTagRecord(name: $0.element.rawValue, sortIndex: $0.offset) }
+            }
+        }
     }
 
     var changeReasons: [ChangeReason] {
@@ -259,6 +400,68 @@ final class NightEntry {
     private static func decodeSymptoms(_ data: Data) -> [AftercareSymptom] {
         let rawValues = (try? JSONDecoder().decode([String].self, from: data)) ?? []
         return rawValues.compactMap(AftercareSymptom.init(rawValue:))
+    }
+}
+
+// MARK: - Typed child models
+//
+// CloudKit-compatible: every attribute has a default, the parent relationship is
+// optional, and the inverse is declared once (on NightEntry). `sortIndex` preserves
+// display order because SwiftData to-many relationships are unordered.
+
+@Model
+final class LoggedSubstanceRecord {
+    var name: String = ""
+    var isInjection: Bool = false
+    var sortIndex: Int = 0
+    var entry: NightEntry?
+
+    init(name: String, isInjection: Bool = false, sortIndex: Int = 0) {
+        self.name = name
+        self.isInjection = isInjection
+        self.sortIndex = sortIndex
+    }
+}
+
+@Model
+final class PartnerDetailRecord {
+    var partnerID: UUID = UUID()
+    var name: String = ""
+    var phoneNumber: String = ""
+    var theyWerePenetrated: Bool = false
+    var userWasPenetrated: Bool = false
+    var sortIndex: Int = 0
+    var entry: NightEntry?
+
+    init(partner: SexPartnerRecord, sortIndex: Int = 0) {
+        self.partnerID = partner.id
+        self.name = partner.name
+        self.phoneNumber = partner.phoneNumber
+        self.theyWerePenetrated = partner.theyWerePenetrated
+        self.userWasPenetrated = partner.userWasPenetrated
+        self.sortIndex = sortIndex
+    }
+
+    var asPartnerRecord: SexPartnerRecord {
+        SexPartnerRecord(
+            id: partnerID,
+            name: name,
+            phoneNumber: phoneNumber,
+            theyWerePenetrated: theyWerePenetrated,
+            userWasPenetrated: userWasPenetrated
+        )
+    }
+}
+
+@Model
+final class TriggerTagRecord {
+    var name: String = ""
+    var sortIndex: Int = 0
+    var entry: NightEntry?
+
+    init(name: String, sortIndex: Int = 0) {
+        self.name = name
+        self.sortIndex = sortIndex
     }
 }
 

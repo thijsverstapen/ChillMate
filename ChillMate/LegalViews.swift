@@ -113,8 +113,8 @@ struct TermsOfUseView: View {
                             title: String(localized: "Professional support"),
                             symbol: "person.text.rectangle.fill",
                             rows: [
-                                String(localized: "Use Support for Dutch sexual-health, crisis, addiction-care, and practical support resources."),
-                                String(localized: "For STI, PrEP, PEP, medication, mental-health, or substance concerns, contact a GP, GGD, pharmacist, clinician, counselor, or other qualified professional."),
+                                String(localized: "Use Support to find sexual-health, crisis, addiction-care, and practical support resources near you."),
+                                String(localized: "For STI, PrEP, PEP, medication, mental-health, or substance concerns, contact a GP, sexual-health service, pharmacist, clinician, counselor, or other qualified professional."),
                                 String(localized: "The app can help organize notes for a conversation, but it cannot replace that conversation.")
                             ]
                         )

@@ -90,6 +90,9 @@ enum ChillMateModelContainer {
     private static var appSchema: Schema {
         Schema([
             NightEntry.self,
+            LoggedSubstanceRecord.self,
+            PartnerDetailRecord.self,
+            TriggerTagRecord.self,
             UserProfile.self,
             STDTestRecord.self,
             DrugDoseTimerRecord.self,
@@ -97,6 +100,30 @@ enum ChillMateModelContainer {
             RiskCheckRecord.self,
             JournalEntry.self
         ])
+    }
+}
+
+/// Materializes NightEntry's typed child records (substances, partners, trigger
+/// tags) from the legacy JSON blobs. Runs every launch but only touches rows
+/// still stamped `typedRecordsVersion == 0` — the stamp lives on the entry
+/// itself (not a local flag), so a run against the in-memory recovery store or a
+/// failed save simply retries next launch, and rows synced later from an older
+/// build get picked up too. Blobs stay in place as a dual-written fallback, so
+/// this can never lose data.
+@MainActor
+enum TypedRecordsMigration {
+    static func runIfNeeded() {
+        let context = ChillMateModelContainer.container().mainContext
+        let descriptor = FetchDescriptor<NightEntry>(
+            predicate: #Predicate { $0.typedRecordsVersion == 0 }
+        )
+        guard let entries = try? context.fetch(descriptor), !entries.isEmpty else { return }
+
+        for entry in entries {
+            entry.materializeTypedRecordsIfNeeded()
+        }
+        context.saveChanges()
+        Logger.data.info("Typed-records migration materialized \(entries.count, privacy: .public) entries")
     }
 }
 
@@ -109,6 +136,9 @@ enum ChillMateSchemaV1: VersionedSchema {
     static var models: [any PersistentModel.Type] {
         [
             NightEntry.self,
+            LoggedSubstanceRecord.self,
+            PartnerDetailRecord.self,
+            TriggerTagRecord.self,
             UserProfile.self,
             STDTestRecord.self,
             DrugDoseTimerRecord.self,

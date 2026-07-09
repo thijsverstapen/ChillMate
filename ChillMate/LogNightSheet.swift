@@ -256,8 +256,8 @@ struct LogNightSheet: View {
                         UIApplication.shared.open(url)
                     }
                 }
-                Button("Call 112") {
-                    guard let url = URL(string: "tel://112") else { return }
+                Button("Call \(EmergencyContactInfo.number)") {
+                    guard let url = EmergencyContactInfo.dialURL else { return }
                     UIApplication.shared.open(url)
                 }
                 Button("I'm okay for now", role: .cancel) { }
@@ -1026,7 +1026,7 @@ private struct MemoryGapProtocolCard: View {
             }
         }
         .alert("Do you want to reach out for help?", isPresented: $showSafetyCheck) {
-            Button("Call 112", role: .destructive) { call("112") }
+            Button("Call \(EmergencyContactInfo.number)", role: .destructive) { call(EmergencyContactInfo.number) }
             if !trustedContactPhone.isEmpty {
                 Button("Call trusted contact") { call(trustedContactPhone) }
             }

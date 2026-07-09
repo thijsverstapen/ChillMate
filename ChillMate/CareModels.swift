@@ -12,6 +12,10 @@ final class STDTestRecord {
     var foundSTIsData: Data = Data("[]".utf8)
     var notes: String = ""
     var createdAt: Date = Date.now
+    /// Optional downsampled JPEG of the result document/screenshot, stored inline
+    /// (matches the app's existing inline-image pattern). Optional keeps it
+    /// CloudKit-compatible and backward-compatible with older records.
+    var resultPhotoData: Data?
 
     init(
         id: UUID = UUID(),
@@ -21,7 +25,8 @@ final class STDTestRecord {
         analResult: STDResultStatus = .pending,
         foundSTIs: [String] = [],
         notes: String = "",
-        createdAt: Date = .now
+        createdAt: Date = .now,
+        resultPhotoData: Data? = nil
     ) {
         self.id = id
         self.testDate = testDate
@@ -31,6 +36,7 @@ final class STDTestRecord {
         self.foundSTIsData = Self.encode(foundSTIs)
         self.notes = notes
         self.createdAt = createdAt
+        self.resultPhotoData = resultPhotoData
     }
 
     var foundSTIs: [String] {

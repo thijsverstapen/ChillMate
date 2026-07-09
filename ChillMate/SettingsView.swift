@@ -104,6 +104,28 @@ struct SettingsView: View {
     @AppStorage("watchVisibleTimers") private var watchVisibleTimers = true
     @AppStorage("watchStressAndTemperatureDetection") private var watchStressAndTemperatureDetection = false
     @AppStorage("autoLockMinutes") private var autoLockMinutes = 0
+    @AppStorage("screenPrivacyEnabled") private var screenPrivacyEnabled = true
+    @AppStorage("safetyCheckInsEnabled") private var safetyCheckInsEnabled = false
+    @AppStorage("checkInHour") private var checkInHour = 10
+    @AppStorage("checkInMinute") private var checkInMinute = 0
+
+    private var checkInTimeBinding: Binding<Date> {
+        Binding {
+            Calendar.current.date(
+                bySettingHour: min(max(checkInHour, 0), 23),
+                minute: min(max(checkInMinute, 0), 59),
+                second: 0,
+                of: .now
+            ) ?? .now
+        } set: { newDate in
+            let comps = Calendar.current.dateComponents([.hour, .minute], from: newDate)
+            checkInHour = comps.hour ?? 10
+            checkInMinute = comps.minute ?? 0
+            if notificationsEnabled {
+                NotificationService.shared.scheduleCheckInReminder()
+            }
+        }
+    }
     @AppStorage("weeklyDigestEnabled") private var weeklyDigestEnabled = false
     @AppStorage("stiReminderEnabled") private var stiReminderEnabled = false
     @AppStorage("stiReminderMonths") private var stiReminderMonths = 3
@@ -244,6 +266,13 @@ struct SettingsView: View {
                     NotificationService.shared.clearSTIReminder()
                 }
             }
+            // Push Apple Watch preference changes immediately (previously they
+            // only reached the watch once, at session activation).
+            .onChange(of: watchHydrationReminders) { _, _ in WatchConnectivityService.shared.sendSettings() }
+            .onChange(of: watchHeartRateWarnings) { _, _ in WatchConnectivityService.shared.sendSettings() }
+            .onChange(of: watchBreathingHaptics) { _, _ in WatchConnectivityService.shared.sendSettings() }
+            .onChange(of: watchDiscreetCheckIns) { _, _ in WatchConnectivityService.shared.sendSettings() }
+            .onChange(of: watchVisibleTimers) { _, _ in WatchConnectivityService.shared.sendSettings() }
             .endEditingOnTap()
     }
 
@@ -289,6 +318,13 @@ struct SettingsView: View {
 
                         AutoLockTimeoutCard(selectedMinutes: $autoLockMinutes)
 
+                        SettingsToggleCard(
+                            title: String(localized: "Hide contents from screenshots"),
+                            caption: String(localized: "Cover the app in the App Switcher and while your screen is being recorded or mirrored, so a quick glance never reveals your log."),
+                            symbol: "eye.slash.fill",
+                            isOn: $screenPrivacyEnabled
+                        )
+
                         EncryptionInfoCard()
 
                     case .privacyDashboard:
@@ -320,11 +356,20 @@ struct SettingsView: View {
                         )
 
                         SettingsToggleCard(
+                            title: String(localized: "Safety check-ins during sessions"),
+                            caption: String(localized: "While a dose timer is running, send more noticeable check-ins with a one-tap way to reach your trusted contact or emergency services if something feels wrong."),
+                            symbol: "shield.lefthalf.filled",
+                            isOn: $safetyCheckInsEnabled
+                        )
+
+                        SettingsToggleCard(
                             title: String(localized: "Daily affirmations"),
                             caption: String(localized: "Send a small confidence boost for recovery, substance-free days, and strong daily scores."),
                             symbol: "sparkles",
                             isOn: $dailyAffirmationsEnabled
                         )
+
+                        CheckInTimeCard(time: checkInTimeBinding)
 
                         SettingsToggleCard(
                             title: String(localized: "Discreet notification text"),
@@ -1045,6 +1090,39 @@ private struct AutoLockTimeoutCard: View {
             }
             .pickerStyle(.menu)
             .tint(Color.chillPrimary)
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+    }
+}
+
+private struct CheckInTimeCard: View {
+    @Binding var time: Date
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: "clock.badge.checkmark.fill")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(Color.chillPrimary)
+                .frame(width: 42, height: 42)
+                .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.10))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Daily check-in time")
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+
+                Text("When the private daily reminder arrives.")
+                    .font(.caption)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 8)
+
+            DatePicker("Daily check-in time", selection: $time, displayedComponents: [.hourAndMinute])
+                .labelsHidden()
+                .tint(Color.chillPrimary)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
@@ -2128,6 +2206,20 @@ private enum AccountDataDeletion {
         let entries = try context.fetch(FetchDescriptor<NightEntry>())
         for entry in entries {
             context.delete(entry)
+        }
+
+        // Cascade removes children attached to the entries above, but a CloudKit
+        // sync can briefly leave child records whose parent hasn't imported (or was
+        // deleted elsewhere). Sweep them explicitly: partner records carry names and
+        // phone numbers, so none may survive "Delete all data".
+        for substanceRecord in try context.fetch(FetchDescriptor<LoggedSubstanceRecord>()) {
+            context.delete(substanceRecord)
+        }
+        for partnerRecord in try context.fetch(FetchDescriptor<PartnerDetailRecord>()) {
+            context.delete(partnerRecord)
+        }
+        for triggerRecord in try context.fetch(FetchDescriptor<TriggerTagRecord>()) {
+            context.delete(triggerRecord)
         }
 
         let profiles = try context.fetch(FetchDescriptor<UserProfile>())

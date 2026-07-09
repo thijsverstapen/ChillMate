@@ -136,6 +136,21 @@ struct OpenEmergencyIntent: AppIntent {
     }
 }
 
+// MARK: - Open Risk Checker
+
+struct OpenRiskCheckerIntent: AppIntent {
+    static let title: LocalizedStringResource = "Check a combination"
+    static let description = IntentDescription("Opens the risk checker in ChillMate to check how substances and medication combine.")
+    static let openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        await MainActor.run {
+            UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: "pendingAppDestination")
+        }
+        return .result()
+    }
+}
+
 // MARK: - Shortcuts Provider
 
 struct ChillMateShortcuts: AppShortcutsProvider {
@@ -198,6 +213,16 @@ struct ChillMateShortcuts: AppShortcutsProvider {
             ],
             shortTitle: "Emergency info",
             systemImageName: "sos.circle.fill"
+        )
+        AppShortcut(
+            intent: OpenRiskCheckerIntent(),
+            phrases: [
+                "Check a combination in \(.applicationName)",
+                "Open the risk checker in \(.applicationName)",
+                "Is this safe to mix in \(.applicationName)"
+            ],
+            shortTitle: "Risk checker",
+            systemImageName: "exclamationmark.shield.fill"
         )
     }
 }

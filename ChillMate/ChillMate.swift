@@ -1,4 +1,5 @@
 import ActivityKit
+import CoreSpotlight
 import SwiftData
 import SwiftUI
 import UIKit
@@ -27,11 +28,22 @@ struct ChillMateApp: App {
                 recordAppUse()
                 refreshPrivacyAndNotificationState()
                 WatchConnectivityService.shared.activate()
+                SpotlightService.shared.indexTools()
+                TypedRecordsMigration.runIfNeeded()
+            }
+            .onContinueUserActivity(CSSearchableItemActionType) { activity in
+                guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
+                if id == SpotlightService.riskCheckerItemID {
+                    UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: "pendingAppDestination")
+                } else if id.hasPrefix("journal-") {
+                    UserDefaults.standard.set(NotificationDestination.journal.rawValue, forKey: "pendingAppDestination")
+                }
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     recordAppUse()
                     refreshLiveActivities()
+                    WatchConnectivityService.shared.syncStandaloneState()
                 }
 
                 refreshPrivacyAndNotificationState()
@@ -129,6 +141,10 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
             UserDefaults.standard.set(NotificationDestination.log.rawValue, forKey: "pendingAppDestination")
         case NotificationService.ActionIdentifier.snooze:
             NotificationService.shared.snoozeCurrentCheckIn()
+        case NotificationService.ActionIdentifier.getHelp:
+            UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: "pendingAppDestination")
+        case NotificationService.ActionIdentifier.imSafe:
+            break
         default:
             if let destination = response.notification.request.content.userInfo["destination"] as? String {
                 UserDefaults.standard.set(destination, forKey: "pendingAppDestination")

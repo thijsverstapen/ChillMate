@@ -5,6 +5,11 @@ import WatchConnectivity
 final class WatchConnectivityService: NSObject {
     static let shared = WatchConnectivityService()
 
+    /// Single latest-wins application context. Every `send*` merges into this
+    /// and pushes the whole dictionary, so senders never clobber each other
+    /// (updateApplicationContext keeps only the most recent dict per direction).
+    private var context: [String: Any] = [:]
+
     private override init() {
         super.init()
     }
@@ -16,9 +21,18 @@ final class WatchConnectivityService: NSObject {
         WCSession.default.activate()
     }
 
-    func sendActiveTimers(_ timers: [DrugDoseTimerRecord]) {
-        guard WCSession.default.isReachable || WCSession.default.activationState == .activated else { return }
+    // MARK: - Outbound state
 
+    private func push(_ updates: [String: Any]) {
+        context.merge(updates) { _, new in new }
+        guard WCSession.default.activationState == .activated else { return }
+        if WCSession.default.isReachable {
+            WCSession.default.sendMessage(updates, replyHandler: nil, errorHandler: { _ in })
+        }
+        try? WCSession.default.updateApplicationContext(context)
+    }
+
+    func sendActiveTimers(_ timers: [DrugDoseTimerRecord]) {
         let now = Date.now
         let payload = timers.filter { $0.endsAt > now }.map { timer in
             [
@@ -29,28 +43,59 @@ final class WatchConnectivityService: NSObject {
                 "durationHours": timer.durationHours
             ] as [String: Any]
         }
-
-        let message: [String: Any] = ["timers": payload]
-        if WCSession.default.isReachable {
-            WCSession.default.sendMessage(message, replyHandler: nil)
-        } else {
-            try? WCSession.default.updateApplicationContext(message)
-        }
+        push(["timers": payload])
     }
 
     func sendSettings() {
-        guard WCSession.default.activationState == .activated else { return }
-
-        let settings: [String: Any] = [
-            "watchHydrationReminders": UserDefaults.standard.bool(forKey: "watchHydrationReminders"),
-            "watchBreathingHaptics": UserDefaults.standard.bool(forKey: "watchBreathingHaptics"),
-            "watchDiscreetCheckIns": UserDefaults.standard.bool(forKey: "watchDiscreetCheckIns"),
-            "watchVisibleTimers": UserDefaults.standard.bool(forKey: "watchVisibleTimers"),
-            "watchHeartRateWarnings": UserDefaults.standard.bool(forKey: "watchHeartRateWarnings")
-        ]
-
-        try? WCSession.default.updateApplicationContext(settings)
+        let d = UserDefaults.standard
+        // The app defaults these toggles to `true`; `object(forKey:) as? Bool`
+        // preserves that until the user changes them (plain `bool(forKey:)`
+        // would report false for an unset key).
+        func flag(_ key: String) -> Bool { d.object(forKey: key) as? Bool ?? true }
+        push([
+            "watchHydrationReminders": flag("watchHydrationReminders"),
+            "watchBreathingHaptics": flag("watchBreathingHaptics"),
+            "watchDiscreetCheckIns": flag("watchDiscreetCheckIns"),
+            "watchVisibleTimers": flag("watchVisibleTimers"),
+            "watchHeartRateWarnings": flag("watchHeartRateWarnings")
+        ])
     }
+
+    func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool) {
+        push([
+            "recoveryStreakDays": recoveryStreakDays,
+            "dailyScore": dailyScore,
+            "dailyScoreActive": dailyScoreActive
+        ])
+    }
+
+    func sendTrustedContactAndEmergency() {
+        let d = UserDefaults.standard
+        let name = d.string(forKey: "trustedContactName") ?? ""
+        let phone = d.string(forKey: "trustedContactPhone") ?? ""
+        let override = (d.string(forKey: "localEmergencyNumber") ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let country = d.string(forKey: "country") ?? "Netherlands"
+        let emergency = override.isEmpty ? (country == "United Kingdom" ? "999" : "112") : override
+        push([
+            "trustedContactName": name,
+            "trustedContactPhone": phone,
+            "emergencyNumber": emergency
+        ])
+    }
+
+    func sendLatestHeartRate(_ bpm: Double?) {
+        push(["hasBPM": bpm != nil, "latestBPM": bpm ?? 0])
+    }
+
+    /// Push everything the watch needs that lives outside SwiftData. Called on
+    /// activation and whenever the app becomes active.
+    func syncStandaloneState() {
+        sendSettings()
+        sendTrustedContactAndEmergency()
+    }
+
+    // MARK: - Inbound events
 
     func logHydrationFromWatch() {
         NotificationCenter.default.post(name: .watchDidLogHydration, object: nil)
@@ -59,32 +104,41 @@ final class WatchConnectivityService: NSObject {
     func requestQuickSkipFromWatch() {
         NotificationCenter.default.post(name: .watchDidRequestQuickSkip, object: nil)
     }
+
+    private func handleInbound(_ payload: [String: Any]) {
+        if payload["hydrationLogged"] as? Bool == true { logHydrationFromWatch() }
+        if payload["quickSkipRequested"] as? Bool == true { requestQuickSkipFromWatch() }
+        if payload["sosRequested"] as? Bool == true {
+            NotificationCenter.default.post(name: .watchDidRequestSOS, object: nil)
+        }
+        if let value = payload["setDiscreetCheckIns"] as? Bool {
+            UserDefaults.standard.set(value, forKey: "watchDiscreetCheckIns")
+            sendSettings() // echo the change back so both sides agree
+        }
+    }
 }
 
 extension WatchConnectivityService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard activationState == .activated else { return }
         Task { @MainActor in
-            WatchConnectivityService.shared.sendSettings()
+            WatchConnectivityService.shared.syncStandaloneState()
         }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-        let hydrationLogged = message["hydrationLogged"] as? Bool == true
-        let quickSkipRequested = message["quickSkipRequested"] as? Bool == true
-        Task { @MainActor in
-            if hydrationLogged { WatchConnectivityService.shared.logHydrationFromWatch() }
-            if quickSkipRequested { WatchConnectivityService.shared.requestQuickSkipFromWatch() }
-        }
+        let box = WCInboundBox(dict: message)
+        Task { @MainActor in WatchConnectivityService.shared.handleInbound(box.dict) }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
-        let hydrationLogged = applicationContext["hydrationLogged"] as? Bool == true
-        let quickSkipRequested = applicationContext["quickSkipRequested"] as? Bool == true
-        Task { @MainActor in
-            if hydrationLogged { WatchConnectivityService.shared.logHydrationFromWatch() }
-            if quickSkipRequested { WatchConnectivityService.shared.requestQuickSkipFromWatch() }
-        }
+        let box = WCInboundBox(dict: applicationContext)
+        Task { @MainActor in WatchConnectivityService.shared.handleInbound(box.dict) }
+    }
+
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        let box = WCInboundBox(dict: userInfo)
+        Task { @MainActor in WatchConnectivityService.shared.handleInbound(box.dict) }
     }
 
     nonisolated func sessionDidBecomeInactive(_ session: WCSession) {}
@@ -94,8 +148,13 @@ extension WatchConnectivityService: WCSessionDelegate {
     }
 }
 
+private struct WCInboundBox: @unchecked Sendable {
+    let dict: [String: Any]
+}
+
 extension Notification.Name {
     static let watchDidLogHydration = Notification.Name("ChillMate.watchDidLogHydration")
     static let chillMateRefreshTimers = Notification.Name("ChillMate.refreshTimers")
     static let watchDidRequestQuickSkip = Notification.Name("ChillMate.watchDidRequestQuickSkip")
+    static let watchDidRequestSOS = Notification.Name("ChillMate.watchDidRequestSOS")
 }

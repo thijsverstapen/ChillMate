@@ -113,6 +113,49 @@ final class HealthKitService {
         }
     }
 
+    /// Mirrors an aftercare mood into Apple Health as a State of Mind sample
+    /// (momentary emotion, associated with health). Requests share authorization
+    /// on first use; callers gate on the user's Apple Health sync setting.
+    func saveStateOfMind(date: Date, mood: AftercareMood) async throws {
+        guard isAvailable else {
+            throw HealthKitError.unavailable
+        }
+
+        let type = HKSampleType.stateOfMindType()
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            store.requestAuthorization(toShare: [type], read: []) { success, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                } else if success {
+                    continuation.resume()
+                } else {
+                    continuation.resume(throwing: HealthKitError.authorizationDenied)
+                }
+            }
+        }
+
+        let mapping = Self.stateOfMindMapping(for: mood)
+        let sample = HKStateOfMind(
+            date: date,
+            kind: .momentaryEmotion,
+            valence: mapping.valence,
+            labels: [mapping.label],
+            associations: [.health]
+        )
+        try await store.save(sample)
+    }
+
+    private static func stateOfMindMapping(for mood: AftercareMood) -> (valence: Double, label: HKStateOfMind.Label) {
+        switch mood {
+        case .grounded: (0.6, .calm)
+        case .okay: (0.25, .content)
+        case .tender: (0.0, .sad)
+        case .anxious: (-0.4, .anxious)
+        case .low: (-0.6, .sad)
+        case .overwhelmed: (-0.7, .overwhelmed)
+        }
+    }
+
     func requestSleepReadAuthorization() async throws {
         guard isAvailable else {
             throw HealthKitError.unavailable
