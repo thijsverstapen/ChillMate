@@ -79,6 +79,9 @@ struct ChillMateApp: App {
             NotificationService.shared.scheduleInactivityReminders(from: lastUseDate)
         }
 
+        // Re-apply weekend night safety check-ins (self-gates on the setting).
+        NotificationService.shared.scheduleWeekendSafetyCheckIns()
+
         if dailyAffirmationsEnabled {
             // Regenerate affirmations on-device at most once per day so fresh,
             // personalized text is used when Apple Intelligence is available,

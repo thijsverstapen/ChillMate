@@ -106,6 +106,7 @@ struct SettingsView: View {
     @AppStorage("autoLockMinutes") private var autoLockMinutes = 0
     @AppStorage("screenPrivacyEnabled") private var screenPrivacyEnabled = true
     @AppStorage("safetyCheckInsEnabled") private var safetyCheckInsEnabled = false
+    @AppStorage("weekendSafetyEnabled") private var weekendSafetyEnabled = false
     @AppStorage("checkInHour") private var checkInHour = 10
     @AppStorage("checkInMinute") private var checkInMinute = 0
 
@@ -157,6 +158,10 @@ struct SettingsView: View {
         DailyScorePalette(score: lastDailyRecoveryScore)
     }
 
+    private var watchSettingsFingerprint: [Bool] {
+        [watchHydrationReminders, watchHeartRateWarnings, watchBreathingHaptics, watchDiscreetCheckIns, watchVisibleTimers]
+    }
+
     private var appVersionText: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
@@ -168,61 +173,10 @@ struct SettingsView: View {
             DashboardBackdrop()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                            Text("Settings")
-                                .font(.largeTitle.bold())
-                                .foregroundStyle(palette.heroText)
-
-                            Text("Locks, alerts, look, and your data")
-                                .font(.callout)
-                                .foregroundStyle(palette.heroSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .padding(.top, 8)
-
-                        VStack(spacing: 12) {
-                            ForEach(SettingsSectionPage.allCases) { page in
-                                NavigationLink(value: page) {
-                                    SettingsCategoryCard(page: page)
-                                }
-                                .buttonStyle(ChillPlainButtonStyle())
-                            }
-                        }
-
-                        if isWorking {
-                            HStack(spacing: 10) {
-                                ProgressView()
-                                Text("Checking permissions")
-                                    .font(.footnote.weight(.semibold))
-                            }
-                            .foregroundStyle(Color.chillSecondary)
-                            .padding(16)
-                            .glassSurface(radius: 22, tint: .black.opacity(0.04))
-                        }
-
-                        if let message {
-                            Text(message)
-                                .font(.footnote.weight(.medium))
-                                .foregroundStyle(Color.chillSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .padding(16)
-                                .glassSurface(radius: 22, tint: .black.opacity(0.04))
-                        }
-
-                        Text(appVersionText)
-                            .font(.footnote.weight(.medium))
-                            .foregroundStyle(Color.chillTertiary)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.top, 4)
-                            .accessibilityLabel(Text("App version \(appVersionText)"))
-                    }
-                    .padding(20)
-                    .padding(.bottom, 28)
-                }
+                settingsCategoryList
+            }
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
-            }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -267,13 +221,136 @@ struct SettingsView: View {
                 }
             }
             // Push Apple Watch preference changes immediately (previously they
-            // only reached the watch once, at session activation).
-            .onChange(of: watchHydrationReminders) { _, _ in WatchConnectivityService.shared.sendSettings() }
-            .onChange(of: watchHeartRateWarnings) { _, _ in WatchConnectivityService.shared.sendSettings() }
-            .onChange(of: watchBreathingHaptics) { _, _ in WatchConnectivityService.shared.sendSettings() }
-            .onChange(of: watchDiscreetCheckIns) { _, _ in WatchConnectivityService.shared.sendSettings() }
-            .onChange(of: watchVisibleTimers) { _, _ in WatchConnectivityService.shared.sendSettings() }
+            // only reached the watch once, at session activation). One combined
+            // observer keeps the modifier chain within the type-checker's budget.
+            .onChange(of: watchSettingsFingerprint) { _, _ in WatchConnectivityService.shared.sendSettings() }
             .endEditingOnTap()
+        }
+    }
+
+    @ViewBuilder
+    private var settingsCategoryList: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Settings")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(palette.heroText)
+
+                Text("Locks, alerts, look, and your data")
+                    .font(.callout)
+                    .foregroundStyle(palette.heroSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.top, 8)
+
+            VStack(spacing: 12) {
+                ForEach(SettingsSectionPage.allCases) { page in
+                    NavigationLink(value: page) {
+                        SettingsCategoryCard(page: page)
+                    }
+                    .buttonStyle(ChillPlainButtonStyle())
+                }
+            }
+
+            if isWorking {
+                HStack(spacing: 10) {
+                    ProgressView()
+                    Text("Checking permissions")
+                        .font(.footnote.weight(.semibold))
+                }
+                .foregroundStyle(Color.chillSecondary)
+                .padding(16)
+                .glassSurface(radius: 22, tint: .black.opacity(0.04))
+            }
+
+            if let message {
+                Text(message)
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(16)
+                    .glassSurface(radius: 22, tint: .black.opacity(0.04))
+            }
+
+            Text(appVersionText)
+                .font(.footnote.weight(.medium))
+                .foregroundStyle(Color.chillTertiary)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 4)
+                .accessibilityLabel(Text("App version \(appVersionText)"))
+        }
+        .padding(20)
+        .padding(.bottom, 28)
+    }
+
+    @ViewBuilder
+    private var notificationsSectionContent: some View {
+        SettingsToggleCard(
+            title: String(localized: "Notifications"),
+            caption: String(localized: "Allow private reminders and health check-in warnings."),
+            symbol: "bell.badge.fill",
+            isOn: $notificationsEnabled
+        )
+
+        SettingsToggleCard(
+            title: String(localized: "Safety check-ins during sessions"),
+            caption: String(localized: "While a dose timer is running, send more noticeable check-ins with a one-tap way to reach your trusted contact or emergency services if something feels wrong."),
+            symbol: "shield.lefthalf.filled",
+            isOn: $safetyCheckInsEnabled
+        )
+
+        SettingsToggleCard(
+            title: String(localized: "Weekend night check-ins"),
+            caption: String(localized: "On Friday and Saturday nights (12–6 am), a discreet passive check-in with one-tap “I'm safe” or “Get help”. Sent when a session is most likely."),
+            symbol: "moon.stars.fill",
+            isOn: Binding(
+                get: { weekendSafetyEnabled },
+                set: { newValue in
+                    weekendSafetyEnabled = newValue
+                    if newValue {
+                        NotificationService.shared.scheduleWeekendSafetyCheckIns()
+                    } else {
+                        NotificationService.shared.clearWeekendSafetyCheckIns()
+                    }
+                }
+            )
+        )
+
+        SettingsToggleCard(
+            title: String(localized: "Daily affirmations"),
+            caption: String(localized: "Send a small confidence boost for recovery, substance-free days, and strong daily scores."),
+            symbol: "sparkles",
+            isOn: $dailyAffirmationsEnabled
+        )
+
+        CheckInTimeCard(time: checkInTimeBinding)
+
+        SettingsToggleCard(
+            title: String(localized: "Discreet notification text"),
+            caption: String(localized: "Use vague lock-screen wording and show details only after opening ChillMate."),
+            symbol: "eye.slash.fill",
+            isOn: $discreetNotifications
+        )
+
+        NotificationToneCard(selectedTone: $notificationTone)
+
+        SettingsToggleCard(
+            title: String(localized: "Weekly summary"),
+            caption: String(localized: "Sunday evening digest of your streak, score, and recent logs."),
+            symbol: "calendar.badge.clock",
+            isOn: $weeklyDigestEnabled
+        )
+
+        SettingsToggleCard(
+            title: String(localized: "STI test reminders"),
+            caption: String(localized: "Remind you to get tested on a regular schedule."),
+            symbol: "cross.case.fill",
+            isOn: $stiReminderEnabled
+        )
+
+        if stiReminderEnabled {
+            STIReminderIntervalCard(selectedMonths: $stiReminderMonths)
+        }
     }
 
     @ViewBuilder
@@ -348,55 +425,7 @@ struct SettingsView: View {
                         )
 
                     case .notifications:
-                        SettingsToggleCard(
-                            title: String(localized: "Notifications"),
-                            caption: String(localized: "Allow private reminders and health check-in warnings."),
-                            symbol: "bell.badge.fill",
-                            isOn: $notificationsEnabled
-                        )
-
-                        SettingsToggleCard(
-                            title: String(localized: "Safety check-ins during sessions"),
-                            caption: String(localized: "While a dose timer is running, send more noticeable check-ins with a one-tap way to reach your trusted contact or emergency services if something feels wrong."),
-                            symbol: "shield.lefthalf.filled",
-                            isOn: $safetyCheckInsEnabled
-                        )
-
-                        SettingsToggleCard(
-                            title: String(localized: "Daily affirmations"),
-                            caption: String(localized: "Send a small confidence boost for recovery, substance-free days, and strong daily scores."),
-                            symbol: "sparkles",
-                            isOn: $dailyAffirmationsEnabled
-                        )
-
-                        CheckInTimeCard(time: checkInTimeBinding)
-
-                        SettingsToggleCard(
-                            title: String(localized: "Discreet notification text"),
-                            caption: String(localized: "Use vague lock-screen wording and show details only after opening ChillMate."),
-                            symbol: "eye.slash.fill",
-                            isOn: $discreetNotifications
-                        )
-
-                        NotificationToneCard(selectedTone: $notificationTone)
-
-                        SettingsToggleCard(
-                            title: String(localized: "Weekly summary"),
-                            caption: String(localized: "Sunday evening digest of your streak, score, and recent logs."),
-                            symbol: "calendar.badge.clock",
-                            isOn: $weeklyDigestEnabled
-                        )
-
-                        SettingsToggleCard(
-                            title: String(localized: "STI test reminders"),
-                            caption: String(localized: "Remind you to get tested on a regular schedule."),
-                            symbol: "cross.case.fill",
-                            isOn: $stiReminderEnabled
-                        )
-
-                        if stiReminderEnabled {
-                            STIReminderIntervalCard(selectedMonths: $stiReminderMonths)
-                        }
+                        notificationsSectionContent
 
                     case .iCloud:
                         ICloudBackupCard(

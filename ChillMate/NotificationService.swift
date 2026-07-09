@@ -228,6 +228,55 @@ final class NotificationService {
         center.removePendingNotificationRequests(withIdentifiers: inactivityDays.map { inactivityIdentifier(day: $0) })
     }
 
+    // MARK: - Weekend night safety check-ins
+
+    /// Gentle, passive "you okay?" check-ins during the window when a session is
+    /// most likely and help is hardest to find: the 00:00–06:00 hours of Saturday
+    /// and Sunday (i.e. Friday-night and Saturday-night sessions). Opt-in via
+    /// `weekendSafetyEnabled`; each carries the SAFETY_CHECKIN category's one-tap
+    /// "I'm safe" / "Get help" actions. Self-gates, so callers can fire it freely.
+    func scheduleWeekendSafetyCheckIns() {
+        clearWeekendSafetyCheckIns()
+        guard UserDefaults.standard.bool(forKey: "weekendSafetyEnabled") else { return }
+
+        // Calendar weekday: Sunday = 1 … Saturday = 7. Saturday's early hours are
+        // Friday night; Sunday's early hours are Saturday night. Two soft pings each.
+        let slots: [(weekday: Int, hour: Int, minute: Int)] = [
+            (7, 1, 30), (7, 4, 0),
+            (1, 1, 30), (1, 4, 0)
+        ]
+
+        for (index, slot) in slots.enumerated() {
+            var components = DateComponents()
+            components.weekday = slot.weekday
+            components.hour = slot.hour
+            components.minute = slot.minute
+
+            let content = notificationContent(
+                title: String(localized: "Checking in"),
+                body: String(localized: "Out tonight? Tap if you want support, or let us know you’re safe."),
+                discreetBody: String(localized: "Private check-in available."),
+                destination: .panic,
+                categoryIdentifier: "SAFETY_CHECKIN",
+                interruptionLevel: .passive
+            )
+
+            center.add(UNNotificationRequest(
+                identifier: weekendSafetyIdentifier(index),
+                content: content,
+                trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+            ))
+        }
+    }
+
+    func clearWeekendSafetyCheckIns() {
+        center.removePendingNotificationRequests(withIdentifiers: (0..<4).map(weekendSafetyIdentifier))
+    }
+
+    private func weekendSafetyIdentifier(_ index: Int) -> String {
+        "chillmate.weekendsafety.\(index)"
+    }
+
     func scheduleDailyAffirmations() {
         scheduleDailyAffirmations(using: Self.affirmationMessagePool)
     }
