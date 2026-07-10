@@ -2627,7 +2627,7 @@ private struct ProfileIntroductionView: View {
                 .ignoresSafeArea()
                 .animation(.easeInOut(duration: 0.54), value: currentPage.animation)
 
-            unsafe IntroSlideView(
+            IntroSlideView(
                 page: currentPage,
                 index: activePage,
                 isCompleting: isCompleting,
