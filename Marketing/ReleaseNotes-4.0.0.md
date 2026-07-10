@@ -1,8 +1,8 @@
-# ChillMate 4.0.0 — App Store "What's New"
+# ChillMate 4.0.0: App Store "What's New"
 
 ## English (en-US / en-GB)
 
-ChillMate 4.0.0 — the Apple Watch update.
+ChillMate 4.0.0, the Apple Watch update.
 
 YOUR WRIST IS NOW A SAFETY COMPANION
 • All-new Apple Watch app: your days-clear streak, live dose timers with a gentle tap when the effect window ends, hydration tracking, discreet check-ins and a breathing exercise.
@@ -14,7 +14,7 @@ SAFER SESSIONS
 • The redose reminder now reaches you even when the app is closed.
 
 MADE FOR WHERE YOU LIVE
-• Support directory now also covers the United States, Ireland and Australia — with the right emergency number (911, 999, 000 or 112) everywhere in the app.
+• Support directory now also covers the United States, Ireland and Australia, with the right emergency number (911, 999, 000 or 112) everywhere in the app.
 • Substance information now links to your country's trusted service, like FRANK, drugcom.de, Drogues Info Service, Energy Control, DanceSafe, Drugs.ie and ADF.
 • The Apple Watch app now speaks Dutch, German, French and Spanish.
 
@@ -23,7 +23,7 @@ MORE PRIVACY
 • Choose your own daily check-in time.
 
 UNDERSTAND YOUR PATTERNS
-• Insights: a five-week overview map, your personal-best streak, and how you sleep after clear nights — over 30 or 90 days.
+• Insights: a five-week overview map, your personal-best streak, and how you sleep after clear nights, over 30 or 90 days.
 • Weekly reflection now includes a short private summary written entirely on your iPhone. Nothing leaves your device.
 
 HEALTH & RECORDS
@@ -38,7 +38,7 @@ ALSO
 
 ## Nederlands (nl-NL)
 
-ChillMate 4.0.0 — de Apple Watch-update.
+ChillMate 4.0.0, de Apple Watch-update.
 
 JE POLS IS NU EEN VEILIGHEIDSMAATJE
 • Volledig nieuwe Apple Watch-app: je dagen-schoon-reeks, live dosistimers met een zachte tik als het effectvenster eindigt, hydratatie bijhouden, discrete check-ins en een ademhalingsoefening.
@@ -50,7 +50,7 @@ VEILIGERE SESSIES
 • De bijneem-herinnering bereikt je nu ook als de app gesloten is.
 
 GEMAAKT VOOR WAAR JIJ WOONT
-• De hulpgids dekt nu ook de VS, Ierland en Australië — met overal het juiste alarmnummer (911, 999, 000 of 112).
+• De hulpgids dekt nu ook de VS, Ierland en Australië, met overal het juiste alarmnummer (911, 999, 000 of 112).
 • Middeleninfo linkt nu naar de vertrouwde dienst van jouw land.
 • De Apple Watch-app spreekt nu ook Nederlands, Duits, Frans en Spaans.
 
@@ -59,7 +59,7 @@ MEER PRIVACY
 • Kies zelf je dagelijkse check-in-tijd.
 
 BEGRIJP JE PATRONEN
-• Inzichten: een vijf-weken-overzicht, je persoonlijke record en hoe je slaapt na schone nachten — over 30 of 90 dagen.
+• Inzichten: een vijf-weken-overzicht, je persoonlijke record en hoe je slaapt na schone nachten, over 30 of 90 dagen.
 • De wekelijkse reflectie bevat nu een korte privésamenvatting, volledig op je iPhone gemaakt. Niets verlaat je toestel.
 
 GEZONDHEID & DOSSIER
@@ -74,7 +74,7 @@ EN VERDER
 
 ## Deutsch (de-DE)
 
-ChillMate 4.0.0 — das Apple-Watch-Update.
+ChillMate 4.0.0, das Apple-Watch-Update.
 
 DEIN HANDGELENK ALS SICHERHEITSBEGLEITER
 • Komplett neue Apple-Watch-App: deine Clean-Serie, Live-Dosis-Timer mit sanftem Tippen am Ende des Wirkfensters, Flüssigkeits-Tracking, diskrete Check-ins und eine Atemübung.
@@ -82,11 +82,11 @@ DEIN HANDGELENK ALS SICHERHEITSBEGLEITER
 • Neue Komplikationen: Recovery-Serie oder Live-Countdown direkt auf dem Zifferblatt und im Smart Stack.
 
 SICHERERE SESSIONS
-• Optionale Sicherheits-Check-ins: Während ein Dosis-Timer läuft, werden Check-ins deutlicher — mit "Hilfe holen" und "Mir geht's gut" per Tipp.
+• Optionale Sicherheits-Check-ins: Während ein Dosis-Timer läuft, werden Check-ins deutlicher, mit "Hilfe holen" und "Mir geht's gut" per Tipp.
 • Die Nachlege-Erinnerung erreicht dich jetzt auch bei geschlossener App.
 
 FÜR DEIN LAND GEMACHT
-• Der Hilfe-Bereich deckt jetzt auch die USA, Irland und Australien ab — überall mit der richtigen Notrufnummer (911, 999, 000 oder 112).
+• Der Hilfe-Bereich deckt jetzt auch die USA, Irland und Australien ab, überall mit der richtigen Notrufnummer (911, 999, 000 oder 112).
 • Substanz-Infos verlinken jetzt auf den vertrauenswürdigen Dienst deines Landes, z. B. drugcom.de.
 • Die Apple-Watch-App spricht jetzt Deutsch, Niederländisch, Französisch und Spanisch.
 
@@ -95,12 +95,12 @@ MEHR PRIVATSPHÄRE
 • Wähle deine eigene tägliche Check-in-Zeit.
 
 VERSTEHE DEINE MUSTER
-• Insights: Fünf-Wochen-Übersicht, persönlicher Rekord und dein Schlaf nach cleanen Nächten — über 30 oder 90 Tage.
+• Insights: Fünf-Wochen-Übersicht, persönlicher Rekord und dein Schlaf nach cleanen Nächten, über 30 oder 90 Tage.
 • Die Wochenreflexion enthält jetzt eine kurze private Zusammenfassung, komplett auf deinem iPhone erstellt. Nichts verlässt dein Gerät.
 
 GESUNDHEIT & UNTERLAGEN
 • Deine Nachsorge-Stimmung kann mit Apple Health (State of Mind) synchronisieren; Schlaf wird automatisch übernommen.
-• Füge ein Foto von STI-Testergebnissen hinzu — bei positiven Ergebnissen durch Face ID geschützt.
+• Füge ein Foto von STI-Testergebnissen hinzu, bei positiven Ergebnissen durch Face ID geschützt.
 • Exportiere deine private Zusammenfassung als PDF für den Arztbesuch.
 
 AUSSERDEM
@@ -110,7 +110,7 @@ AUSSERDEM
 
 ## Français (fr-FR)
 
-ChillMate 4.0.0 — la mise à jour Apple Watch.
+ChillMate 4.0.0, la mise à jour Apple Watch.
 
 TON POIGNET DEVIENT UN COMPAGNON DE SÉCURITÉ
 • App Apple Watch entièrement nouvelle : ta série de jours sans conso, des minuteurs de dose en direct avec une petite vibration à la fin de la fenêtre d'effet, le suivi d'hydratation, des points discrets et un exercice de respiration.
@@ -122,7 +122,7 @@ DES SESSIONS PLUS SÛRES
 • Le rappel avant re-dose t'atteint désormais même app fermée.
 
 PENSÉ POUR TON PAYS
-• L'annuaire d'aide couvre désormais aussi les États-Unis, l'Irlande et l'Australie — avec partout le bon numéro d'urgence (911, 999, 000 ou 112).
+• L'annuaire d'aide couvre désormais aussi les États-Unis, l'Irlande et l'Australie, avec partout le bon numéro d'urgence (911, 999, 000 ou 112).
 • Les infos substances renvoient au service de confiance de ton pays, comme Drogues Info Service.
 • L'app Apple Watch parle maintenant français, néerlandais, allemand et espagnol.
 
@@ -131,7 +131,7 @@ PLUS DE CONFIDENTIALITÉ
 • Choisis l'heure de ton point quotidien.
 
 COMPRENDS TES HABITUDES
-• Insights : une vue sur cinq semaines, ton record personnel et ton sommeil après les nuits sans conso — sur 30 ou 90 jours.
+• Insights : une vue sur cinq semaines, ton record personnel et ton sommeil après les nuits sans conso, sur 30 ou 90 jours.
 • La réflexion hebdo inclut un court résumé privé, généré entièrement sur ton iPhone. Rien ne quitte ton appareil.
 
 SANTÉ & DOSSIERS
@@ -146,7 +146,7 @@ ET AUSSI
 
 ## Español (es-ES)
 
-ChillMate 4.0.0 — la actualización de Apple Watch.
+ChillMate 4.0.0, la actualización de Apple Watch.
 
 TU MUÑECA, AHORA UN COMPAÑERO DE SEGURIDAD
 • App de Apple Watch totalmente nueva: tu racha de días sin consumo, temporizadores de dosis en directo con un toque suave al terminar la ventana de efecto, registro de hidratación, controles discretos y un ejercicio de respiración.
@@ -158,7 +158,7 @@ SESIONES MÁS SEGURAS
 • El recordatorio antes de repetir dosis ahora te llega incluso con la app cerrada.
 
 HECHO PARA TU PAÍS
-• La guía de apoyo ahora cubre también EE. UU., Irlanda y Australia — con el número de emergencias correcto (911, 999, 000 o 112) en toda la app.
+• La guía de apoyo ahora cubre también EE. UU., Irlanda y Australia, con el número de emergencias correcto (911, 999, 000 o 112) en toda la app.
 • La información de sustancias enlaza ahora al servicio de confianza de tu país, como Energy Control.
 • La app de Apple Watch ahora habla español, neerlandés, alemán y francés.
 
@@ -167,7 +167,7 @@ MÁS PRIVACIDAD
 • Elige la hora de tu control diario.
 
 ENTIENDE TUS PATRONES
-• Insights: un mapa de cinco semanas, tu récord personal y cómo duermes tras noches sin consumo — en 30 o 90 días.
+• Insights: un mapa de cinco semanas, tu récord personal y cómo duermes tras noches sin consumo, en 30 o 90 días.
 • La reflexión semanal incluye un breve resumen privado, generado por completo en tu iPhone. Nada sale de tu dispositivo.
 
 SALUD Y REGISTROS

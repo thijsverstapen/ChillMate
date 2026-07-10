@@ -1,5 +1,6 @@
 import Contacts
 import ContactsUI
+import CoreMotion
 import PhotosUI
 import StoreKit
 import SwiftData
@@ -1219,10 +1220,16 @@ struct ProfileSetupView: View {
                         .padding(.top, 8)
                         .padding(.bottom, 12)
                     }
+                    // The wizard rises softly into place as the intro dissolves, so the
+                    // two read as one continuous flow rather than a hard cut.
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
                 } else {
                     ProfileIntroductionView {
-                        hasSeenIntroduction = true
+                        withAnimation(.easeInOut(duration: 0.55)) {
+                            hasSeenIntroduction = true
+                        }
                     }
+                    .transition(.opacity)
                 }
             }
             .navigationTitle("")
@@ -2153,7 +2160,7 @@ private struct ProfilePermissionsPage: View {
 
                     PermissionSetupCard(
                         title: String(localized: "Night safety check-ins"),
-                        subtitle: String(localized: "On weekend nights (12–6 am), a discreet “you okay?” with one-tap help."),
+                        subtitle: String(localized: "On weekend nights (12 to 6 am), a discreet “you okay?” with one-tap help."),
                         symbol: "moon.stars.fill",
                         isOn: weekendSafetyEnabled,
                         action: {
@@ -2548,20 +2555,70 @@ struct ProfileSetupMedicationSection: View {
     }
 }
 
-private enum OnboardingSlideDirection { case forward, backward }
+/// Publishes a gently low-passed device tilt so the intro atmosphere can drift with
+/// the phone, adding depth on top of the finger-follow parallax. Simulator reports no
+/// device motion, so this reads as a harmless zero there. Gated behind Reduce Motion
+/// by the caller (updates are never started when motion is off).
+@MainActor
+private final class MotionTilt: ObservableObject {
+    @Published var x: CGFloat = 0
+    @Published var y: CGFloat = 0
+    private let manager = CMMotionManager()
+
+    func start() {
+        guard manager.isDeviceMotionAvailable, !manager.isDeviceMotionActive else { return }
+        manager.deviceMotionUpdateInterval = 1.0 / 30.0
+        manager.startDeviceMotionUpdates(to: .main) { [weak self] motion, _ in
+            guard let self, let motion else { return }
+            let targetX = max(-0.6, min(0.6, CGFloat(motion.attitude.roll)))
+            let targetY = max(-0.6, min(0.6, CGFloat(motion.attitude.pitch - 0.6)))
+            // Low-pass to kill jitter without per-frame animation transactions.
+            self.x = self.x * 0.86 + targetX * 0.14
+            self.y = self.y * 0.86 + targetY * 0.14
+        }
+    }
+
+    func stop() { manager.stopDeviceMotionUpdates() }
+}
 
 @MainActor
 private struct ProfileIntroductionView: View {
     let continueAction: () -> Void
     @State private var activePage = 0
     @State private var isCompleting = false
-    @State private var slideDirection: OnboardingSlideDirection = .forward
     @State private var dragX: CGFloat = 0
+    @State private var nudge: CGFloat = 0
+    @State private var containerWidth: CGFloat = 1
+    @StateObject private var tilt = MotionTilt()
+    @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
+    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
+    @AppStorage("onboardingSwipeHintShown") private var swipeHintShown = false
 
     private let pages = IntroPage.all
     private var currentPage: IntroPage {
         guard activePage < pages.count else { return IntroPage.fallback }
         return pages[activePage]
+    }
+    private var motionOff: Bool { reduceSystemMotion || chillReducedMotion }
+
+    // Drag-coupled morph: which neighbour the finger is pulling toward, and how far.
+    private var dragDirection: Int {
+        if dragX < 0 { return 1 }        // dragging left → next slide
+        if dragX > 0 { return -1 }       // dragging right → previous slide
+        return 0
+    }
+    private var neighborIndex: Int { activePage + dragDirection }
+    private var hasNeighbor: Bool { neighborIndex >= 0 && neighborIndex < pages.count }
+    private var neighborKind: IntroAnimationKind {
+        hasNeighbor ? pages[neighborIndex].animation : currentPage.animation
+    }
+    private var morphT: CGFloat {
+        guard hasNeighbor else { return 0 }
+        return min(1, abs(dragX) / max(containerWidth, 1) * 1.3)
+    }
+    // Resist at the ends (rubber-band) and fold in the one-time swipe nudge.
+    private var effectiveParallax: CGFloat {
+        (hasNeighbor ? dragX : dragX * 0.3) + nudge
     }
 
     var body: some View {
@@ -2574,17 +2631,14 @@ private struct ProfileIntroductionView: View {
                 page: currentPage,
                 index: activePage,
                 isCompleting: isCompleting,
-                parallax: dragX
-            )
-            .id(activePage)
-            .transition(
-                slideDirection == .forward
-                    ? .asymmetric(
-                        insertion: .move(edge: .trailing).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity))
-                    : .asymmetric(
-                        insertion: .move(edge: .leading).combined(with: .opacity),
-                        removal: .move(edge: .trailing).combined(with: .opacity))
+                parallax: effectiveParallax,
+                activeKind: currentPage.animation,
+                neighborKind: neighborKind,
+                morphT: morphT,
+                tiltX: motionOff ? 0 : tilt.x,
+                tiltY: motionOff ? 0 : tilt.y,
+                showSkip: activePage < pages.count - 1 && !isCompleting,
+                onSkip: finish
             )
             .ignoresSafeArea()
             .scaleEffect(isCompleting ? 1.09 : 1)
@@ -2603,6 +2657,13 @@ private struct ProfileIntroductionView: View {
             .offset(y: isCompleting ? 24 : 0)
             .animation(.easeInOut(duration: 0.28), value: isCompleting)
         }
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { containerWidth = geo.size.width }
+                    .onChange(of: geo.size.width) { _, newWidth in containerWidth = newWidth }
+            }
+        )
         .gesture(
             DragGesture(minimumDistance: 18)
                 .onChanged { val in
@@ -2616,21 +2677,46 @@ private struct ProfileIntroductionView: View {
                 }
         )
         .sensoryFeedback(.impact(weight: .light), trigger: activePage)
+        .sensoryFeedback(trigger: isCompleting) { _, completing in
+            completing ? .impact(weight: .heavy) : nil
+        }
+        .onAppear {
+            if !motionOff { tilt.start() }
+            armSwipeHint()
+        }
+        .onDisappear { tilt.stop() }
+    }
+
+    // One-time nudge on first launch: the slide drifts a few points and springs back,
+    // signalling that it can be swiped. Reuses the parallax channel so hero, text, and
+    // atmosphere all lean together, exactly like a real drag.
+    private func armSwipeHint() {
+        guard !swipeHintShown, !motionOff else { return }
+        swipeHintShown = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.55)) { nudge = -24 }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.44) {
+                withAnimation(.spring(response: 0.62, dampingFraction: 0.7)) { nudge = 0 }
+            }
+        }
     }
 
     private func advance() {
         if activePage == pages.count - 1 {
-            withAnimation(.spring(response: 0.56, dampingFraction: 0.82)) { isCompleting = true }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { continueAction() }
+            finish()
         } else {
-            slideDirection = .forward
             withAnimation(.spring(response: 0.44, dampingFraction: 0.88)) { activePage += 1 }
         }
     }
 
+    private func finish() {
+        guard !isCompleting else { return }
+        withAnimation(.spring(response: 0.56, dampingFraction: 0.82)) { isCompleting = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { continueAction() }
+    }
+
     private func goBack() {
         guard activePage > 0 else { return }
-        slideDirection = .backward
         withAnimation(.spring(response: 0.44, dampingFraction: 0.88)) { activePage -= 1 }
     }
 }
@@ -2711,29 +2797,38 @@ private struct OnboardingProgress: View {
     let index: Int
     let count: Int
 
+    // A thin bar that fills as you move through the intro, with faint ticks marking
+    // each screen so the length reads at a glance ("four short screens").
     var body: some View {
-        HStack(spacing: 7) {
-            ForEach(0..<count, id: \.self) { item in
-                ZStack {
-                    if item == index {
-                        Capsule()
-                            .fill(LinearGradient.chillBrand)
-                            .frame(width: 32, height: 5)
-                        Capsule()
-                            .fill(Color.chillPrimary)
-                            .frame(width: 32, height: 5)
-                            .blur(radius: 7)
-                            .opacity(0.60)
-                    } else {
-                        Capsule()
-                            .fill(.white.opacity(0.28))
-                            .frame(width: 8, height: 5)
+        let fraction = CGFloat(index + 1) / CGFloat(max(count, 1))
+        GeometryReader { geo in
+            let width = geo.size.width
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(.white.opacity(0.16))
+                    .frame(height: 5)
+
+                Capsule()
+                    .fill(LinearGradient.chillBrand)
+                    .frame(width: max(14, width * fraction), height: 5)
+                    .shadow(color: Color.chillPrimary.opacity(0.55), radius: 8)
+
+                if count > 1 {
+                    HStack(spacing: 0) {
+                        ForEach(1..<count, id: \.self) { _ in
+                            Spacer(minLength: 0)
+                            Rectangle()
+                                .fill(Color.chillDarkBackground.opacity(0.55))
+                                .frame(width: 2, height: 5)
+                        }
+                        Spacer(minLength: 0)
                     }
                 }
-                .shadow(color: item == index ? Color.chillPrimary.opacity(0.55) : .clear, radius: 9)
             }
         }
-        .animation(.spring(response: 0.36, dampingFraction: 0.76), value: index)
+        .frame(height: 5)
+        .frame(maxWidth: 210)
+        .animation(.spring(response: 0.44, dampingFraction: 0.82), value: index)
         .accessibilityLabel("Onboarding page \(index + 1) of \(count)")
     }
 }
@@ -2745,9 +2840,9 @@ private struct IntroPage {
     let animation: IntroAnimationKind
 
     static let fallback = IntroPage(
-        eyebrow: String(localized: "Your overview"),
-        title: String(localized: "Your last 3 months, at a glance"),
-        subtitle: String(localized: "See Chills, sleep, substances, and aftercare in one private overview. After your first log, the app's mood gently follows your wellbeing score."),
+        eyebrow: String(localized: "Track privately"),
+        title: String(localized: "Your last 3 months, in one\u{00A0}place"),
+        subtitle: String(localized: "Log the parts you want to remember, like sleep, substances, and aftercare. Then see your Chills, patterns, and wellbeing score in one private overview."),
         animation: .summary
     )
 
@@ -2760,34 +2855,16 @@ private struct IntroPage {
         ),
         fallback,
         IntroPage(
-            eyebrow: String(localized: "Log a Chill"),
-            title: String(localized: "Save the parts you want to remember"),
-            subtitle: String(localized: "Add time, sleep, substances, condoms, partners, and location when that context matters."),
-            animation: .log
-        ),
-        IntroPage(
             eyebrow: String(localized: "Your tools"),
             title: String(localized: "Grouped by the moment"),
             subtitle: String(localized: "Everything sits under four moments: plan before you go, stay safe while you’re out, check in with aftercare and health, then see your patterns. The one you need rises to the top."),
             animation: .care
         ),
         IntroPage(
-            eyebrow: String(localized: "Privacy & quick hide"),
-            title: String(localized: "Private, locked, quick to hide"),
-            subtitle: String(localized: "Lock ChillMate with Face ID or a PIN and keep local data encrypted on this iPhone. The red stop button on Home instantly hides the screen; tap it to resume."),
+            eyebrow: String(localized: "Private and honest"),
+            title: String(localized: "Private, locked, and honest"),
+            subtitle: String(localized: "Lock ChillMate with Face ID or a PIN, keep everything encrypted on this iPhone, and hide the screen in one tap. It offers reflection and safety information from verified sources. It is not medical advice."),
             animation: .privacy
-        ),
-        IntroPage(
-            eyebrow: String(localized: "Information & liability"),
-            title: String(localized: "Reflection, not medical advice"),
-            subtitle: String(localized: "Information here comes from verified, official sources, updated over time as they change. It is not medical advice. ChillMate and its maker are not liable for how it is used."),
-            animation: .notice
-        ),
-        IntroPage(
-            eyebrow: String(localized: "Ready"),
-            title: String(localized: "Set up your private profile"),
-            subtitle: String(localized: "Add only what feels useful. You can change everything later."),
-            animation: .ready
         )
     ]
 }
@@ -2808,6 +2885,13 @@ private struct IntroSlideView: View {
     let index: Int
     let isCompleting: Bool
     var parallax: CGFloat = 0
+    var activeKind: IntroAnimationKind = .welcome
+    var neighborKind: IntroAnimationKind = .welcome
+    var morphT: CGFloat = 0
+    var tiltX: CGFloat = 0
+    var tiltY: CGFloat = 0
+    var showSkip: Bool = false
+    var onSkip: (() -> Void)? = nil
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
     @AppStorage("chillReducedMotion") private var chillReducedMotion = false
     @State private var checkmarkInPlace = false
@@ -2816,7 +2900,7 @@ private struct IntroSlideView: View {
     var body: some View {
         GeometryReader { proxy in
             let topPadding = max(proxy.safeAreaInsets.top + 16, 58)
-            let heroHeight = min(max(proxy.size.height * 0.34, 230), 330)
+            let heroHeight = min(max(proxy.size.height * 0.32, 220), 310)
 
             TimelineView(.animation) { ctx in
                 let rawPhase = ctx.date.timeIntervalSinceReferenceDate
@@ -2828,30 +2912,35 @@ private struct IntroSlideView: View {
                 ZStack {
                     IntroAtmosphere(kind: page.animation, index: index, phase: phase)
                         .ignoresSafeArea()
-                        .offset(x: pOffset * 0.05)
+                        .offset(x: pOffset * 0.05 + tiltX * 26, y: tiltY * 20)
 
                     VStack(alignment: .leading, spacing: 0) {
-                        OnboardingTopBar(checkmarkInPlace: checkmarkInPlace || isCompleting)
-                            .padding(.horizontal, 24)
-                            .padding(.top, topPadding)
+                        OnboardingTopBar(
+                            checkmarkInPlace: checkmarkInPlace || isCompleting,
+                            showSkip: showSkip,
+                            onSkip: onSkip
+                        )
+                        .padding(.horizontal, 24)
+                        .padding(.top, topPadding)
 
                         Spacer(minLength: 14)
 
-                        IntroHeroScene(
-                            kind: page.animation,
+                        MorphingIntroHero(
+                            activeKind: activeKind,
+                            neighborKind: neighborKind,
+                            morphT: morphT,
                             phase: phase,
                             isCompleting: isCompleting,
-                            checkmarkInPlace: checkmarkInPlace || isCompleting,
-                            pageIndex: index
+                            checkmarkInPlace: checkmarkInPlace || isCompleting
                         )
                         .frame(maxWidth: .infinity)
                         .frame(height: heroHeight)
                         .scaleEffect(isCompleting ? 1.16 : 1)
                         .blur(radius: isCompleting ? 6 : 0)
                         .animation(.spring(response: 0.56, dampingFraction: 0.76), value: isCompleting)
-                        .offset(x: pOffset * 0.16)
+                        .offset(x: pOffset * 0.16 + tiltX * 10, y: tiltY * 8)
 
-                        Spacer(minLength: 0)
+                        Spacer(minLength: 28)
 
                         IntroTextBlock(page: page, isVisible: textVisible)
                             .padding(.horizontal, 24)
@@ -2864,6 +2953,7 @@ private struct IntroSlideView: View {
             }
         }
         .onAppear { armEntrance() }
+        .onChange(of: index) { _, _ in armEntrance() }
     }
 
     private func armEntrance() {
@@ -2880,14 +2970,32 @@ private struct IntroSlideView: View {
 
 private struct OnboardingTopBar: View {
     let checkmarkInPlace: Bool
+    var showSkip: Bool = false
+    var onSkip: (() -> Void)? = nil
 
     var body: some View {
         HStack(alignment: .center, spacing: 14) {
             ChillMateIntroWordmark(checkmarkInPlace: checkmarkInPlace)
 
             Spacer(minLength: 12)
+
+            if showSkip, let onSkip {
+                Button(action: onSkip) {
+                    Text("Skip")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.72))
+                        .padding(.horizontal, 15)
+                        .padding(.vertical, 8)
+                        .background(.white.opacity(0.12), in: Capsule())
+                        .overlay { Capsule().stroke(.white.opacity(0.16), lineWidth: 1) }
+                }
+                .buttonStyle(ChillPlainButtonStyle())
+                .transition(.opacity)
+                .accessibilityLabel("Skip introduction")
+            }
         }
         .frame(height: 42, alignment: .center)
+        .animation(.easeInOut(duration: 0.25), value: showSkip)
     }
 }
 
@@ -3136,6 +3244,62 @@ private struct ChillMateOnboardingLogo: View {
     }
 }
 
+/// A single, persistent hero that morphs between the four intro states, instead of
+/// each slide spawning and discarding its own. It stacks every scene and cross-fades
+/// / scales the active one, so the mark reads as one element transforming through the
+/// story rather than four separate reveals. Reuses the existing `IntroHeroScene`
+/// visuals as morph layers.
+@MainActor
+private struct MorphingIntroHero: View {
+    let activeKind: IntroAnimationKind
+    var neighborKind: IntroAnimationKind = .welcome
+    var morphT: CGFloat = 0
+    let phase: TimeInterval
+    let isCompleting: Bool
+    let checkmarkInPlace: Bool
+
+    private let kinds: [IntroAnimationKind] = [.welcome, .summary, .care, .privacy]
+
+    // `morphT` (0…1) tracks the finger during a swipe, blending the active scene into
+    // the one being dragged toward. At rest it is 0, so the active scene sits at full
+    // and everything else is parked small and transparent. Releasing without committing
+    // springs the parallax back to 0, which unwinds the blend — the morph is reversible.
+    var body: some View {
+        ZStack {
+            ForEach(Array(kinds.enumerated()), id: \.offset) { _, kind in
+                let isActive = kind == activeKind
+                let isNeighbor = kind == neighborKind && neighborKind != activeKind
+                let opacity: Double = isActive
+                    ? Double(1 - morphT)
+                    : (isNeighbor ? Double(morphT) : 0)
+                let scale: CGFloat = isActive
+                    ? (1 - 0.10 * morphT)
+                    : (isNeighbor ? (0.72 + 0.28 * morphT) : 0.72)
+                let rotation: Double = isActive
+                    ? Double(6 * morphT)
+                    : (isNeighbor ? Double(10 * (1 - morphT)) : 10)
+
+                IntroHeroScene(
+                    kind: kind,
+                    phase: phase,
+                    isCompleting: isCompleting && isActive,
+                    checkmarkInPlace: checkmarkInPlace,
+                    // Constant index: the scenes are assembled once and never
+                    // re-enter on page change — the blend above carries the motion.
+                    pageIndex: 0
+                )
+                .opacity(opacity)
+                .scaleEffect(max(0.0001, scale))
+                .rotationEffect(.degrees(rotation))
+                .allowsHitTesting(isActive)
+            }
+        }
+        // Only the committed page change springs; the drag-driven blend tracks the
+        // finger directly (no implicit animation on morphT).
+        .animation(.spring(response: 0.62, dampingFraction: 0.74), value: activeKind)
+    }
+}
+
 @MainActor
 private struct IntroHeroScene: View {
     let kind: IntroAnimationKind
@@ -3145,6 +3309,12 @@ private struct IntroHeroScene: View {
     let pageIndex: Int
 
     @State private var appeared = false
+    @State private var careLead: Int? = nil
+    @State private var careTapped = false
+    @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
+    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
+
+    private var careMotionOff: Bool { reduceSystemMotion || chillReducedMotion }
 
     var body: some View {
         ZStack {
@@ -3163,6 +3333,8 @@ private struct IntroHeroScene: View {
         .blur(radius: appeared ? 0 : 10)
         .animation(.spring(response: 0.62, dampingFraction: 0.76).delay(0.04), value: appeared)
         .animation(.spring(response: 0.56, dampingFraction: 0.76), value: isCompleting)
+        // A soft tap the instant a moment is chosen and rises to the top.
+        .sensoryFeedback(.impact(weight: .medium), trigger: careLead)
         .onAppear {
             appeared = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
@@ -3173,6 +3345,18 @@ private struct IntroHeroScene: View {
             appeared = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
                 withAnimation { appeared = true }
+            }
+        }
+    }
+
+    private func selectMoment(_ index: Int) {
+        if careMotionOff {
+            careLead = index
+            careTapped = true
+        } else {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.76)) {
+                careLead = index
+                careTapped = true
             }
         }
     }
@@ -3280,7 +3464,9 @@ private struct IntroHeroScene: View {
     // MARK: – Care: real circular orbit
 
     /// Teaches the four Home "moments" — the same icons, colours, and order the
-    /// user meets on the dashboard — so the layout feels familiar on first open.
+    /// user meets on the dashboard — and lets the user *do* the core Home behaviour
+    /// once: tap the moment you're in, and it rises to the top with a "Now" badge,
+    /// exactly the way the real dashboard rearranges itself.
     private var careScene: some View {
         let moments: [(title: String, symbol: String, tint: Color)] = [
             (String(localized: "Before you go"), "checkmark.shield.fill", .chillSecondaryBlue),
@@ -3288,18 +3474,25 @@ private struct IntroHeroScene: View {
             (String(localized: "Aftercare & health"), "heart.text.square.fill", .chillMint),
             (String(localized: "Your patterns"), "chart.xyaxis.line", .chillPrimary)
         ]
+        // Promote the chosen moment to the top, keeping the rest in their order.
+        let order: [Int] = {
+            guard let lead = careLead else { return Array(moments.indices) }
+            return [lead] + moments.indices.filter { $0 != lead }
+        }()
 
         return ZStack {
-            RoundedRectangle(cornerRadius: 40, style: .continuous)
+            RoundedRectangle(cornerRadius: 38, style: .continuous)
                 .fill(.white.opacity(0.10))
-                .frame(width: 268, height: 272)
+                .frame(width: 288, height: 262)
                 .overlay {
-                    RoundedRectangle(cornerRadius: 40, style: .continuous)
+                    RoundedRectangle(cornerRadius: 38, style: .continuous)
                         .stroke(.white.opacity(0.22), lineWidth: 1.1)
                 }
 
-            VStack(spacing: 12) {
-                ForEach(Array(moments.enumerated()), id: \.offset) { i, moment in
+            VStack(spacing: 8) {
+                ForEach(order, id: \.self) { index in
+                    let moment = moments[index]
+                    let isLead = careLead == index
                     HStack(spacing: 12) {
                         Image(systemName: moment.symbol)
                             .font(.system(size: 17, weight: .bold))
@@ -3311,19 +3504,63 @@ private struct IntroHeroScene: View {
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(.white)
                             .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .minimumScaleFactor(0.7)
 
-                        Spacer(minLength: 0)
+                        Spacer(minLength: 6)
+
+                        if isLead {
+                            Text("Now")
+                                .font(.system(size: 10, weight: .heavy))
+                                .foregroundStyle(moment.tint)
+                                .padding(.horizontal, 7)
+                                .padding(.vertical, 3)
+                                .background(moment.tint.opacity(0.22), in: Capsule())
+                                .fixedSize()
+                                .transition(.scale.combined(with: .opacity))
+                        }
                     }
-                    .frame(width: 212, alignment: .leading)
+                    .padding(.horizontal, 11)
+                    .padding(.vertical, 5)
+                    .background(
+                        RoundedRectangle(cornerRadius: 13, style: .continuous)
+                            .fill(.white.opacity(isLead ? 0.12 : 0.0001))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 13, style: .continuous)
+                                    .stroke(moment.tint.opacity(isLead ? 0.5 : 0), lineWidth: 1.2)
+                            }
+                    )
+                    .frame(width: 240, alignment: .leading)
+                    .contentShape(Rectangle())
                     .opacity(appeared ? 1 : 0)
                     .offset(x: appeared ? 0 : -26)
-                    .animation(.spring(response: 0.52, dampingFraction: 0.78).delay(Double(i) * 0.10 + 0.12), value: appeared)
+                    .animation(.spring(response: 0.52, dampingFraction: 0.78).delay(Double(index) * 0.10 + 0.12), value: appeared)
+                    .onTapGesture { selectMoment(index) }
                 }
+
+                careHint
+                    .frame(width: 240, alignment: .leading)
+                    .padding(.top, 2)
             }
             .offset(y: bob(1, amount: 2.0))
         }
         .shadow(color: Color.chillPrimary.opacity(0.30), radius: 26, y: 14)
+    }
+
+    /// The one-line coach mark under the moments: an invitation before the first tap,
+    /// then a confirmation of what just happened.
+    private var careHint: some View {
+        HStack(spacing: 6) {
+            Image(systemName: careTapped ? "arrow.up" : "hand.tap.fill")
+                .font(.system(size: 11, weight: .bold))
+                .symbolEffect(.pulse, options: careTapped || careMotionOff ? .nonRepeating : .repeating, isActive: !careTapped)
+            Text(careTapped
+                 ? String(localized: "The moment you’re in rises to the top")
+                 : String(localized: "Tap the one you’re in right now"))
+                .font(.system(size: 11, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .foregroundStyle(.white.opacity(0.66))
     }
 
     // MARK: – Privacy: ping rings + face ID

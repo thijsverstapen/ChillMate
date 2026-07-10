@@ -301,7 +301,7 @@ struct SettingsView: View {
 
         SettingsToggleCard(
             title: String(localized: "Weekend night check-ins"),
-            caption: String(localized: "On Friday and Saturday nights (12–6 am), a discreet passive check-in with one-tap “I'm safe” or “Get help”. Sent when a session is most likely."),
+            caption: String(localized: "On Friday and Saturday nights (12 to 6 am), a discreet passive check-in with one-tap “I'm safe” or “Get help”. Sent when a session is most likely."),
             symbol: "moon.stars.fill",
             isOn: Binding(
                 get: { weekendSafetyEnabled },
@@ -1549,7 +1549,7 @@ private struct PINLockCard: View {
                     .font(.headline)
                     .foregroundStyle(Color.chillText)
 
-                Text(isEnabled ? String(localized: "PIN is on. Tap to change.") : String(localized: "Add a 4–8 digit PIN alongside Face ID."))
+                Text(isEnabled ? String(localized: "PIN is on. Tap to change.") : String(localized: "Add a 4 to 8 digit PIN alongside Face ID."))
                     .font(.caption)
                     .foregroundStyle(Color.chillSecondary)
                     .fixedSize(horizontal: false, vertical: true)
