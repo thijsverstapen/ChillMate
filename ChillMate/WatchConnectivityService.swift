@@ -71,12 +71,14 @@ final class WatchConnectivityService: NSObject {
 
     func sendTrustedContactAndEmergency() {
         let d = UserDefaults.standard
-        let name = d.string(forKey: "trustedContactName") ?? ""
-        let phone = d.string(forKey: "trustedContactPhone") ?? ""
-        let override = (d.string(forKey: "localEmergencyNumber") ?? "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        let country = d.string(forKey: "country") ?? "Netherlands"
-        let emergency = override.isEmpty ? (country == "United Kingdom" ? "999" : "112") : override
+        let name = d.string(forKey: DefaultsKey.trustedContactName) ?? ""
+        let phone = d.string(forKey: DefaultsKey.trustedContactPhone) ?? ""
+        // Resolved through EmergencyContactInfo, not re-derived here. The previous
+        // inline copy only special-cased the United Kingdom, so the watch relayed
+        // 112 to users in the United States and Australia — a number that does not
+        // reach emergency services there — on the device most likely to be in reach
+        // during an actual emergency.
+        let emergency = EmergencyContactInfo.resolvedNumber(in: d)
         push([
             "trustedContactName": name,
             "trustedContactPhone": phone,

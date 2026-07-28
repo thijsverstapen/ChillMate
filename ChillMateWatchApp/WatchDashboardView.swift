@@ -501,6 +501,10 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     @Published var latestBPM: Double? = nil
     @Published var trustedContactName = ""
     @Published var trustedContactPhone = ""
+    /// Last number relayed by the phone. Persisted (see `emergencyNumberKey`) so a
+    /// cold watch launch out of range of the phone still dials the user's real
+    /// emergency number instead of falling back to the 112 default — which does not
+    /// reach emergency services in the US or Australia.
     @Published var emergencyNumber = "112"
 
     // Settings mirrored from the phone
@@ -518,12 +522,16 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     private let hydrationCountKey = "watchHydrationCount"
     private let hydrationDayKey = "watchHydrationDay"
     private let quickSkipDayKey = "watchQuickSkipDay"
+    private let emergencyNumberKey = "watchEmergencyNumber"
 
     private override init() {
         super.init()
         rolloverIfNeeded()
         hydrationCount = defaults.integer(forKey: hydrationCountKey)
         quickSkipSentToday = defaults.integer(forKey: quickSkipDayKey) == Self.todayKey
+        if let stored = defaults.string(forKey: emergencyNumberKey), !stored.isEmpty {
+            emergencyNumber = stored
+        }
         activate()
     }
 
@@ -625,7 +633,10 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         if let value = context["dailyScoreActive"] as? Bool { dailyScoreActive = value }
         if let value = context["trustedContactName"] as? String { trustedContactName = value }
         if let value = context["trustedContactPhone"] as? String { trustedContactPhone = value }
-        if let value = context["emergencyNumber"] as? String, !value.isEmpty { emergencyNumber = value }
+        if let value = context["emergencyNumber"] as? String, !value.isEmpty {
+            emergencyNumber = value
+            defaults.set(value, forKey: emergencyNumberKey)
+        }
 
         if let value = context["hasBPM"] as? Bool {
             latestBPM = value ? (context["latestBPM"] as? Double) : nil

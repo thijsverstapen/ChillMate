@@ -57,6 +57,7 @@
 		F88B00000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000015 /* Assets.xcassets */; };
 		F88B00000000000000000005 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000016 /* Localizable.xcstrings */; };
 		F99C00000000000000000002 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F99C00000000000000000001 /* Localizable.xcstrings */; };
+		AAB100000000000000000001 /* DefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000001 /* DefaultsKeys.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -185,6 +186,7 @@
 		F88B00000000000000000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F88B00000000000000000016 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F99C00000000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		AAF100000000000000000001 /* DefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeys.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -275,6 +277,7 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF100000000000000000001 /* DefaultsKeys.swift */,
 				999FB1F12FBCA47E00F3BA3E /* Info.plist */,
 				99C79EAC2FBC8C3200A17BA3 /* ChillMate.entitlements */,
 				A11B00000000000000000011 /* ChillMate.swift */,
@@ -604,6 +607,7 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000001 /* DefaultsKeys.swift in Sources */,
 				A11B00000000000000000001 /* ChillMate.swift in Sources */,
 				A11B00000000000000000002 /* NightEntry.swift in Sources */,
 				A11B00000000000000000003 /* Substance.swift in Sources */,

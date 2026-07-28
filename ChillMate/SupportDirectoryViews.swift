@@ -196,13 +196,9 @@ struct SupportResource: Identifiable {
     }
 
     /// Primary emergency number for the country (112 across the EU, 999 UK, 911 US, 000 AU).
+    /// Delegates to `EmergencyContactInfo` so there is exactly one such table in the app.
     static func emergencyNumber(for country: String) -> String {
-        switch country {
-        case "United Kingdom": return "999"
-        case "United States": return "911"
-        case "Australia": return "000"
-        default: return "112"
-        }
+        EmergencyContactInfo.number(forCountry: country)
     }
 
     /// Fallback label for the non-urgent sexual-health contact when the user has

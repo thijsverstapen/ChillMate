@@ -7,25 +7,57 @@ import SwiftUI
 // them here is behavior-preserving.
 
 /// Country-aware emergency-services number, honoring the user's manual override.
-/// Every supported country uses 112 except the United Kingdom (999); 112 also
-/// works EU-wide as a fallback. Readable from any view or service.
+///
+/// THE single source of truth for "what number does this user dial". Everything —
+/// the phone UI, the watch relay, the support directory — resolves through here.
+///
+/// It used to be three separate implementations, and the copy in
+/// `WatchConnectivityService` only special-cased the United Kingdom, so the watch
+/// relayed 112 to users in the United States and Australia. 112 does not reach
+/// emergency services in the US. That bug traced directly back to the doc comment
+/// that used to sit here, which claimed every supported country but the UK uses
+/// 112 while the code below already handled US and AU correctly.
+///
+/// The country codes are the exact strings the country picker stores.
 enum EmergencyContactInfo {
-    static var number: String {
-        let defaults = UserDefaults.standard
-        let override = (defaults.string(forKey: "localEmergencyNumber") ?? "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        if !override.isEmpty { return override }
-        switch defaults.string(forKey: "country") ?? "Netherlands" {
+    /// Pure country → emergency-number lookup, with no UserDefaults access, so it
+    /// is directly testable and safe to call from any target.
+    ///
+    /// 112 is the default: it is the single emergency number across the EU/EEA and
+    /// also connects on GSM networks in most of the rest of the world.
+    static func number(forCountry country: String) -> String {
+        switch country {
         case "United Kingdom": return "999"
         case "United States": return "911"
         case "Australia": return "000"
+        case "Netherlands", "Belgium", "Germany", "Ireland", "France", "Spain": return "112"
         default: return "112"
         }
     }
 
+    /// The user's manual override, trimmed; empty when they have not set one.
+    static func override(in defaults: UserDefaults = .standard) -> String {
+        (defaults.string(forKey: DefaultsKey.localEmergencyNumber) ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// The resolved number: manual override if set, otherwise the country default.
+    static func resolvedNumber(in defaults: UserDefaults = .standard) -> String {
+        let manual = override(in: defaults)
+        if !manual.isEmpty { return manual }
+        return number(forCountry: defaults.string(forKey: DefaultsKey.country) ?? "Netherlands")
+    }
+
+    static var number: String { resolvedNumber() }
+
+    /// Strips a number down to the characters a `tel:` URL accepts.
+    static func dialDigits(_ number: String) -> String {
+        number.filter { $0.isNumber || $0 == "+" }
+    }
+
     /// A `tel://` URL for the resolved emergency number, or nil if malformed.
     static var dialURL: URL? {
-        URL(string: "tel://\(number.filter { $0.isNumber || $0 == "+" })")
+        URL(string: "tel://\(dialDigits(number))")
     }
 }
 
