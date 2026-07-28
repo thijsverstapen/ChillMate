@@ -1303,12 +1303,32 @@ struct ProfileSetupView: View {
                             systemImage: "globe"
                         ) {
                             Picker("Language", selection: $appLanguage) {
-                                Text("English").tag("en")
-                                Text("Nederlands (Dutch)").tag("nl")
-                                Text(verbatim: "Español").tag("es")
-                                Text(verbatim: "Deutsch").tag("de")
-                                Text(verbatim: "Français").tag("fr")
+                                ForEach(AppLanguage.allCases) { language in
+                                    Text(verbatim: language.endonym).tag(language.rawValue)
+                                }
                             }
+                        }
+                        .onChange(of: appLanguage) { _, newValue in
+                            // Writes AppleLanguages, which is what actually selects
+                            // the bundle's .lproj. Without this the picker only
+                            // stored a string nothing read.
+                            guard let language = AppLanguage.matching(newValue) else { return }
+                            LocalizationService.apply(language)
+                        }
+
+                        if LocalizationService.pendingRestart {
+                            // Bundle localization is resolved once at process start,
+                            // so the new language applies on the next launch. Say so
+                            // rather than letting the screen look broken.
+                            Label(
+                                String(localized: "Reopen ChillMate to finish switching language."),
+                                systemImage: "arrow.clockwise"
+                            )
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 10)
                         }
 
                         ProfileSetupRowDivider()
@@ -1317,17 +1337,14 @@ struct ProfileSetupView: View {
                             title: String(localized: "Country"),
                             systemImage: "mappin.and.ellipse"
                         ) {
+                            // Names come from Locale, so they translate with the app
+                            // instead of being hard-coded English. The tag stays the
+                            // English rawValue because it is the persisted key that
+                            // SupportResource and EmergencyContactInfo match on.
                             Picker("Country", selection: $country) {
-                                Text("Netherlands").tag("Netherlands")
-                                Text("Belgium").tag("Belgium")
-                                Text("Germany").tag("Germany")
-                                Text("United Kingdom").tag("United Kingdom")
-                                Text("Ireland").tag("Ireland")
-                                Text("France").tag("France")
-                                Text("Spain").tag("Spain")
-                                Text("United States").tag("United States")
-                                Text("Australia").tag("Australia")
-                                Text("Other").tag("Other")
+                                ForEach(SupportedCountry.allCases) { supported in
+                                    Text(supported.displayName).tag(supported.rawValue)
+                                }
                             }
                         }
 

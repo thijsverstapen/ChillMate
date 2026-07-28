@@ -292,17 +292,21 @@ final class NightEntry {
         hadSex && !skippedNight
     }
 
+    /// Uses a catalog plural rule rather than an inline `count == 1` ternary. The
+    /// previous form hard-coded English "person"/"people", and a two-branch ternary
+    /// cannot express languages with more than two plural categories anyway.
     var partnerSummary: String {
         let count = max(partnerDetails.count, max(1, partnerCount))
-        return "\(count) \(count == 1 ? "person" : "people")"
+        return String(localized: "\(count) person")
     }
 
     var sleepSummary: String {
         guard sleptYet else {
-            return "Sleep not yet logged"
+            return String(localized: "Sleep not yet logged")
         }
 
-        return "\(SleepMood(hours: sleepHours).emoji) \(sleepHours.formatted(.number.precision(.fractionLength(0...1)))) h sleep"
+        let hours = sleepHours.formatted(.number.precision(.fractionLength(0...1)))
+        return "\(SleepMood(hours: sleepHours).emoji) \(String(localized: "\(hours) h sleep"))"
     }
 
     var timeFrameSummary: String {
@@ -319,14 +323,23 @@ final class NightEntry {
         return "\(start) - \(end)"
     }
 
+    /// The four outcomes are whole localized sentences rather than two clauses glued
+    /// with a comma: word order and punctuation between them differ by language.
     var saferSexSummary: String {
         guard hadSex, !skippedNight else {
-            return "No sex recorded"
+            return String(localized: "No sex recorded")
         }
 
-        let condomText = usedCondom ? "Condom used" : "No condom"
-        let penetrationText = wasPenetrated ? "penetrated" : "not penetrated"
-        return "\(condomText), \(penetrationText)"
+        switch (usedCondom, wasPenetrated) {
+        case (true, true):
+            return String(localized: "Condom used, penetrated")
+        case (true, false):
+            return String(localized: "Condom used, not penetrated")
+        case (false, true):
+            return String(localized: "No condom, penetrated")
+        case (false, false):
+            return String(localized: "No condom, not penetrated")
+        }
     }
 
     var hasLocation: Bool {
@@ -340,7 +353,7 @@ final class NightEntry {
         }
 
         guard let locationLatitude, let locationLongitude else {
-            return "No location"
+            return String(localized: "No location")
         }
 
         let latitude = locationLatitude.formatted(.number.precision(.fractionLength(3)))
@@ -516,7 +529,7 @@ struct SexPartnerRecord: Codable, Hashable, Identifiable {
 
     var displayName: String {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? "Unnamed person" : trimmed
+        return trimmed.isEmpty ? String(localized: "Unnamed person") : trimmed
     }
 
     var normalizedPhoneNumber: String {

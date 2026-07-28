@@ -137,7 +137,7 @@ struct AppLockView<Content: View>: View {
         do {
             let success = try await AppAuthenticator.authenticate(reason: String(localized: "Unlock ChillMate"))
             isUnlocked = success
-            message = success ? nil : "Could not unlock ChillMate."
+            message = success ? nil : String(localized: "Could not unlock ChillMate.")
         } catch {
             message = error.localizedDescription
         }
@@ -274,7 +274,7 @@ struct PrivacyCoverView: View {
 enum AppAuthenticator {
     static func authenticate(reason: String) async throws -> Bool {
         let context = LAContext()
-        context.localizedCancelTitle = "Cancel"
+        context.localizedCancelTitle = String(localized: "Cancel")
 
         guard unsafe context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) else {
             throw AppAuthenticationError.unavailable

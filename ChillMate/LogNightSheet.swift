@@ -1266,12 +1266,12 @@ final class LocationLookupService: NSObject, CLLocationManagerDelegate {
             }
         }
 
-        return "Current location"
+        return String(localized: "Current location")
     }
 
     private static func displayName(from namedParts: [String]) -> String {
         guard !namedParts.isEmpty else {
-            return "Current location"
+            return String(localized: "Current location")
         }
 
         let uniqueParts = Array(NSOrderedSet(array: namedParts)) as? [String] ?? namedParts

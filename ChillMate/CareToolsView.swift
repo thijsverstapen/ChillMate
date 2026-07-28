@@ -956,7 +956,7 @@ struct SaferSessionPlanView: View {
 
     private var contactSubtitle: String {
         if trustedContactName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return "Add a trusted contact in Emergency Information."
+            return String(localized: "Add a trusted contact in Emergency Information.")
         }
 
         if trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -1436,10 +1436,12 @@ struct DrugTimerView: View {
 
     private var profileAdjustmentCaption: String {
         guard let profile = profiles.first else {
-            return "Add height and weight in Profile to personalize the reminder window."
+            return String(localized: "Add height and weight in Profile to personalize the reminder window.")
         }
 
-        return "Reminder window adjusted from \(Int(profile.weightKg.rounded())) kg and \(Int(profile.heightCm.rounded())) cm."
+        let kg = Int(profile.weightKg.rounded())
+        let cm = Int(profile.heightCm.rounded())
+        return String(localized: "Reminder window adjusted from \(kg) kg and \(cm) cm.")
     }
 
     private var trackedPeople: [String] {
@@ -3708,9 +3710,9 @@ struct PanicSupportView: View {
                             Text("References")
                                 .font(.headline)
                                 .foregroundStyle(Color.chillText)
-                            Link("Mind: panic attacks and grounding", destination: URL(string: "https://www.mind.org.uk/information-support/types-of-mental-health-problems/anxiety-and-panic-attacks/panic-attacks")!)
-                            Link("NHS: breathing exercises for stress", destination: URL(string: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/")!)
-                            Link("Government.nl: emergency number 112", destination: URL(string: "https://www.government.nl/topics/emergency-number-112")!)
+                            Link(String(localized: "Mind: panic attacks and grounding"), destination: URL(string: "https://www.mind.org.uk/information-support/types-of-mental-health-problems/anxiety-and-panic-attacks/panic-attacks")!)
+                            Link(String(localized: "NHS: breathing exercises for stress"), destination: URL(string: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/")!)
+                            Link(String(localized: "Government.nl: emergency number 112"), destination: URL(string: "https://www.government.nl/topics/emergency-number-112")!)
                         }
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillPrimary)
@@ -4212,7 +4214,7 @@ struct EmergencyCardView: View {
 
     private var medicationText: String {
         guard let profile, !profile.medications.isEmpty else {
-            return "No medication saved"
+            return String(localized: "No medication saved")
         }
         return profile.medications.prefix(4).map { "\($0.name) \($0.dosage)" }.joined(separator: ", ")
     }
@@ -4220,7 +4222,7 @@ struct EmergencyCardView: View {
     private var trustedContactText: String {
         let name = trustedContactName.trimmingCharacters(in: .whitespacesAndNewlines)
         let phone = trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines)
-        if name.isEmpty && phone.isEmpty { return "Not set" }
+        if name.isEmpty && phone.isEmpty { return String(localized: "Not set") }
         if phone.isEmpty { return name }
         return name.isEmpty ? phone : "\(name), \(phone)"
     }

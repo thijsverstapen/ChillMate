@@ -1,0 +1,402 @@
+{
+  "sourceLanguage" : "en",
+  "version" : "1.0",
+  "strings" : {
+    "NSContactsUsageDescription" : {
+      "comment" : "Shown when the user adds a person from Contacts to a log or STI notification.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate kann eine Person aus deinen Kontakten zu einem privaten Eintrag oder einer STI-Benachrichtigung hinzufügen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate can let you add a person from Contacts to a private log or STI warning shortcut."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate puede añadir a una persona de tus contactos a un registro privado o a un aviso de ITS."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate peut ajouter une personne de vos contacts à une entrée privée ou à une alerte IST."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate kan iemand uit je contacten toevoegen aan een privélogboek of een soa-melding."
+          }
+        }
+      }
+    },
+    "NSFaceIDUsageDescription" : {
+      "comment" : "Shown before the first Face ID unlock of the app lock.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate nutzt Face ID, um deine sensiblen Daten zu schützen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate uses Face ID to help protect your sensitive information."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate usa Face ID para ayudar a proteger tu información sensible."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate utilise Face ID pour protéger vos informations sensibles."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate gebruikt Face ID om je gevoelige gegevens te beschermen."
+          }
+        }
+      }
+    },
+    "NSHealthClinicalHealthRecordsShareUsageDescription" : {
+      "comment" : "Shown when requesting access to clinical health records.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate kann Schlafdaten und Angaben zu sexueller Aktivität mit Apple Health synchronisieren, damit dein Tracking nützlicher und persönlicher wird."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate puede sincronizar datos de sueño y registros de actividad sexual con Apple Salud para que tu seguimiento sea más útil y personalizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate peut synchroniser vos données de sommeil et d'activité sexuelle avec Apple Santé pour un suivi plus utile et personnalisé."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate kan slaapgegevens en seksuele activiteit synchroniseren met Apple Gezondheid, zodat je bijhouden nuttiger en persoonlijker wordt."
+          }
+        }
+      }
+    },
+    "NSHealthShareUsageDescription" : {
+      "comment" : "Shown when requesting permission to read from Apple Health.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate kann Schlafdaten und Angaben zu sexueller Aktivität mit Apple Health synchronisieren, damit dein Tracking nützlicher und persönlicher wird."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate puede sincronizar datos de sueño y registros de actividad sexual con Apple Salud para que tu seguimiento sea más útil y personalizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate peut synchroniser vos données de sommeil et d'activité sexuelle avec Apple Santé pour un suivi plus utile et personnalisé."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate kan slaapgegevens en seksuele activiteit synchroniseren met Apple Gezondheid, zodat je bijhouden nuttiger en persoonlijker wordt."
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription" : {
+      "comment" : "Shown when requesting permission to write to Apple Health.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate kann Schlafdaten und Angaben zu sexueller Aktivität mit Apple Health synchronisieren, damit dein Tracking nützlicher und persönlicher wird."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate puede sincronizar datos de sueño y registros de actividad sexual con Apple Salud para que tu seguimiento sea más útil y personalizado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate peut synchroniser vos données de sommeil et d'activité sexuelle avec Apple Santé pour un suivi plus utile et personnalisé."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate kan slaapgegevens en seksuele activiteit synchroniseren met Apple Gezondheid, zodat je bijhouden nuttiger en persoonlijker wordt."
+          }
+        }
+      }
+    },
+    "NSLocationAlwaysAndWhenInUseUsageDescription" : {
+      "comment" : "Shown when requesting location access.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate nutzt deinen Standort nur, wenn du ihn selbst zu einem privaten Eintrag hinzufügst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate uses your location if you choose to add it to a private log entry."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate usa tu ubicación solo si decides añadirla a un registro privado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate utilise votre position uniquement si vous choisissez de l'ajouter à une entrée privée."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate gebruikt je locatie alleen als je die zelf aan een privé-item toevoegt."
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "comment" : "Shown when requesting location access while the app is in use.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate nutzt deinen Standort nur, wenn du ihn selbst zu einem privaten Eintrag hinzufügst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate uses your location if you choose to add it to a private log entry."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate usa tu ubicación solo si decides añadirla a un registro privado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate utilise votre position uniquement si vous choisissez de l'ajouter à une entrée privée."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate gebruikt je locatie alleen als je die zelf aan een privé-item toevoegt."
+          }
+        }
+      }
+    },
+    "Log Chill" : {
+      "comment" : "Home-screen Quick Action title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chill eintragen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Log Chill"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registrar Chill"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noter un Chill"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chill loggen"
+          }
+        }
+      }
+    },
+    "Start Timer" : {
+      "comment" : "Home-screen Quick Action title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timer starten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start Timer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Iniciar temporizador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Démarrer le minuteur"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Timer starten"
+          }
+        }
+      }
+    },
+    "Panic Support" : {
+      "comment" : "Home-screen Quick Action title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soforthilfe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Panic Support"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda urgente"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aide immédiate"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Directe hulp"
+          }
+        }
+      }
+    },
+    "Safe Route Home" : {
+      "comment" : "Home-screen Quick Action title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicher nach Hause"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Safe Route Home"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a casa seguro"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rentrer en sécurité"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veilig naar huis"
+          }
+        }
+      }
+    }
+  }
+}

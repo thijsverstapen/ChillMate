@@ -2902,11 +2902,12 @@ private struct NightStatus: Identifiable {
 
     var detailText: String {
         guard let entry else {
-            return "No entry recorded."
+            return String(localized: "No entry recorded.")
         }
 
         if entry.skippedNight {
-            return "Marked skipped. \(entry.sleepSummary)"
+            let sleep = entry.sleepSummary
+            return String(localized: "Marked skipped. \(sleep)")
         }
 
         let substances = entry.substances.joined(separator: ", ")

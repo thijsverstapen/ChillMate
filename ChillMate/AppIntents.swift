@@ -66,11 +66,11 @@ struct LogSkippedNightIntent: AppIntent {
                 predicate: #Predicate { $0.date >= startOfToday }
             )
             if let existing = try? context.fetch(descriptor), !existing.isEmpty {
-                return "You already have an entry logged for today."
+                return String(localized: "You already have an entry logged for today.")
             }
             context.insert(NightEntry(date: .now, hadSex: false, skippedNight: true, substances: []))
             context.saveChanges()
-            return "Logged a clear night in ChillMate."
+            return String(localized: "Logged a clear night in ChillMate.")
         }
         return .result(value: message)
     }

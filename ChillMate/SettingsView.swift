@@ -984,7 +984,7 @@ struct SettingsView: View {
                 }
             } catch {
                 await MainActor.run {
-                    message = "Could not apply retention: \(error.localizedDescription)"
+                    message = String(localized: "Could not apply retention: \(error.localizedDescription)")
                     isWorking = false
                 }
             }
@@ -1008,7 +1008,7 @@ struct SettingsView: View {
             dismiss()
             return true
         } catch {
-            message = "ChillMate could not delete everything: \(error.localizedDescription)"
+            message = String(localized: "ChillMate could not delete everything: \(error.localizedDescription)")
             isWorking = false
             return false
         }
@@ -1374,10 +1374,11 @@ private struct EncryptedBackupCard: View {
     private var recoveryStatusText: String {
         if lastOnDeviceRecoverySnapshotTimestamp > 0 {
             let date = Date(timeIntervalSince1970: lastOnDeviceRecoverySnapshotTimestamp)
-            return "Automatic encrypted on-device recovery is updated when ChillMate moves to the background. Last update: \(date.formatted(date: .abbreviated, time: .shortened))."
+            let stamp = date.formatted(date: .abbreviated, time: .shortened)
+            return String(localized: "Automatic encrypted on-device recovery is updated when ChillMate moves to the background. Last update: \(stamp).")
         }
 
-        return "Automatic encrypted on-device recovery starts after you have saved local data and the app has moved to the background once."
+        return String(localized: "Automatic encrypted on-device recovery starts after you have saved local data and the app has moved to the background once.")
     }
 
     var body: some View {
@@ -1457,10 +1458,11 @@ private struct ICloudBackupCard: View {
 
         if lastBackupTimestamp > 0 {
             let date = Date(timeIntervalSince1970: lastBackupTimestamp)
-            return "Latest encrypted iCloud backup: \(date.formatted(date: .abbreviated, time: .shortened))."
+            let stamp = date.formatted(date: .abbreviated, time: .shortened)
+            return String(localized: "Latest encrypted iCloud backup: \(stamp).")
         }
 
-        return "Turn this on to keep an encrypted backup in iCloud Drive and restore it from Settings or setup."
+        return String(localized: "Turn this on to keep an encrypted backup in iCloud Drive and restore it from Settings or setup.")
     }
 
     var body: some View {

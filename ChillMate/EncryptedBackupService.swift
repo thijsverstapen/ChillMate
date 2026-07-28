@@ -102,14 +102,15 @@ final class ICloudBackupService {
 
     var statusLine: String {
         guard isAvailable else {
-            return "iCloud Drive is not available on this device."
+            return String(localized: "iCloud Drive is not available on this device.")
         }
 
         if let latest = try? latestBackupDate() {
-            return "Latest encrypted iCloud backup: \(latest.formatted(date: .abbreviated, time: .shortened))."
+            let stamp = latest.formatted(date: .abbreviated, time: .shortened)
+            return String(localized: "Latest encrypted iCloud backup: \(stamp).")
         }
 
-        return "iCloud is ready. No ChillMate backup has been saved yet."
+        return String(localized: "iCloud is ready. No ChillMate backup has been saved yet.")
     }
 
     func saveLatestBackup(localContext: ModelContext) throws -> Date {
@@ -123,7 +124,7 @@ final class ICloudBackupService {
 
         let date = Date.now
         UserDefaults.standard.set(date.timeIntervalSince1970, forKey: "lastICloudBackupTimestamp")
-        UserDefaults.standard.set("Encrypted iCloud backup saved.", forKey: "lastICloudBackupStatus")
+        UserDefaults.standard.set(String(localized: "Encrypted iCloud backup saved."), forKey: DefaultsKey.lastICloudBackupStatus)
         return date
     }
 
@@ -132,7 +133,7 @@ final class ICloudBackupService {
         let data = try Data(contentsOf: url)
         let summary = try EncryptedBackupService.shared.importEncryptedBackupData(data, into: context)
         UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: "lastICloudRestoreTimestamp")
-        UserDefaults.standard.set("Restored \(summary.totalItems) items from iCloud.", forKey: "lastICloudBackupStatus")
+        UserDefaults.standard.set(String(localized: "Restored \(summary.totalItems) items from iCloud."), forKey: DefaultsKey.lastICloudBackupStatus)
         return summary
     }
 
@@ -154,7 +155,7 @@ final class ICloudBackupService {
 
         UserDefaults.standard.removeObject(forKey: "lastICloudBackupTimestamp")
         UserDefaults.standard.removeObject(forKey: "lastICloudRestoreTimestamp")
-        UserDefaults.standard.set("iCloud backups deleted.", forKey: "lastICloudBackupStatus")
+        UserDefaults.standard.set(String(localized: "iCloud backups deleted."), forKey: DefaultsKey.lastICloudBackupStatus)
     }
 
     private func latestBackupURL() throws -> URL {

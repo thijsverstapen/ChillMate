@@ -39,7 +39,9 @@ final class NotificationService {
     private let riskWarningIdentifier = "chillmate.risk.health"
     private let inactivityDays = [7, 14, 21]
     private let affirmationIdentifiers = (1...7).map { "chillmate.affirmation.\($0)" }
-    private let checkInMessages = [
+    /// Computed, not stored: as a stored property these were localized once when the
+    /// singleton was first touched and then frozen for the life of the process.
+    private var checkInMessages: [String] {[
         String(localized: "Pause for a second. How's your body doing right now?"),
         String(localized: "Water. Food. Air. Which one do you need?"),
         String(localized: "You don't have to be doing great. How are you actually feeling?"),
@@ -52,7 +54,7 @@ final class NotificationService {
         String(localized: "If there is chest pain, blue lips, seizure, or someone cannot be woken: call emergency services now."),
         String(localized: "Your boundaries are still yours right now. Nothing has changed that."),
         String(localized: "Check your temperature. Are you warm enough? Too warm? Drink something.")
-    ]
+    ]}
 
     private var pendingSnoozeID: String?
 
@@ -84,31 +86,71 @@ final class NotificationService {
         UserDefaults.standard.integer(forKey: "checkInMinute")
     }
 
-    private func tonedBody(_ body: String, discreetBody: String) -> String {
+    /// Selects the body text for the user's chosen tone.
+    ///
+    /// This used to reshape English text at runtime:
+    ///
+    ///     case .direct:  body.replacingOccurrences(of: "when you are ready",
+    ///                                              with: "now if you can")
+    ///     case .playful: "\(body) Small check, future-you says thanks."
+    ///
+    /// `body` arrives already localized, so the `.direct` substring could never
+    /// match in Dutch, German, French or Spanish — "Direct" silently behaved
+    /// exactly like "Gentle" for every non-English user — and `.playful` welded an
+    /// English sentence onto translated text, producing mixed-language
+    /// notifications. Callers now pass real per-tone translations, and the playful
+    /// suffix is a localized format string rather than concatenation, so languages
+    /// that need it elsewhere in the sentence can place it.
+    private func tonedBody(
+        _ body: String,
+        directBody: String?,
+        playfulBody: String?,
+        discreetBody: String
+    ) -> String {
         switch notificationTone {
         case .gentle:
-            body
+            return body
         case .direct:
-            body.replacingOccurrences(of: "when you are ready", with: "now if you can")
+            return directBody ?? body
         case .minimal:
-            discreetBody
+            return discreetBody
         case .playful:
-            "\(body) Small check, future-you says thanks."
+            if let playfulBody { return playfulBody }
+            return String(
+                format: String(localized: "%@ Small check, future-you says thanks."),
+                body
+            )
         }
     }
 
     private func notificationContent(
         title: String,
         body: String,
+        /// Optional "Direct" phrasing of `body`. Falls back to `body`.
+        directBody: String? = nil,
+        /// Optional "Playful" phrasing of `body`. Falls back to a localized suffix.
+        playfulBody: String? = nil,
         discreetTitle: String = "ChillMate",
-        discreetBody: String = "Private check-in. Open ChillMate for details.",
+        discreetBody: String? = nil,
         destination: NotificationDestination? = nil,
         categoryIdentifier: String? = nil,
         interruptionLevel: UNNotificationInterruptionLevel = .passive
     ) -> UNMutableNotificationContent {
+        // Resolved here rather than as a default argument value: a default is
+        // evaluated at the call site, and as a bare literal this text was never
+        // localized at all.
+        let resolvedDiscreetBody = discreetBody
+            ?? String(localized: "Private check-in. Open ChillMate for details.")
         let content = UNMutableNotificationContent()
         content.title = discreetNotificationsEnabled ? discreetTitle : title
-        content.body = discreetNotificationsEnabled ? discreetBody : tonedBody(body, discreetBody: discreetBody)
+        content.body = discreetNotificationsEnabled
+            ? resolvedDiscreetBody
+            : tonedBody(
+                body,
+                directBody: directBody,
+                playfulBody: playfulBody,
+                discreetBody: resolvedDiscreetBody
+            )
         content.sound = .default
         if let destination {
             content.userInfo = ["destination": destination.rawValue]
@@ -166,6 +208,8 @@ final class NotificationService {
         let content = notificationContent(
             title: String(localized: "Private check-in"),
             body: String(localized: "Add sleep, reflection notes, or a skipped Chill when you are ready."),
+            directBody: String(localized: "Add sleep, reflection notes, or a skipped Chill now if you can."),
+            playfulBody: String(localized: "Sleep, notes, or a skipped Chill? Small check, future-you says thanks."),
             discreetBody: String(localized: "Private check-in available."),
             destination: .home,
             categoryIdentifier: "CHECKIN"
@@ -185,6 +229,8 @@ final class NotificationService {
         let content = notificationContent(
             title: String(localized: "Private check-in"),
             body: String(localized: "Add sleep, reflection notes, or a skipped Chill when you are ready."),
+            directBody: String(localized: "Add sleep, reflection notes, or a skipped Chill now if you can."),
+            playfulBody: String(localized: "Sleep, notes, or a skipped Chill? Small check, future-you says thanks."),
             discreetBody: String(localized: "Private check-in available."),
             destination: .home,
             categoryIdentifier: "CHECKIN"
@@ -210,6 +256,8 @@ final class NotificationService {
             let content = notificationContent(
                 title: String(localized: "Maybe add a private log?"),
                 body: String(localized: "If there was a Chill, skipped Chill, sleep, or aftercare moment, you can add it when you feel ready."),
+                directBody: String(localized: "Add any Chill, skipped Chill, sleep, or aftercare moment now if you can."),
+                playfulBody: String(localized: "Chill, skipped Chill, sleep, aftercare? Small check, future-you says thanks."),
                 discreetBody: String(localized: "Private reminder available."),
                 destination: .home,
                 categoryIdentifier: "CHECKIN"
@@ -970,20 +1018,22 @@ final class NotificationService {
 private extension NotificationService {
     static func riskWarningTitle(count: Int) -> String {
         switch count {
-        case 4...6: return "Worth a quick check-in"
-        case 7...9: return "A pattern worth noticing"
-        default:    return "Health check-in"
+        case 4...6: return String(localized: "Worth a quick check-in")
+        case 7...9: return String(localized: "A pattern worth noticing")
+        default:    return String(localized: "Health check-in")
         }
     }
 
+    /// `count` is interpolated inside the localized string rather than around it, so
+    /// translators can move the number to wherever their language needs it.
     static func riskWarningBody(count: Int) -> String {
         switch count {
         case 4...6:
-            return "You have logged \(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person."
+            return String(localized: "You have logged \(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person.")
         case 7...9:
-            return "ChillMate has logged \(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, sexual-health service, or GP can help, without judgment."
+            return String(localized: "ChillMate has logged \(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, sexual-health service, or GP can help, without judgment.")
         default:
-            return "You have logged \(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, sexual-health service, or counselor can support you."
+            return String(localized: "You have logged \(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, sexual-health service, or counselor can support you.")
         }
     }
 }

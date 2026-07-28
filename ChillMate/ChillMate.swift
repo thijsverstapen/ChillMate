@@ -24,6 +24,10 @@ struct ChillMateApp: App {
             }
             .modelContainer(ChillMateModelContainer.container())
             .preferredColorScheme(.dark)
+            // Dates, numbers and measurements follow the chosen language right away.
+            // Catalog string lookup is bound to the bundle resolved at process start,
+            // so that part lands on the next launch (the picker says so).
+            .environment(\.locale, LocalizationService.selectedLocale)
             .onAppear {
                 recordAppUse()
                 refreshPrivacyAndNotificationState()
@@ -105,6 +109,9 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
+        // Re-assert the stored language override before anything reads a localized
+        // string, so a choice made on a previous run survives.
+        LocalizationService.applyStoredLanguageIfNeeded()
         UNUserNotificationCenter.current().delegate = self
         NotificationService.shared.registerCategories()
         // Required for CloudKit silent-push sync and HealthKit background delivery
