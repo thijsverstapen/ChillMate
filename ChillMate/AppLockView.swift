@@ -19,6 +19,8 @@ struct AppLockView<Content: View>: View {
     @State private var backgroundedAt: Date?
     @State private var showAppSwitcherCover = false
     @State private var isScreenCaptured = false
+    @State private var lockoutRemaining: Int?
+    @State private var lockoutTask: Task<Void, Never>?
 
     private var showPrivacyCover: Bool {
         screenPrivacyEnabled && (showAppSwitcherCover || isScreenCaptured)
@@ -55,6 +57,7 @@ struct AppLockView<Content: View>: View {
                     pinCode: $pinCode,
                     message: message,
                     isAuthenticating: isAuthenticating,
+                    isLockedOut: (lockoutRemaining ?? 0) > 0,
                     unlockWithFaceID: unlockWithFaceID,
                     unlockWithPIN: unlockWithPIN
                 )
@@ -73,55 +76,72 @@ struct AppLockView<Content: View>: View {
 
             isScreenCaptured = screenIsCaptured()
 
+            // A lockout persists across launches, so pick it up again here rather
+            // than presenting a fresh-looking PIN field that silently refuses.
+            if PINThrottle.isLockedOut {
+                startLockoutCountdown()
+            }
+
             if requiresFaceID {
                 await unlockWithFaceID()
             }
         }
-        .onChange(of: scenePhase) { _, newPhase in
-            // Cover the App Switcher snapshot and any backgrounded state so a glance
-            // at open apps never reveals the log. Skipped while the system auth sheet
-            // is up (it briefly makes the scene .inactive).
-            switch newPhase {
-            case .active:
-                showAppSwitcherCover = false
-            default:
-                if !isAuthenticating { showAppSwitcherCover = true }
-            }
-        }
+        .onDisappear { lockoutTask?.cancel() }
         .onReceive(NotificationCenter.default.publisher(for: UIScreen.capturedDidChangeNotification)) { _ in
             isScreenCaptured = screenIsCaptured()
         }
+        // One observer, not two. Two .onChange(of: scenePhase) modifiers on the same
+        // view both fire with no defined relative order, which is a poor way to
+        // sequence "cover the screen" against "decide whether to re-lock".
         .onChange(of: scenePhase) { _, newPhase in
-            // While the Face ID / system auth dialog is on screen the scene briefly
-            // turns .inactive. Ignoring phase changes during authentication, and
-            // only treating a real .background as "the user left the app", prevents
-            // the endless lock → prompt → lock loop behind the Face ID wall.
-            guard lockRequired, !isAuthenticating else { return }
-
-            switch newPhase {
-            case .background:
-                if backgroundedAt == nil { backgroundedAt = .now }
-            case .active:
-                guard let leftAt = backgroundedAt else { return }
-                backgroundedAt = nil
-                let elapsed = Date.now.timeIntervalSince(leftAt)
-                let threshold = Double(autoLockMinutes) * 60
-                if autoLockMinutes == 0 || elapsed >= threshold {
-                    isUnlocked = false
-                    pinCode = ""
-                    if requiresFaceID {
-                        Task { await unlockWithFaceID() }
-                    }
-                }
-            default:
-                break
-            }
+            updatePrivacyCover(for: newPhase)
+            updateLockState(for: newPhase)
         }
         .onChange(of: requiresFaceID) { _, isRequired in
             isUnlocked = !(isRequired || requiresPIN)
         }
         .onChange(of: requiresPIN) { _, isRequired in
             isUnlocked = !(requiresFaceID || isRequired)
+        }
+    }
+
+    /// Covers the App Switcher snapshot and any backgrounded state so a glance at
+    /// open apps never reveals the log. Skipped while the system auth sheet is up
+    /// (it briefly makes the scene .inactive).
+    private func updatePrivacyCover(for phase: ScenePhase) {
+        switch phase {
+        case .active:
+            showAppSwitcherCover = false
+        default:
+            if !isAuthenticating { showAppSwitcherCover = true }
+        }
+    }
+
+    /// While the Face ID / system auth dialog is on screen the scene briefly turns
+    /// .inactive. Ignoring phase changes during authentication, and only treating a
+    /// real .background as "the user left the app", prevents the endless
+    /// lock → prompt → lock loop behind the Face ID wall.
+    private func updateLockState(for phase: ScenePhase) {
+        guard lockRequired, !isAuthenticating else { return }
+
+        switch phase {
+        case .background:
+            if backgroundedAt == nil { backgroundedAt = .now }
+        case .active:
+            guard let leftAt = backgroundedAt else { return }
+            backgroundedAt = nil
+            let elapsed = Date.now.timeIntervalSince(leftAt)
+            let threshold = Double(autoLockMinutes) * 60
+            if autoLockMinutes == 0 || elapsed >= threshold {
+                isUnlocked = false
+                pinCode = ""
+                if PINThrottle.isLockedOut { startLockoutCountdown() }
+                if requiresFaceID {
+                    Task { await unlockWithFaceID() }
+                }
+            }
+        default:
+            break
         }
     }
 
@@ -149,13 +169,53 @@ struct AppLockView<Content: View>: View {
             return
         }
 
+        // Refuse while locked out, so the throttle cannot be bypassed by tapping
+        // faster than the countdown redraws.
+        if let remaining = lockoutRemaining, remaining > 0 {
+            pinCode = ""
+            message = lockoutMessage(remaining)
+            return
+        }
+
         if LocalSecurityService.verifyPINFromKeychain(pinCode) {
+            PINThrottle.recordSuccess()
+            lockoutRemaining = nil
             isUnlocked = true
             pinCode = ""
             message = nil
         } else {
             pinCode = ""
-            message = String(localized: "That PIN did not match.")
+            if PINThrottle.recordFailure() != nil {
+                startLockoutCountdown()
+                message = lockoutMessage(PINThrottle.remainingLockout)
+            } else {
+                let left = PINThrottle.freeAttempts - PINThrottle.failedAttempts
+                message = left > 0
+                    ? String(localized: "That PIN did not match. \(left) attempts left.")
+                    : String(localized: "That PIN did not match.")
+            }
+        }
+    }
+
+    private func lockoutMessage(_ seconds: Int) -> String {
+        seconds >= 60
+            ? String(localized: "Too many attempts. Try again in \(seconds / 60) minutes.")
+            : String(localized: "Too many attempts. Try again in \(seconds) seconds.")
+    }
+
+    /// Ticks the visible countdown once a second while a lockout is running.
+    private func startLockoutCountdown() {
+        lockoutTask?.cancel()
+        lockoutRemaining = PINThrottle.remainingLockout
+        lockoutTask = Task {
+            while !Task.isCancelled, PINThrottle.isLockedOut {
+                lockoutRemaining = PINThrottle.remainingLockout
+                message = lockoutMessage(PINThrottle.remainingLockout)
+                try? await Task.sleep(for: .seconds(1))
+            }
+            guard !Task.isCancelled else { return }
+            lockoutRemaining = nil
+            message = nil
         }
     }
 }
@@ -166,6 +226,7 @@ struct LockScreen: View {
     @Binding var pinCode: String
     let message: String?
     let isAuthenticating: Bool
+    var isLockedOut: Bool = false
     let unlockWithFaceID: () async -> Void
     let unlockWithPIN: () -> Void
 
@@ -214,8 +275,8 @@ struct LockScreen: View {
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                     }
-                    .disabled(pinCode.count < 4)
-                    .opacity(pinCode.count >= 4 ? 1 : 0.55)
+                    .disabled(pinCode.count < 4 || isLockedOut)
+                    .opacity(pinCode.count >= 4 && !isLockedOut ? 1 : 0.55)
                 }
 
                 if requiresFaceID {
@@ -272,16 +333,25 @@ struct PrivacyCoverView: View {
 }
 
 enum AppAuthenticator {
+    /// Authenticates with biometrics, falling back to the device passcode.
+    ///
+    /// This used to evaluate `.deviceOwnerAuthenticationWithBiometrics` only. Five
+    /// failed Face ID attempts lock biometrics out at the system level, so a user
+    /// with Face ID but no app PIN was then shut out of their own health data with
+    /// no way back in. `.deviceOwnerAuthentication` tries biometrics first and
+    /// offers the device passcode when they fail or are unavailable — the same
+    /// guarantee, with a recovery path.
     static func authenticate(reason: String) async throws -> Bool {
         let context = LAContext()
         context.localizedCancelTitle = String(localized: "Cancel")
 
-        guard unsafe context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) else {
+        let policy: LAPolicy = .deviceOwnerAuthentication
+        guard unsafe context.canEvaluatePolicy(policy, error: nil) else {
             throw AppAuthenticationError.unavailable
         }
 
         return try await withCheckedThrowingContinuation { continuation in
-            context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { success, error in
+            context.evaluatePolicy(policy, localizedReason: reason) { success, error in
                 if let error {
                     continuation.resume(throwing: error)
                 } else {
@@ -296,7 +366,8 @@ enum AppAuthenticationError: LocalizedError {
     case unavailable
 
     var errorDescription: String? {
-        String(localized: "Face ID is not available on this device.")
+        // Covers the passcode fallback too, so no longer names Face ID alone.
+        String(localized: "This device has no Face ID, Touch ID, or passcode set up.")
     }
 }
 
@@ -325,7 +396,7 @@ enum LocalSecurityService {
         if let storedHash = keychainRead(account: keychainHashAccount),
            let storedSalt = keychainRead(account: keychainSaltAccount) {
             let inputHash = pbkdf2Hash(pin: pin, salt: storedSalt)
-            if inputHash == storedHash {
+            if constantTimeEquals(inputHash, storedHash) {
                 return true
             }
         }
@@ -488,11 +559,18 @@ enum LocalSecurityService {
         }
     }
 
-    private static func hashPIN(_ pin: String, salt: String) -> String {
-        var data = Data(salt.utf8)
-        data.append(Data(pin.utf8))
-        let digest = SHA256.hash(data: data)
-        return digest.map(\.twoDigitHex).joined()
+    /// Compares two digests without an early exit.
+    ///
+    /// `Data`'s `==` is free to return as soon as it finds a differing byte, so how
+    /// long a rejection takes leaks how much of the digest matched. The window is
+    /// small next to a 200,000-iteration PBKDF2, but the fix is three lines.
+    private static func constantTimeEquals(_ lhs: Data, _ rhs: Data) -> Bool {
+        guard lhs.count == rhs.count else { return false }
+        var difference: UInt8 = 0
+        for (left, right) in zip(lhs, rhs) {
+            difference |= left ^ right
+        }
+        return difference == 0
     }
 
     private static func protectItem(at url: URL) {

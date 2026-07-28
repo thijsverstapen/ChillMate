@@ -113,6 +113,15 @@ final class ICloudBackupService {
         return String(localized: "iCloud is ready. No ChillMate backup has been saved yet.")
     }
 
+    /// How many timestamped archives to keep alongside the "latest" file.
+    ///
+    /// Every backup wrote a new timestamped archive and nothing ever removed them,
+    /// so a user backing up daily filled their iCloud Drive without bound. The only
+    /// cleanup available was `deleteBackups()`, which removes all of them.
+    /// Keeping a handful preserves the point of timestamped copies — rolling back
+    /// past a bad import — without the unbounded growth.
+    private let archiveRetentionCount = 10
+
     func saveLatestBackup(localContext: ModelContext) throws -> Date {
         let directory = try backupDirectory()
         let data = try EncryptedBackupService.shared.encryptedBackupData(localContext: localContext)
@@ -121,6 +130,7 @@ final class ICloudBackupService {
 
         let archiveURL = directory.appendingPathComponent(timestampedFileName())
         try data.write(to: archiveURL, options: [.atomic, .completeFileProtection])
+        pruneArchives(in: directory)
 
         let date = Date.now
         UserDefaults.standard.set(date.timeIntervalSince1970, forKey: "lastICloudBackupTimestamp")
@@ -176,6 +186,27 @@ final class ICloudBackupService {
             .appendingPathComponent(folderName, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         return directory
+    }
+
+    /// Trims timestamped archives to `archiveRetentionCount`, newest kept.
+    ///
+    /// Sorts by the timestamp encoded in the filename rather than by file dates:
+    /// iCloud rewrites modification dates as it syncs, so file metadata is not a
+    /// reliable ordering here. Never touches the "latest" file.
+    private func pruneArchives(in directory: URL) {
+        guard let contents = try? FileManager.default.contentsOfDirectory(
+            at: directory,
+            includingPropertiesForKeys: nil
+        ) else { return }
+
+        let archives = contents
+            .filter { $0.pathExtension == "cmbak" && $0.lastPathComponent != latestFileName }
+            .sorted { $0.lastPathComponent > $1.lastPathComponent }
+
+        guard archives.count > archiveRetentionCount else { return }
+        for url in archives.dropFirst(archiveRetentionCount) {
+            try? FileManager.default.removeItem(at: url)
+        }
     }
 
     private func timestampedFileName() -> String {

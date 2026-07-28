@@ -1,5 +1,14 @@
 import Foundation
+import OSLog
 import WatchConnectivity
+
+extension Logger {
+    /// Shared logger for phone↔watch connectivity.
+    static let watch = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "com.codex.ChillMate",
+        category: "watch"
+    )
+}
 
 @MainActor
 final class WatchConnectivityService: NSObject {
@@ -27,9 +36,20 @@ final class WatchConnectivityService: NSObject {
         context.merge(updates) { _, new in new }
         guard WCSession.default.activationState == .activated else { return }
         if WCSession.default.isReachable {
-            WCSession.default.sendMessage(updates, replyHandler: nil, errorHandler: { _ in })
+            WCSession.default.sendMessage(updates, replyHandler: nil, errorHandler: { error in
+                Logger.watch.error("Watch sendMessage failed: \(error.localizedDescription, privacy: .public)")
+            })
         }
-        try? WCSession.default.updateApplicationContext(context)
+
+        // Errors were swallowed by `try?` and an empty errorHandler. Since `context`
+        // only ever merges and never shrinks, it can grow past
+        // updateApplicationContext's payload limit — at which point the watch
+        // silently stops receiving updates, including the emergency number.
+        do {
+            try WCSession.default.updateApplicationContext(context)
+        } catch {
+            Logger.watch.error("Watch context update failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     func sendActiveTimers(_ timers: [DrugDoseTimerRecord]) {

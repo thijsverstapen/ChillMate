@@ -64,6 +64,7 @@
 		AAB100000000000000000005 /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000005 /* AccessibilityID.swift */; };
 		AAB100000000000000000006 /* ChillMateQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000006 /* ChillMateQueries.swift */; };
 		AAB100000000000000000007 /* BackgroundPhotoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000007 /* BackgroundPhotoStore.swift */; };
+		AAB100000000000000000008 /* PINThrottle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000008 /* PINThrottle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -199,6 +200,7 @@
 		AAF100000000000000000005 /* AccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityID.swift; sourceTree = "<group>"; };
 		AAF100000000000000000006 /* ChillMateQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChillMateQueries.swift; sourceTree = "<group>"; };
 		AAF100000000000000000007 /* BackgroundPhotoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPhotoStore.swift; sourceTree = "<group>"; };
+		AAF100000000000000000008 /* PINThrottle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PINThrottle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -289,6 +291,7 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF100000000000000000008 /* PINThrottle.swift */,
 				AAF100000000000000000007 /* BackgroundPhotoStore.swift */,
 				AAF100000000000000000006 /* ChillMateQueries.swift */,
 				AAF100000000000000000005 /* AccessibilityID.swift */,
@@ -626,6 +629,7 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000008 /* PINThrottle.swift in Sources */,
 				AAB100000000000000000007 /* BackgroundPhotoStore.swift in Sources */,
 				AAB100000000000000000006 /* ChillMateQueries.swift in Sources */,
 				AAB100000000000000000005 /* AccessibilityID.swift in Sources */,

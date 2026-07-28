@@ -23,6 +23,10 @@ enum ChillMateModelContainer {
                 return recoveryContainer
             }
 
+            // Both the CloudKit-backed store and the in-memory recovery store
+            // failed. Log before trapping so the reason survives in the device
+            // console and in a crash report, rather than only the message text.
+            Logger.data.fault("Model container unavailable: \(error.localizedDescription, privacy: .public)")
             fatalError("Unable to create ChillMate model container: \(error.localizedDescription)")
         }
     }

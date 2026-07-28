@@ -16974,34 +16974,6 @@
         }
       }
     },
-    "Face ID is not available on this device.": {
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Face ID ist auf diesem Gerät nicht verfügbar."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Face ID no está disponible en este dispositivo."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Face ID n'est pas disponible sur cet appareil."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Face ID is niet beschikbaar op dit apparaat."
-          }
-        }
-      }
-    },
     "Face ID or PIN before opening.": {
       "localizations": {
         "de": {
@@ -42799,6 +42771,41 @@
         }
       }
     },
+    "That PIN did not match. %lld attempts left.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese PIN stimmt nicht. Noch %lld Versuche."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That PIN did not match. %lld attempts left."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese PIN no coincide. Quedan %lld intentos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce code ne correspond pas. Encore %lld tentatives."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die pincode klopt niet. Nog %lld pogingen."
+          }
+        }
+      }
+    },
     "That didn't send. Please try again.": {
       "localizations": {
         "de": {
@@ -43615,6 +43622,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deze app kan veiligere beslissingen ondersteunen, maar kan geen diagnose stellen, behandelen of spoedeisende of professionele medische zorg vervangen."
+          }
+        }
+      }
+    },
+    "This device has no Face ID, Touch ID, or passcode set up.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf diesem Gerät sind weder Face ID, Touch ID noch ein Code eingerichtet."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device has no Face ID, Touch ID, or passcode set up."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este dispositivo no tiene Face ID, Touch ID ni código configurado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet appareil n'a ni Face ID, ni Touch ID, ni code configuré."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Op dit apparaat is geen Face ID, Touch ID of toegangscode ingesteld."
           }
         }
       }
@@ -44693,6 +44735,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vanavond hoeft niet op vorig weekend te lijken."
+          }
+        }
+      }
+    },
+    "Too many attempts. Try again in %lld minutes.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu viele Versuche. Versuch es in %lld Minuten erneut."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many attempts. Try again in %lld minutes."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demasiados intentos. Inténtalo de nuevo en %lld minutos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trop de tentatives. Réessayez dans %lld minutes."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te veel pogingen. Probeer het over %lld minuten opnieuw."
+          }
+        }
+      }
+    },
+    "Too many attempts. Try again in %lld seconds.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu viele Versuche. Versuch es in %lld Sekunden erneut."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many attempts. Try again in %lld seconds."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demasiados intentos. Inténtalo de nuevo en %lld segundos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trop de tentatives. Réessayez dans %lld secondes."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te veel pogingen. Probeer het over %lld seconden opnieuw."
           }
         }
       }

@@ -1,6 +1,6 @@
 # Privacy Policy — ChillMate
 
-**Last updated: 29 May 2026**
+**Last updated: 28 July 2026**
 **Developer: Thijs Verstappen**
 **Contact: tjw.verstappen@gmail.com**
 
@@ -76,19 +76,39 @@ If you enable check-in or recovery reminders, ChillMate schedules local notifica
 
 ---
 
-## 6. Third-Party Services
+## 6. Apple Watch
+
+If you pair an Apple Watch, ChillMate mirrors a subset of your data to the watch app so it can work when your phone is out of reach. That mirror includes:
+
+- your recovery streak, daily score, and any running dose timers,
+- your watch-specific settings,
+- your emergency number,
+- the **name and phone number of your trusted contact**, so the watch can reach them without your phone.
+
+This transfer happens directly between your phone and your watch over Apple's Watch Connectivity, on your own devices. It does not pass through our servers — we have none.
+
+Two things worth knowing:
+
+- The trusted contact's name and number are another person's details, stored on a second device. Add someone only if they would be comfortable with that.
+- ChillMate's app lock (PIN / Face ID) protects the **phone** app. The watch app is protected by your watch's own passcode and wrist detection, not by ChillMate's lock.
+
+You can remove this mirrored data at any time by clearing your trusted contact in Settings, or by unpairing the watch.
+
+---
+
+## 7. Third-Party Services
 
 ChillMate includes no third-party SDKs, analytics libraries, advertising networks, or social login integrations. The app makes no outbound network requests under normal operation.
 
 ---
 
-## 7. Age Restriction
+## 8. Age Restriction
 
 ChillMate is intended for adults aged 18 and over. It is not directed at children or minors. If you are under 18, please do not use this app.
 
 ---
 
-## 8. Data Deletion
+## 9. Data Deletion
 
 Because all data is stored on your device:
 
@@ -99,19 +119,19 @@ There is no account to close and no server-side data to request deletion of.
 
 ---
 
-## 9. Changes to This Policy
+## 10. Changes to This Policy
 
 If this privacy policy changes materially, the updated policy will be published at this URL and the "Last updated" date at the top will be revised. Continued use of the app after a policy update constitutes acceptance of the revised terms.
 
 ---
 
-## 10. Medical Disclaimer
+## 11. Medical Disclaimer
 
 ChillMate is a private reflection and wellbeing tool. It does **not** diagnose conditions, recommend substance use, provide dosage guidance, or replace professional medical or clinical advice. For urgent health concerns or emergencies, contact local emergency services.
 
 ---
 
-## 11. Contact
+## 12. Contact
 
 Questions about this privacy policy?
 
