@@ -12,7 +12,7 @@ struct LogNightSheet: View {
     @AppStorage("healthKitSleepReadWriteEnabled") private var healthKitSleepReadEnabled = false
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
 
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
 
     @State private var startDate = Date.now
     @State private var endDate = Date.now.addingTimeInterval(60 * 60)

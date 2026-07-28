@@ -62,6 +62,8 @@
 		AAB100000000000000000003 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000003 /* InfoPlist.xcstrings */; };
 		AAB100000000000000000004 /* MotionPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000004 /* MotionPreference.swift */; };
 		AAB100000000000000000005 /* AccessibilityID.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000005 /* AccessibilityID.swift */; };
+		AAB100000000000000000006 /* ChillMateQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000006 /* ChillMateQueries.swift */; };
+		AAB100000000000000000007 /* BackgroundPhotoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000007 /* BackgroundPhotoStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -195,6 +197,8 @@
 		AAF100000000000000000003 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		AAF100000000000000000004 /* MotionPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotionPreference.swift; sourceTree = "<group>"; };
 		AAF100000000000000000005 /* AccessibilityID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityID.swift; sourceTree = "<group>"; };
+		AAF100000000000000000006 /* ChillMateQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChillMateQueries.swift; sourceTree = "<group>"; };
+		AAF100000000000000000007 /* BackgroundPhotoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPhotoStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -285,6 +289,8 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF100000000000000000007 /* BackgroundPhotoStore.swift */,
+				AAF100000000000000000006 /* ChillMateQueries.swift */,
 				AAF100000000000000000005 /* AccessibilityID.swift */,
 				AAF100000000000000000004 /* MotionPreference.swift */,
 				AAF100000000000000000003 /* InfoPlist.xcstrings */,
@@ -620,6 +626,8 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000007 /* BackgroundPhotoStore.swift in Sources */,
+				AAB100000000000000000006 /* ChillMateQueries.swift in Sources */,
 				AAB100000000000000000005 /* AccessibilityID.swift in Sources */,
 				AAB100000000000000000004 /* MotionPreference.swift in Sources */,
 				AAB100000000000000000002 /* LocalizationService.swift in Sources */,

@@ -50,7 +50,12 @@ enum DefaultsKey {
 
     // MARK: Appearance & accessibility
     static let appBackgroundStyle = "appBackgroundStyle"
+    /// Legacy: the background photo as base64 in UserDefaults. Read only by
+    /// `BackgroundPhotoStore.migrateFromUserDefaultsIfNeeded()`, which moves it to a
+    /// file and clears it.
     static let appBackgroundPhotoData = "appBackgroundPhotoData"
+    /// Short fingerprint of the file-backed background photo — no image bytes.
+    static let appBackgroundPhotoFingerprint = "appBackgroundPhotoFingerprint"
     static let highContrastMode = "highContrastMode"
     static let chillReducedMotion = "chillReducedMotion"
 

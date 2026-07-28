@@ -115,6 +115,9 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         // Re-assert the stored language override before anything reads a localized
         // string, so a choice made on a previous run survives.
         LocalizationService.applyStoredLanguageIfNeeded()
+        // Moves any existing base64 background photo out of the UserDefaults plist
+        // and into a protected file. No-op once done.
+        BackgroundPhotoStore.migrateFromUserDefaultsIfNeeded()
         UNUserNotificationCenter.current().delegate = self
         NotificationService.shared.registerCategories()
         // Required for CloudKit silent-push sync and HealthKit background delivery

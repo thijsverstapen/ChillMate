@@ -6,9 +6,9 @@ import SwiftUI
 
 struct PrivateInsightsView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
-    @Query(sort: \JournalEntry.date, order: .reverse) private var journals: [JournalEntry]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentJournalEntries) private var journals: [JournalEntry]
 
     @State private var windowDays = 90
 

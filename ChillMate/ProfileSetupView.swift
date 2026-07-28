@@ -15,7 +15,7 @@ import UniformTypeIdentifiers
 struct AppHomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
     @AppStorage("lastOnDeviceRecoveryStatus") private var lastOnDeviceRecoveryStatus = ""
     @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
     @AppStorage("lastICloudBackupStatus") private var lastICloudBackupStatus = ""

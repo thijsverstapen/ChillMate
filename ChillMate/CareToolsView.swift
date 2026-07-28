@@ -142,8 +142,8 @@ struct CareToolGroupView: View {
 struct STDTestsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var tests: [STDTestRecord]
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentTests) private var tests: [STDTestRecord]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
 
     @State private var testDate = Date.now
     @State private var oralResult: STDResultStatus = .pending
@@ -717,7 +717,7 @@ private struct ResultPickerRow: View {
 struct SaferSessionPlanView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \SaferSessionPlan.createdAt, order: .reverse) private var plans: [SaferSessionPlan]
+    @Query(ChillMateQueries.recentPlansByCreation) private var plans: [SaferSessionPlan]
 
     @AppStorage("trustedContactName") private var trustedContactName = ""
     @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
@@ -1412,8 +1412,8 @@ struct DrugTimerView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @AppStorage("drugTimerTrackedPeople") private var trackedPeopleData = Data("[]".utf8)
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
 
     @State private var selectedSubstance: Substance = .cannabis
     @State private var timerScope: TimerScope = .myself
@@ -2051,8 +2051,8 @@ private struct RedoseNudgeCard: View {
 struct CombinationRiskCheckerView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \RiskCheckRecord.createdAt, order: .reverse) private var riskChecks: [RiskCheckRecord]
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.recentRiskChecks) private var riskChecks: [RiskCheckRecord]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
 
     @State private var selectedSubstances: Set<Substance> = []
     @State private var medicationText = ""
@@ -3052,7 +3052,7 @@ private struct CountrySupportLinksCard: View {
 
 struct AftercareView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
 
     private var trackedEntries: [NightEntry] {
         entries.filter { $0.hadSex && !$0.skippedNight }
@@ -3759,7 +3759,7 @@ struct PanicSupportView: View {
 }
 
 struct SafeRouteHomeView: View {
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
     @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
     @AppStorage("trustedContactMessage") private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
     @State private var destination = ""
@@ -4113,9 +4113,9 @@ private extension LoggedLocation {
 
 struct EmergencyCardView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
     @AppStorage("trustedContactName") private var trustedContactName = ""
     @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
     @AppStorage("emergencyAllergies") private var emergencyAllergies = ""
@@ -4262,7 +4262,7 @@ private struct EmergencyCardLine: View {
 
 struct CravingDelayView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
     @State private var startedAt: Date?
     @State private var isShowingTimer = false
 
@@ -4432,11 +4432,11 @@ private extension Int {
 
 struct SafetyAutopilotView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
-    @Query(sort: \SaferSessionPlan.plannedDate, order: .reverse) private var plans: [SaferSessionPlan]
-    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var stiTests: [STDTestRecord]
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentPlansByDate) private var plans: [SaferSessionPlan]
+    @Query(ChillMateQueries.recentTests) private var stiTests: [STDTestRecord]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
 
     @State private var showHelperSummary = false
     @State private var showCheckingInfo = false
@@ -4858,7 +4858,7 @@ private struct BoundaryPromptField: View {
 
 struct RecoveryModeView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
     @AppStorage("recoveryGoal") private var recoveryGoal = ""
     @AppStorage("recoverySupportPerson") private var supportPerson = ""
     @AppStorage("recoveryCommitment") private var recoveryCommitment = ""
@@ -4930,11 +4930,11 @@ struct RecoveryModeView: View {
 
 struct ProfessionalHelperBridgeView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
-    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var stiTests: [STDTestRecord]
-    @Query(sort: \RiskCheckRecord.createdAt, order: .reverse) private var riskChecks: [RiskCheckRecord]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentTests) private var stiTests: [STDTestRecord]
+    @Query(ChillMateQueries.recentRiskChecks) private var riskChecks: [RiskCheckRecord]
 
     @State private var pdfURL: URL?
 
@@ -5281,11 +5281,11 @@ private struct EvidenceSourcesSection: View {
 
 struct UnifiedTimelineView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
-    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
-    @Query(sort: \SaferSessionPlan.plannedDate, order: .reverse) private var plans: [SaferSessionPlan]
-    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var tests: [STDTestRecord]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentJournalEntries) private var journalEntries: [JournalEntry]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentPlansByDate) private var plans: [SaferSessionPlan]
+    @Query(ChillMateQueries.recentTests) private var tests: [STDTestRecord]
 
     private var events: [UnifiedTimelineEvent] {
         var result: [UnifiedTimelineEvent] = []

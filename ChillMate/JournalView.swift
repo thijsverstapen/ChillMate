@@ -9,7 +9,7 @@ import UIKit
 
 struct JournalView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
+    @Query(ChillMateQueries.recentJournalEntries) private var journalEntries: [JournalEntry]
 
     @State private var date = Date.now
     @State private var rememberClearly = ""

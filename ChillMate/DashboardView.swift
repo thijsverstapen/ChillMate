@@ -12,12 +12,12 @@ struct DashboardView: View {
     @AppStorage("reductionGoalSessions") private var reductionGoalSessions = 0
     @AppStorage("reductionGoalCountSubstanceOnly") private var reductionGoalCountSubstanceOnly = true
     @AppStorage("notificationsEnabled") private var notificationsEnabled = false
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
-    @Query(sort: \SaferSessionPlan.createdAt, order: .reverse) private var plans: [SaferSessionPlan]
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
-    @Query(sort: \STDTestRecord.testDate, order: .reverse) private var tests: [STDTestRecord]
-    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
+    @Query(ChillMateQueries.dashboardEntries) private var entries: [NightEntry]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.recentPlansByCreation) private var plans: [SaferSessionPlan]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentTests) private var tests: [STDTestRecord]
+    @Query(ChillMateQueries.recentJournalEntries) private var journalEntries: [JournalEntry]
 
     @State private var isShowingLogSheet = false
     @State private var isShowingCalendar = false
@@ -34,24 +34,49 @@ struct DashboardView: View {
 
     private var calendar: Calendar { .current }
 
+    /// Metrics are recomputed in `.task(id:)` rather than lazily inside `body`.
+    ///
+    /// The previous cache keyed on `entries.count`, so editing an existing night —
+    /// changing substances, logging sleep, completing aftercare — left the count
+    /// unchanged and the dashboard kept showing stale numbers: stale daily score,
+    /// stale streak, stale PEP countdown, and stale data pushed to the widget and
+    /// the watch. It only refreshed when a row was added or deleted.
+    ///
+    /// It also wrote `@State` from a computed property read during `body`,
+    /// deferring the write into `Task { @MainActor }` to dodge the "Modifying state
+    /// during view update" warning. Because the write landed after the pass, a
+    /// second read in the same pass (`shouldEscalateHelp`) still saw an empty cache
+    /// and recomputed everything a second time — two full scans over every entry.
     @State private var cachedMetrics: DashboardMetrics?
-    @State private var cachedMetricsEntryCount = -1
-    @State private var cachedMetricsHRV: Double = -1
 
+    /// Changes whenever anything the metrics depend on changes. `NightEntry`
+    /// exposes `contentVersion`, which its setters bump, so edits register even
+    /// though the row count is identical.
+    private var metricsInvalidationKey: MetricsKey {
+        MetricsKey(
+            entryCount: entries.count,
+            contentVersion: entries.reduce(into: 0) { $0 &+= $1.contentVersion },
+            profileCount: profiles.count,
+            hrv: lastKnownHRVms
+        )
+    }
+
+    /// Cached value when it is current, freshly built when it is not. Never writes
+    /// state, so it is safe to read as many times per pass as needed.
     private var dashboardMetrics: DashboardMetrics {
-        let needsRebuild = cachedMetrics == nil
-            || cachedMetricsEntryCount != entries.count
-            || cachedMetricsHRV != lastKnownHRVms
-        if needsRebuild {
-            let m = DashboardMetrics(entries: entries, profiles: profiles, calendar: calendar, latestHRVms: lastKnownHRVms)
-            Task { @MainActor in
-                cachedMetrics = m
-                cachedMetricsEntryCount = entries.count
-                cachedMetricsHRV = lastKnownHRVms
-            }
-            return m
-        }
-        return cachedMetrics!
+        cachedMetrics ?? DashboardMetrics(
+            entries: entries,
+            profiles: profiles,
+            calendar: calendar,
+            latestHRVms: lastKnownHRVms
+        )
+    }
+
+    struct MetricsKey: Equatable {
+        let entryCount: Int
+        let contentVersion: Int
+        let profileCount: Int
+        let hrv: Double
     }
 
     @ViewBuilder
@@ -104,7 +129,7 @@ struct DashboardView: View {
                             HeaderSummaryView(width: proxy.size.width, dailyScore: metrics.dailyScore)
 
                             VStack(alignment: .leading, spacing: 22) {
-                                GetHelpNowBar(escalated: shouldEscalateHelp) {
+                                GetHelpNowBar(escalated: shouldEscalateHelp(metrics)) {
                                     careNavPath.append(.panicSupport)
                                 }
 
@@ -196,6 +221,17 @@ struct DashboardView: View {
             }
             .navigationTitle("")
             .toolbarBackground(.hidden, for: .navigationBar)
+            .task(id: metricsInvalidationKey) {
+                // Rebuilt here rather than lazily inside `body`, so the work happens
+                // once per actual change instead of once per read, and no state is
+                // written during a view update.
+                cachedMetrics = DashboardMetrics(
+                    entries: entries,
+                    profiles: profiles,
+                    calendar: calendar,
+                    latestHRVms: lastKnownHRVms
+                )
+            }
             .onAppear {
                 lastDailyRecoveryScore = metrics.dailyScore.displayValue
                 updateWidgetData(metrics: metrics)
@@ -330,9 +366,10 @@ struct DashboardView: View {
 
     /// Whether the "Get help now" bar should visibly escalate (pulsing ring). True on
     /// distress signals or in the small hours, when a crisis is likeliest.
-    private var shouldEscalateHelp: Bool {
-        let m = dashboardMetrics
-        if m.realityCheckActive || m.healthWarningCount > 3 { return true }
+    private func shouldEscalateHelp(_ metrics: DashboardMetrics) -> Bool {
+        // Takes the metrics the body already computed. Reading `dashboardMetrics`
+        // here re-derived them a second time in the same pass.
+        if metrics.realityCheckActive || metrics.healthWarningCount > 3 { return true }
         let hour = Calendar.current.component(.hour, from: .now)
         return hour >= 0 && hour < 5
     }
@@ -727,9 +764,9 @@ private struct CalendarDaySummary {
 struct CalendarOverviewView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \NightEntry.date, order: .reverse) private var entries: [NightEntry]
-    @Query(sort: \JournalEntry.date, order: .reverse) private var journalEntries: [JournalEntry]
-    @Query(sort: \DrugDoseTimerRecord.startedAt, order: .reverse) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
+    @Query(ChillMateQueries.recentJournalEntries) private var journalEntries: [JournalEntry]
+    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
     @State private var displayedMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: .now)) ?? .now
     @State private var selectedDay = Calendar.current.startOfDay(for: .now)
 
@@ -1255,21 +1292,28 @@ private struct DailyRecoveryScore {
         isActive ? value : 88
     }
 
+    /// `entries` arrives sorted by date descending, so the latest non-skipped row is
+    /// simply the first one — no scan needed. The substance check still has to look
+    /// at rows until it finds one, but stops there instead of always walking the
+    /// whole table.
+    ///
+    /// `entry.substances` is not a stored property: each read filters, sorts and
+    /// dedupes a SwiftData relationship that may fault to disk. The previous loop
+    /// called it once per entry and then `substancePoints` called it twice more on
+    /// the latest row, so a several-hundred-entry store did thousands of redundant
+    /// sorts per dashboard render.
     init(entries: [NightEntry], recoveryStreakDays: Int, calendar: Calendar, latestHRVms: Double = 0) {
-        var hasEverLoggedSubstances = false
-        var latest: NightEntry?
-        var latestDate = Date.distantPast
+        let latest = entries.first { !$0.skippedNight }
+        // Read once and pass down, rather than re-reading the getter.
+        let latestSubstances = latest?.substances ?? []
 
-        for entry in entries where !entry.skippedNight {
-            let substances = entry.substances
-
-            if !substances.isEmpty {
-                hasEverLoggedSubstances = true
-            }
-
-            if entry.date > latestDate {
-                latest = entry
-                latestDate = entry.date
+        var hasEverLoggedSubstances = !latestSubstances.isEmpty
+        if !hasEverLoggedSubstances {
+            for entry in entries where !entry.skippedNight {
+                if !entry.substances.isEmpty {
+                    hasEverLoggedSubstances = true
+                    break
+                }
             }
         }
 
@@ -1294,10 +1338,13 @@ private struct DailyRecoveryScore {
         let sleep = Self.sleepPoints(latest)
         let hydration = latest?.aftercareDrankWater == true ? 12 : 5
         let food = latest?.aftercareAteFood == true ? 10 : 4
-        let substance = Self.substancePoints(latest)
-        let anxiety = Self.anxietyPoints(latest)
+        let substance = Self.substancePoints(latest, substances: latestSubstances)
+        // nil when there is no latest entry, which is what symptomPoints scores
+        // differently from "an entry with no symptoms".
+        let latestSymptoms: [AftercareSymptom]? = latest?.aftercareSymptoms
+        let anxiety = Self.anxietyPoints(latest, symptoms: latestSymptoms ?? [])
         let recovery = Int(min(18.0, (log(Double(max(1, recoveryStreakDays)) + 1) / log(30)) * 18))
-        let symptoms = Self.symptomPoints(latest)
+        let symptoms = Self.symptomPoints(latestSymptoms)
         let hrv = Self.hrvPoints(latestHRVms)
         let total = min(100, max(0, sleep + hydration + food + substance + anxiety + recovery + symptoms + hrv))
 
@@ -1309,10 +1356,10 @@ private struct DailyRecoveryScore {
             Factor(name: String(localized: "Sleep"), caption: latest?.sleptYet == true ? "\(latest?.sleepHours.formatted(.number.precision(.fractionLength(0...1))) ?? "0") h" : "not logged"),
             Factor(name: String(localized: "Hydration"), caption: latest?.aftercareDrankWater == true ? "checked" : "unknown"),
             Factor(name: String(localized: "Food"), caption: latest?.aftercareAteFood == true ? "checked" : "unknown"),
-            Factor(name: String(localized: "Substances"), caption: latest?.substances.isEmpty == false ? "logged" : "clear"),
-            Factor(name: String(localized: "Anxiety"), caption: Self.anxietyCaption(latest)),
+            Factor(name: String(localized: "Substances"), caption: latestSubstances.isEmpty ? "clear" : "logged"),
+            Factor(name: String(localized: "Anxiety"), caption: Self.anxietyCaption(latest, symptoms: latestSymptoms ?? [])),
             Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
-            Factor(name: String(localized: "Symptoms"), caption: latest?.aftercareSymptoms.isEmpty == false ? "\(latest?.aftercareSymptoms.count ?? 0) selected" : "none"),
+            Factor(name: String(localized: "Symptoms"), caption: latestSymptoms.isEmpty ? "none" : "\(latestSymptoms.count) selected"),
             Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
         ]
     }
@@ -1341,25 +1388,26 @@ private struct DailyRecoveryScore {
         }
     }
 
-    private static func substancePoints(_ entry: NightEntry?) -> Int {
-        guard let entry else {
+    /// Takes the already-read substance list instead of reading the getter twice.
+    private static func substancePoints(_ entry: NightEntry?, substances: [String]) -> Int {
+        guard entry != nil else {
             return 12
         }
 
-        if entry.substances.isEmpty {
+        if substances.isEmpty {
             return 15
         }
 
-        return max(2, 14 - (entry.substances.count * 4))
+        return max(2, 14 - (substances.count * 4))
     }
 
-    private static func anxietyPoints(_ entry: NightEntry?) -> Int {
+    private static func anxietyPoints(_ entry: NightEntry?, symptoms: [AftercareSymptom]) -> Int {
         guard let entry else {
             return 7
         }
 
         let mood = AftercareMood(rawValue: entry.aftercareMood) ?? .okay
-        if entry.aftercareSymptoms.contains(.anxious) || mood == .anxious || mood == .overwhelmed {
+        if symptoms.contains(.anxious) || mood == .anxious || mood == .overwhelmed {
             return 2
         }
 
@@ -1370,21 +1418,23 @@ private struct DailyRecoveryScore {
         return 10
     }
 
-    private static func symptomPoints(_ entry: NightEntry?) -> Int {
-        guard let entry else {
+    /// Takes the already-decoded symptom list. `aftercareSymptoms` JSON-decodes on
+    /// every read, and this was one of three reads of it per score.
+    private static func symptomPoints(_ symptoms: [AftercareSymptom]?) -> Int {
+        guard let symptoms else {
             return 8
         }
 
-        return max(0, 12 - (entry.aftercareSymptoms.count * 2))
+        return max(0, 12 - (symptoms.count * 2))
     }
 
-    private static func anxietyCaption(_ entry: NightEntry?) -> String {
+    private static func anxietyCaption(_ entry: NightEntry?, symptoms: [AftercareSymptom]) -> String {
         guard let entry else {
             return "unknown"
         }
 
         let mood = AftercareMood(rawValue: entry.aftercareMood) ?? .okay
-        return entry.aftercareSymptoms.contains(.anxious) ? "selected" : mood.rawValue.lowercased()
+        return symptoms.contains(.anxious) ? "selected" : mood.rawValue.lowercased()
     }
 
     private static func hrvPoints(_ ms: Double) -> Int {
@@ -2996,7 +3046,7 @@ struct FlowLayout: Layout {
 struct ProfileOverviewView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \UserProfile.createdAt, order: .forward) private var profiles: [UserProfile]
+    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var isShowingProfileEditor = false
     let showsBackButton: Bool

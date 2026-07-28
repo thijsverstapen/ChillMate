@@ -432,17 +432,25 @@ enum LocalSecurityService {
         SecItemDelete(query as CFDictionary)
     }
 
+    /// Walks the app's data directories and marks everything complete-protected.
+    ///
+    /// The previous version enumerated Application Support, Documents, Caches,
+    /// Library *and* tmp. Caches and tmp both live inside Library, so their contents
+    /// were visited twice — once via Library's recursive walk and once via their
+    /// own — doubling an already file-system-heavy pass that grows with the store
+    /// and runs on every launch and foreground.
+    ///
+    /// Enumerating Library alone covers Application Support and Caches. Documents
+    /// and tmp sit outside it and are still walked. Roots are pruned so no
+    /// directory nested inside another root is enumerated twice.
     fileprivate static func applyFileProtectionNow() {
         let fileManager = FileManager.default
         let directories: [FileManager.SearchPathDirectory] = [
-            .applicationSupportDirectory,
-            .documentDirectory,
-            .cachesDirectory,
-            .libraryDirectory
+            .libraryDirectory,
+            .documentDirectory
         ]
 
-        var protectedRoots = Set<URL>()
-
+        var roots: [URL] = []
         for directory in directories {
             guard let root = try? fileManager.url(
                 for: directory,
@@ -452,13 +460,18 @@ enum LocalSecurityService {
             ) else {
                 continue
             }
+            roots.append(root.resolvingSymlinksInPath())
+        }
+        roots.append(fileManager.temporaryDirectory.resolvingSymlinksInPath())
 
-            protectedRoots.insert(root)
+        // Drop any root contained in another, so nothing is enumerated twice.
+        let deduped = roots.filter { candidate in
+            !roots.contains { other in
+                other != candidate && candidate.path.hasPrefix(other.path + "/")
+            }
         }
 
-        protectedRoots.insert(fileManager.temporaryDirectory)
-
-        for root in protectedRoots {
+        for root in deduped {
             protectItem(at: root)
 
             guard let enumerator = fileManager.enumerator(

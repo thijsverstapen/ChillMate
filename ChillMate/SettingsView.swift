@@ -95,7 +95,7 @@ struct SettingsView: View {
     @AppStorage("chillReducedMotion") private var chillReducedMotion = false
     @AppStorage("oneHandedControls") private var oneHandedControls = true
     @AppStorage("appBackgroundStyle") private var appBackgroundStyle = ChillBackgroundStyle.score.rawValue
-    @AppStorage("appBackgroundPhotoData") private var appBackgroundPhotoData = ""
+    @AppStorage(DefaultsKey.appBackgroundPhotoFingerprint) private var backgroundPhotoFingerprint = ""
     @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
     @AppStorage("watchHydrationReminders") private var watchHydrationReminders = true
     @AppStorage("watchHeartRateWarnings") private var watchHeartRateWarnings = true
@@ -919,7 +919,12 @@ struct SettingsView: View {
             }
 
             let optimizedData = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 1400, compressionQuality: 0.84)
-            appBackgroundPhotoData = optimizedData.base64EncodedString()
+            // Written to a protected file rather than base64'd into UserDefaults;
+            // only the fingerprint goes to defaults, which is what drives the
+            // backdrop's reload.
+            let fingerprint = BackgroundPhotoStore.save(optimizedData)
+            ChillBackgroundImageCache.removeAll()
+            backgroundPhotoFingerprint = fingerprint
             appBackgroundStyle = ChillBackgroundStyle.photo.rawValue
             message = String(localized: "Background photo updated.")
         }
@@ -2222,6 +2227,7 @@ private enum AccountDataDeletion {
             "trustedContactMessage",
             "appBackgroundStyle",
             "appBackgroundPhotoData",
+            DefaultsKey.appBackgroundPhotoFingerprint,
             "locationServicesChecked",
             "lastOnDeviceRecoverySnapshotTimestamp",
             "lastOnDeviceRecoveryRestoreTimestamp",
@@ -2231,6 +2237,10 @@ private enum AccountDataDeletion {
         for key in keys {
             UserDefaults.standard.removeObject(forKey: key)
         }
+
+        // The background photo is a file now, so clearing its defaults key is not
+        // enough to erase it.
+        BackgroundPhotoStore.delete()
     }
 
     private static func deleteAllModels(in context: ModelContext) throws {

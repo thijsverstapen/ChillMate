@@ -31,10 +31,13 @@ enum ChillBackgroundStyle: String, CaseIterable, Identifiable {
 }
 
 struct DashboardBackdrop: View {
-    @AppStorage("appBackgroundStyle") private var appBackgroundStyle = ChillBackgroundStyle.score.rawValue
-    @AppStorage("appBackgroundPhotoData") private var appBackgroundPhotoData = ""
-    @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
-    @AppStorage("highContrastMode") private var highContrastMode = false
+    @AppStorage(DefaultsKey.appBackgroundStyle) private var appBackgroundStyle = ChillBackgroundStyle.score.rawValue
+    /// A short fingerprint, not the image. The photo itself lives in a file (see
+    /// BackgroundPhotoStore); this used to be a multi-megabyte base64 string held
+    /// in UserDefaults and re-scanned on every body evaluation.
+    @AppStorage(DefaultsKey.appBackgroundPhotoFingerprint) private var backgroundPhotoFingerprint = ""
+    @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
+    @AppStorage(DefaultsKey.highContrastMode) private var highContrastMode = false
     @State private var decodedBackgroundImage: UIImage?
     var score: Int? = nil
 
@@ -47,7 +50,7 @@ struct DashboardBackdrop: View {
     }
 
     private var backgroundImageIdentifier: String {
-        "\(appBackgroundStyle)-\(appBackgroundPhotoData.count)-\(appBackgroundPhotoData.prefix(32))"
+        "\(appBackgroundStyle)-\(backgroundPhotoFingerprint)"
     }
 
     var body: some View {
@@ -85,7 +88,7 @@ struct DashboardBackdrop: View {
         }
         .ignoresSafeArea()
         .task(id: backgroundImageIdentifier) {
-            guard style == .photo, let data = Data(base64Encoded: appBackgroundPhotoData) else {
+            guard style == .photo else {
                 decodedBackgroundImage = nil
                 return
             }
@@ -93,6 +96,14 @@ struct DashboardBackdrop: View {
             let cacheKey = "\(backgroundImageIdentifier)-1400"
             if let cachedImage = ChillBackgroundImageCache.image(for: cacheKey) {
                 decodedBackgroundImage = cachedImage
+                return
+            }
+
+            // Read off the main actor: this touches the file system.
+            guard let data = await Task.detached(priority: .userInitiated, operation: {
+                BackgroundPhotoStore.load()
+            }).value else {
+                decodedBackgroundImage = nil
                 return
             }
 
@@ -106,22 +117,6 @@ struct DashboardBackdrop: View {
             ChillBackgroundImageCache.store(image, for: cacheKey)
             decodedBackgroundImage = image
         }
-    }
-}
-
-@MainActor
-private enum ChillBackgroundImageCache {
-    private static var images: [String: UIImage] = [:]
-
-    static func image(for key: String) -> UIImage? {
-        images[key]
-    }
-
-    static func store(_ image: UIImage, for key: String) {
-        if images.count > 4, let firstKey = images.keys.first {
-            images.removeValue(forKey: firstKey)
-        }
-        images[key] = image
     }
 }
 

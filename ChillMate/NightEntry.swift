@@ -46,6 +46,24 @@ final class NightEntry {
     /// re-materialized, even while its child records are still importing.
     var typedRecordsVersion: Int = 0
 
+    /// Bumped by every setter that changes displayed content.
+    ///
+    /// Views that cache derived values (the dashboard's metrics, most of all) need
+    /// to know an entry was *edited*, not just added or removed. Summing this
+    /// across the fetched rows gives a cheap key that changes on edits too — a
+    /// row-count comparison does not, which is how the dashboard came to show
+    /// stale figures after editing a night.
+    ///
+    /// It has a default and is a plain Int, so it round-trips through CloudKit like
+    /// every other attribute. Overflow is harmless: this is an equality key, not a
+    /// counter anyone reads.
+    var contentVersion: Int = 0
+
+    /// Records that this entry's displayed content changed.
+    func markContentChanged() {
+        contentVersion &+= 1
+    }
+
     init(
         id: UUID = UUID(),
         date: Date,
@@ -157,6 +175,7 @@ final class NightEntry {
         set {
             substancesData = NightEntry.encode(newValue)
             replaceSubstanceRecords(with: newValue, isInjection: false)
+            markContentChanged()
         }
     }
 
@@ -171,6 +190,7 @@ final class NightEntry {
         set {
             injectionSubstancesData = NightEntry.encode(newValue)
             replaceSubstanceRecords(with: newValue, isInjection: true)
+            markContentChanged()
         }
     }
 
@@ -189,6 +209,7 @@ final class NightEntry {
             for record in replaced {
                 record.modelContext?.delete(record)
             }
+            markContentChanged()
         }
     }
 
@@ -207,6 +228,7 @@ final class NightEntry {
             for record in replaced {
                 record.modelContext?.delete(record)
             }
+            markContentChanged()
         }
     }
 
@@ -280,12 +302,18 @@ final class NightEntry {
 
     var changeReasons: [ChangeReason] {
         get { NightEntry.decodeChangeReasons(changeReasonsData) }
-        set { changeReasonsData = NightEntry.encodeChangeReasons(newValue) }
+        set {
+            changeReasonsData = NightEntry.encodeChangeReasons(newValue)
+            markContentChanged()
+        }
     }
 
     var aftercareSymptoms: [AftercareSymptom] {
         get { NightEntry.decodeSymptoms(aftercareSymptomsData) }
-        set { aftercareSymptomsData = NightEntry.encodeSymptoms(newValue) }
+        set {
+            aftercareSymptomsData = NightEntry.encodeSymptoms(newValue)
+            markContentChanged()
+        }
     }
 
     var isTrackedEvent: Bool {
