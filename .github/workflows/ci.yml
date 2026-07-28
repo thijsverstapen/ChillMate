@@ -1,0 +1,106 @@
+name: CI
+
+# The project had no CI at all: every build, test and consistency check across
+# six targets and five languages was manual. This gate would have caught the
+# build-setting drift fixed in 4.2.1 (a test target requiring a newer iOS than
+# the app, a malformed bundle identifier, one target left on Swift 5).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SCHEME: ChillMate
+
+jobs:
+  # Cheap checks that need no Xcode, so a typo in the catalog or a stray build
+  # artifact fails in seconds rather than after a full build.
+  lint:
+    name: Consistency checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: String Catalog is complete and well formed
+        run: python3 scripts/check_localization.py
+
+      - name: No build artifacts are tracked
+        run: |
+          if git ls-files | grep -qE '^(DerivedData|DerivedDataDevice|build)/'; then
+            echo "::error::Build artifacts are tracked in git."
+            git ls-files | grep -E '^(DerivedData|DerivedDataDevice|build)/' | head -20
+            exit 1
+          fi
+
+      - name: No UserDefaults keys outside the registry
+        run: python3 scripts/check_defaults_keys.py
+
+  build-test:
+    name: Build and test
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select the newest installed Xcode
+        # Pinning an exact Xcode_26.app breaks whenever the runner image is
+        # updated; take whatever the image has and print it for the log.
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+          xcodebuild -version
+
+      - name: Resolve a simulator destination
+        run: |
+          DEST=$(python3 scripts/pick_simulator.py)
+          echo "DESTINATION=$DEST" >> "$GITHUB_ENV"
+          echo "Using $DEST"
+
+      - name: Install xcbeautify
+        run: brew install xcbeautify
+
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify
+
+      - name: Unit tests
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -only-testing:ChillMateTests \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify
+
+      - name: UI smoke tests
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -only-testing:ChillMateUITests/ChillMateUITests/testLaunchesToForeground \
+            -only-testing:ChillMateUITests/ChillMateUITests/testLaunchesInEveryLanguage \
+            -only-testing:ChillMateUITests/ChillMateUITests/testEachTabOpens \
+            -only-testing:ChillMateUITests/ChillMateUITests/testLogSheetOpens \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult
+          retention-days: 5
