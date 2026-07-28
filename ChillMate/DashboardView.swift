@@ -256,6 +256,7 @@ struct DashboardView: View {
                     }
                     .buttonStyle(ChillPlainButtonStyle())
                     .accessibilityLabel("Panic close app")
+                    .accessibilityIdentifier(AccessibilityID.panicButton)
                     .sensoryFeedback(trigger: isPrivacyScreenActive) { _, active in active ? .impact(weight: .heavy) : nil }
                 }
             }
@@ -501,7 +502,7 @@ private struct HeaderSummaryView: View {
             .padding(.bottom, 4)
 
             Text("Summary")
-                .font(.system(size: 38, weight: .bold, design: .rounded))
+                .chillScaledFont(size: 38, weight: .bold, relativeTo: .largeTitle, design: .rounded)
                 .foregroundStyle(.white)
                 .minimumScaleFactor(0.80)
 
@@ -535,7 +536,7 @@ private struct DailyScoreStatusPill: View {
                 .lineLimit(1)
 
             Text(score.isActive ? score.label : String(localized: "Log a Chill to activate your daily score"))
-                .font(.system(size: 9, weight: .semibold))
+                .chillScaledFont(size: 9, weight: .semibold, relativeTo: .caption2)
                 .foregroundStyle(Color.chillSecondary)
                 .multilineTextAlignment(.center)
                 .lineLimit(score.isActive ? 1 : 3)
@@ -548,6 +549,7 @@ private struct DailyScoreStatusPill: View {
         .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(score.isActive ? "Daily score \(score.value), \(score.label)" : "Daily score inactive. Make a substance-related log to activate daily score.")
+        .accessibilityIdentifier(AccessibilityID.dailyScorePill)
     }
 }
 
@@ -610,6 +612,10 @@ private struct CalendarOverviewButton: View {
             .padding(16)
             .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.09), interactive: true)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(String(localized: "Calendar"))
+        .accessibilityHint(String(localized: "View logged and skipped Chills month by month"))
+        .accessibilityAddTraits(.isButton)
         .buttonStyle(ChillPlainButtonStyle())
     }
 }
@@ -805,6 +811,7 @@ struct CalendarOverviewView: View {
                             }
                             .buttonStyle(.bordered)
                             .tint(Color.chillPrimary)
+                            .accessibilityLabel(String(localized: "Previous month"))
 
                             Spacer()
 
@@ -822,6 +829,7 @@ struct CalendarOverviewView: View {
                             }
                             .buttonStyle(.bordered)
                             .tint(Color.chillPrimary)
+                            .accessibilityLabel(String(localized: "Next month"))
                         }
 
                         LazyVGrid(columns: columns, spacing: 8) {
@@ -1027,7 +1035,7 @@ private struct ReductionGoalProgressCard: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text("\(currentMonthCount)")
-                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .chillScaledFont(size: 28, weight: .black, relativeTo: .title, design: .rounded)
                     .foregroundStyle(progressColor)
                 Text("/ \(goal)")
                     .font(.title3.weight(.semibold))
@@ -1155,13 +1163,13 @@ private struct RecoveryStreakBadge: View {
                 VStack(alignment: .leading, spacing: 14) {
                     HStack(alignment: .center, spacing: 12) {
                         Text(emoji)
-                            .font(.system(size: 30))
+                            .chillScaledFont(size: 30, relativeTo: .title)
                             .frame(width: 48, height: 48)
                             .glassSurface(radius: 24, tint: tint.opacity(0.16))
 
                         VStack(alignment: .leading, spacing: 3) {
                             Text(displayText)
-                                .font(.system(size: 30, weight: .bold))
+                                .chillScaledFont(size: 30, weight: .bold, relativeTo: .title)
                                 .foregroundStyle(Color.chillText)
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.72)
@@ -1464,19 +1472,21 @@ private struct HealthWarningCard: View {
 private struct PEPCountdownCard: View {
     let entry: NightEntry
 
+    /// Only the remaining-time line is inside the TimelineView. The card body and
+    /// its glass surface used to be rebuilt every minute along with it.
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 60)) { context in
-            let remaining = max(0, entry.pepDeadline.timeIntervalSince(context.date))
-            VStack(alignment: .leading, spacing: 12) {
-                Label("PEP time window", systemImage: "clock.badge.exclamationmark.fill")
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
+        VStack(alignment: .leading, spacing: 12) {
+            Label("PEP time window", systemImage: "clock.badge.exclamationmark.fill")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
 
-                Text("Based on what you logged, this may be worth a quick HIV PEP check. PEP works best if started within 72 hours.")
-                    .font(.callout)
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+            Text("Based on what you logged, this may be worth a quick HIV PEP check. PEP works best if started within 72 hours.")
+                .font(.callout)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
 
+            TimelineView(.periodic(from: .now, by: 60)) { context in
+                let remaining = max(0, entry.pepDeadline.timeIntervalSince(context.date))
                 HStack(alignment: .firstTextBaseline) {
                     Text(remainingText(for: remaining))
                         .font(.title2.bold())
@@ -1486,21 +1496,29 @@ private struct PEPCountdownCard: View {
                         .font(.caption.weight(.bold))
                         .foregroundStyle(Color.chillSecondary)
                 }
-
-                Text("Contact a sexual-health service, GP, or hospital as soon as possible. PEP works best when started quickly and is generally time limited to 72 hours.")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(accessibilityRemainingLabel(for: remaining))
             }
-            .padding(18)
-            .glassSurface(radius: 30, tint: Color.chillSecondaryBlue.opacity(0.12), interactive: true)
+
+            Text("Contact a sexual-health service, GP, or hospital as soon as possible. PEP works best when started quickly and is generally time limited to 72 hours.")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .padding(18)
+        .glassSurface(radius: 30, tint: Color.chillSecondaryBlue.opacity(0.12), interactive: true)
     }
 
     private func remainingText(for interval: TimeInterval) -> String {
         let hours = Int(interval / 3600)
         let minutes = Int((interval.truncatingRemainder(dividingBy: 3600)) / 60)
         return "\(hours)h \(minutes)m"
+    }
+
+    private func accessibilityRemainingLabel(for interval: TimeInterval) -> String {
+        let hours = Int(interval / 3600)
+        let minutes = Int((interval.truncatingRemainder(dividingBy: 3600)) / 60)
+        return String(localized: "\(hours) hours \(minutes) minutes left in the 72 hour PEP window")
     }
 }
 
@@ -1632,10 +1650,10 @@ private struct MilestoneShareSheet: View {
 
                 VStack(spacing: 16) {
                     Text(emoji)
-                        .font(.system(size: 52))
+                        .chillScaledFont(size: 52, relativeTo: .largeTitle)
 
                     Text(milestoneText)
-                        .font(.system(size: 36, weight: .black, design: .rounded))
+                        .chillScaledFont(size: 36, weight: .black, relativeTo: .largeTitle, design: .rounded)
                         .foregroundStyle(.white)
 
                     Text(String(localized: "without logged substance use"))
@@ -2136,7 +2154,7 @@ private struct StatTile: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(value)
-                    .font(.system(size: 26, weight: .bold, design: .rounded))
+                    .chillScaledFont(size: 26, weight: .bold, relativeTo: .title, design: .rounded)
                     .foregroundStyle(Color.chillText)
                     .monospacedDigit()
                     .contentTransition(.numericText())
@@ -2183,7 +2201,7 @@ private struct ScoreFactorsSheet: View {
                                 .stroke(LinearGradient.chillBrand, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                                 .rotationEffect(.degrees(-90))
                             Text(score.isActive ? "\(score.value)" : score.emoji)
-                                .font(.system(size: 18, weight: .black, design: .rounded))
+                                .chillScaledFont(size: 18, weight: .black, relativeTo: .title3, design: .rounded)
                                 .foregroundStyle(Color.chillText)
                         }
                         .frame(width: 52, height: 52)
@@ -2266,7 +2284,7 @@ private struct MetricCard: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(value)
-                    .font(.system(size: 22, weight: .black, design: .rounded))
+                    .chillScaledFont(size: 22, weight: .black, relativeTo: .title2, design: .rounded)
                     .monospacedDigit()
                     .foregroundStyle(Color.chillText)
                     .lineLimit(1)
@@ -2767,6 +2785,8 @@ private struct FloatingLogBar: View {
     @State private var isPressed = false
     @State private var confirmSkip = false
     @State private var hasQuickSkippedLocally = false
+    @State private var pressTask: Task<Void, Never>?
+    @Environment(\.chillReduceMotion) private var reduceMotion
 
     var body: some View {
         VStack(spacing: 0) {
@@ -2784,9 +2804,17 @@ private struct FloatingLogBar: View {
                 Spacer(minLength: 12)
 
                 Button {
-                    withAnimation(.spring(response: 0.20, dampingFraction: 0.70)) { isPressed = true }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) {
-                        withAnimation(.spring(response: 0.28, dampingFraction: 0.80)) { isPressed = false }
+                    // Cancellable and reduce-motion aware. The previous
+                    // DispatchQueue.main.asyncAfter could not be cancelled and fired
+                    // its animation even after the view had gone away.
+                    if !reduceMotion {
+                        pressTask?.cancel()
+                        withAnimation(.spring(response: 0.20, dampingFraction: 0.70)) { isPressed = true }
+                        pressTask = Task {
+                            try? await Task.sleep(for: .milliseconds(140))
+                            guard !Task.isCancelled else { return }
+                            withAnimation(.spring(response: 0.28, dampingFraction: 0.80)) { isPressed = false }
+                        }
                     }
                     add()
                 } label: {
@@ -2801,6 +2829,7 @@ private struct FloatingLogBar: View {
                 }
                 .buttonStyle(ChillPlainButtonStyle())
                 .accessibilityLabel("Add Chill")
+                .accessibilityIdentifier(AccessibilityID.logChillButton)
             }
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
@@ -2834,12 +2863,14 @@ private struct FloatingLogBar: View {
                 }
                 .buttonStyle(ChillPlainButtonStyle())
                 .accessibilityLabel("Log nothing happened tonight")
+                .accessibilityIdentifier(AccessibilityID.skipNightButton)
             }
         }
         .glassSurface(radius: 30, tint: .black.opacity(0.04))
         .padding(.horizontal, 20)
         .padding(.bottom, 8)
-        .animation(.easeInOut(duration: 0.25), value: isTonightLogged)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: isTonightLogged)
+        .onDisappear { pressTask?.cancel() }
         .alert(String(localized: "Log a clear night?"), isPresented: $confirmSkip) {
             Button(String(localized: "Cancel"), role: .cancel) { }
             Button(String(localized: "Confirm")) {

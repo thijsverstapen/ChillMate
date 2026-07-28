@@ -137,42 +137,54 @@ private struct WatchActiveTimerCard: View {
     let timer: WatchTimerInfo
     @State private var didWarn = false
 
+    /// Two timelines with different cadences instead of one at 1 Hz.
+    ///
+    /// The whole card — label, Gauge, and the card background — used to be rebuilt
+    /// every second for the entire length of a dose window, which on a watch is a
+    /// real battery cost. The countdown text genuinely needs 1 Hz because it shows
+    /// seconds; the gauge does not. Across a multi-hour window one second moves the
+    /// bar by well under a hundredth of a percent, so it ticks every 15s.
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 1)) { context in
-            let total = max(timer.durationSeconds, 1)
-            let elapsed = max(0, context.date.timeIntervalSince(timer.startedAt))
-            let remaining = max(0, timer.endsAt.timeIntervalSince(context.date))
-            let progress = min(1, elapsed / total)
-            let ended = remaining <= 0
-
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Label(timer.substanceName, systemImage: "timer")
-                        .font(.headline)
-                        .lineLimit(1)
-                    Spacer(minLength: 4)
-                    Text(ended ? String(localized: "Window ended") : remaining.formattedRemaining)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label(timer.substanceName, systemImage: "timer")
+                    .font(.headline)
+                    .lineLimit(1)
+                Spacer(minLength: 4)
+                TimelineView(.periodic(from: .now, by: 1)) { context in
+                    let remaining = max(0, timer.endsAt.timeIntervalSince(context.date))
+                    Text(remaining <= 0 ? String(localized: "Window ended") : remaining.formattedRemaining)
                         .font(.caption.monospacedDigit())
-                        .foregroundStyle(ended ? .orange : .secondary)
-                }
-
-                Gauge(value: progress) {
-                    Text("Effect window")
-                } currentValueLabel: {
-                    EmptyView()
-                }
-                .gaugeStyle(.accessoryLinearCapacity)
-                .tint(ended ? .orange : (progress > 0.75 ? .yellow : .mint))
-
-                if ended {
-                    Text("Take it slow before any redose.")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(remaining <= 0 ? .orange : .secondary)
                 }
             }
-            .padding(12)
-            .watchCard()
+
+            TimelineView(.periodic(from: .now, by: 15)) { context in
+                let total = max(timer.durationSeconds, 1)
+                let elapsed = max(0, context.date.timeIntervalSince(timer.startedAt))
+                let remaining = max(0, timer.endsAt.timeIntervalSince(context.date))
+                let progress = min(1, elapsed / total)
+                let ended = remaining <= 0
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Gauge(value: progress) {
+                        Text("Effect window")
+                    } currentValueLabel: {
+                        EmptyView()
+                    }
+                    .gaugeStyle(.accessoryLinearCapacity)
+                    .tint(ended ? .orange : (progress > 0.75 ? .yellow : .mint))
+
+                    if ended {
+                        Text("Take it slow before any redose.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
         }
+        .padding(12)
+        .watchCard()
         // Fire one haptic when the effect window ends (foreground); the phone
         // covers the background case with a scheduled notification.
         .task(id: timer.id) {

@@ -134,18 +134,25 @@ private struct MainTabView: View {
             .tabItem {
                 Label("Home", systemImage: "house.fill")
             }
+            // Locale-independent handles for UI tests. The tests used to query
+            // tab bar items by their English label, so they could only ever
+            // pass in English — including the run that launches in all five
+            // languages.
+            .accessibilityIdentifier(AccessibilityID.homeTab)
             .tag(AppTab.home)
 
             HistoryTabView(segment: $historySegment)
                 .tabItem {
                     Label("History", systemImage: "clock.arrow.circlepath")
                 }
+                .accessibilityIdentifier(AccessibilityID.historyTab)
                 .tag(AppTab.history)
 
             MoreHubView()
                 .tabItem {
                     Label("More", systemImage: "ellipsis.circle.fill")
                 }
+                .accessibilityIdentifier(AccessibilityID.moreTab)
                 .tag(AppTab.more)
         }
         .tint(.chillPrimary)
@@ -3032,7 +3039,7 @@ private struct IntroTextBlock: View {
                 .animation(.spring(response: 0.50, dampingFraction: 0.82), value: isVisible)
 
             Text(page.title)
-                .font(.system(size: 39, weight: .black, design: .rounded))
+                .chillScaledFont(size: 39, weight: .black, relativeTo: .largeTitle, design: .rounded)
                 .foregroundStyle(.white)
                 .lineSpacing(1)
                 .minimumScaleFactor(0.74)
@@ -3430,7 +3437,7 @@ private struct IntroHeroScene: View {
                             .shadow(color: colors[i].opacity(0.42), radius: 14, y: 6)
                             .animation(.spring(response: 0.78, dampingFraction: 0.68).delay(Double(i) * 0.09), value: appeared)
                         Text(labels[i])
-                            .font(.system(size: 9, weight: .bold))
+                            .chillScaledFont(size: 9, weight: .bold, relativeTo: .caption2)
                             .foregroundStyle(.white.opacity(0.74))
                     }
                 }
@@ -3527,7 +3534,7 @@ private struct IntroHeroScene: View {
 
                         if isLead {
                             Text("Now")
-                                .font(.system(size: 10, weight: .heavy))
+                                .chillScaledFont(size: 10, weight: .heavy, relativeTo: .caption2)
                                 .foregroundStyle(moment.tint)
                                 .padding(.horizontal, 7)
                                 .padding(.vertical, 3)
@@ -3573,7 +3580,7 @@ private struct IntroHeroScene: View {
             Text(careTapped
                  ? String(localized: "The moment you’re in rises to the top")
                  : String(localized: "Tap the one you’re in right now"))
-                .font(.system(size: 11, weight: .semibold))
+                .chillScaledFont(size: 11, weight: .semibold, relativeTo: .caption2)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
         }
@@ -3884,7 +3891,7 @@ struct ProfileSetupHeroCard: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 Text("Let’s make it yours")
-                    .font(.system(size: 36, weight: .bold))
+                    .chillScaledFont(size: 36, weight: .bold, relativeTo: .largeTitle)
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
 

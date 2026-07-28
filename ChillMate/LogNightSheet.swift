@@ -614,6 +614,7 @@ private struct SexPartnerDetailsCard: View {
                                 }
                                 .buttonStyle(ChillPlainButtonStyle())
                                 .foregroundStyle(Color.chillSecondary)
+                                .accessibilityLabel(String(localized: "Remove person"))
                             }
                             .padding(10)
                             .glassSurface(radius: 18, tint: .black.opacity(0.04))
@@ -796,6 +797,7 @@ private struct SubstancePicker: View {
                             }
                             .buttonStyle(ChillPlainButtonStyle())
                             .foregroundStyle(Color.chillMint)
+                            .accessibilityLabel(String(localized: "Add injected substance"))
                         }
 
                         if injectedSubstances.isEmpty {
@@ -1148,7 +1150,7 @@ private struct SleepCheckCard: View {
             if sleptYet {
                 HStack(spacing: 14) {
                     Text(mood.emoji)
-                        .font(.system(size: 42))
+                        .chillScaledFont(size: 42, relativeTo: .largeTitle)
                         .frame(width: 54, height: 54)
                         .glassSurface(radius: 27, tint: .yellow.opacity(0.18))
 

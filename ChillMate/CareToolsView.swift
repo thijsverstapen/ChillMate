@@ -385,6 +385,7 @@ private struct STDTestCard: View {
                 }
                 .buttonStyle(ChillPlainButtonStyle())
                 .foregroundStyle(Color.chillSecondary)
+                .accessibilityLabel(String(localized: "Delete STI test"))
             }
 
             ResultPickerRow(title: String(localized: "Oral"), result: resultBinding(\.oralResult))
@@ -4354,42 +4355,66 @@ private struct LatestDoseReminder: View {
 private struct DelayOrb: View {
     let startedAt: Date?
 
+    /// The gradient circle and the glass surface are built once and stay put; only
+    /// the digits and the caption sit inside the TimelineView.
+    ///
+    /// Previously the whole orb — including `glassSurface`, which is a blurred
+    /// material — was rebuilt once a second for the full ten minutes of the delay
+    /// tool, when the only thing changing was the number.
     var body: some View {
-        Group {
-            if startedAt == nil {
-                orbContent(remaining: 10 * 60)
-            } else {
-                TimelineView(.periodic(from: .now, by: 1)) { context in
-                    orbContent(remaining: remainingSeconds(now: context.date))
-                }
-            }
-        }
-    }
-
-    private func orbContent(remaining: Int) -> some View {
         VStack(spacing: 14) {
             ZStack {
                 Circle()
                     .fill(LinearGradient(colors: [Color.chillPrimary.opacity(0.55), Color.chillMint.opacity(0.65)], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 156, height: 156)
                     .scaleEffect(startedAt == nil ? 0.92 : 1.0)
-                Text(timeText(remaining))
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.white)
+
+                countdown { remaining in
+                    Text(timeText(remaining))
+                        .chillScaledFont(size: 34, weight: .bold, relativeTo: .largeTitle, design: .rounded)
+                        .monospacedDigit()
+                        .foregroundStyle(.white)
+                        // The countdown is information, not decoration, so it keeps
+                        // updating under Reduce Motion. Only VoiceOver pacing changes.
+                        .accessibilityLabel(accessibilityTimeLabel(remaining))
+                }
             }
-            Text(remaining == 0 && startedAt != nil ? String(localized: "Pause complete. Decide slowly.") : String(localized: "Let the first urge pass before choosing."))
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(Color.chillSecondary)
+
+            countdown { remaining in
+                Text(remaining == 0 && startedAt != nil
+                     ? String(localized: "Pause complete. Decide slowly.")
+                     : String(localized: "Let the first urge pass before choosing."))
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(20)
         .glassSurface(radius: 32, tint: Color.chillPrimary.opacity(0.08))
     }
 
+    /// Drives `content` from a one-second timeline once the delay is running, and
+    /// renders it statically before that.
+    @ViewBuilder
+    private func countdown<Content: View>(@ViewBuilder content: @escaping (Int) -> Content) -> some View {
+        if startedAt == nil {
+            content(10 * 60)
+        } else {
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                content(remainingSeconds(now: context.date))
+            }
+        }
+    }
+
     private func remainingSeconds(now: Date) -> Int {
         guard let startedAt else { return 10 * 60 }
         return max(0, Int(startedAt.addingTimeInterval(10 * 60).timeIntervalSince(now)))
+    }
+
+    private func accessibilityTimeLabel(_ seconds: Int) -> String {
+        let minutes = seconds / 60
+        let remainder = seconds % 60
+        return String(localized: "\(minutes) minutes \(remainder) seconds remaining")
     }
 
     private func timeText(_ seconds: Int) -> String {
@@ -4863,7 +4888,7 @@ struct RecoveryModeView: View {
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("\(streakDays)")
-                                .font(.system(size: 54, weight: .black, design: .rounded))
+                                .chillScaledFont(size: 54, weight: .black, relativeTo: .largeTitle, design: .rounded)
                                 .foregroundStyle(Color.chillText)
                             Text("days since logged substance use")
                                 .font(.headline)

@@ -28,6 +28,9 @@ struct ChillMateApp: App {
             // Catalog string lookup is bound to the bundle resolved at process start,
             // so that part lands on the next launch (the picker says so).
             .environment(\.locale, LocalizationService.selectedLocale)
+            // Publishes the combined system + in-app reduce-motion preference to
+            // every descendant, including sheets and covers.
+            .chillMotionPreference()
             .onAppear {
                 recordAppUse()
                 refreshPrivacyAndNotificationState()

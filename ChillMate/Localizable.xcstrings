@@ -573,6 +573,41 @@
         }
       }
     },
+    "%lld hours %lld minutes left in the 72 hour PEP window": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch %lld Stunden %lld Minuten im 72-Stunden-PEP-Fenster"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld hours %lld minutes left in the 72 hour PEP window"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quedan %lld horas %lld minutos en la ventana de PEP de 72 horas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il reste %lld heures %lld minutes dans la fenêtre PEP de 72 heures"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog %lld uur en %lld minuten in het PEP-venster van 72 uur"
+          }
+        }
+      }
+    },
     "%lld logged": {
       "localizations": {
         "de": {
@@ -597,6 +632,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld gelogd"
+          }
+        }
+      }
+    },
+    "%lld minutes %lld seconds remaining": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch %lld Minuten %lld Sekunden"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld minutes %lld seconds remaining"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quedan %lld minutos %lld segundos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il reste %lld minutes %lld secondes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nog %lld minuten en %lld seconden"
           }
         }
       }
@@ -4000,6 +4070,41 @@
         }
       }
     },
+    "Add injected substance": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Injizierte Substanz hinzufügen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add injected substance"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir sustancia inyectada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter une substance injectée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geïnjecteerd middel toevoegen"
+          }
+        }
+      }
+    },
     "Add logs to Apple Health": {
       "localizations": {
         "de": {
@@ -6453,6 +6558,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Automatisch versleuteld herstel op dit apparaat wordt bijgewerkt zodra ChillMate naar de achtergrond gaat. Laatste update: %@."
+          }
+        }
+      }
+    },
+    "Automatic encrypted on-device recovery is updated when ChillMate moves to the background. Last update: \\(stamp).": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die automatische verschlüsselte Wiederherstellung auf dem Gerät wird aktualisiert, sobald ChillMate in den Hintergrund wechselt. Letzte Aktualisierung: \\(stamp)."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic encrypted on-device recovery is updated when ChillMate moves to the background. Last update: \\(stamp)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La recuperación cifrada automática en el dispositivo se actualiza cuando ChillMate pasa a segundo plano. Última actualización: \\(stamp)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La récupération chiffrée automatique sur l'appareil est mise à jour quand ChillMate passe en arrière-plan. Dernière mise à jour : \\(stamp)."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch versleuteld herstel op dit apparaat wordt bijgewerkt zodra ChillMate naar de achtergrond gaat. Laatste update: \\(stamp)."
           }
         }
       }
@@ -9509,6 +9649,41 @@
         }
       }
     },
+    "ChillMate could not delete everything: \\(error.localizedDescription)": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate konnte nicht alles löschen: \\(error.localizedDescription)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate could not delete everything: \\(error.localizedDescription)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate no ha podido eliminarlo todo: \\(error.localizedDescription)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate n'a pas pu tout supprimer : \\(error.localizedDescription)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate kon niet alles verwijderen: \\(error.localizedDescription)"
+          }
+        }
+      }
+    },
     "ChillMate could not find the Apple Health types it needs.": {
       "localizations": {
         "de": {
@@ -9680,6 +9855,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "ChillMate heeft in 3 weken %lld Chills met hoog risico vastgelegd. Dat vraagt echt iets van je lichaam en je hoofd. Een hulpverlener, soa-poli of huisarts kan helpen, zonder oordeel."
+          }
+        }
+      }
+    },
+    "ChillMate has logged \\(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, sexual-health service, or GP can help, without judgment.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate hat in 3 Wochen \\(count) Chills mit hohem Risiko erfasst. Das fordert Körper und Kopf wirklich. Beratung, eine Sexualgesundheitsstelle oder deine Hausärztin können helfen – ohne Urteil."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate has logged \\(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, sexual-health service, or GP can help, without judgment."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate ha registrado \\(count) Chills de alto riesgo en 3 semanas. Tu cuerpo y tu mente cargan con eso. Un profesional, un servicio de salud sexual o tu médico pueden ayudar, sin juzgar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate a noté \\(count) Chills à haut risque en 3 semaines. Votre corps et votre esprit en portent la charge. Un professionnel, un service de santé sexuelle ou votre médecin peuvent aider, sans jugement."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate heeft in 3 weken \\(count) Chills met hoog risico vastgelegd. Dat vraagt echt iets van je lichaam en je hoofd. Een hulpverlener, soa-poli of huisarts kan helpen, zonder oordeel."
           }
         }
       }
@@ -11885,6 +12095,41 @@
         }
       }
     },
+    "Could not apply retention: \\(error.localizedDescription)": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufbewahrung konnte nicht angewendet werden: \\(error.localizedDescription)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not apply retention: \\(error.localizedDescription)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido aplicar la retención: \\(error.localizedDescription)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'appliquer la conservation : \\(error.localizedDescription)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kon bewaartermijn niet toepassen: \\(error.localizedDescription)"
+          }
+        }
+      }
+    },
     "Could not seal the encrypted backup archive.": {
       "localizations": {
         "de": {
@@ -13286,6 +13531,41 @@
         }
       }
     },
+    "Delete STI test": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "STI-Test löschen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete STI test"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar prueba de ITS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer le test IST"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soa-test verwijderen"
+          }
+        }
+      }
+    },
     "Delete account": {
       "comment": "A label displayed in a card that deletes the user's account.",
       "isCommentAutoGenerated": true,
@@ -13526,6 +13806,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "iCloud-back-ups verwijderen"
+          }
+        }
+      }
+    },
+    "Delete journal entry": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tagebucheintrag löschen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete journal entry"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar entrada del diario"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer l'entrée du journal"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagboekitem verwijderen"
           }
         }
       }
@@ -23244,6 +23559,41 @@
         }
       }
     },
+    "Latest encrypted iCloud backup: \\(stamp).": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letztes verschlüsseltes iCloud-Backup: \\(stamp)."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Latest encrypted iCloud backup: \\(stamp)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Última copia de seguridad cifrada en iCloud: \\(stamp)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernière sauvegarde iCloud chiffrée : \\(stamp)."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laatste versleutelde iCloud-back-up: \\(stamp)."
+          }
+        }
+      }
+    },
     "Latest restore attempt": {
       "localizations": {
         "de": {
@@ -24909,6 +25259,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gemarkeerd als overgeslagen. %@"
+          }
+        }
+      }
+    },
+    "Marked skipped. \\(sleep)": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als ausgelassen markiert. \\(sleep)"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marked skipped. \\(sleep)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marcado como omitido. \\(sleep)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Marqué comme ignoré. \\(sleep)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gemarkeerd als overgeslagen. \\(sleep)"
           }
         }
       }
@@ -26663,6 +27048,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Volgende"
+          }
+        }
+      }
+    },
+    "Next month": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächster Monat"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next month"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mes siguiente"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mois suivant"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende maand"
           }
         }
       }
@@ -32651,6 +33071,41 @@
         }
       }
     },
+    "Previous month": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorheriger Monat"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous month"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mes anterior"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mois précédent"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorige maand"
+          }
+        }
+      }
+    },
     "Privacy": {
       "localizations": {
         "de": {
@@ -34803,6 +35258,41 @@
         }
       }
     },
+    "Reminder window adjusted from \\(kg) kg and \\(cm) cm.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erinnerungsfenster angepasst an \\(kg) kg und \\(cm) cm."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reminder window adjusted from \\(kg) kg and \\(cm) cm."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ventana de recordatorio ajustada a \\(kg) kg y \\(cm) cm."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fenêtre de rappel ajustée d'après \\(kg) kg et \\(cm) cm."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herinneringsvenster afgestemd op \\(kg) kg en \\(cm) cm."
+          }
+        }
+      }
+    },
     "Reminder: %@": {
       "comment": "A label that appears under an STD test date, indicating that the result is due. The argument is the date when the result is due.",
       "isCommentAutoGenerated": true,
@@ -34933,6 +35423,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Locatie verwijderen"
+          }
+        }
+      }
+    },
+    "Remove person": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Person entfernen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove person"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quitar persona"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retirer la personne"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Persoon verwijderen"
           }
         }
       }
@@ -35539,6 +36064,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld items hersteld vanuit iCloud."
+          }
+        }
+      }
+    },
+    "Restored \\(summary.totalItems) items from iCloud.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(summary.totalItems) Objekte aus iCloud wiederhergestellt."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restored \\(summary.totalItems) items from iCloud."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(summary.totalItems) elementos restaurados desde iCloud."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(summary.totalItems) éléments restaurés depuis iCloud."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(summary.totalItems) items hersteld vanuit iCloud."
           }
         }
       }
@@ -50591,6 +51151,76 @@
         }
       }
     },
+    "You have logged \\(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, sexual-health service, or counselor can support you.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du hast in den letzten 3 Wochen \\(count) Chills mit Sex und Substanzen eingetragen. Diese Häufigkeit bringt Gesundheitsrisiken mit sich. Hausärztin, Sexualgesundheitsstelle oder Beratung können dich unterstützen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have logged \\(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, sexual-health service, or counselor can support you."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Has registrado \\(count) Chills con sexo y sustancias en las últimas 3 semanas. Esa frecuencia conlleva riesgos para la salud. Un médico, un servicio de salud sexual o un profesional pueden apoyarte."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vous avez noté \\(count) Chills avec sexe et substances ces 3 dernières semaines. Cette fréquence comporte des risques pour la santé. Un médecin, un service de santé sexuelle ou un professionnel peuvent vous soutenir."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je hebt de afgelopen 3 weken \\(count) Chills met seks en middelen vastgelegd. Die frequentie brengt gezondheidsrisico's mee. Een huisarts, soa-poli of hulpverlener kan je steunen."
+          }
+        }
+      }
+    },
+    "You have logged \\(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person.": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du hast in den letzten 3 Wochen \\(count) Chills mit Sex und Substanzen eingetragen. Das ist ein ruhiges Gespräch mit deiner Hausärztin oder einer Vertrauensperson wert."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You have logged \\(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Has registrado \\(count) Chills con sexo y sustancias en las últimas 3 semanas. Merece una conversación tranquila con tu médico o alguien de confianza."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vous avez noté \\(count) Chills avec sexe et substances ces 3 dernières semaines. Cela mérite une conversation posée avec votre médecin ou une personne de confiance."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je hebt de afgelopen 3 weken \\(count) Chills met seks en middelen vastgelegd. Dat is een rustig gesprek met je huisarts of iemand die je vertrouwt waard."
+          }
+        }
+      }
+    },
     "You marked something that may need attention. You can reach out now, or just keep going. This stays private.": {
       "localizations": {
         "de": {
@@ -52490,6 +53120,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "Je bent nu veilig"
+          }
+        }
+      }
+    },
+    "\\(hours) h sleep": {
+      "extractionState": "manual",
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(hours) Std. Schlaf"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(hours) h sleep"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(hours) h de sueño"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(hours) h de sommeil"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\\(hours) u slaap"
           }
         }
       }

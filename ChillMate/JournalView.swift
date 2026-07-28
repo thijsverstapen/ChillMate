@@ -584,6 +584,7 @@ private struct JournalEntryCard: View {
                 }
                 .buttonStyle(ChillPlainButtonStyle())
                 .foregroundStyle(Color.chillSecondary)
+                .accessibilityLabel(String(localized: "Delete journal entry"))
             }
 
             JournalLine(title: String(localized: "Clear memory"), value: entry.rememberClearly)
