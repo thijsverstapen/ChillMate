@@ -92,18 +92,7 @@ enum ChillMateModelContainer {
     }
 
     private static var appSchema: Schema {
-        Schema([
-            NightEntry.self,
-            LoggedSubstanceRecord.self,
-            PartnerDetailRecord.self,
-            TriggerTagRecord.self,
-            UserProfile.self,
-            STDTestRecord.self,
-            DrugDoseTimerRecord.self,
-            SaferSessionPlan.self,
-            RiskCheckRecord.self,
-            JournalEntry.self
-        ])
+        Schema(ChillMateSchemaModels.all)
     }
 }
 
@@ -117,45 +106,105 @@ enum ChillMateModelContainer {
 @MainActor
 enum TypedRecordsMigration {
     static func runIfNeeded() {
+        let defaults = UserDefaults.standard
         let context = ChillMateModelContainer.container().mainContext
-        let descriptor = FetchDescriptor<NightEntry>(
+
+        // Once a run finds nothing left, later launches only need a bounded
+        // "is there anything new?" probe rather than a full predicate fetch over
+        // the whole table. A row synced later from an older build still gets
+        // picked up, because the probe is a real query — it is just capped at one
+        // row instead of materializing every match.
+        let settled = defaults.bool(forKey: DefaultsKey.typedRecordsMigrationCompleted)
+        var descriptor = FetchDescriptor<NightEntry>(
             predicate: #Predicate { $0.typedRecordsVersion == 0 }
         )
-        guard let entries = try? context.fetch(descriptor), !entries.isEmpty else { return }
+        if settled {
+            descriptor.fetchLimit = 1
+        }
+
+        guard let probe = try? context.fetch(descriptor), !probe.isEmpty else {
+            defaults.set(true, forKey: DefaultsKey.typedRecordsMigrationCompleted)
+            return
+        }
+
+        // Something turned up; if we were in the settled state, re-fetch in full.
+        let entries: [NightEntry]
+        if settled {
+            var full = FetchDescriptor<NightEntry>(
+                predicate: #Predicate { $0.typedRecordsVersion == 0 }
+            )
+            full.fetchLimit = 0
+            let refetched = context.fetchLogging(full)
+            entries = refetched.isEmpty ? probe : refetched
+        } else {
+            entries = probe
+        }
 
         for entry in entries {
             entry.materializeTypedRecordsIfNeeded()
         }
         context.saveChanges()
+        defaults.set(true, forKey: DefaultsKey.typedRecordsMigrationCompleted)
         Logger.data.info("Typed-records migration materialized \(entries.count, privacy: .public) entries")
     }
 }
 
-/// Versioned baseline for the current schema. Establishing this now (before publish)
-/// gives future schema changes an explicit migration foundation instead of relying
-/// solely on inferred lightweight migration.
+/// Versioned baseline for the schema as it shipped through 4.2.0.
+///
+/// Establishing this before publish gave future schema changes an explicit
+/// migration foundation instead of relying solely on inferred lightweight
+/// migration.
 enum ChillMateSchemaV1: VersionedSchema {
     static var versionIdentifier: Schema.Version { Schema.Version(1, 0, 0) }
 
-    static var models: [any PersistentModel.Type] {
-        [
-            NightEntry.self,
-            LoggedSubstanceRecord.self,
-            PartnerDetailRecord.self,
-            TriggerTagRecord.self,
-            UserProfile.self,
-            STDTestRecord.self,
-            DrugDoseTimerRecord.self,
-            SaferSessionPlan.self,
-            RiskCheckRecord.self,
-            JournalEntry.self
-        ]
-    }
+    static var models: [any PersistentModel.Type] { ChillMateSchemaModels.all }
+}
+
+/// 4.2.1: adds `NightEntry.contentVersion`, the edit counter that lets views
+/// distinguish "an entry changed" from "a row was added or removed".
+///
+/// The model list is identical — only an attribute was added, with a default, so
+/// SwiftData's lightweight inference handles it. The version is bumped anyway so
+/// the store records which shape it is on and a future stage that *does* need
+/// custom work has a defined predecessor to migrate from.
+enum ChillMateSchemaV2: VersionedSchema {
+    static var versionIdentifier: Schema.Version { Schema.Version(2, 0, 0) }
+
+    static var models: [any PersistentModel.Type] { ChillMateSchemaModels.all }
+}
+
+/// Single list of persisted models, shared by every schema version and by the
+/// live container, so the three can never drift apart.
+enum ChillMateSchemaModels {
+    static let all: [any PersistentModel.Type] = [
+        NightEntry.self,
+        LoggedSubstanceRecord.self,
+        PartnerDetailRecord.self,
+        TriggerTagRecord.self,
+        UserProfile.self,
+        STDTestRecord.self,
+        DrugDoseTimerRecord.self,
+        SaferSessionPlan.self,
+        RiskCheckRecord.self,
+        JournalEntry.self
+    ]
 }
 
 enum ChillMateMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [ChillMateSchemaV1.self] }
-    static var stages: [MigrationStage] { [] }
+    static var schemas: [any VersionedSchema.Type] {
+        [ChillMateSchemaV1.self, ChillMateSchemaV2.self]
+    }
+
+    /// V1 → V2 is `.lightweight`: the only change is a new attribute carrying a
+    /// default, which SwiftData can infer. It is declared explicitly rather than
+    /// left to an empty `stages` array so the path between versions is stated in
+    /// code, and so the next stage that needs a `.custom` handler has an obvious
+    /// place to go.
+    static var stages: [MigrationStage] {
+        [
+            .lightweight(fromVersion: ChillMateSchemaV1.self, toVersion: ChillMateSchemaV2.self)
+        ]
+    }
 }
 
 extension Logger {
@@ -172,6 +221,25 @@ extension ModelContext {
             try save()
         } catch {
             Logger.data.error("SwiftData save failed in \(caller, privacy: .public): \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Fetches, logging any failure and returning an empty result.
+    ///
+    /// Behaviour matches the `(try? fetch(...)) ?? []` this replaces — the caller
+    /// still gets an empty array — but a failing fetch now leaves a trace instead
+    /// of being indistinguishable from a genuinely empty table. That distinction
+    /// matters here: "no dose timers" and "the store could not be read" render the
+    /// same way on screen but mean very different things.
+    func fetchLogging<T>(
+        _ descriptor: FetchDescriptor<T>,
+        _ caller: String = #function
+    ) -> [T] {
+        do {
+            return try fetch(descriptor)
+        } catch {
+            Logger.data.error("SwiftData fetch failed in \(caller, privacy: .public): \(error.localizedDescription, privacy: .public)")
+            return []
         }
     }
 }

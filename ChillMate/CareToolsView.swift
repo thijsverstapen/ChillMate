@@ -1648,7 +1648,7 @@ struct DrugTimerView: View {
     }
 
     private func syncTimersToWatch() {
-        let all = (try? modelContext.fetch(FetchDescriptor<DrugDoseTimerRecord>())) ?? []
+        let all = modelContext.fetchLogging(FetchDescriptor<DrugDoseTimerRecord>())
         WatchConnectivityService.shared.sendActiveTimers(all)
     }
 
@@ -1939,7 +1939,7 @@ private struct DrugTimerCard: View {
                     modelContext.delete(timer)
                     modelContext.saveChanges()
                     WatchConnectivityService.shared.sendActiveTimers(
-                        (try? modelContext.fetch(FetchDescriptor<DrugDoseTimerRecord>())) ?? []
+                        modelContext.fetchLogging(FetchDescriptor<DrugDoseTimerRecord>())
                     )
                 } label: {
                     Image(systemName: "trash.fill")

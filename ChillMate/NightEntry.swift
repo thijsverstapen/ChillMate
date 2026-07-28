@@ -154,6 +154,29 @@ final class NightEntry {
     //     which the getters fall back to,
     //   - the encrypted-backup format (which reads these computed properties)
     //     stays byte-identical across versions.
+    //
+    // RETIRING THE BLOBS
+    //
+    // Dual-writing is a migration state, not a destination. It doubles the stored
+    // bytes and the CloudKit record payload, makes every getter a fallback chain,
+    // and leaves two representations that can in principle disagree. It is not
+    // meant to be permanent, and until now nothing recorded when it ends.
+    //
+    // The blocker is CloudKit, not local data: a device still on an older build
+    // writes blob-only rows, and those must keep resolving. So the exit condition
+    // is a *release* condition, not a code one:
+    //
+    //   1. 4.2.1 (this release) — dual-write continues. TypedRecordsMigration
+    //      stamps every local row typedRecordsVersion == 1.
+    //   2. Once App Store adoption of >= 4.2.0 is effectively complete (no build
+    //      older than typed records still syncing into a shared iCloud database,
+    //      in practice two or more releases later), stop WRITING the blobs while
+    //      still READING them. That is a one-line change in each setter.
+    //   3. One release after that, drop the *Data properties in a schema V3 stage
+    //      with a .custom handler that materializes any straggler rows first.
+    //
+    // Do not skip step 2: going straight from dual-write to dropped columns loses
+    // data for anyone whose old device syncs a blob-only row after the upgrade.
 
     @Relationship(deleteRule: .cascade, inverse: \LoggedSubstanceRecord.entry)
     var substanceRecords: [LoggedSubstanceRecord]? = nil
@@ -401,20 +424,27 @@ final class NightEntry {
         startDate.addingTimeInterval(72 * 60 * 60)
     }
 
+    // Coders are shared rather than allocated per call. These helpers run once per
+    // property read, and the getters are read repeatedly per render, so the
+    // allocations were not free. JSONEncoder/JSONDecoder are value types with no
+    // mutable configuration here, so sharing them is safe.
+    private static let encoder = JSONEncoder()
+    private static let decoder = JSONDecoder()
+
     private static func encode(_ substances: [String]) -> Data {
-        (try? JSONEncoder().encode(substances)) ?? Data("[]".utf8)
+        (try? encoder.encode(substances)) ?? Data("[]".utf8)
     }
 
     private static func decode(_ data: Data) -> [String] {
-        (try? JSONDecoder().decode([String].self, from: data)) ?? []
+        (try? decoder.decode([String].self, from: data)) ?? []
     }
 
     private static func encodePartners(_ partners: [SexPartnerRecord]) -> Data {
-        (try? JSONEncoder().encode(partners)) ?? Data("[]".utf8)
+        (try? encoder.encode(partners)) ?? Data("[]".utf8)
     }
 
     private static func decodePartners(_ data: Data) -> [SexPartnerRecord] {
-        (try? JSONDecoder().decode([SexPartnerRecord].self, from: data)) ?? []
+        (try? decoder.decode([SexPartnerRecord].self, from: data)) ?? []
     }
 
     private static func encodeTriggers(_ values: [ChillTrigger]) -> Data {
@@ -434,13 +464,11 @@ final class NightEntry {
     }
 
     private static func encodeSymptoms(_ symptoms: [AftercareSymptom]) -> Data {
-        let rawValues = symptoms.map(\.rawValue)
-        return (try? JSONEncoder().encode(rawValues)) ?? Data("[]".utf8)
+        encode(symptoms.map(\.rawValue))
     }
 
     private static func decodeSymptoms(_ data: Data) -> [AftercareSymptom] {
-        let rawValues = (try? JSONDecoder().decode([String].self, from: data)) ?? []
-        return rawValues.compactMap(AftercareSymptom.init(rawValue:))
+        decode(data).compactMap(AftercareSymptom.init(rawValue:))
     }
 }
 
