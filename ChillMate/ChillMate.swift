@@ -8,10 +8,10 @@ import UserNotifications
 @main
 struct ChillMateApp: App {
     @UIApplicationDelegateAdaptor(ChillMateAppDelegate.self) private var appDelegate
-    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
-    @AppStorage("dailyAffirmationsEnabled") private var dailyAffirmationsEnabled = false
-    @AppStorage("lastAppUseTimestamp") private var lastAppUseTimestamp = Date.now.timeIntervalSince1970
-    @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
+    @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
+    @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
+    @AppStorage(DefaultsKey.lastAppUseTimestamp) private var lastAppUseTimestamp = Date.now.timeIntervalSince1970
+    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
@@ -41,9 +41,9 @@ struct ChillMateApp: App {
             .onContinueUserActivity(CSSearchableItemActionType) { activity in
                 guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
                 if id == SpotlightService.riskCheckerItemID {
-                    UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: "pendingAppDestination")
+                    UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: DefaultsKey.pendingAppDestination)
                 } else if id.hasPrefix("journal-") {
-                    UserDefaults.standard.set(NotificationDestination.journal.rawValue, forKey: "pendingAppDestination")
+                    UserDefaults.standard.set(NotificationDestination.journal.rawValue, forKey: DefaultsKey.pendingAppDestination)
                 }
             }
             .onChange(of: scenePhase) { _, newPhase in
@@ -63,7 +63,7 @@ struct ChillMateApp: App {
     }
 
     private func refreshLiveActivities() {
-        guard UserDefaults.standard.bool(forKey: "hasActiveDrugTimer") else { return }
+        guard UserDefaults.standard.bool(forKey: DefaultsKey.hasActiveDrugTimer) else { return }
         NotificationCenter.default.post(name: .chillMateRefreshTimers, object: nil)
     }
 
@@ -79,9 +79,9 @@ struct ChillMateApp: App {
         }
 
         let today = Calendar.current.startOfDay(for: .now)
-        let lastScheduled = Date(timeIntervalSince1970: UserDefaults.standard.double(forKey: "lastInactivityScheduleDay"))
+        let lastScheduled = Date(timeIntervalSince1970: UserDefaults.standard.double(forKey: DefaultsKey.lastInactivityScheduleDay))
         if lastScheduled < today {
-            UserDefaults.standard.set(today.timeIntervalSince1970, forKey: "lastInactivityScheduleDay")
+            UserDefaults.standard.set(today.timeIntervalSince1970, forKey: DefaultsKey.lastInactivityScheduleDay)
             let lastUseDate = Date(timeIntervalSince1970: lastAppUseTimestamp)
             NotificationService.shared.scheduleInactivityReminders(from: lastUseDate)
         }
@@ -93,10 +93,10 @@ struct ChillMateApp: App {
             // Regenerate affirmations on-device at most once per day so fresh,
             // personalized text is used when Apple Intelligence is available,
             // without running the model on every foreground.
-            let lastAffirmationDay = Date(timeIntervalSince1970: UserDefaults.standard.double(forKey: "lastAffirmationScheduleDay"))
+            let lastAffirmationDay = Date(timeIntervalSince1970: UserDefaults.standard.double(forKey: DefaultsKey.lastAffirmationScheduleDay))
             if lastAffirmationDay < today {
-                UserDefaults.standard.set(today.timeIntervalSince1970, forKey: "lastAffirmationScheduleDay")
-                let language = UserDefaults.standard.string(forKey: "appLanguage") ?? "en"
+                UserDefaults.standard.set(today.timeIntervalSince1970, forKey: DefaultsKey.lastAffirmationScheduleDay)
+                let language = UserDefaults.standard.string(forKey: DefaultsKey.appLanguage) ?? "en"
                 Task {
                     await NotificationService.shared.scheduleDailyAffirmationsUsingOnDeviceModel(languageCode: language)
                 }
@@ -121,7 +121,7 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         UNUserNotificationCenter.current().delegate = self
         NotificationService.shared.registerCategories()
         // Required for CloudKit silent-push sync and HealthKit background delivery
-        if UserDefaults.standard.bool(forKey: "iCloudBackupEnabled") {
+        if UserDefaults.standard.bool(forKey: DefaultsKey.iCloudBackupEnabled) {
             application.registerForRemoteNotifications()
         }
         return true
@@ -154,16 +154,16 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
     ) {
         switch response.actionIdentifier {
         case NotificationService.ActionIdentifier.logNow:
-            UserDefaults.standard.set(NotificationDestination.log.rawValue, forKey: "pendingAppDestination")
+            UserDefaults.standard.set(NotificationDestination.log.rawValue, forKey: DefaultsKey.pendingAppDestination)
         case NotificationService.ActionIdentifier.snooze:
             NotificationService.shared.snoozeCurrentCheckIn()
         case NotificationService.ActionIdentifier.getHelp:
-            UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: "pendingAppDestination")
+            UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: DefaultsKey.pendingAppDestination)
         case NotificationService.ActionIdentifier.imSafe:
             break
         default:
             if let destination = response.notification.request.content.userInfo["destination"] as? String {
-                UserDefaults.standard.set(destination, forKey: "pendingAppDestination")
+                UserDefaults.standard.set(destination, forKey: DefaultsKey.pendingAppDestination)
             }
         }
         completionHandler()
@@ -190,7 +190,7 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
             return false
         }
 
-        UserDefaults.standard.set(destination.rawValue, forKey: "pendingAppDestination")
+        UserDefaults.standard.set(destination.rawValue, forKey: DefaultsKey.pendingAppDestination)
         return true
     }
 }

@@ -37,7 +37,7 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 
 /// Applies and reports the app's language override.
 ///
-/// The in-app Language picker used to write `@AppStorage("appLanguage")` and
+/// The in-app Language picker used to write `@AppStorage(DefaultsKey.appLanguage)` and
 /// nothing else. No code read that key to change the UI language — there was no
 /// `AppleLanguages` write, no `Locale` override, no `.environment(\.locale)`
 /// anywhere in the project — so the only thing it affected was the language passed

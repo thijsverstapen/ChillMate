@@ -14,6 +14,7 @@ struct FirstLaunchSplashView: View {
     @State private var player = AVPlayer()
     @State private var didFinish = false
     @State private var endObserver: NSObjectProtocol?
+    @State private var watchdog: Task<Void, Never>?
 
     var body: some View {
         ZStack {
@@ -27,6 +28,7 @@ struct FirstLaunchSplashView: View {
         }
         .onAppear(perform: start)
         .onDisappear {
+            watchdog?.cancel()
             if let endObserver {
                 NotificationCenter.default.removeObserver(endObserver)
             }
@@ -56,8 +58,13 @@ struct FirstLaunchSplashView: View {
         player.play()
 
         // Safety net: if playback stalls or can't start, continue anyway.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-            MainActor.assumeIsolated { finishOnce() }
+        // A Task rather than asyncAfter so it stops with the view instead of firing
+        // onFinish() six seconds after the splash has already been dismissed.
+        watchdog?.cancel()
+        watchdog = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(6))
+            guard !Task.isCancelled else { return }
+            finishOnce()
         }
     }
 

@@ -5,7 +5,7 @@ import UIKit
 /// File-backed storage for the custom dashboard background photo.
 ///
 /// The photo used to live in UserDefaults as a base64 `String`, read through
-/// `@AppStorage("appBackgroundPhotoData")`. UserDefaults is a preferences plist:
+/// `@AppStorage(DefaultsKey.appBackgroundPhotoData)`. UserDefaults is a preferences plist:
 /// it is loaded into memory in full at launch and rewritten synchronously, so a
 /// multi-megabyte base64 image sat in memory for the life of the process and cost a
 /// full plist rewrite on every change. Worse, `DashboardBackdrop` derived its cache

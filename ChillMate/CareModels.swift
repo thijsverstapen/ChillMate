@@ -395,7 +395,7 @@ enum DrugTimerLiveActivityController {
                 pushType: nil
             )
             timer.liveActivityID = activity.id
-            UserDefaults.standard.set(true, forKey: "hasActiveDrugTimer")
+            UserDefaults.standard.set(true, forKey: DefaultsKey.hasActiveDrugTimer)
         } catch {
             timer.liveActivityID = ""
             print("[ChillMate] Live Activity request failed: \(error)")
@@ -440,7 +440,7 @@ enum DrugTimerLiveActivityController {
         
         let hasOtherActivities = Activity<DrugTimerActivityAttributes>.activities.contains { $0.id != timer.liveActivityID }
         if !hasOtherActivities {
-            UserDefaults.standard.set(false, forKey: "hasActiveDrugTimer")
+            UserDefaults.standard.set(false, forKey: DefaultsKey.hasActiveDrugTimer)
         }
     }
 }

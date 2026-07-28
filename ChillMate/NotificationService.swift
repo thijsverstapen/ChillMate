@@ -61,14 +61,14 @@ final class NotificationService {
     private init() {}
 
     private var discreetNotificationsEnabled: Bool {
-        if UserDefaults.standard.object(forKey: "discreetNotifications") == nil {
+        if UserDefaults.standard.object(forKey: DefaultsKey.discreetNotifications) == nil {
             return false
         }
-        return UserDefaults.standard.bool(forKey: "discreetNotifications")
+        return UserDefaults.standard.bool(forKey: DefaultsKey.discreetNotifications)
     }
 
     private var notificationTone: NotificationTone {
-        if let value = UserDefaults.standard.string(forKey: "notificationTone"),
+        if let value = UserDefaults.standard.string(forKey: DefaultsKey.notificationTone),
            let tone = NotificationTone(rawValue: value) {
             return tone
         }
@@ -78,12 +78,12 @@ final class NotificationService {
     var checkInHour: Int {
         // Respect an explicitly-set hour (including midnight, 0). Only fall back to
         // 10:00 when the user has never chosen a time.
-        guard UserDefaults.standard.object(forKey: "checkInHour") != nil else { return 10 }
-        return UserDefaults.standard.integer(forKey: "checkInHour")
+        guard UserDefaults.standard.object(forKey: DefaultsKey.checkInHour) != nil else { return 10 }
+        return UserDefaults.standard.integer(forKey: DefaultsKey.checkInHour)
     }
 
     var checkInMinute: Int {
-        UserDefaults.standard.integer(forKey: "checkInMinute")
+        UserDefaults.standard.integer(forKey: DefaultsKey.checkInMinute)
     }
 
     /// Selects the body text for the user's chosen tone.
@@ -285,7 +285,7 @@ final class NotificationService {
     /// "I'm safe" / "Get help" actions. Self-gates, so callers can fire it freely.
     func scheduleWeekendSafetyCheckIns() {
         clearWeekendSafetyCheckIns()
-        guard UserDefaults.standard.bool(forKey: "weekendSafetyEnabled") else { return }
+        guard UserDefaults.standard.bool(forKey: DefaultsKey.weekendSafetyEnabled) else { return }
 
         // Calendar weekday: Sunday = 1 … Saturday = 7. Saturday's early hours are
         // Friday night; Sunday's early hours are Saturday night. Two soft pings each.
@@ -835,7 +835,7 @@ final class NotificationService {
 
         // Opt-in "safety check-ins": more assertive (active vs passive) and carrying
         // a one-tap "Get help" action that routes to the trusted contact / emergency.
-        let safetyMode = UserDefaults.standard.bool(forKey: "safetyCheckInsEnabled")
+        let safetyMode = UserDefaults.standard.bool(forKey: DefaultsKey.safetyCheckInsEnabled)
         let category = safetyMode ? "SAFETY_CHECKIN" : "CHECKIN"
         let level: UNNotificationInterruptionLevel = safetyMode ? .active : .passive
 

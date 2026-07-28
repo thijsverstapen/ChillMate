@@ -134,7 +134,7 @@ final class WatchConnectivityService: NSObject {
             NotificationCenter.default.post(name: .watchDidRequestSOS, object: nil)
         }
         if let value = payload["setDiscreetCheckIns"] as? Bool {
-            UserDefaults.standard.set(value, forKey: "watchDiscreetCheckIns")
+            UserDefaults.standard.set(value, forKey: DefaultsKey.watchDiscreetCheckIns)
             sendSettings() // echo the change back so both sides agree
         }
     }

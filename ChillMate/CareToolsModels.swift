@@ -59,6 +59,19 @@ enum EmergencyContactInfo {
     static var dialURL: URL? {
         URL(string: "tel://\(dialDigits(number))")
     }
+
+    /// Non-optional dial URL for SwiftUI's `Link(destination:)`, which requires one.
+    ///
+    /// Built from `URLComponents` rather than force-unwrapping a literal, so there
+    /// is no `!` anywhere on the emergency-call path. 112 is the fallback of last
+    /// resort here only because the resolved number failed to parse — the ordinary
+    /// path is `dialURL`, which already honours the user's country and override.
+    static var fallbackDialURL: URL {
+        var components = URLComponents()
+        components.scheme = "tel"
+        components.host = dialDigits(number).isEmpty ? "112" : dialDigits(number)
+        return components.url ?? URL(fileURLWithPath: "/")
+    }
 }
 
 enum CareToolPage: String, Identifiable {

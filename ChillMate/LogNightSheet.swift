@@ -8,9 +8,9 @@ import SwiftUI
 struct LogNightSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
-    @AppStorage("healthKitSleepReadWriteEnabled") private var healthKitSleepReadEnabled = false
-    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
+    @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthKitSleepReadEnabled = false
+    @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
 
     @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
 
@@ -43,7 +43,7 @@ struct LogNightSheet: View {
     @State private var memoryNeedsHelp = false
     @State private var memoryNotes = ""
     @State private var isShowingMemoryGapAlert = false
-    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
+    @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
     @State private var note = ""
     @State private var attachedLocation: LoggedLocation?
     @State private var locationMessage: String?
@@ -975,7 +975,7 @@ private struct MemoryGapProtocolCard: View {
     @Binding var needsHelp: Bool
     @Binding var notes: String
 
-    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
+    @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
     @Environment(\.openURL) private var openURL
     @State private var showSafetyCheck = false
 

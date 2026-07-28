@@ -8,7 +8,7 @@ struct WeeklyReflectionView: View {
     @Environment(\.dismiss) private var dismiss
     @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
     @Query(ChillMateQueries.recentJournalEntries) private var journalEntries: [JournalEntry]
-    @AppStorage("appLanguage") private var appLanguage = "en"
+    @AppStorage(DefaultsKey.appLanguage) private var appLanguage = "en"
     @State private var aiReflection: String?
     @State private var didRequestReflection = false
 

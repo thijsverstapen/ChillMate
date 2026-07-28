@@ -35,7 +35,7 @@ final class EncryptedBackupService {
         let key = try EncryptedBackupKeychain.shared.archiveKey()
         let encryptedData = try encrypt(payload, with: key.data)
         try EncryptedBackupKeychain.shared.saveRecoverySnapshot(encryptedData)
-        UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: "lastOnDeviceRecoverySnapshotTimestamp")
+        UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.lastOnDeviceRecoverySnapshotTimestamp)
         return true
     }
 
@@ -57,14 +57,14 @@ final class EncryptedBackupService {
 
         try archive.merge(into: context)
         try context.save()
-        UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: "lastOnDeviceRecoveryRestoreTimestamp")
+        UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.lastOnDeviceRecoveryRestoreTimestamp)
         return archive.importSummary
     }
 
     func deleteOnDeviceRecoverySnapshot() throws {
         try EncryptedBackupKeychain.shared.deleteRecoverySnapshot()
-        UserDefaults.standard.removeObject(forKey: "lastOnDeviceRecoverySnapshotTimestamp")
-        UserDefaults.standard.removeObject(forKey: "lastOnDeviceRecoveryRestoreTimestamp")
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.lastOnDeviceRecoverySnapshotTimestamp)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.lastOnDeviceRecoveryRestoreTimestamp)
     }
 
     private func encrypt(_ payload: Data, with keyData: Data) throws -> Data {
@@ -133,7 +133,7 @@ final class ICloudBackupService {
         pruneArchives(in: directory)
 
         let date = Date.now
-        UserDefaults.standard.set(date.timeIntervalSince1970, forKey: "lastICloudBackupTimestamp")
+        UserDefaults.standard.set(date.timeIntervalSince1970, forKey: DefaultsKey.lastICloudBackupTimestamp)
         UserDefaults.standard.set(String(localized: "Encrypted iCloud backup saved."), forKey: DefaultsKey.lastICloudBackupStatus)
         return date
     }
@@ -142,7 +142,7 @@ final class ICloudBackupService {
         let url = try latestBackupURL()
         let data = try Data(contentsOf: url)
         let summary = try EncryptedBackupService.shared.importEncryptedBackupData(data, into: context)
-        UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: "lastICloudRestoreTimestamp")
+        UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.lastICloudRestoreTimestamp)
         UserDefaults.standard.set(String(localized: "Restored \(summary.totalItems) items from iCloud."), forKey: DefaultsKey.lastICloudBackupStatus)
         return summary
     }
@@ -163,8 +163,8 @@ final class ICloudBackupService {
             try FileManager.default.removeItem(at: url)
         }
 
-        UserDefaults.standard.removeObject(forKey: "lastICloudBackupTimestamp")
-        UserDefaults.standard.removeObject(forKey: "lastICloudRestoreTimestamp")
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.lastICloudBackupTimestamp)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.lastICloudRestoreTimestamp)
         UserDefaults.standard.set(String(localized: "iCloud backups deleted."), forKey: DefaultsKey.lastICloudBackupStatus)
     }
 

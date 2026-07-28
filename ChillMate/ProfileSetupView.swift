@@ -16,11 +16,11 @@ struct AppHomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
-    @AppStorage("lastOnDeviceRecoveryStatus") private var lastOnDeviceRecoveryStatus = ""
-    @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
-    @AppStorage("lastICloudBackupStatus") private var lastICloudBackupStatus = ""
-    @AppStorage("lastICloudBackupTimestamp") private var lastICloudBackupTimestamp = 0.0
-    @AppStorage("hasShownFirstLaunchSplash") private var hasShownFirstLaunchSplash = false
+    @AppStorage(DefaultsKey.lastOnDeviceRecoveryStatus) private var lastOnDeviceRecoveryStatus = ""
+    @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
+    @AppStorage(DefaultsKey.lastICloudBackupStatus) private var lastICloudBackupStatus = ""
+    @AppStorage(DefaultsKey.lastICloudBackupTimestamp) private var lastICloudBackupTimestamp = 0.0
+    @AppStorage(DefaultsKey.hasShownFirstLaunchSplash) private var hasShownFirstLaunchSplash = false
     @State private var didAttemptRecoveryRestore = false
 
     var body: some View {
@@ -116,9 +116,9 @@ private struct MainTabView: View {
     @State private var careNavPath: [CareToolPage] = []
     @State private var historySegment: HistorySegment = .calendar
     @State private var isShowingShortcutLog = false
-    @AppStorage("pendingAppDestination") private var pendingAppDestination = ""
-    @AppStorage("lastSelectedTab") private var lastSelectedTab = AppTab.home.rawValue
-    @AppStorage("lastBackgroundedAt") private var lastBackgroundedAt = 0.0
+    @AppStorage(DefaultsKey.pendingAppDestination) private var pendingAppDestination = ""
+    @AppStorage(DefaultsKey.lastSelectedTab) private var lastSelectedTab = AppTab.home.rawValue
+    @AppStorage(DefaultsKey.lastBackgroundedAt) private var lastBackgroundedAt = 0.0
     @Environment(\.scenePhase) private var scenePhase
 
     /// After at least this long in the background, reopening the app returns to
@@ -1083,23 +1083,23 @@ struct AgeVerificationInfo: View {
 
 struct ProfileSetupView: View {
     @Environment(\.modelContext) private var modelContext
-    @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
-    @AppStorage("healthKitSexualActivityWriteEnabled") private var healthKitSexualActivityWriteEnabled = false
-    @AppStorage("healthKitSleepReadWriteEnabled") private var healthKitSleepReadWriteEnabled = false
-    @AppStorage("healthKitHeartRateReadEnabled") private var healthKitHeartRateReadEnabled = false
-    @AppStorage("healthKitHRVReadEnabled") private var healthKitHRVReadEnabled = false
-    @AppStorage("healthKitWorkoutReadEnabled") private var healthKitWorkoutReadEnabled = false
-    @AppStorage("appLanguage") private var appLanguage = "en"
-    @AppStorage("country") private var country = "Netherlands"
-    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
-    @AppStorage("dailyAffirmationsEnabled") private var dailyAffirmationsEnabled = false
-    @AppStorage("requiresFaceID") private var requiresFaceID = false
-    @AppStorage("locationServicesChecked") private var locationServicesChecked = false
-    @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
-    @AppStorage("lastICloudBackupStatus") private var lastICloudBackupStatus = ""
-    @AppStorage("trustedContactName") private var trustedContactName = ""
-    @AppStorage("trustedContactPhone") private var trustedContactPhone = ""
-    @AppStorage("trustedContactMessage") private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
+    @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
+    @AppStorage(DefaultsKey.healthKitSexualActivityWriteEnabled) private var healthKitSexualActivityWriteEnabled = false
+    @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthKitSleepReadWriteEnabled = false
+    @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
+    @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
+    @AppStorage(DefaultsKey.healthKitWorkoutReadEnabled) private var healthKitWorkoutReadEnabled = false
+    @AppStorage(DefaultsKey.appLanguage) private var appLanguage = "en"
+    @AppStorage(DefaultsKey.country) private var country = "Netherlands"
+    @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
+    @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
+    @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
+    @AppStorage(DefaultsKey.locationServicesChecked) private var locationServicesChecked = false
+    @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
+    @AppStorage(DefaultsKey.lastICloudBackupStatus) private var lastICloudBackupStatus = ""
+    @AppStorage(DefaultsKey.trustedContactName) private var trustedContactName = ""
+    @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
+    @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
 
     @State private var hasSeenIntroduction = false
     @State private var setupStep: ProfileSetupStep = .basicDetails
@@ -1138,11 +1138,11 @@ struct ProfileSetupView: View {
 
     // MARK: Age assurance (DeclaredAgeRange)
     /// Set once Apple's age-range signal confirms 18+, so we don't re-prompt.
-    @AppStorage("ageAssuranceVerifiedAdult") private var ageAssuranceVerifiedAdult = false
+    @AppStorage(DefaultsKey.ageAssuranceVerifiedAdult) private var ageAssuranceVerifiedAdult = false
     /// True only when Apple positively reports the account is under 18. Persisted
     /// so the 18+ block survives an app relaunch (a determined relaunch must not
     /// silently clear an authoritative under-18 signal).
-    @AppStorage("ageAssuranceUnderage") private var ageAssuranceUnderage = false
+    @AppStorage(DefaultsKey.ageAssuranceUnderage) private var ageAssuranceUnderage = false
     @State private var isCheckingAgeRange = false
     @State private var ageAssuranceMessage: String?
     #if canImport(DeclaredAgeRange)
@@ -2128,11 +2128,11 @@ private struct ProfilePermissionsPage: View {
     @Binding var requiresFaceID: Bool
     @Binding var locationServicesChecked: Bool
     @Binding var iCloudBackupEnabled: Bool
-    @AppStorage("discreetNotifications") private var discreetNotifications = false
-    @AppStorage("weekendSafetyEnabled") private var weekendSafetyEnabled = false
-    @AppStorage("safetyCheckInsEnabled") private var safetyCheckInsEnabled = false
-    @AppStorage("weeklyDigestEnabled") private var weeklyDigestEnabled = false
-    @AppStorage("stiReminderEnabled") private var stiReminderEnabled = false
+    @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
+    @AppStorage(DefaultsKey.weekendSafetyEnabled) private var weekendSafetyEnabled = false
+    @AppStorage(DefaultsKey.safetyCheckInsEnabled) private var safetyCheckInsEnabled = false
+    @AppStorage(DefaultsKey.weeklyDigestEnabled) private var weeklyDigestEnabled = false
+    @AppStorage(DefaultsKey.stiReminderEnabled) private var stiReminderEnabled = false
     let message: String?
     let isChecking: Bool
     let requestHealth: () -> Void
@@ -2607,6 +2607,7 @@ private final class MotionTilt: ObservableObject {
 
 @MainActor
 private struct ProfileIntroductionView: View {
+    @StateObject private var delays = DelayedActionRunner()
     let continueAction: () -> Void
     @State private var activePage = 0
     @State private var isCompleting = false
@@ -2615,8 +2616,8 @@ private struct ProfileIntroductionView: View {
     @State private var containerWidth: CGFloat = 1
     @StateObject private var tilt = MotionTilt()
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
-    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
-    @AppStorage("onboardingSwipeHintShown") private var swipeHintShown = false
+    @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
+    @AppStorage(DefaultsKey.onboardingSwipeHintShown) private var swipeHintShown = false
 
     private let pages = IntroPage.all
     private var currentPage: IntroPage {
@@ -2717,9 +2718,9 @@ private struct ProfileIntroductionView: View {
     private func armSwipeHint() {
         guard !swipeHintShown, !motionOff else { return }
         swipeHintShown = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
+        delays.run(after: .milliseconds(1100), skipDelayWhenReducingMotion: false) {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.55)) { nudge = -24 }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.44) {
+            delays.run(after: .milliseconds(440), skipDelayWhenReducingMotion: false) {
                 withAnimation(.spring(response: 0.62, dampingFraction: 0.7)) { nudge = 0 }
             }
         }
@@ -2736,7 +2737,7 @@ private struct ProfileIntroductionView: View {
     private func finish() {
         guard !isCompleting else { return }
         withAnimation(.spring(response: 0.56, dampingFraction: 0.82)) { isCompleting = true }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) { continueAction() }
+        delays.run(after: .milliseconds(500), reduceMotion: motionOff) { continueAction() }
     }
 
     private func goBack() {
@@ -2746,6 +2747,7 @@ private struct ProfileIntroductionView: View {
 }
 
 private struct IntroBottomControls: View {
+    @StateObject private var delays = DelayedActionRunner()
     let index: Int
     let count: Int
     let isCompleting: Bool
@@ -2754,7 +2756,7 @@ private struct IntroBottomControls: View {
     @State private var shimmerPhase: CGFloat = -0.4
     @State private var isPressed = false
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
-    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
+    @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -2763,9 +2765,11 @@ private struct IntroBottomControls: View {
             OnboardingProgress(index: index, count: count)
 
             Button {
-                withAnimation(.spring(response: 0.20, dampingFraction: 0.68)) { isPressed = true }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) {
-                    withAnimation(.spring(response: 0.30, dampingFraction: 0.80)) { isPressed = false }
+                if !(reduceSystemMotion || chillReducedMotion) {
+                    withAnimation(.spring(response: 0.20, dampingFraction: 0.68)) { isPressed = true }
+                    delays.run(after: .milliseconds(140), skipDelayWhenReducingMotion: false) {
+                        withAnimation(.spring(response: 0.30, dampingFraction: 0.80)) { isPressed = false }
+                    }
                 }
                 action()
             } label: {
@@ -2905,6 +2909,7 @@ private enum IntroAnimationKind {
 
 @MainActor
 private struct IntroSlideView: View {
+    @StateObject private var delays = DelayedActionRunner()
     let page: IntroPage
     let index: Int
     let isCompleting: Bool
@@ -2917,7 +2922,7 @@ private struct IntroSlideView: View {
     var showSkip: Bool = false
     var onSkip: (() -> Void)? = nil
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
-    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
+    @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
     @State private var checkmarkInPlace = false
     @State private var textVisible = false
 
@@ -2983,10 +2988,10 @@ private struct IntroSlideView: View {
     private func armEntrance() {
         textVisible = false
         checkmarkInPlace = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+        delays.run(after: .milliseconds(60), skipDelayWhenReducingMotion: false) {
             withAnimation(.spring(response: 0.58, dampingFraction: 0.80)) { textVisible = true }
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) {
+        delays.run(after: .milliseconds(160), skipDelayWhenReducingMotion: false) {
             withAnimation(.spring(response: 0.70, dampingFraction: 0.62)) { checkmarkInPlace = true }
         }
     }
@@ -3068,7 +3073,7 @@ private struct IntroTextBlock: View {
 private struct IntroRootBackground: View {
     let kind: IntroAnimationKind
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
-    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
+    @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
 
     var body: some View {
         TimelineView(.animation) { ctx in
@@ -3326,6 +3331,7 @@ private struct MorphingIntroHero: View {
 
 @MainActor
 private struct IntroHeroScene: View {
+    @StateObject private var delays = DelayedActionRunner()
     let kind: IntroAnimationKind
     let phase: TimeInterval
     let isCompleting: Bool
@@ -3336,7 +3342,7 @@ private struct IntroHeroScene: View {
     @State private var careLead: Int? = nil
     @State private var careTapped = false
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
-    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
+    @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
 
     private var careMotionOff: Bool { reduceSystemMotion || chillReducedMotion }
 
@@ -3361,16 +3367,17 @@ private struct IntroHeroScene: View {
         .sensoryFeedback(.impact(weight: .medium), trigger: careLead)
         .onAppear {
             appeared = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
+            delays.run(after: .milliseconds(40), skipDelayWhenReducingMotion: false) {
                 withAnimation { appeared = true }
             }
         }
         .onChange(of: pageIndex) { _, _ in
             appeared = false
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.04) {
+            delays.run(after: .milliseconds(40), skipDelayWhenReducingMotion: false) {
                 withAnimation { appeared = true }
             }
         }
+        .cancellingDelayedActions(delays)
     }
 
     private func selectMoment(_ index: Int) {

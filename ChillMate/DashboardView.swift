@@ -5,13 +5,13 @@ import WidgetKit
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
-    @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
-    @AppStorage("lastKnownHRVms") private var lastKnownHRVms: Double = 0
-    @AppStorage("healthKitHRVReadEnabled") private var healthKitHRVReadEnabled = false
-    @AppStorage("healthKitHeartRateReadEnabled") private var healthKitHeartRateReadEnabled = false
-    @AppStorage("reductionGoalSessions") private var reductionGoalSessions = 0
-    @AppStorage("reductionGoalCountSubstanceOnly") private var reductionGoalCountSubstanceOnly = true
-    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
+    @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
+    @AppStorage(DefaultsKey.lastKnownHRVms) private var lastKnownHRVms: Double = 0
+    @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
+    @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
+    @AppStorage(DefaultsKey.reductionGoalSessions) private var reductionGoalSessions = 0
+    @AppStorage(DefaultsKey.reductionGoalCountSubstanceOnly) private var reductionGoalCountSubstanceOnly = true
+    @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @Query(ChillMateQueries.dashboardEntries) private var entries: [NightEntry]
     @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
     @Query(ChillMateQueries.recentPlansByCreation) private var plans: [SaferSessionPlan]
@@ -260,7 +260,7 @@ struct DashboardView: View {
             .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestSOS)) { _ in
                 // "Ping my phone" from the Watch Safety screen routes this phone
                 // straight to the country-aware emergency page.
-                UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: "pendingAppDestination")
+                UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: DefaultsKey.pendingAppDestination)
             }
             .task(id: healthKitHRVReadEnabled) {
                 guard healthKitHRVReadEnabled else { return }
@@ -383,7 +383,7 @@ struct DashboardView: View {
     private func updateWidgetData(metrics: DashboardMetrics) {
         let shared = UserDefaults(suiteName: "group.com.codex.ChillMate") ?? .standard
         shared.set(metrics.recoveryStreakDays, forKey: "widgetRecoveryStreak")
-        shared.set(metrics.dailyScore.displayValue, forKey: "lastDailyRecoveryScore")
+        shared.set(metrics.dailyScore.displayValue, forKey: DefaultsKey.lastDailyRecoveryScore)
         shared.set(metrics.dailyScore.isActive, forKey: "widgetScoreIsActive")
         WidgetCenter.shared.reloadAllTimelines()
 
@@ -1777,7 +1777,7 @@ private struct MilestoneShareSheet: View {
 
 private struct ProfessionalHelpView: View {
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
+    @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
 
     private var palette: DailyScorePalette {
         DailyScorePalette(score: lastDailyRecoveryScore)
@@ -2103,6 +2103,9 @@ private struct GetHelpNowBar: View {
 }
 
 private struct MetricsGrid: View {
+    @StateObject private var delays = DelayedActionRunner()
+    @Environment(\.chillReduceMotion) private var reduceMotion
+
     let trackedCount: Int
     let skippedCount: Int
     let substanceCount: Int
@@ -2173,12 +2176,15 @@ private struct MetricsGrid: View {
         .sheet(isPresented: $isShowingFactors) {
             ScoreFactorsSheet(score: dailyScore, openCalendar: {
                 isShowingFactors = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { openRecoveryStreak() }
+                // Cancellable, and skipped entirely under Reduce Motion, where the
+                // delay exists only to let a flourish play.
+                delays.run(after: .milliseconds(350), reduceMotion: reduceMotion) { openRecoveryStreak() }
             })
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
         .sensoryFeedback(trigger: isShowingFactors) { _, presented in presented ? .impact(weight: .light) : nil }
+        .cancellingDelayedActions(delays)
     }
 
     private var sleepValue: String {
@@ -3257,8 +3263,8 @@ private struct ProfilePhotoHeader: View {
 private struct ProfileEditView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
-    @AppStorage("country") private var country = "Netherlands"
+    @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
+    @AppStorage(DefaultsKey.country) private var country = "Netherlands"
     @Bindable var profile: UserProfile
 
     private var palette: DailyScorePalette {

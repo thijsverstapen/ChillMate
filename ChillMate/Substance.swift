@@ -255,7 +255,7 @@ enum Substance: String, CaseIterable, Identifiable {
     }
 
     private static var referenceCountry: String {
-        UserDefaults.standard.string(forKey: "country") ?? "Netherlands"
+        UserDefaults.standard.string(forKey: DefaultsKey.country) ?? "Netherlands"
     }
 
     var referenceURL: URL? {

@@ -92,6 +92,32 @@ enum DefaultsKey {
     static let watchVisibleTimers = "watchVisibleTimers"
     static let watchHeartRateWarnings = "watchHeartRateWarnings"
 
+    // MARK: Consent, recovery & emergency free-text
+    static let consentBoundaryWant = "consentBoundaryWant"
+    static let consentBoundaryNo = "consentBoundaryNo"
+    static let consentCheckInPhrase = "consentCheckInPhrase"
+    static let consentExitPlan = "consentExitPlan"
+    static let recoveryGoal = "recoveryGoal"
+    static let recoveryCommitment = "recoveryCommitment"
+    static let recoverySupportPerson = "recoverySupportPerson"
+    static let emergencyAllergies = "emergencyAllergies"
+    static let emergencyInstructions = "emergencyInstructions"
+    static let localHealthcareContact = "localHealthcareContact"
+
+    // MARK: Onboarding & UI state
+    static let ageAssuranceVerifiedAdult = "ageAssuranceVerifiedAdult"
+    static let ageAssuranceUnderage = "ageAssuranceUnderage"
+    static let onboardingSwipeHintShown = "onboardingSwipeHintShown"
+    static let locationServicesChecked = "locationServicesChecked"
+    static let lastSelectedTab = "lastSelectedTab"
+    static let lastBackgroundedAt = "lastBackgroundedAt"
+    static let oneHandedControls = "oneHandedControls"
+
+    // MARK: Misc settings
+    static let healthKitSexualActivityWriteEnabled = "healthKitSexualActivityWriteEnabled"
+    static let stiReminderMonths = "stiReminderMonths"
+    static let watchStressAndTemperatureDetection = "watchStressAndTemperatureDetection"
+
     /// App-group suite shared with the widget and Live Activity extensions.
     static let appGroupSuite = "group.com.codex.ChillMate"
 }

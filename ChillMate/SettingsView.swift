@@ -75,40 +75,40 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
 
 @MainActor
 struct SettingsView: View {
-    @AppStorage("requiresFaceID") private var requiresFaceID = false
-    @AppStorage("requiresPIN") private var requiresPIN = false
-    @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
-    @AppStorage("healthKitAutoSync") private var healthKitAutoSync = false
-    @AppStorage("healthKitSexualActivityWriteEnabled") private var healthKitSexualActivityWriteEnabled = false
-    @AppStorage("healthKitSleepReadWriteEnabled") private var healthKitSleepReadWriteEnabled = false
-    @AppStorage("healthKitHeartRateReadEnabled") private var healthKitHeartRateReadEnabled = false
-    @AppStorage("healthKitHRVReadEnabled") private var healthKitHRVReadEnabled = false
-    @AppStorage("healthKitWorkoutReadEnabled") private var healthKitWorkoutReadEnabled = false
-    @AppStorage("notificationsEnabled") private var notificationsEnabled = false
-    @AppStorage("dailyAffirmationsEnabled") private var dailyAffirmationsEnabled = false
-    @AppStorage("discreetNotifications") private var discreetNotifications = false
-    @AppStorage("notificationTone") private var notificationTone = NotificationTone.gentle.rawValue
-    @AppStorage("iCloudBackupEnabled") private var iCloudBackupEnabled = false
-    @AppStorage("lastICloudBackupStatus") private var lastICloudBackupStatus = ""
-    @AppStorage("lastICloudBackupTimestamp") private var lastICloudBackupTimestamp = 0.0
-    @AppStorage("highContrastMode") private var highContrastMode = false
-    @AppStorage("chillReducedMotion") private var chillReducedMotion = false
-    @AppStorage("oneHandedControls") private var oneHandedControls = true
-    @AppStorage("appBackgroundStyle") private var appBackgroundStyle = ChillBackgroundStyle.score.rawValue
+    @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
+    @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
+    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
+    @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
+    @AppStorage(DefaultsKey.healthKitSexualActivityWriteEnabled) private var healthKitSexualActivityWriteEnabled = false
+    @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthKitSleepReadWriteEnabled = false
+    @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
+    @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
+    @AppStorage(DefaultsKey.healthKitWorkoutReadEnabled) private var healthKitWorkoutReadEnabled = false
+    @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
+    @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
+    @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
+    @AppStorage(DefaultsKey.notificationTone) private var notificationTone = NotificationTone.gentle.rawValue
+    @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
+    @AppStorage(DefaultsKey.lastICloudBackupStatus) private var lastICloudBackupStatus = ""
+    @AppStorage(DefaultsKey.lastICloudBackupTimestamp) private var lastICloudBackupTimestamp = 0.0
+    @AppStorage(DefaultsKey.highContrastMode) private var highContrastMode = false
+    @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
+    @AppStorage(DefaultsKey.oneHandedControls) private var oneHandedControls = true
+    @AppStorage(DefaultsKey.appBackgroundStyle) private var appBackgroundStyle = ChillBackgroundStyle.score.rawValue
     @AppStorage(DefaultsKey.appBackgroundPhotoFingerprint) private var backgroundPhotoFingerprint = ""
-    @AppStorage("lastDailyRecoveryScore") private var lastDailyRecoveryScore = 42
-    @AppStorage("watchHydrationReminders") private var watchHydrationReminders = true
-    @AppStorage("watchHeartRateWarnings") private var watchHeartRateWarnings = true
-    @AppStorage("watchBreathingHaptics") private var watchBreathingHaptics = true
-    @AppStorage("watchDiscreetCheckIns") private var watchDiscreetCheckIns = true
-    @AppStorage("watchVisibleTimers") private var watchVisibleTimers = true
-    @AppStorage("watchStressAndTemperatureDetection") private var watchStressAndTemperatureDetection = false
-    @AppStorage("autoLockMinutes") private var autoLockMinutes = 0
-    @AppStorage("screenPrivacyEnabled") private var screenPrivacyEnabled = true
-    @AppStorage("safetyCheckInsEnabled") private var safetyCheckInsEnabled = false
-    @AppStorage("weekendSafetyEnabled") private var weekendSafetyEnabled = false
-    @AppStorage("checkInHour") private var checkInHour = 10
-    @AppStorage("checkInMinute") private var checkInMinute = 0
+    @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
+    @AppStorage(DefaultsKey.watchHydrationReminders) private var watchHydrationReminders = true
+    @AppStorage(DefaultsKey.watchHeartRateWarnings) private var watchHeartRateWarnings = true
+    @AppStorage(DefaultsKey.watchBreathingHaptics) private var watchBreathingHaptics = true
+    @AppStorage(DefaultsKey.watchDiscreetCheckIns) private var watchDiscreetCheckIns = true
+    @AppStorage(DefaultsKey.watchVisibleTimers) private var watchVisibleTimers = true
+    @AppStorage(DefaultsKey.watchStressAndTemperatureDetection) private var watchStressAndTemperatureDetection = false
+    @AppStorage(DefaultsKey.autoLockMinutes) private var autoLockMinutes = 0
+    @AppStorage(DefaultsKey.screenPrivacyEnabled) private var screenPrivacyEnabled = true
+    @AppStorage(DefaultsKey.safetyCheckInsEnabled) private var safetyCheckInsEnabled = false
+    @AppStorage(DefaultsKey.weekendSafetyEnabled) private var weekendSafetyEnabled = false
+    @AppStorage(DefaultsKey.checkInHour) private var checkInHour = 10
+    @AppStorage(DefaultsKey.checkInMinute) private var checkInMinute = 0
 
     private var checkInTimeBinding: Binding<Date> {
         Binding {
@@ -127,12 +127,12 @@ struct SettingsView: View {
             }
         }
     }
-    @AppStorage("weeklyDigestEnabled") private var weeklyDigestEnabled = false
-    @AppStorage("stiReminderEnabled") private var stiReminderEnabled = false
-    @AppStorage("stiReminderMonths") private var stiReminderMonths = 3
-    @AppStorage("dataRetentionMonths") private var dataRetentionMonths = 0
-    @AppStorage("reductionGoalSessions") private var reductionGoalSessions = 0
-    @AppStorage("reductionGoalCountSubstanceOnly") private var reductionGoalCountSubstanceOnly = true
+    @AppStorage(DefaultsKey.weeklyDigestEnabled) private var weeklyDigestEnabled = false
+    @AppStorage(DefaultsKey.stiReminderEnabled) private var stiReminderEnabled = false
+    @AppStorage(DefaultsKey.stiReminderMonths) private var stiReminderMonths = 3
+    @AppStorage(DefaultsKey.dataRetentionMonths) private var dataRetentionMonths = 0
+    @AppStorage(DefaultsKey.reductionGoalSessions) private var reductionGoalSessions = 0
+    @AppStorage(DefaultsKey.reductionGoalCountSubstanceOnly) private var reductionGoalCountSubstanceOnly = true
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -1369,8 +1369,8 @@ private struct ClinicalReviewSettingsCard: View {
 }
 
 private struct EncryptedBackupCard: View {
-    @AppStorage("lastOnDeviceRecoveryStatus") private var lastOnDeviceRecoveryStatus = ""
-    @AppStorage("lastOnDeviceRecoverySnapshotTimestamp") private var lastOnDeviceRecoverySnapshotTimestamp = 0.0
+    @AppStorage(DefaultsKey.lastOnDeviceRecoveryStatus) private var lastOnDeviceRecoveryStatus = ""
+    @AppStorage(DefaultsKey.lastOnDeviceRecoverySnapshotTimestamp) private var lastOnDeviceRecoverySnapshotTimestamp = 0.0
     let backupURL: URL?
     let isWorking: Bool
     let prepareBackup: () -> Void

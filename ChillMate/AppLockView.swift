@@ -5,11 +5,11 @@ import SwiftUI
 import UIKit
 
 struct AppLockView<Content: View>: View {
-    @AppStorage("requiresFaceID") private var requiresFaceID = false
-    @AppStorage("requiresPIN") private var requiresPIN = false
-    @AppStorage("localEncryptionEnabled") private var localEncryptionEnabled = true
-    @AppStorage("autoLockMinutes") private var autoLockMinutes = 0
-    @AppStorage("screenPrivacyEnabled") private var screenPrivacyEnabled = true
+    @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
+    @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
+    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
+    @AppStorage(DefaultsKey.autoLockMinutes) private var autoLockMinutes = 0
+    @AppStorage(DefaultsKey.screenPrivacyEnabled) private var screenPrivacyEnabled = true
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var isUnlocked = false
@@ -422,7 +422,7 @@ enum LocalSecurityService {
     }
 
     static func clearPIN() {
-        UserDefaults.standard.removeObject(forKey: "requiresPIN")
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.requiresPIN)
         UserDefaults.standard.removeObject(forKey: "appPINHash")
         UserDefaults.standard.removeObject(forKey: "appPINSalt")
         keychainDelete(account: keychainHashAccount)

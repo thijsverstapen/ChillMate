@@ -5,7 +5,7 @@ import SwiftUI
 
 struct NetherlandsSupportDirectoryView: View {
     @Environment(\.dismiss) private var dismiss
-    @AppStorage("country") private var country = "Netherlands"
+    @AppStorage(DefaultsKey.country) private var country = "Netherlands"
     @State private var query = ""
 
     private var filteredResources: [SupportResource] {

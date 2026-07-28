@@ -85,7 +85,7 @@ struct OpenSafeRouteIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         await MainActor.run {
-            UserDefaults.standard.set(NotificationDestination.safeRoute.rawValue, forKey: "pendingAppDestination")
+            UserDefaults.standard.set(NotificationDestination.safeRoute.rawValue, forKey: DefaultsKey.pendingAppDestination)
         }
         return .result()
     }
@@ -100,7 +100,7 @@ struct OpenLogSheetIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         await MainActor.run {
-            UserDefaults.standard.set(NotificationDestination.log.rawValue, forKey: "pendingAppDestination")
+            UserDefaults.standard.set(NotificationDestination.log.rawValue, forKey: DefaultsKey.pendingAppDestination)
         }
         return .result()
     }
@@ -115,7 +115,7 @@ struct OpenTimersIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         await MainActor.run {
-            UserDefaults.standard.set(NotificationDestination.timers.rawValue, forKey: "pendingAppDestination")
+            UserDefaults.standard.set(NotificationDestination.timers.rawValue, forKey: DefaultsKey.pendingAppDestination)
         }
         return .result()
     }
@@ -130,7 +130,7 @@ struct OpenEmergencyIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         await MainActor.run {
-            UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: "pendingAppDestination")
+            UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: DefaultsKey.pendingAppDestination)
         }
         return .result()
     }
@@ -145,7 +145,7 @@ struct OpenRiskCheckerIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         await MainActor.run {
-            UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: "pendingAppDestination")
+            UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: DefaultsKey.pendingAppDestination)
         }
         return .result()
     }

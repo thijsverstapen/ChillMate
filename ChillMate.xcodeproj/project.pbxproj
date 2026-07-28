@@ -38,7 +38,6 @@
 		C44E00000000000000000002 /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E00000000000000000012 /* ProfileSetupView.swift */; };
 		C44E00000000000000000003 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E00000000000000000013 /* NotificationService.swift */; };
 		D55F00000000000000000001 /* CareModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000011 /* CareModels.swift */; };
-		D55F00000000000000000002 /* CareToolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000012 /* CareToolsView.swift */; };
 		D55F00000000000000000003 /* CareToolsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000013 /* CareToolsModels.swift */; };
 		D55F00000000000000000004 /* MedicationRiskData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000014 /* MedicationRiskData.swift */; };
 		D55F00000000000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000015 /* JournalView.swift */; };
@@ -65,6 +64,27 @@
 		AAB100000000000000000006 /* ChillMateQueries.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000006 /* ChillMateQueries.swift */; };
 		AAB100000000000000000007 /* BackgroundPhotoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000007 /* BackgroundPhotoStore.swift */; };
 		AAB100000000000000000008 /* PINThrottle.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000008 /* PINThrottle.swift */; };
+		AAB100000000000000000009 /* CareToolsShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000009 /* CareToolsShared.swift */; };
+		AAB10000000000000000000A /* STDTestsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000000A /* STDTestsView.swift */; };
+		AAB10000000000000000000B /* SaferSessionPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000000B /* SaferSessionPlanView.swift */; };
+		AAB10000000000000000000C /* DrugTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000000C /* DrugTimerView.swift */; };
+		AAB10000000000000000000D /* CombinationRiskCheckerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000000D /* CombinationRiskCheckerView.swift */; };
+		AAB10000000000000000000E /* DrugInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000000E /* DrugInfoView.swift */; };
+		AAB10000000000000000000F /* EmergencyViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000000F /* EmergencyViews.swift */; };
+		AAB100000000000000000010 /* AftercareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000010 /* AftercareView.swift */; };
+		AAB100000000000000000011 /* PanicSupportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000011 /* PanicSupportView.swift */; };
+		AAB100000000000000000012 /* SafeRouteHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000012 /* SafeRouteHomeView.swift */; };
+		AAB100000000000000000013 /* CravingDelayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000013 /* CravingDelayView.swift */; };
+		AAB100000000000000000014 /* SafetyAutopilotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000014 /* SafetyAutopilotView.swift */; };
+		AAB100000000000000000015 /* ConsentBoundariesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000015 /* ConsentBoundariesView.swift */; };
+		AAB100000000000000000016 /* RecoveryModeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000016 /* RecoveryModeView.swift */; };
+		AAB100000000000000000017 /* ProfessionalHelperBridgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000017 /* ProfessionalHelperBridgeView.swift */; };
+		AAB100000000000000000018 /* DrugCheckingEducationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000018 /* DrugCheckingEducationView.swift */; };
+		AAB100000000000000000019 /* PrivacyReceiptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000019 /* PrivacyReceiptView.swift */; };
+		AAB10000000000000000001A /* CareTimelineViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001A /* CareTimelineViews.swift */; };
+		AAB10000000000000000001B /* SecurityHealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001B /* SecurityHealthCheckView.swift */; };
+		AAB10000000000000000001C /* RecentlyDeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001C /* RecentlyDeletedView.swift */; };
+		AAB10000000000000000001D /* DelayedAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001D /* DelayedAction.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -172,7 +192,6 @@
 		C6079172DEC0D2D76B936C7B /* ChillMateUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ChillMateUITests.swift; sourceTree = "<group>"; };
 		C85331B142C2356AE703C063 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		D55F00000000000000000011 /* CareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareModels.swift; sourceTree = "<group>"; };
-		D55F00000000000000000012 /* CareToolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsView.swift; sourceTree = "<group>"; };
 		D55F00000000000000000013 /* CareToolsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsModels.swift; sourceTree = "<group>"; };
 		D55F00000000000000000014 /* MedicationRiskData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationRiskData.swift; sourceTree = "<group>"; };
 		D55F00000000000000000015 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
@@ -201,6 +220,27 @@
 		AAF100000000000000000006 /* ChillMateQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChillMateQueries.swift; sourceTree = "<group>"; };
 		AAF100000000000000000007 /* BackgroundPhotoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPhotoStore.swift; sourceTree = "<group>"; };
 		AAF100000000000000000008 /* PINThrottle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PINThrottle.swift; sourceTree = "<group>"; };
+		AAF100000000000000000009 /* CareToolsShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsShared.swift; sourceTree = "<group>"; };
+		AAF10000000000000000000A /* STDTestsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = STDTestsView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000000B /* SaferSessionPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaferSessionPlanView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000000C /* DrugTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugTimerView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000000D /* CombinationRiskCheckerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinationRiskCheckerView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000000E /* DrugInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugInfoView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000000F /* EmergencyViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmergencyViews.swift; sourceTree = "<group>"; };
+		AAF100000000000000000010 /* AftercareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AftercareView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000011 /* PanicSupportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanicSupportView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000012 /* SafeRouteHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeRouteHomeView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000013 /* CravingDelayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CravingDelayView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000014 /* SafetyAutopilotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafetyAutopilotView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000015 /* ConsentBoundariesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentBoundariesView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000016 /* RecoveryModeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoveryModeView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000017 /* ProfessionalHelperBridgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfessionalHelperBridgeView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000018 /* DrugCheckingEducationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugCheckingEducationView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000019 /* PrivacyReceiptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReceiptView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000001A /* CareTimelineViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareTimelineViews.swift; sourceTree = "<group>"; };
+		AAF10000000000000000001B /* SecurityHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityHealthCheckView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000001C /* RecentlyDeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyDeletedView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000001D /* DelayedAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedAction.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -291,6 +331,27 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF10000000000000000001D /* DelayedAction.swift */,
+				AAF10000000000000000001C /* RecentlyDeletedView.swift */,
+				AAF10000000000000000001B /* SecurityHealthCheckView.swift */,
+				AAF10000000000000000001A /* CareTimelineViews.swift */,
+				AAF100000000000000000019 /* PrivacyReceiptView.swift */,
+				AAF100000000000000000018 /* DrugCheckingEducationView.swift */,
+				AAF100000000000000000017 /* ProfessionalHelperBridgeView.swift */,
+				AAF100000000000000000016 /* RecoveryModeView.swift */,
+				AAF100000000000000000015 /* ConsentBoundariesView.swift */,
+				AAF100000000000000000014 /* SafetyAutopilotView.swift */,
+				AAF100000000000000000013 /* CravingDelayView.swift */,
+				AAF100000000000000000012 /* SafeRouteHomeView.swift */,
+				AAF100000000000000000011 /* PanicSupportView.swift */,
+				AAF100000000000000000010 /* AftercareView.swift */,
+				AAF10000000000000000000F /* EmergencyViews.swift */,
+				AAF10000000000000000000E /* DrugInfoView.swift */,
+				AAF10000000000000000000D /* CombinationRiskCheckerView.swift */,
+				AAF10000000000000000000C /* DrugTimerView.swift */,
+				AAF10000000000000000000B /* SaferSessionPlanView.swift */,
+				AAF10000000000000000000A /* STDTestsView.swift */,
+				AAF100000000000000000009 /* CareToolsShared.swift */,
 				AAF100000000000000000008 /* PINThrottle.swift */,
 				AAF100000000000000000007 /* BackgroundPhotoStore.swift */,
 				AAF100000000000000000006 /* ChillMateQueries.swift */,
@@ -321,7 +382,6 @@
 				C44E00000000000000000012 /* ProfileSetupView.swift */,
 				C44E00000000000000000013 /* NotificationService.swift */,
 				D55F00000000000000000011 /* CareModels.swift */,
-				D55F00000000000000000012 /* CareToolsView.swift */,
 				D55F00000000000000000017 /* FeedbackView.swift */,
 				D55F00000000000000000018 /* FirstLaunchSplashView.swift */,
 				D55F00000000000000000019 /* FirstLaunchSplash.mp4 */,
@@ -629,6 +689,27 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB10000000000000000001D /* DelayedAction.swift in Sources */,
+				AAB10000000000000000001C /* RecentlyDeletedView.swift in Sources */,
+				AAB10000000000000000001B /* SecurityHealthCheckView.swift in Sources */,
+				AAB10000000000000000001A /* CareTimelineViews.swift in Sources */,
+				AAB100000000000000000019 /* PrivacyReceiptView.swift in Sources */,
+				AAB100000000000000000018 /* DrugCheckingEducationView.swift in Sources */,
+				AAB100000000000000000017 /* ProfessionalHelperBridgeView.swift in Sources */,
+				AAB100000000000000000016 /* RecoveryModeView.swift in Sources */,
+				AAB100000000000000000015 /* ConsentBoundariesView.swift in Sources */,
+				AAB100000000000000000014 /* SafetyAutopilotView.swift in Sources */,
+				AAB100000000000000000013 /* CravingDelayView.swift in Sources */,
+				AAB100000000000000000012 /* SafeRouteHomeView.swift in Sources */,
+				AAB100000000000000000011 /* PanicSupportView.swift in Sources */,
+				AAB100000000000000000010 /* AftercareView.swift in Sources */,
+				AAB10000000000000000000F /* EmergencyViews.swift in Sources */,
+				AAB10000000000000000000E /* DrugInfoView.swift in Sources */,
+				AAB10000000000000000000D /* CombinationRiskCheckerView.swift in Sources */,
+				AAB10000000000000000000C /* DrugTimerView.swift in Sources */,
+				AAB10000000000000000000B /* SaferSessionPlanView.swift in Sources */,
+				AAB10000000000000000000A /* STDTestsView.swift in Sources */,
+				AAB100000000000000000009 /* CareToolsShared.swift in Sources */,
 				AAB100000000000000000008 /* PINThrottle.swift in Sources */,
 				AAB100000000000000000007 /* BackgroundPhotoStore.swift in Sources */,
 				AAB100000000000000000006 /* ChillMateQueries.swift in Sources */,
@@ -655,7 +736,6 @@
 				C44E00000000000000000002 /* ProfileSetupView.swift in Sources */,
 				C44E00000000000000000003 /* NotificationService.swift in Sources */,
 				D55F00000000000000000001 /* CareModels.swift in Sources */,
-				D55F00000000000000000002 /* CareToolsView.swift in Sources */,
 				D55F00000000000000000007 /* FeedbackView.swift in Sources */,
 				D55F00000000000000000008 /* FirstLaunchSplashView.swift in Sources */,
 				D55F00000000000000000006 /* LegalViews.swift in Sources */,
