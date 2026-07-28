@@ -7,19 +7,19 @@ import WidgetKit
 /// WatchConnectivity sync (see WatchConnectivityReceiver.publishWidgetSnapshot).
 /// Key strings are duplicated on the writer side by design — keep them in sync.
 enum WidgetStore {
-    static let suite = UserDefaults(suiteName: "group.com.codex.ChillMate")
+    static let suite = UserDefaults(suiteName: WidgetSharedKey.suiteName)
 
-    static var streakDays: Int { suite?.integer(forKey: "widgetStreakDays") ?? 0 }
-    static var score: Int { suite?.integer(forKey: "widgetScore") ?? 0 }
-    static var scoreActive: Bool { suite?.bool(forKey: "widgetScoreActive") ?? false }
+    static var streakDays: Int { suite?.integer(forKey: WidgetSharedKey.watchStreakDays) ?? 0 }
+    static var score: Int { suite?.integer(forKey: WidgetSharedKey.watchScore) ?? 0 }
+    static var scoreActive: Bool { suite?.bool(forKey: WidgetSharedKey.watchScoreActive) ?? false }
 
     static var activeTimer: (substance: String, start: Date, end: Date)? {
         guard let suite,
-              let substance = suite.string(forKey: "widgetTimerSubstance"),
+              let substance = suite.string(forKey: WidgetSharedKey.watchTimerSubstance),
               !substance.isEmpty else { return nil }
-        let end = suite.double(forKey: "widgetTimerEnd")
+        let end = suite.double(forKey: WidgetSharedKey.watchTimerEnd)
         guard end > Date.now.timeIntervalSince1970 else { return nil }
-        let start = suite.double(forKey: "widgetTimerStart")
+        let start = suite.double(forKey: WidgetSharedKey.watchTimerStart)
         return (substance, Date(timeIntervalSince1970: start), Date(timeIntervalSince1970: end))
     }
 }

@@ -395,10 +395,10 @@ struct DashboardView: View {
     }
 
     private func updateWidgetData(metrics: DashboardMetrics) {
-        let shared = UserDefaults(suiteName: "group.com.codex.ChillMate") ?? .standard
-        shared.set(metrics.recoveryStreakDays, forKey: "widgetRecoveryStreak")
+        let shared = UserDefaults(suiteName: WidgetSharedKey.suiteName) ?? .standard
+        shared.set(metrics.recoveryStreakDays, forKey: WidgetSharedKey.recoveryStreak)
         shared.set(metrics.dailyScore.displayValue, forKey: DefaultsKey.lastDailyRecoveryScore)
-        shared.set(metrics.dailyScore.isActive, forKey: "widgetScoreIsActive")
+        shared.set(metrics.dailyScore.isActive, forKey: WidgetSharedKey.scoreIsActive)
         WidgetCenter.shared.reloadAllTimelines()
 
         WatchConnectivityService.shared.sendMetrics(

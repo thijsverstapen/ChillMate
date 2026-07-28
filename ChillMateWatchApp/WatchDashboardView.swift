@@ -667,15 +667,15 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     /// complications (ChillMateWatchAppWidget) can render it. Key strings are
     /// duplicated in the widget's WidgetStore by design — keep them in sync.
     private func publishWidgetSnapshot() {
-        guard let shared = UserDefaults(suiteName: "group.com.codex.ChillMate") else { return }
-        shared.set(recoveryStreakDays, forKey: "widgetStreakDays")
-        shared.set(dailyScore, forKey: "widgetScore")
-        shared.set(dailyScoreActive, forKey: "widgetScoreActive")
+        guard let shared = UserDefaults(suiteName: WidgetSharedKey.suiteName) else { return }
+        shared.set(recoveryStreakDays, forKey: WidgetSharedKey.watchStreakDays)
+        shared.set(dailyScore, forKey: WidgetSharedKey.watchScore)
+        shared.set(dailyScoreActive, forKey: WidgetSharedKey.watchScoreActive)
 
         let active = activeTimers.first
-        shared.set(active?.substanceName ?? "", forKey: "widgetTimerSubstance")
-        shared.set(active?.startedAt.timeIntervalSince1970 ?? 0, forKey: "widgetTimerStart")
-        shared.set(active.map { $0.endsAt.timeIntervalSince1970 } ?? 0, forKey: "widgetTimerEnd")
+        shared.set(active?.substanceName ?? "", forKey: WidgetSharedKey.watchTimerSubstance)
+        shared.set(active?.startedAt.timeIntervalSince1970 ?? 0, forKey: WidgetSharedKey.watchTimerStart)
+        shared.set(active.map { $0.endsAt.timeIntervalSince1970 } ?? 0, forKey: WidgetSharedKey.watchTimerEnd)
 
         WidgetCenter.shared.reloadAllTimelines()
     }

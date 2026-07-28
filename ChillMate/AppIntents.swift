@@ -10,7 +10,7 @@ import SwiftUI
 /// its own dead key (`widgetHydrationLogged`) or posted an unobserved
 /// notification, so "log hydration" recorded nothing; this unifies them.
 enum HydrationLog {
-    static let appGroup = "group.com.codex.ChillMate"
+    static let appGroup = WidgetSharedKey.suiteName
     static let key = "lastHydrationLogDate"
 
     private static var store: UserDefaults { UserDefaults(suiteName: appGroup) ?? .standard }

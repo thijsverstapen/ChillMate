@@ -12,7 +12,7 @@ struct WidgetLogHydrationIntent: AppIntent {
         // Shared contract with the app's HydrationLog: a date-stamped daily flag in
         // the App Group (key "lastHydrationLogDate"). Previously wrote a dead
         // "widgetHydrationLogged" boolean that nothing read.
-        let defaults = UserDefaults(suiteName: "group.com.codex.ChillMate") ?? .standard
+        let defaults = UserDefaults(suiteName: WidgetSharedKey.suiteName) ?? .standard
         defaults.set(Date.now.timeIntervalSince1970, forKey: "lastHydrationLogDate")
         return .result(value: "Logged.")
     }
@@ -52,18 +52,18 @@ private struct ChillMateWidgetTimelineProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (ChillMateWidgetEntry) -> Void) {
-        let defaults = UserDefaults(suiteName: "group.com.codex.ChillMate") ?? .standard
-        let streak = defaults.integer(forKey: "widgetRecoveryStreak")
-        let score = defaults.integer(forKey: "lastDailyRecoveryScore")
-        let isActive = defaults.bool(forKey: "widgetScoreIsActive")
+        let defaults = UserDefaults(suiteName: WidgetSharedKey.suiteName) ?? .standard
+        let streak = defaults.integer(forKey: WidgetSharedKey.recoveryStreak)
+        let score = defaults.integer(forKey: WidgetSharedKey.dailyScore)
+        let isActive = defaults.bool(forKey: WidgetSharedKey.scoreIsActive)
         completion(ChillMateWidgetEntry(date: Date(), recoveryStreakDays: streak, dailyScore: score, scoreIsActive: isActive))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<ChillMateWidgetEntry>) -> Void) {
-        let defaults = UserDefaults(suiteName: "group.com.codex.ChillMate") ?? .standard
-        let streak = defaults.integer(forKey: "widgetRecoveryStreak")
-        let score = defaults.integer(forKey: "lastDailyRecoveryScore")
-        let isActive = defaults.bool(forKey: "widgetScoreIsActive")
+        let defaults = UserDefaults(suiteName: WidgetSharedKey.suiteName) ?? .standard
+        let streak = defaults.integer(forKey: WidgetSharedKey.recoveryStreak)
+        let score = defaults.integer(forKey: WidgetSharedKey.dailyScore)
+        let isActive = defaults.bool(forKey: WidgetSharedKey.scoreIsActive)
         let entry = ChillMateWidgetEntry(date: Date(), recoveryStreakDays: streak, dailyScore: score, scoreIsActive: isActive)
         let nextUpdate = Calendar.current.date(byAdding: .hour, value: 1, to: Date()) ?? Date()
         completion(Timeline(entries: [entry], policy: .after(nextUpdate)))

@@ -12,6 +12,13 @@
 //            the new SnapshotHelper.swift
 // -----------------------------------------------------
 
+// LOCAL PATCH (ChillMate): the five stored mutable statics below are marked
+// `nonisolated(unsafe)` so this file builds under Swift 6 language mode, which
+// every target in this project now uses. Upstream fastlane still ships them
+// unannotated. They are written once during test setup and read from the test
+// runner thereafter, so the annotation reflects existing behaviour rather than
+// changing it. Re-apply after regenerating this file from fastlane.
+
 import Foundation
 import XCTest
 
@@ -54,14 +61,14 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
 @objcMembers
 @MainActor
 open class Snapshot: NSObject {
-    static var app: XCUIApplication?
-    static var waitForAnimations = true
-    static var cacheDirectory: URL?
+    nonisolated(unsafe) static var app: XCUIApplication?
+    nonisolated(unsafe) static var waitForAnimations = true
+    nonisolated(unsafe) static var cacheDirectory: URL?
     static var screenshotsDirectory: URL? {
         return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
     }
-    static var deviceLanguage = ""
-    static var currentLocale = ""
+    nonisolated(unsafe) static var deviceLanguage = ""
+    nonisolated(unsafe) static var currentLocale = ""
 
     open class func setupSnapshot(_ app: XCUIApplication, waitForAnimations: Bool = true) {
 

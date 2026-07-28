@@ -119,5 +119,6 @@ enum DefaultsKey {
     static let watchStressAndTemperatureDetection = "watchStressAndTemperatureDetection"
 
     /// App-group suite shared with the widget and Live Activity extensions.
-    static let appGroupSuite = "group.com.codex.ChillMate"
+    /// Defined in `WidgetSharedKey`, which is a member of all four targets.
+    static let appGroupSuite = WidgetSharedKey.suiteName
 }
