@@ -152,68 +152,7 @@ struct SaferSessionPlanView: View {
                         .padding(16)
                         .glassSurface(radius: 28, tint: .green.opacity(0.10), interactive: true)
 
-                        VStack(alignment: .leading, spacing: 14) {
-                            CareSectionTitle(title: String(localized: "Support and supplies"), symbol: "bag.fill")
-
-                            SaferPlanToggle(title: String(localized: "Emergency contact"), subtitle: contactSubtitle, symbol: "person.crop.circle.badge.checkmark", isOn: $emergencyContactReady)
-                            SaferPlanToggle(title: String(localized: "Transport"), subtitle: String(localized: "A way home is planned before the Chill starts."), symbol: "car.fill", isOn: $transportPlanned)
-                            if transportPlanned {
-                                TextField("What is the transport plan?", text: $transportPlan, axis: .vertical)
-                                    .lineLimit(1...3)
-                                    .textFieldStyle(.plain)
-                                    .foregroundStyle(Color.chillText)
-                                    .padding(14)
-                                    .glassSurface(radius: 18, tint: transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .red.opacity(0.08) : .black.opacity(0.04), interactive: true)
-
-                                if transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                    Text("Add the plan before saving.")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(.red)
-                                }
-                            }
-                            SaferPlanToggle(title: String(localized: "Condoms"), subtitle: String(localized: "Condoms are packed or available."), symbol: "checkmark.seal.fill", isOn: $condomsPacked)
-                            SaferPlanToggle(title: String(localized: "Lube"), subtitle: String(localized: "Lube is packed or available."), symbol: "drop.circle.fill", isOn: $lubePacked)
-                            SaferPlanToggle(title: String(localized: "PrEP taken"), subtitle: String(localized: "I have taken PrEP as planned."), symbol: "cross.case.fill", isOn: $prepTaken)
-                            SaferPlanToggle(title: String(localized: "PrEP reminders"), subtitle: String(localized: "Schedule around-sex PrEP reminders for this plan."), symbol: "bell.badge.fill", isOn: $prepRemindersEnabled)
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
-
-                        PrepGuideCard()
-
-                        DontMixWarningCard(isAcknowledged: $dontMixAcknowledged)
-
-                        SaferPlanRiskCard(assessment: riskAssessment)
-
-                        PartnerSessionModeCard(
-                            isEnabled: $partnerModeEnabled,
-                            sharedSafetyPlan: $sharedSafetyPlan,
-                            agreedBoundaries: $agreedBoundaries,
-                            groupMemberName: $groupMemberName,
-                            groupMemberNames: $groupMemberNames,
-                            groupCheckInMinutes: $groupCheckInMinutes,
-                            aftercareReminderForEveryone: $aftercareReminderForEveryone
-                        )
-
-                        GlassActionButton(prominent: true, action: savePlan) {
-                            Label("Save plan", systemImage: "checkmark.circle.fill")
-                                .font(.headline)
-                                .frame(maxWidth: .infinity)
-                        }
-                        .disabled(!canSavePlan)
-                        .opacity(canSavePlan ? 1 : 0.55)
-
-                        if !plans.isEmpty {
-                            VStack(alignment: .leading, spacing: 12) {
-                                CareSectionTitle(title: String(localized: "Current and past plans"), symbol: "clock.arrow.circlepath")
-
-                                LazyVStack(spacing: 12) {
-                                    ForEach(plans) { plan in
-                                        SaferPlanCard(plan: plan)
-                                    }
-                                }
-                            }
-                        }
+                        saferSessionPlanViewContinued
                     }
                     .padding(20)
                     .padding(.bottom, 36)
@@ -241,6 +180,76 @@ struct SaferSessionPlanView: View {
             }
             .endEditingOnTap()
         }
+    }
+
+    /// Second half of `SaferSessionPlanView`'s body, which ran to 144 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var saferSessionPlanViewContinued: some View {
+            VStack(alignment: .leading, spacing: 14) {
+                CareSectionTitle(title: String(localized: "Support and supplies"), symbol: "bag.fill")
+
+                SaferPlanToggle(title: String(localized: "Emergency contact"), subtitle: contactSubtitle, symbol: "person.crop.circle.badge.checkmark", isOn: $emergencyContactReady)
+                SaferPlanToggle(title: String(localized: "Transport"), subtitle: String(localized: "A way home is planned before the Chill starts."), symbol: "car.fill", isOn: $transportPlanned)
+                if transportPlanned {
+                    TextField("What is the transport plan?", text: $transportPlan, axis: .vertical)
+                        .lineLimit(1...3)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(Color.chillText)
+                        .padding(14)
+                        .glassSurface(radius: 18, tint: transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .red.opacity(0.08) : .black.opacity(0.04), interactive: true)
+
+                    if transportPlan.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Text("Add the plan before saving.")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.red)
+                    }
+                }
+                SaferPlanToggle(title: String(localized: "Condoms"), subtitle: String(localized: "Condoms are packed or available."), symbol: "checkmark.seal.fill", isOn: $condomsPacked)
+                SaferPlanToggle(title: String(localized: "Lube"), subtitle: String(localized: "Lube is packed or available."), symbol: "drop.circle.fill", isOn: $lubePacked)
+                SaferPlanToggle(title: String(localized: "PrEP taken"), subtitle: String(localized: "I have taken PrEP as planned."), symbol: "cross.case.fill", isOn: $prepTaken)
+                SaferPlanToggle(title: String(localized: "PrEP reminders"), subtitle: String(localized: "Schedule around-sex PrEP reminders for this plan."), symbol: "bell.badge.fill", isOn: $prepRemindersEnabled)
+            }
+            .padding(16)
+            .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
+
+            PrepGuideCard()
+
+            DontMixWarningCard(isAcknowledged: $dontMixAcknowledged)
+
+            SaferPlanRiskCard(assessment: riskAssessment)
+
+            PartnerSessionModeCard(
+                isEnabled: $partnerModeEnabled,
+                sharedSafetyPlan: $sharedSafetyPlan,
+                agreedBoundaries: $agreedBoundaries,
+                groupMemberName: $groupMemberName,
+                groupMemberNames: $groupMemberNames,
+                groupCheckInMinutes: $groupCheckInMinutes,
+                aftercareReminderForEveryone: $aftercareReminderForEveryone
+            )
+
+            GlassActionButton(prominent: true, action: savePlan) {
+                Label("Save plan", systemImage: "checkmark.circle.fill")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+            }
+            .disabled(!canSavePlan)
+            .opacity(canSavePlan ? 1 : 0.55)
+
+            if !plans.isEmpty {
+                VStack(alignment: .leading, spacing: 12) {
+                    CareSectionTitle(title: String(localized: "Current and past plans"), symbol: "clock.arrow.circlepath")
+
+                    LazyVStack(spacing: 12) {
+                        ForEach(plans) { plan in
+                            SaferPlanCard(plan: plan)
+                        }
+                    }
+                }
+            }
     }
 
     private var contactSubtitle: String {

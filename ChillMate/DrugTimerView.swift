@@ -82,92 +82,7 @@ struct DrugTimerView: View {
 
                         MedicalSafetyDisclaimerCard(compact: true)
 
-                        VStack(alignment: .leading, spacing: 14) {
-                            Picker("Timer type", selection: $timerScope) {
-                                ForEach(TimerScope.allCases) { scope in
-                                    Text(scope.localizedDisplayName).tag(scope)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-                            .padding(4)
-                            .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                            if timerScope == .others {
-                                TimerPeopleManager(
-                                    people: trackedPeople,
-                                    selectedPerson: $selectedTrackedPerson,
-                                    newPerson: $newTrackedPerson,
-                                    addPerson: addTrackedPerson,
-                                    removePerson: removeTrackedPerson
-                                )
-                            }
-
-                            Picker("Substance", selection: $selectedSubstance) {
-                                ForEach(timerSubstances) { substance in
-                                    Text(substance.localizedDisplayName).tag(substance)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                            .tint(Color.chillSecondaryBlue)
-
-                            AdministrationRoutePicker(selectedRoute: $selectedAdministrationRoute)
-
-                            DatePicker("Taken at", selection: $startedAt, displayedComponents: [.date, .hourAndMinute])
-                                .tint(Color.chillSecondaryBlue)
-
-                            StaticEffectWindowSummary(
-                                substance: selectedSubstance,
-                                adjustedDuration: adjustedDefaultDuration,
-                                profileCaption: profileAdjustmentCaption
-                            )
-
-                            TextField("Private note, optional", text: $doseNote)
-                                .textFieldStyle(.plain)
-                                .foregroundStyle(Color.chillText)
-                                .padding(14)
-                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                            GlassActionButton(prominent: true, action: startTimer) {
-                                Label("Start check-in", systemImage: "timer.circle.fill")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .disabled(!canStartTimer)
-                            .opacity(canStartTimer ? 1 : 0.55)
-                        }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color.chillText)
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.10), interactive: true)
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            CareSectionTitle(title: String(localized: "Current and past check-ins"), symbol: "clock.arrow.circlepath")
-
-                            let activeTimers = visibleTimers.filter { $0.endsAt > .now }
-                            let pastTimers = visibleTimers.filter { $0.endsAt <= .now }
-
-                            if visibleTimers.isEmpty {
-                                CareEmptyState(text: String(localized: "No timers yet."))
-                            } else {
-                                if !activeTimers.isEmpty {
-                                    TimelineView(.periodic(from: .now, by: 60)) { context in
-                                        LazyVStack(spacing: 12) {
-                                            ForEach(activeTimers) { timer in
-                                                DrugTimerCard(timer: timer, now: context.date)
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if !pastTimers.isEmpty {
-                                    LazyVStack(spacing: 12) {
-                                        ForEach(pastTimers) { timer in
-                                            DrugTimerCard(timer: timer, now: .now)
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        drugTimerViewContinued
                     }
                     .padding(20)
                     .padding(.bottom, 36)
@@ -197,6 +112,109 @@ struct DrugTimerView: View {
             }
             .endEditingOnTap()
         }
+    }
+
+    /// Second half of `DrugTimerView`'s body, which ran to 106 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var drugTimerViewContinued: some View {
+            VStack(alignment: .leading, spacing: 14) {
+                Picker("Timer type", selection: $timerScope) {
+                    ForEach(TimerScope.allCases) { scope in
+                        Text(scope.localizedDisplayName).tag(scope)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .padding(4)
+                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                if timerScope == .others {
+                    TimerPeopleManager(
+                        people: trackedPeople,
+                        selectedPerson: $selectedTrackedPerson,
+                        newPerson: $newTrackedPerson,
+                        addPerson: addTrackedPerson,
+                        removePerson: removeTrackedPerson
+                    )
+                }
+
+                Picker("Substance", selection: $selectedSubstance) {
+                    ForEach(timerSubstances) { substance in
+                        Text(substance.localizedDisplayName).tag(substance)
+                    }
+                }
+                .pickerStyle(.menu)
+                .tint(Color.chillSecondaryBlue)
+
+                AdministrationRoutePicker(selectedRoute: $selectedAdministrationRoute)
+
+                DatePicker("Taken at", selection: $startedAt, displayedComponents: [.date, .hourAndMinute])
+                    .tint(Color.chillSecondaryBlue)
+
+                StaticEffectWindowSummary(
+                    substance: selectedSubstance,
+                    adjustedDuration: adjustedDefaultDuration,
+                    profileCaption: profileAdjustmentCaption
+                )
+
+                TextField("Private note, optional", text: $doseNote)
+                    .textFieldStyle(.plain)
+                    .foregroundStyle(Color.chillText)
+                    .padding(14)
+                    .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                GlassActionButton(prominent: true, action: startTimer) {
+                    Label("Start check-in", systemImage: "timer.circle.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .disabled(!canStartTimer)
+                .opacity(canStartTimer ? 1 : 0.55)
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(Color.chillText)
+            .padding(16)
+            .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.10), interactive: true)
+
+            drugTimerViewContinuedTail
+    }
+
+    /// Second half of `DrugTimerView`'s body, which ran to 133 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var drugTimerViewContinuedTail: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                CareSectionTitle(title: String(localized: "Current and past check-ins"), symbol: "clock.arrow.circlepath")
+
+                let activeTimers = visibleTimers.filter { $0.endsAt > .now }
+                let pastTimers = visibleTimers.filter { $0.endsAt <= .now }
+
+                if visibleTimers.isEmpty {
+                    CareEmptyState(text: String(localized: "No timers yet."))
+                } else {
+                    if !activeTimers.isEmpty {
+                        TimelineView(.periodic(from: .now, by: 60)) { context in
+                            LazyVStack(spacing: 12) {
+                                ForEach(activeTimers) { timer in
+                                    DrugTimerCard(timer: timer, now: context.date)
+                                }
+                            }
+                        }
+                    }
+
+                    if !pastTimers.isEmpty {
+                        LazyVStack(spacing: 12) {
+                            ForEach(pastTimers) { timer in
+                                DrugTimerCard(timer: timer, now: .now)
+                            }
+                        }
+                    }
+                }
+            }
     }
 
     private func startTimer() {

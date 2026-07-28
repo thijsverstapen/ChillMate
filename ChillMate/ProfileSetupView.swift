@@ -2150,6 +2150,16 @@ private struct ProfilePermissionsPage: View {
                 subtitle: String(localized: "Choose which system features ChillMate can use. You can change these later in Settings.")
             )
 
+            profilePermissionsPageContinued
+        }
+    }
+
+    /// Second half of `ProfilePermissionsPage`'s body, which ran to 150 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var profilePermissionsPageContinued: some View {
             VStack(spacing: 0) {
                 PermissionSetupCard(
                     title: String(localized: "Face ID"),
@@ -2289,6 +2299,15 @@ private struct ProfilePermissionsPage: View {
             .padding(.vertical, 6)
             .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
 
+            profilePermissionsPageContinuedTail
+    }
+
+    /// Second half of `ProfilePermissionsPage`'s body, which ran to 192 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var profilePermissionsPageContinuedTail: some View {
             if isChecking {
                 Label("Checking permission", systemImage: "hourglass")
                     .font(.footnote.weight(.semibold))
@@ -2332,7 +2351,6 @@ private struct ProfilePermissionsPage: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 8)
-        }
     }
 }
 
@@ -2458,103 +2476,7 @@ struct ProfileSetupMedicationSection: View {
                 subtitle: String(localized: "Turn this on only if you want ChillMate to remember medication for check-ins and risk checks.")
             )
 
-            VStack(spacing: 0) {
-                ProfileSetupToggleRow(
-                    title: String(localized: "I use current medication"),
-                    subtitle: isEnabled ? "Medication fields are shown" : "No medication fields needed",
-                    isOn: $isEnabled,
-                    systemImage: "pills.fill"
-                )
-
-                if isEnabled {
-                    ProfileSetupRowDivider()
-
-                    ProfileSetupTextField(
-                        title: String(localized: "Medication name"),
-                        placeholder: String(localized: "For example sertraline"),
-                        text: $name,
-                        systemImage: "pills.fill"
-                    )
-
-                    ProfileSetupRowDivider()
-
-                    ProfileSetupTextField(
-                        title: String(localized: "Prescription amount"),
-                        placeholder: String(localized: "As written on your label"),
-                        text: $dosage,
-                        systemImage: "number"
-                    )
-
-                    ProfileSetupRowDivider()
-
-                    ProfileSetupDateRow(
-                        title: String(localized: "Last taken"),
-                        date: $takenAt,
-                        systemImage: "clock.fill"
-                    )
-
-                    ProfileSetupRowDivider()
-
-                    ProfileSetupMeasurementRow(
-                        title: String(localized: "Medication duration"),
-                        value: $effectiveHours,
-                        range: 0.5...72,
-                        unit: "h",
-                        systemImage: "timer"
-                    )
-
-                    GlassActionButton(prominent: false, action: addMedication) {
-                        Label("Add medication", systemImage: "plus.circle.fill")
-                            .font(.subheadline.weight(.bold))
-                            .frame(maxWidth: .infinity)
-                    }
-                    .disabled(!canAdd)
-                    .opacity(canAdd ? 1 : 0.55)
-                    .padding(.top, 14)
-
-                    if medications.isEmpty {
-                        Text("No medication saved yet.")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Color.chillSecondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, 12)
-                    } else {
-                        VStack(spacing: 8) {
-                            ForEach(medications) { medication in
-                                HStack(alignment: .top, spacing: 10) {
-                                    Image(systemName: "pills.circle.fill")
-                                        .foregroundStyle(Color.chillPrimary)
-
-                                    VStack(alignment: .leading, spacing: 3) {
-                                        Text(medication.name)
-                                            .font(.subheadline.weight(.bold))
-                                            .foregroundStyle(Color.chillText)
-                                        Text(medication.timingSummary)
-                                            .font(.caption)
-                                            .foregroundStyle(Color.chillSecondary)
-                                    }
-
-                                    Spacer()
-
-                                    Button {
-                                        medications.removeAll { $0.id == medication.id }
-                                    } label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                    }
-                                    .buttonStyle(ChillPlainButtonStyle())
-                                    .foregroundStyle(Color.chillSecondary)
-                                }
-                                .padding(10)
-                                .background(.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                            }
-                        }
-                        .padding(.top, 12)
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 6)
-            .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
+            medicationCard
         }
     }
 
@@ -2576,6 +2498,108 @@ struct ProfileSetupMedicationSection: View {
         dosage = ""
         takenAt = .now
         effectiveHours = 8
+    }
+
+    /// Toggle and medication rows, split out of a 107-line body.
+    @ViewBuilder
+    private var medicationCard: some View {
+        VStack(spacing: 0) {
+            ProfileSetupToggleRow(
+                title: String(localized: "I use current medication"),
+                subtitle: isEnabled ? "Medication fields are shown" : "No medication fields needed",
+                isOn: $isEnabled,
+                systemImage: "pills.fill"
+            )
+
+            if isEnabled {
+                ProfileSetupRowDivider()
+
+                ProfileSetupTextField(
+                    title: String(localized: "Medication name"),
+                    placeholder: String(localized: "For example sertraline"),
+                    text: $name,
+                    systemImage: "pills.fill"
+                )
+
+                ProfileSetupRowDivider()
+
+                ProfileSetupTextField(
+                    title: String(localized: "Prescription amount"),
+                    placeholder: String(localized: "As written on your label"),
+                    text: $dosage,
+                    systemImage: "number"
+                )
+
+                ProfileSetupRowDivider()
+
+                ProfileSetupDateRow(
+                    title: String(localized: "Last taken"),
+                    date: $takenAt,
+                    systemImage: "clock.fill"
+                )
+
+                ProfileSetupRowDivider()
+
+                ProfileSetupMeasurementRow(
+                    title: String(localized: "Medication duration"),
+                    value: $effectiveHours,
+                    range: 0.5...72,
+                    unit: "h",
+                    systemImage: "timer"
+                )
+
+                GlassActionButton(prominent: false, action: addMedication) {
+                    Label("Add medication", systemImage: "plus.circle.fill")
+                        .font(.subheadline.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                }
+                .disabled(!canAdd)
+                .opacity(canAdd ? 1 : 0.55)
+                .padding(.top, 14)
+
+                if medications.isEmpty {
+                    Text("No medication saved yet.")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 12)
+                } else {
+                    VStack(spacing: 8) {
+                        ForEach(medications) { medication in
+                            HStack(alignment: .top, spacing: 10) {
+                                Image(systemName: "pills.circle.fill")
+                                    .foregroundStyle(Color.chillPrimary)
+
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(medication.name)
+                                        .font(.subheadline.weight(.bold))
+                                        .foregroundStyle(Color.chillText)
+                                    Text(medication.timingSummary)
+                                        .font(.caption)
+                                        .foregroundStyle(Color.chillSecondary)
+                                }
+
+                                Spacer()
+
+                                Button {
+                                    medications.removeAll { $0.id == medication.id }
+                                } label: {
+                                    Image(systemName: "xmark.circle.fill")
+                                }
+                                .buttonStyle(ChillPlainButtonStyle())
+                                .foregroundStyle(Color.chillSecondary)
+                            }
+                            .padding(10)
+                            .background(.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                        }
+                    }
+                    .padding(.top, 12)
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 6)
+        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
     }
 }
 

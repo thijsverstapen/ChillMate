@@ -77,75 +77,7 @@ struct EmergencyNetherlandsView: View {
 
                         EmergencyRedFlagCard()
 
-                        VStack(alignment: .leading, spacing: 14) {
-                            CareSectionTitle(title: String(localized: "Trusted contact"), symbol: "person.crop.circle.badge.checkmark")
-
-                            TextField("Name", text: $trustedContactName)
-                                .textFieldStyle(.plain)
-                                .foregroundStyle(Color.chillText)
-                                .padding(14)
-                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                            TextField("Phone number", text: $trustedContactPhone)
-                                .keyboardType(.phonePad)
-                                .textFieldStyle(.plain)
-                                .foregroundStyle(Color.chillText)
-                                .padding(14)
-                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                            Button {
-                                call(trustedContactPhone)
-                            } label: {
-                                Label(trustedContactName.isEmpty ? "Call trusted contact" : "Call \(trustedContactName)", systemImage: "phone.circle.fill")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(ChillPillButtonStyle(prominent: true))
-                            .disabled(cleanedPhone(trustedContactPhone).isEmpty)
-
-                            TextField("Message", text: $trustedContactMessage, axis: .vertical)
-                                .lineLimit(2...4)
-                                .textFieldStyle(.plain)
-                                .foregroundStyle(Color.chillText)
-                                .padding(14)
-                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                            Button {
-                                sendLocationMessage()
-                            } label: {
-                                HStack {
-                                    if isFetchingLocation {
-                                        ProgressView()
-                                    }
-                                    Label("Send current location", systemImage: "message.fill")
-                                        .font(.headline)
-                                }
-                                .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(ChillPillButtonStyle(prominent: true))
-                            .disabled(cleanedPhone(trustedContactPhone).isEmpty || isFetchingLocation)
-
-                            if let locationMessage {
-                                Text(locationMessage)
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(Color.chillSecondary)
-                                    .fixedSize(horizontal: false, vertical: true)
-                            }
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
-
-                        VStack(alignment: .leading, spacing: 10) {
-                            CareSectionTitle(title: String(localized: "Non-urgent sexual health"), symbol: "cross.case.fill")
-                            Text("For STI testing, sexual health questions, or treatment that is not an emergency, contact \(healthcareContactLabel).")
-                                .font(.callout)
-                                .foregroundStyle(Color.chillSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: .black.opacity(0.04))
-
-                        CountrySupportLinksCard(country: country)
+                        emergencyNetherlandsViewContinued
                     }
                     .padding(20)
                     .padding(.bottom, 36)
@@ -158,6 +90,83 @@ struct EmergencyNetherlandsView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .endEditingOnTap()
         }
+    }
+
+    /// Second half of `EmergencyNetherlandsView`'s body, which ran to 132 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var emergencyNetherlandsViewContinued: some View {
+            VStack(alignment: .leading, spacing: 14) {
+                CareSectionTitle(title: String(localized: "Trusted contact"), symbol: "person.crop.circle.badge.checkmark")
+
+                TextField("Name", text: $trustedContactName)
+                    .textFieldStyle(.plain)
+                    .foregroundStyle(Color.chillText)
+                    .padding(14)
+                    .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                TextField("Phone number", text: $trustedContactPhone)
+                    .keyboardType(.phonePad)
+                    .textFieldStyle(.plain)
+                    .foregroundStyle(Color.chillText)
+                    .padding(14)
+                    .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                Button {
+                    call(trustedContactPhone)
+                } label: {
+                    Label(trustedContactName.isEmpty ? "Call trusted contact" : "Call \(trustedContactName)", systemImage: "phone.circle.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChillPillButtonStyle(prominent: true))
+                .disabled(cleanedPhone(trustedContactPhone).isEmpty)
+
+                TextField("Message", text: $trustedContactMessage, axis: .vertical)
+                    .lineLimit(2...4)
+                    .textFieldStyle(.plain)
+                    .foregroundStyle(Color.chillText)
+                    .padding(14)
+                    .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                Button {
+                    sendLocationMessage()
+                } label: {
+                    HStack {
+                        if isFetchingLocation {
+                            ProgressView()
+                        }
+                        Label("Send current location", systemImage: "message.fill")
+                            .font(.headline)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChillPillButtonStyle(prominent: true))
+                .disabled(cleanedPhone(trustedContactPhone).isEmpty || isFetchingLocation)
+
+                if let locationMessage {
+                    Text(locationMessage)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(16)
+            .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
+
+            VStack(alignment: .leading, spacing: 10) {
+                CareSectionTitle(title: String(localized: "Non-urgent sexual health"), symbol: "cross.case.fill")
+                Text("For STI testing, sexual health questions, or treatment that is not an emergency, contact \(healthcareContactLabel).")
+                    .font(.callout)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(16)
+            .glassSurface(radius: 28, tint: .black.opacity(0.04))
+
+            CountrySupportLinksCard(country: country)
     }
 
     private func call(_ number: String) {

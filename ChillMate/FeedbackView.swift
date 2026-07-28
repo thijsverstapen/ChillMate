@@ -48,76 +48,7 @@ struct FeedbackView: View {
         ZStack {
             DashboardBackdrop()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    PageHeader(
-                        title: String(localized: "Feedback"),
-                        subtitle: String(localized: "Report a bug, share an idea, or ask a question. Your app version is added automatically."),
-                        symbol: "envelope.fill",
-                        tint: Color.chillIconTeal
-                    )
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("What's it about?")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.chillText)
-
-                        Picker("What's it about?", selection: $topic) {
-                            ForEach(FeedbackTopic.allCases) { topic in
-                                Text(topic.title).tag(topic)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .glassSurface(radius: 24, tint: .black.opacity(0.04))
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Your message")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.chillText)
-
-                        TextField("Share as much detail as you like", text: $message, axis: .vertical)
-                            .lineLimit(5...)
-                            .textFieldStyle(.plain)
-                            .foregroundStyle(Color.chillText)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .glassSurface(radius: 24, tint: .black.opacity(0.04))
-
-                    if let statusMessage {
-                        Text(statusMessage)
-                            .font(.footnote.weight(.medium))
-                            .foregroundStyle(Color.chillSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    Button(action: submit) {
-                        Text("Send feedback")
-                            .font(.headline.weight(.bold))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 52)
-                            .background(
-                                (canSubmit ? Color.chillPrimary : Color.chillSecondary.opacity(0.6)),
-                                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            )
-                    }
-                    .buttonStyle(ChillPlainButtonStyle())
-                    .disabled(!canSubmit)
-
-                    Text("Tapping send opens an email with your message and your app version already filled in, ready for you to send.")
-                        .font(.caption)
-                        .foregroundStyle(Color.chillTertiary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding(20)
-                .padding(.bottom, 36)
-            }
-            .scrollIndicators(.hidden)
-            .scrollDismissesKeyboard(.interactively)
+            feedbackForm
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
@@ -170,6 +101,81 @@ struct FeedbackView: View {
             URLQueryItem(name: "body", value: emailBody)
         ]
         return components.url
+    }
+
+    /// Form content, split out of a 104-line body.
+    @ViewBuilder
+    private var feedbackForm: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                PageHeader(
+                    title: String(localized: "Feedback"),
+                    subtitle: String(localized: "Report a bug, share an idea, or ask a question. Your app version is added automatically."),
+                    symbol: "envelope.fill",
+                    tint: Color.chillIconTeal
+                )
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("What's it about?")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+
+                    Picker("What's it about?", selection: $topic) {
+                        ForEach(FeedbackTopic.allCases) { topic in
+                            Text(topic.title).tag(topic)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .glassSurface(radius: 24, tint: .black.opacity(0.04))
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Your message")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+
+                    TextField("Share as much detail as you like", text: $message, axis: .vertical)
+                        .lineLimit(5...)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(Color.chillText)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .glassSurface(radius: 24, tint: .black.opacity(0.04))
+
+                if let statusMessage {
+                    Text(statusMessage)
+                        .font(.footnote.weight(.medium))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Button(action: submit) {
+                    Text("Send feedback")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .background(
+                            (canSubmit ? Color.chillPrimary : Color.chillSecondary.opacity(0.6)),
+                            in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        )
+                }
+                .buttonStyle(ChillPlainButtonStyle())
+                .disabled(!canSubmit)
+
+                Text("Tapping send opens an email with your message and your app version already filled in, ready for you to send.")
+                    .font(.caption)
+                    .foregroundStyle(Color.chillTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(20)
+            .padding(.bottom, 36)
+        }
+        .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.interactively)
     }
 }
 

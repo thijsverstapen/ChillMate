@@ -147,73 +147,7 @@ private struct AftercareEntryCard: View {
                     .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
             }
 
-            Picker("Mood", selection: moodBinding) {
-                ForEach(AftercareMood.allCases) { mood in
-                    Text("\(mood.emoji) \(mood.localizedDisplayName)").tag(mood)
-                }
-            }
-            .pickerStyle(.menu)
-            .tint(Color.chillAccentTeal)
-
-            VStack(alignment: .leading, spacing: 10) {
-                CareSectionTitle(title: String(localized: "Symptoms"), symbol: "heart.text.clipboard.fill")
-
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 126), spacing: 10)], spacing: 10) {
-                    ForEach(AftercareSymptom.allCases) { symptom in
-                        Button {
-                            toggleSymptom(symptom)
-                        } label: {
-                            Text(symptom.localizedDisplayName)
-                                .font(.caption.weight(.bold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.75)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
-                        }
-                        .buttonStyle(ChillPlainButtonStyle())
-                        .foregroundStyle(entry.aftercareSymptoms.contains(symptom) ? .white : Color.chillText)
-                        .background {
-                            Capsule()
-                                .fill(entry.aftercareSymptoms.contains(symptom) ? Color.chillAccentTeal : Color.white.opacity(0.45))
-                        }
-                    }
-                }
-
-                if !entry.aftercareSymptoms.isEmpty {
-                    SymptomInsightCard(symptoms: entry.aftercareSymptoms)
-                }
-            }
-
-            TextField("How do you feel about last Chill?", text: $entry.aftercareFeeling, axis: .vertical)
-                .lineLimit(2...5)
-                .textFieldStyle(.plain)
-                .foregroundStyle(Color.chillText)
-                .padding(14)
-                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-            GlassActionButton(prominent: true) {
-                entry.aftercareCompletedAt = .now
-                if entry.aftercareSleepRecorded {
-                    entry.sleptYet = true
-                    entry.sleepHours = entry.aftercareSleepHours
-                }
-                modelContext.saveChanges()
-
-                // Mirror the mood to Apple Health's State of Mind when the user
-                // already syncs logs to Health. Failures stay silent — the local
-                // check-in is the source of truth.
-                if healthKitAutoSync {
-                    let mood = AftercareMood(rawValue: entry.aftercareMood) ?? .okay
-                    let completedAt = entry.aftercareCompletedAt ?? .now
-                    Task {
-                        try? await HealthKitService.shared.saveStateOfMind(date: completedAt, mood: mood)
-                    }
-                }
-            } label: {
-                Label("Save aftercare", systemImage: "checkmark.heart.fill")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-            }
+            aftercareDetailFields
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillAccentTeal.opacity(0.08), interactive: true)
@@ -274,6 +208,78 @@ private struct AftercareEntryCard: View {
             }
 
             isImportingSleep = false
+        }
+    }
+
+    /// Mood, symptoms, free-text and the save button, split out of a 150-line body.
+    @ViewBuilder
+    private var aftercareDetailFields: some View {
+        Picker("Mood", selection: moodBinding) {
+            ForEach(AftercareMood.allCases) { mood in
+                Text("\(mood.emoji) \(mood.localizedDisplayName)").tag(mood)
+            }
+        }
+        .pickerStyle(.menu)
+        .tint(Color.chillAccentTeal)
+
+        VStack(alignment: .leading, spacing: 10) {
+            CareSectionTitle(title: String(localized: "Symptoms"), symbol: "heart.text.clipboard.fill")
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 126), spacing: 10)], spacing: 10) {
+                ForEach(AftercareSymptom.allCases) { symptom in
+                    Button {
+                        toggleSymptom(symptom)
+                    } label: {
+                        Text(symptom.localizedDisplayName)
+                            .font(.caption.weight(.bold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                    }
+                    .buttonStyle(ChillPlainButtonStyle())
+                    .foregroundStyle(entry.aftercareSymptoms.contains(symptom) ? .white : Color.chillText)
+                    .background {
+                        Capsule()
+                            .fill(entry.aftercareSymptoms.contains(symptom) ? Color.chillAccentTeal : Color.white.opacity(0.45))
+                    }
+                }
+            }
+
+            if !entry.aftercareSymptoms.isEmpty {
+                SymptomInsightCard(symptoms: entry.aftercareSymptoms)
+            }
+        }
+
+        TextField("How do you feel about last Chill?", text: $entry.aftercareFeeling, axis: .vertical)
+            .lineLimit(2...5)
+            .textFieldStyle(.plain)
+            .foregroundStyle(Color.chillText)
+            .padding(14)
+            .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+        GlassActionButton(prominent: true) {
+            entry.aftercareCompletedAt = .now
+            if entry.aftercareSleepRecorded {
+                entry.sleptYet = true
+                entry.sleepHours = entry.aftercareSleepHours
+            }
+            modelContext.saveChanges()
+
+            // Mirror the mood to Apple Health's State of Mind when the user
+            // already syncs logs to Health. Failures stay silent — the local
+            // check-in is the source of truth.
+            if healthKitAutoSync {
+                let mood = AftercareMood(rawValue: entry.aftercareMood) ?? .okay
+                let completedAt = entry.aftercareCompletedAt ?? .now
+                Task {
+                    try? await HealthKitService.shared.saveStateOfMind(date: completedAt, mood: mood)
+                }
+            }
+        } label: {
+            Label("Save aftercare", systemImage: "checkmark.heart.fill")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
         }
     }
 }

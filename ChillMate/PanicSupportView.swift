@@ -87,66 +87,7 @@ struct PanicSupportView: View {
                         .padding(16)
                         .glassSurface(radius: 28, tint: .white.opacity(0.18), interactive: true)
 
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                CareSectionTitle(title: String(localized: "Grounding steps"), symbol: "hand.raised.fill")
-
-                                Spacer()
-
-                                Button("Renew") {
-                                    completedGroundingSteps.removeAll()
-                                }
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(Color.chillPrimary)
-                                .disabled(completedGroundingSteps.isEmpty)
-                                .opacity(completedGroundingSteps.isEmpty ? 0.45 : 1)
-                            }
-
-                            ForEach(Array(groundingSteps.enumerated()), id: \.offset) { index, step in
-                                Button {
-                                    if completedGroundingSteps.contains(index) {
-                                        completedGroundingSteps.remove(index)
-                                    } else {
-                                        completedGroundingSteps.insert(index)
-                                    }
-                                } label: {
-                                    HStack(alignment: .top, spacing: 10) {
-                                        Image(systemName: completedGroundingSteps.contains(index) ? "checkmark.circle.fill" : "circle")
-                                            .font(.headline)
-                                            .foregroundStyle(completedGroundingSteps.contains(index) ? Color.chillMint : Color.chillSecondary)
-
-                                        Text(step)
-                                            .font(.callout.weight(.semibold))
-                                            .foregroundStyle(completedGroundingSteps.contains(index) ? Color.chillSecondary : Color.chillText)
-                                            .fixedSize(horizontal: false, vertical: true)
-
-                                        Spacer(minLength: 0)
-                                    }
-                                    .padding(12)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .glassSurface(radius: 18, tint: (completedGroundingSteps.contains(index) ? Color.chillMint : Color.chillPrimary).opacity(0.08), interactive: true)
-                                }
-                                .buttonStyle(ChillPlainButtonStyle())
-                            }
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: .white.opacity(0.16), interactive: true)
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("References")
-                                .font(.headline)
-                                .foregroundStyle(Color.chillText)
-                            Link(String(localized: "Mind: panic attacks and grounding"), destination: URL(string: "https://www.mind.org.uk/information-support/types-of-mental-health-problems/anxiety-and-panic-attacks/panic-attacks")!)
-                            Link(String(localized: "NHS: breathing exercises for stress"), destination: URL(string: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/")!)
-                            Link(String(localized: "Government.nl: emergency number 112"), destination: URL(string: "https://www.government.nl/topics/emergency-number-112")!)
-                        }
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.chillPrimary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(16)
-                        .glassSurface(radius: 24, tint: .black.opacity(0.04))
-
-                        EmergencyRedFlagCard()
+                        panicSupportViewContinued
                     }
                     .padding(20)
                     .padding(.bottom, 36)
@@ -155,6 +96,74 @@ struct PanicSupportView: View {
             }
             .navigationTitle("")
         }
+    }
+
+    /// Second half of `PanicSupportView`'s body, which ran to 137 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var panicSupportViewContinued: some View {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    CareSectionTitle(title: String(localized: "Grounding steps"), symbol: "hand.raised.fill")
+
+                    Spacer()
+
+                    Button("Renew") {
+                        completedGroundingSteps.removeAll()
+                    }
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillPrimary)
+                    .disabled(completedGroundingSteps.isEmpty)
+                    .opacity(completedGroundingSteps.isEmpty ? 0.45 : 1)
+                }
+
+                ForEach(Array(groundingSteps.enumerated()), id: \.offset) { index, step in
+                    Button {
+                        if completedGroundingSteps.contains(index) {
+                            completedGroundingSteps.remove(index)
+                        } else {
+                            completedGroundingSteps.insert(index)
+                        }
+                    } label: {
+                        HStack(alignment: .top, spacing: 10) {
+                            Image(systemName: completedGroundingSteps.contains(index) ? "checkmark.circle.fill" : "circle")
+                                .font(.headline)
+                                .foregroundStyle(completedGroundingSteps.contains(index) ? Color.chillMint : Color.chillSecondary)
+
+                            Text(step)
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(completedGroundingSteps.contains(index) ? Color.chillSecondary : Color.chillText)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Spacer(minLength: 0)
+                        }
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .glassSurface(radius: 18, tint: (completedGroundingSteps.contains(index) ? Color.chillMint : Color.chillPrimary).opacity(0.08), interactive: true)
+                    }
+                    .buttonStyle(ChillPlainButtonStyle())
+                }
+            }
+            .padding(16)
+            .glassSurface(radius: 28, tint: .white.opacity(0.16), interactive: true)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("References")
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+                Link(String(localized: "Mind: panic attacks and grounding"), destination: URL(string: "https://www.mind.org.uk/information-support/types-of-mental-health-problems/anxiety-and-panic-attacks/panic-attacks")!)
+                Link(String(localized: "NHS: breathing exercises for stress"), destination: URL(string: "https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/")!)
+                Link(String(localized: "Government.nl: emergency number 112"), destination: URL(string: "https://www.government.nl/topics/emergency-number-112")!)
+            }
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(Color.chillPrimary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .glassSurface(radius: 24, tint: .black.opacity(0.04))
+
+            EmergencyRedFlagCard()
     }
 
     private func toggleBreathing() {

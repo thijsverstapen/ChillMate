@@ -54,95 +54,7 @@ struct STDTestsView: View {
 
                         STIExposureGuideCard()
 
-                        VStack(alignment: .leading, spacing: 14) {
-                            DatePicker("Test date", selection: $testDate, displayedComponents: [.date])
-                                .font(.headline)
-                                .foregroundStyle(Color.chillText)
-                                .tint(Color.chillMint)
-
-                            ResultPickerRow(title: String(localized: "Oral"), result: $oralResult)
-                            ResultPickerRow(title: String(localized: "Genital"), result: $genitalResult)
-                            ResultPickerRow(title: String(localized: "Anal"), result: $analResult)
-
-                            if hasPositiveSelection {
-                                PositiveSTIDetailsDisclosure(
-                                    foundSTIs: $foundSTIs,
-                                    selectedSTI: $selectedSTI,
-                                    customSTIName: $customSTIName
-                                )
-                            }
-
-                            TextField("Notes, clinic, or reference", text: $notes, axis: .vertical)
-                                .lineLimit(2...4)
-                                .textFieldStyle(.plain)
-                                .foregroundStyle(Color.chillText)
-                                .padding(14)
-                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                            // Resolved outside the picker's Sendable label closure;
-                            // also makes the ternary actually hit the string catalog.
-                            let resultPhotoLabel = resultPhotoData == nil
-                                ? String(localized: "Add photo of result")
-                                : String(localized: "Change result photo")
-                            PhotosPicker(selection: $resultPhotoItem, matching: .images) {
-                                Label(resultPhotoLabel, systemImage: "paperclip")
-                                    .font(.subheadline.weight(.semibold))
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(ChillPillButtonStyle(prominent: false))
-
-                            if let data = resultPhotoData, let image = UIImage(data: data) {
-                                ZStack(alignment: .topTrailing) {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(maxWidth: .infinity, maxHeight: 160)
-                                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                    Button {
-                                        resultPhotoData = nil
-                                        resultPhotoItem = nil
-                                    } label: {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .font(.title3)
-                                            .foregroundStyle(.white, .black.opacity(0.5))
-                                            .padding(8)
-                                    }
-                                    .accessibilityLabel("Remove result photo")
-                                }
-                            }
-
-                            GlassActionButton(prominent: true, action: saveTest) {
-                                Label("Save test", systemImage: "checkmark.circle.fill")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                            }
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
-                        .onChange(of: resultPhotoItem) { _, newItem in
-                            guard let newItem else { return }
-                            // The Task inherits the view's main actor, so the @State
-                            // assignment is safe without a MainActor.run hop.
-                            Task {
-                                if let data = try? await newItem.loadTransferable(type: Data.self) {
-                                    resultPhotoData = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 1400, compressionQuality: 0.8)
-                                }
-                            }
-                        }
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            CareSectionTitle(title: String(localized: "Current and past STI tests"), symbol: "list.bullet.rectangle")
-
-                            if tests.isEmpty {
-                                CareEmptyState(text: String(localized: "No STI tests saved yet."))
-                            } else {
-                                LazyVStack(spacing: 12) {
-                                    ForEach(tests) { test in
-                                        STDTestCard(test: test, contacts: warningContacts(for: test))
-                                    }
-                                }
-                            }
-                        }
+                        stdTestsViewContinued
                     }
                     .padding(20)
                     .padding(.bottom, 36)
@@ -163,6 +75,112 @@ struct STDTestsView: View {
             }
             .endEditingOnTap()
         }
+    }
+
+    /// Second half of `STDTestsView`'s body, which ran to 114 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var stdTestsViewContinued: some View {
+            VStack(alignment: .leading, spacing: 14) {
+                DatePicker("Test date", selection: $testDate, displayedComponents: [.date])
+                    .font(.headline)
+                    .foregroundStyle(Color.chillText)
+                    .tint(Color.chillMint)
+
+                ResultPickerRow(title: String(localized: "Oral"), result: $oralResult)
+                ResultPickerRow(title: String(localized: "Genital"), result: $genitalResult)
+                ResultPickerRow(title: String(localized: "Anal"), result: $analResult)
+
+                if hasPositiveSelection {
+                    PositiveSTIDetailsDisclosure(
+                        foundSTIs: $foundSTIs,
+                        selectedSTI: $selectedSTI,
+                        customSTIName: $customSTIName
+                    )
+                }
+
+                TextField("Notes, clinic, or reference", text: $notes, axis: .vertical)
+                    .lineLimit(2...4)
+                    .textFieldStyle(.plain)
+                    .foregroundStyle(Color.chillText)
+                    .padding(14)
+                    .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                // Resolved outside the picker's Sendable label closure;
+                // also makes the ternary actually hit the string catalog.
+                let resultPhotoLabel = resultPhotoData == nil
+                    ? String(localized: "Add photo of result")
+                    : String(localized: "Change result photo")
+                PhotosPicker(selection: $resultPhotoItem, matching: .images) {
+                    Label(resultPhotoLabel, systemImage: "paperclip")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChillPillButtonStyle(prominent: false))
+
+                if let data = resultPhotoData, let image = UIImage(data: data) {
+                    ZStack(alignment: .topTrailing) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity, maxHeight: 160)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        Button {
+                            resultPhotoData = nil
+                            resultPhotoItem = nil
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.title3)
+                                .foregroundStyle(.white, .black.opacity(0.5))
+                                .padding(8)
+                        }
+                        .accessibilityLabel("Remove result photo")
+                    }
+                }
+
+                GlassActionButton(prominent: true, action: saveTest) {
+                    Label("Save test", systemImage: "checkmark.circle.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            .padding(16)
+            .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
+            .onChange(of: resultPhotoItem) { _, newItem in
+                guard let newItem else { return }
+                // The Task inherits the view's main actor, so the @State
+                // assignment is safe without a MainActor.run hop.
+                Task {
+                    if let data = try? await newItem.loadTransferable(type: Data.self) {
+                        resultPhotoData = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 1400, compressionQuality: 0.8)
+                    }
+                }
+            }
+
+            stdTestsViewContinuedTail
+    }
+
+    /// Second half of `STDTestsView`'s body, which ran to 126 lines.
+    ///
+    /// Split purely for readability: these are the same views in the same
+    /// order, still direct children of the same container.
+    @ViewBuilder
+    private var stdTestsViewContinuedTail: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                CareSectionTitle(title: String(localized: "Current and past STI tests"), symbol: "list.bullet.rectangle")
+
+                if tests.isEmpty {
+                    CareEmptyState(text: String(localized: "No STI tests saved yet."))
+                } else {
+                    LazyVStack(spacing: 12) {
+                        ForEach(tests) { test in
+                            STDTestCard(test: test, contacts: warningContacts(for: test))
+                        }
+                    }
+                }
+            }
     }
 
     private func saveTest() {

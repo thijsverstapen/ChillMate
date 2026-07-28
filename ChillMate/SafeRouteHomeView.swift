@@ -27,142 +27,7 @@ struct SafeRouteHomeView: View {
         ZStack {
                 DashboardBackdrop()
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        PageHeader(
-                            title: String(localized: "Safe route home"),
-                            subtitle: String(localized: "Plan transport, share where you are, or open a get-me-home flow quickly. Search an address, choose transit, driving, or cycling, then open Maps or message your trusted contact."),
-                            symbol: "location.fill",
-                            tint: Color.chillMint
-                        )
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            CareSectionTitle(title: String(localized: "Destination"), symbol: "map.fill")
-
-                            TextField("Where do you want to go?", text: $destination)
-                                .textFieldStyle(.plain)
-                                .foregroundStyle(Color.chillText)
-                                .padding(14)
-                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                            if !savedHomeAddress.isEmpty {
-                                Button {
-                                    selectedSuggestion = nil
-                                    routeSuggestions = []
-                                    destination = savedHomeAddress
-                                } label: {
-                                    Label("Use saved home address", systemImage: "house.fill")
-                                        .font(.subheadline.weight(.bold))
-                                        .frame(maxWidth: .infinity)
-                                }
-                                .buttonStyle(ChillPillButtonStyle(prominent: false))
-                            }
-
-                            if !routeSuggestions.isEmpty {
-                                VStack(spacing: 8) {
-                                    ForEach(routeSuggestions) { suggestion in
-                                        Button {
-                                            selectedSuggestion = suggestion
-                                            destination = suggestion.title
-                                            routeSuggestions = []
-                                        } label: {
-                                            HStack(spacing: 10) {
-                                                Image(systemName: "mappin.circle.fill")
-                                                    .foregroundStyle(Color.chillMint)
-
-                                                VStack(alignment: .leading, spacing: 2) {
-                                                    Text(suggestion.title)
-                                                        .font(.subheadline.weight(.semibold))
-                                                        .foregroundStyle(Color.chillText)
-                                                    if !suggestion.subtitle.isEmpty {
-                                                        Text(suggestion.subtitle)
-                                                            .font(.caption)
-                                                            .foregroundStyle(Color.chillSecondary)
-                                                            .lineLimit(2)
-                                                    }
-                                                }
-
-                                                Spacer(minLength: 0)
-                                            }
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .padding(12)
-                                            .glassSurface(radius: 18, tint: Color.chillMint.opacity(0.07), interactive: true)
-                                        }
-                                        .buttonStyle(ChillPlainButtonStyle())
-                                    }
-                                }
-                            }
-
-                            Picker("Route type", selection: $selectedRouteMode) {
-                                ForEach(RouteTransportMode.allCases) { mode in
-                                    Label(mode.title, systemImage: mode.symbolName).tag(mode)
-                                }
-                            }
-                            .pickerStyle(.segmented)
-
-                            Button(action: openDirections) {
-                                Label("Start \(selectedRouteMode.title.lowercased())", systemImage: selectedRouteMode.symbolName)
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(ChillPillButtonStyle(prominent: true))
-
-                            HStack(spacing: 10) {
-                                Button(action: openUber) {
-                                    Label("Uber", systemImage: "car.fill")
-                                        .frame(maxWidth: .infinity)
-                                }
-                                .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .chillText))
-
-                                Button(action: openBolt) {
-                                    Label("Bolt", systemImage: "bolt.car.fill")
-                                        .frame(maxWidth: .infinity)
-                                }
-                                .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .chillText))
-                            }
-                            .font(.headline)
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
-
-                        VStack(alignment: .leading, spacing: 12) {
-                            CareSectionTitle(title: String(localized: "Share location"), symbol: "location.circle.fill")
-
-                            if let currentLocation {
-                                Text(currentLocation.locationMessage)
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(Color.chillSecondary)
-                            }
-
-                            if let message {
-                                Text(message)
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(Color.chillSecondary)
-                            }
-
-                            Button(action: shareLocationNow) {
-                                Label(isFetchingLocation ? "Getting location" : "Send location to trusted contact", systemImage: "message.fill")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(ChillPillButtonStyle(prominent: true))
-                            .disabled(isFetchingLocation || trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.10), interactive: true)
-
-                        Button(role: .destructive, action: getMeHomeEmergencyFlow) {
-                            Label("Get me home now", systemImage: "exclamationmark.triangle.fill")
-                                .font(.headline)
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(ChillPillButtonStyle(prominent: true, tint: .red))
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-                .scrollDismissesKeyboard(.interactively)
+                routeForm
             }
             .navigationTitle("")
             .endEditingOnTap()
@@ -276,6 +141,147 @@ struct SafeRouteHomeView: View {
         let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         guard let url = URL(string: "sms:\(phone)&body=\(encodedBody)") else { return }
         UIApplication.shared.open(url)
+    }
+
+    /// Scrolling content, split out of a 149-line body.
+    @ViewBuilder
+    private var routeForm: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                PageHeader(
+                    title: String(localized: "Safe route home"),
+                    subtitle: String(localized: "Plan transport, share where you are, or open a get-me-home flow quickly. Search an address, choose transit, driving, or cycling, then open Maps or message your trusted contact."),
+                    symbol: "location.fill",
+                    tint: Color.chillMint
+                )
+
+                VStack(alignment: .leading, spacing: 12) {
+                    CareSectionTitle(title: String(localized: "Destination"), symbol: "map.fill")
+
+                    TextField("Where do you want to go?", text: $destination)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(Color.chillText)
+                        .padding(14)
+                        .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+
+                    if !savedHomeAddress.isEmpty {
+                        Button {
+                            selectedSuggestion = nil
+                            routeSuggestions = []
+                            destination = savedHomeAddress
+                        } label: {
+                            Label("Use saved home address", systemImage: "house.fill")
+                                .font(.subheadline.weight(.bold))
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(ChillPillButtonStyle(prominent: false))
+                    }
+
+                    if !routeSuggestions.isEmpty {
+                        VStack(spacing: 8) {
+                            ForEach(routeSuggestions) { suggestion in
+                                Button {
+                                    selectedSuggestion = suggestion
+                                    destination = suggestion.title
+                                    routeSuggestions = []
+                                } label: {
+                                    HStack(spacing: 10) {
+                                        Image(systemName: "mappin.circle.fill")
+                                            .foregroundStyle(Color.chillMint)
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(suggestion.title)
+                                                .font(.subheadline.weight(.semibold))
+                                                .foregroundStyle(Color.chillText)
+                                            if !suggestion.subtitle.isEmpty {
+                                                Text(suggestion.subtitle)
+                                                    .font(.caption)
+                                                    .foregroundStyle(Color.chillSecondary)
+                                                    .lineLimit(2)
+                                            }
+                                        }
+
+                                        Spacer(minLength: 0)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(12)
+                                    .glassSurface(radius: 18, tint: Color.chillMint.opacity(0.07), interactive: true)
+                                }
+                                .buttonStyle(ChillPlainButtonStyle())
+                            }
+                        }
+                    }
+
+                    Picker("Route type", selection: $selectedRouteMode) {
+                        ForEach(RouteTransportMode.allCases) { mode in
+                            Label(mode.title, systemImage: mode.symbolName).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    Button(action: openDirections) {
+                        Label("Start \(selectedRouteMode.title.lowercased())", systemImage: selectedRouteMode.symbolName)
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(ChillPillButtonStyle(prominent: true))
+
+                    HStack(spacing: 10) {
+                        Button(action: openUber) {
+                            Label("Uber", systemImage: "car.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .chillText))
+
+                        Button(action: openBolt) {
+                            Label("Bolt", systemImage: "bolt.car.fill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .chillText))
+                    }
+                    .font(.headline)
+                }
+                .padding(16)
+                .glassSurface(radius: 28, tint: Color.chillMint.opacity(0.10), interactive: true)
+
+                VStack(alignment: .leading, spacing: 12) {
+                    CareSectionTitle(title: String(localized: "Share location"), symbol: "location.circle.fill")
+
+                    if let currentLocation {
+                        Text(currentLocation.locationMessage)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                    }
+
+                    if let message {
+                        Text(message)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                    }
+
+                    Button(action: shareLocationNow) {
+                        Label(isFetchingLocation ? "Getting location" : "Send location to trusted contact", systemImage: "message.fill")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(ChillPillButtonStyle(prominent: true))
+                    .disabled(isFetchingLocation || trustedContactPhone.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+                .padding(16)
+                .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.10), interactive: true)
+
+                Button(role: .destructive, action: getMeHomeEmergencyFlow) {
+                    Label("Get me home now", systemImage: "exclamationmark.triangle.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChillPillButtonStyle(prominent: true, tint: .red))
+            }
+            .padding(20)
+            .padding(.bottom, 36)
+        }
+        .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.interactively)
     }
 }
 

@@ -110,116 +110,7 @@ struct LogNightSheet: View {
             ZStack {
                 DashboardBackdrop()
 
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        Picker("Chill type", selection: $mode) {
-                            Label("I used", systemImage: "heart.fill")
-                                .tag(LogMode.tracked)
-                            Label("I didn't use", systemImage: "moon.zzz.fill")
-                                .tag(LogMode.skipped)
-                        }
-                        .pickerStyle(.segmented)
-                        .padding(4)
-                        .glassSurface(radius: 22, tint: .black.opacity(0.04), interactive: true)
-                        .sensoryFeedback(.impact(weight: .medium), trigger: saveHaptic)
-                        .disablesRootSwipeBack()
-
-                        if mode == .tracked {
-                            TimeFrameCard(startDate: $startDate, endDate: $endDate)
-                        } else {
-                            DatePicker("Chill", selection: $startDate, displayedComponents: [.date])
-                                .font(.headline)
-                                .foregroundStyle(Color.chillText)
-                                .tint(Color.chillAccentTeal)
-                                .padding(16)
-                                .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
-                        }
-
-                        if mode == .tracked {
-                            LocationCaptureCard(
-                                location: attachedLocation,
-                                isFetching: isFetchingLocation,
-                                message: locationMessage,
-                                capture: fetchLocation,
-                                remove: clearLocation
-                            )
-
-                            SleepCheckCard(sleptYet: $sleptYet, sleepHours: $sleepHours)
-
-                            PartnerCountCard(partnerCount: $partnerCount)
-
-                            SexPartnerDetailsCard(
-                                partners: $partnerDetails,
-                                partnerName: $partnerName,
-                                partnerPhoneNumber: $partnerPhoneNumber,
-                                partnerTheyWerePenetrated: $partnerTheyWerePenetrated,
-                                partnerUserWasPenetrated: $partnerUserWasPenetrated,
-                                partnerCount: $partnerCount,
-                                addFromContacts: {
-                                    isShowingContactPicker = true
-                                }
-                            )
-
-                            SaferSexCard(
-                                usedCondom: $usedCondom,
-                                wasPenetrated: $wasPenetrated
-                            )
-
-                            SubstancePicker(
-                                selectedSubstances: $selectedSubstances,
-                                otherSubstance: $otherSubstance,
-                                didInjectDrugs: $didInjectDrugs,
-                                injectionSubstance: $injectionSubstance,
-                                injectedSubstances: $injectedSubstances,
-                                availableInjectionSubstances: selectedSubstanceNamesForInjection,
-                                columns: columns
-                            )
-
-                            TriggerMapCard(selectedTriggers: $selectedTriggers)
-
-                            WhatChangedInputCard(selectedReasons: $selectedChangeReasons)
-
-                            MemoryGapProtocolCard(
-                                reportedMemoryGap: $reportedMemoryGap,
-                                safeNow: $memorySafeNow,
-                                injuries: $memoryInjuries,
-                                consentConcern: $memoryConsentConcern,
-                                needsHelp: $memoryNeedsHelp,
-                                notes: $memoryNotes
-                            )
-                            .onChange(of: memoryInjuries) { _, val in
-                                if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
-                            }
-                            .onChange(of: memoryConsentConcern) { _, val in
-                                if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
-                            }
-                            .onChange(of: memoryNeedsHelp) { _, val in
-                                if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
-                            }
-                        } else {
-                            SkippedNightMessage()
-                        }
-
-                        VStack(alignment: .leading, spacing: 10) {
-                            Label("Private note", systemImage: "lock.fill")
-                                .font(.headline)
-                                .foregroundStyle(Color.chillText)
-
-                            TextField("Optional context", text: $note, axis: .vertical)
-                                .lineLimit(3...6)
-                                .textFieldStyle(.plain)
-                                .foregroundStyle(Color.chillText)
-                                .padding(14)
-                                .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-                        }
-                        .padding(16)
-                        .glassSurface(radius: 28, tint: .black.opacity(0.04))
-                    }
-                    .padding(20)
-                    .padding(.bottom, 24)
-                }
-                .scrollIndicators(.hidden)
-                .scrollDismissesKeyboard(.interactively)
+                logForm
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
@@ -385,6 +276,121 @@ struct LogNightSheet: View {
     private func clearLocation() {
         attachedLocation = nil
         locationMessage = nil
+    }
+
+    /// Scrolling form, split out of a 161-line body.
+    @ViewBuilder
+    private var logForm: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                Picker("Chill type", selection: $mode) {
+                    Label("I used", systemImage: "heart.fill")
+                        .tag(LogMode.tracked)
+                    Label("I didn't use", systemImage: "moon.zzz.fill")
+                        .tag(LogMode.skipped)
+                }
+                .pickerStyle(.segmented)
+                .padding(4)
+                .glassSurface(radius: 22, tint: .black.opacity(0.04), interactive: true)
+                .sensoryFeedback(.impact(weight: .medium), trigger: saveHaptic)
+                .disablesRootSwipeBack()
+
+                if mode == .tracked {
+                    TimeFrameCard(startDate: $startDate, endDate: $endDate)
+                } else {
+                    DatePicker("Chill", selection: $startDate, displayedComponents: [.date])
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+                        .tint(Color.chillAccentTeal)
+                        .padding(16)
+                        .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
+                }
+
+                if mode == .tracked {
+                    LocationCaptureCard(
+                        location: attachedLocation,
+                        isFetching: isFetchingLocation,
+                        message: locationMessage,
+                        capture: fetchLocation,
+                        remove: clearLocation
+                    )
+
+                    SleepCheckCard(sleptYet: $sleptYet, sleepHours: $sleepHours)
+
+                    PartnerCountCard(partnerCount: $partnerCount)
+
+                    SexPartnerDetailsCard(
+                        partners: $partnerDetails,
+                        partnerName: $partnerName,
+                        partnerPhoneNumber: $partnerPhoneNumber,
+                        partnerTheyWerePenetrated: $partnerTheyWerePenetrated,
+                        partnerUserWasPenetrated: $partnerUserWasPenetrated,
+                        partnerCount: $partnerCount,
+                        addFromContacts: {
+                            isShowingContactPicker = true
+                        }
+                    )
+
+                    SaferSexCard(
+                        usedCondom: $usedCondom,
+                        wasPenetrated: $wasPenetrated
+                    )
+
+                    SubstancePicker(
+                        selectedSubstances: $selectedSubstances,
+                        otherSubstance: $otherSubstance,
+                        didInjectDrugs: $didInjectDrugs,
+                        injectionSubstance: $injectionSubstance,
+                        injectedSubstances: $injectedSubstances,
+                        availableInjectionSubstances: selectedSubstanceNamesForInjection,
+                        columns: columns
+                    )
+
+                    TriggerMapCard(selectedTriggers: $selectedTriggers)
+
+                    WhatChangedInputCard(selectedReasons: $selectedChangeReasons)
+
+                    MemoryGapProtocolCard(
+                        reportedMemoryGap: $reportedMemoryGap,
+                        safeNow: $memorySafeNow,
+                        injuries: $memoryInjuries,
+                        consentConcern: $memoryConsentConcern,
+                        needsHelp: $memoryNeedsHelp,
+                        notes: $memoryNotes
+                    )
+                    .onChange(of: memoryInjuries) { _, val in
+                        if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
+                    }
+                    .onChange(of: memoryConsentConcern) { _, val in
+                        if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
+                    }
+                    .onChange(of: memoryNeedsHelp) { _, val in
+                        if val && reportedMemoryGap { isShowingMemoryGapAlert = true }
+                    }
+                } else {
+                    SkippedNightMessage()
+                }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("Private note", systemImage: "lock.fill")
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+
+                    TextField("Optional context", text: $note, axis: .vertical)
+                        .lineLimit(3...6)
+                        .textFieldStyle(.plain)
+                        .foregroundStyle(Color.chillText)
+                        .padding(14)
+                        .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
+                }
+                .padding(16)
+                .glassSurface(radius: 28, tint: .black.opacity(0.04))
+            }
+            .padding(20)
+            .padding(.bottom, 24)
+        }
+        .scrollIndicators(.hidden)
+        .scrollDismissesKeyboard(.interactively)
     }
 }
 

@@ -114,6 +114,129 @@ struct DashboardView: View {
         }
     }
 
+    @ToolbarContentBuilder
+    private var panicToolbarItem: some ToolbarContent {
+        ToolbarItem(placement: .topBarTrailing) {
+            Button(role: .destructive) {
+                Task {
+                    _ = try? EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext)
+                }
+                isPrivacyScreenActive = true
+            } label: {
+                Image(systemName: "xmark.octagon.fill")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(.red)
+                    .frame(width: 36, height: 36)
+                    .glassSurface(radius: 18, tint: .white.opacity(0.34), interactive: true)
+            }
+            .buttonStyle(ChillPlainButtonStyle())
+            .accessibilityLabel("Panic close app")
+            .accessibilityIdentifier(AccessibilityID.panicButton)
+            .sensoryFeedback(trigger: isPrivacyScreenActive) { _, active in active ? .impact(weight: .heavy) : nil }
+        }
+    }
+
+    /// The scrolling column of cards under the header.
+    ///
+    /// Pulled out of `body`, which ran past 200 lines. Takes `metrics` as a
+    /// parameter rather than re-reading `dashboardMetrics`, so the value the whole
+    /// pass renders from is computed exactly once.
+    @ViewBuilder
+    private func mainColumn(metrics: DashboardMetrics) -> some View {
+        VStack(alignment: .leading, spacing: 22) {
+            GetHelpNowBar(escalated: shouldEscalateHelp(metrics)) {
+                careNavPath.append(.panicSupport)
+            }
+
+            TodayFocusCard(
+                entries: entries,
+                plans: plans,
+                timers: timers,
+                tests: tests,
+                journalEntries: journalEntries,
+                metrics: metrics,
+                log: { isShowingLogSheet = true },
+                openCare: { careNavPath.append($0) },
+                openCalendar: openCalendar
+            )
+
+            MetricsGrid(
+                trackedCount: metrics.trackedCount,
+                skippedCount: metrics.skippedCount,
+                substanceCount: metrics.substanceCount,
+                averageSleepHours: metrics.averageSleepHours,
+                dailyScore: metrics.dailyScore,
+                recoveryStreakDays: metrics.recoveryStreakDays,
+                openRecoveryStreak: openCalendar
+            )
+
+            situationalCards(metrics: metrics)
+
+            MomentGroupsSection(
+                groups: orderedToolGroups,
+                highlightedPage: currentMoment?.page,
+                highlightHint: currentMoment?.hint
+            ) { page in
+                careNavPath.append(page)
+            }
+
+            if hydrationLoggedToday {
+                hydrationBadge
+            }
+
+            MedicalSafetyDisclaimerCard(compact: true)
+        }
+    }
+
+    /// Cards that appear only when the underlying condition holds.
+    @ViewBuilder
+    private func situationalCards(metrics: DashboardMetrics) -> some View {
+        if let pepEntry = metrics.pepConcernEntry {
+            PEPCountdownCard(entry: pepEntry)
+        }
+
+        if metrics.healthWarningCount > 3 {
+            HealthWarningCard(count: metrics.healthWarningCount)
+        }
+
+        if reductionGoalSessions > 0 {
+            ReductionGoalProgressCard(
+                goal: reductionGoalSessions,
+                substanceOnly: reductionGoalCountSubstanceOnly,
+                entries: entries
+            )
+        }
+
+        if metrics.shouldShowWhatChanged {
+            WhatChangedPatternCard(
+                recentCount: metrics.recentRiskCount,
+                previousCount: metrics.previousRiskCount,
+                reasonCounts: metrics.changeReasonCounts
+            )
+        }
+
+        if metrics.realityCheckActive {
+            RealityCheckCard {
+                careNavPath.append(.panicSupport)
+            }
+        }
+    }
+
+    private var hydrationBadge: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "drop.fill")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Color.chillSecondaryBlue)
+            Text("Water logged today")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .glassSurface(radius: 22, tint: Color.chillSecondaryBlue.opacity(0.10))
+    }
+
     var body: some View {
         let metrics = dashboardMetrics
 
@@ -128,91 +251,10 @@ struct DashboardView: View {
                         VStack(alignment: .leading, spacing: 22) {
                             HeaderSummaryView(width: proxy.size.width, dailyScore: metrics.dailyScore)
 
-                            VStack(alignment: .leading, spacing: 22) {
-                                GetHelpNowBar(escalated: shouldEscalateHelp(metrics)) {
-                                    careNavPath.append(.panicSupport)
-                                }
-
-                                TodayFocusCard(
-                                    entries: entries,
-                                    plans: plans,
-                                    timers: timers,
-                                    tests: tests,
-                                    journalEntries: journalEntries,
-                                    metrics: metrics,
-                                    log: { isShowingLogSheet = true },
-                                    openCare: { careNavPath.append($0) },
-                                    openCalendar: openCalendar
-                                )
-
-                                MetricsGrid(
-                                    trackedCount: metrics.trackedCount,
-                                    skippedCount: metrics.skippedCount,
-                                    substanceCount: metrics.substanceCount,
-                                    averageSleepHours: metrics.averageSleepHours,
-                                    dailyScore: metrics.dailyScore,
-                                    recoveryStreakDays: metrics.recoveryStreakDays,
-                                    openRecoveryStreak: openCalendar
-                                )
-
-                                if let pepEntry = metrics.pepConcernEntry {
-                                    PEPCountdownCard(entry: pepEntry)
-                                }
-
-                                if metrics.healthWarningCount > 3 {
-                                    HealthWarningCard(count: metrics.healthWarningCount)
-                                }
-
-                                if reductionGoalSessions > 0 {
-                                    ReductionGoalProgressCard(
-                                        goal: reductionGoalSessions,
-                                        substanceOnly: reductionGoalCountSubstanceOnly,
-                                        entries: entries
-                                    )
-                                }
-
-                                if metrics.shouldShowWhatChanged {
-                                    WhatChangedPatternCard(
-                                        recentCount: metrics.recentRiskCount,
-                                        previousCount: metrics.previousRiskCount,
-                                        reasonCounts: metrics.changeReasonCounts
-                                    )
-                                }
-
-                                if metrics.realityCheckActive {
-                                    RealityCheckCard {
-                                        careNavPath.append(.panicSupport)
-                                    }
-                                }
-
-                                MomentGroupsSection(
-                                    groups: orderedToolGroups,
-                                    highlightedPage: currentMoment?.page,
-                                    highlightHint: currentMoment?.hint
-                                ) { page in
-                                    careNavPath.append(page)
-                                }
-
-                                if hydrationLoggedToday {
-                                    HStack(spacing: 10) {
-                                        Image(systemName: "drop.fill")
-                                            .font(.subheadline.weight(.bold))
-                                            .foregroundStyle(Color.chillSecondaryBlue)
-                                        Text("Water logged today")
-                                            .font(.subheadline.weight(.semibold))
-                                            .foregroundStyle(Color.chillText)
-                                        Spacer(minLength: 0)
-                                    }
-                                    .padding(14)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .glassSurface(radius: 22, tint: Color.chillSecondaryBlue.opacity(0.10))
-                                }
-
-                                MedicalSafetyDisclaimerCard(compact: true)
-                            }
-                            .frame(width: contentWidth, alignment: .leading)
-                            .padding(.horizontal, 20)
-                            .padding(.top, 18)
+                            mainColumn(metrics: metrics)
+                                .frame(width: contentWidth, alignment: .leading)
+                                .padding(.horizontal, 20)
+                                .padding(.top, 18)
                         }
                         .padding(.bottom, 136)
                     }
@@ -248,20 +290,15 @@ struct DashboardView: View {
                     NotificationService.shared.clearPEPWindowReminders()
                 }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestQuickSkip)) { _ in
-                quickSkip()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .watchDidLogHydration)) { _ in
-                // Persist the watch's hydration tap (the relay was previously
-                // unobserved) and reflect it immediately.
-                HydrationLog.markLoggedNow()
-                hydrationLoggedToday = true
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestSOS)) { _ in
-                // "Ping my phone" from the Watch Safety screen routes this phone
-                // straight to the country-aware emergency page.
-                UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: DefaultsKey.pendingAppDestination)
-            }
+            .modifier(WatchRelayObservers(
+                quickSkip: quickSkip,
+                logHydration: {
+                    // Persist the watch's hydration tap (the relay was previously
+                    // unobserved) and reflect it immediately.
+                    HydrationLog.markLoggedNow()
+                    hydrationLoggedToday = true
+                }
+            ))
             .task(id: healthKitHRVReadEnabled) {
                 guard healthKitHRVReadEnabled else { return }
                 if let hrv = try? await HealthKitService.shared.latestHRV() {
@@ -276,26 +313,7 @@ struct DashboardView: View {
                 let bpm = (try? await HealthKitService.shared.latestHeartRate()) ?? nil
                 WatchConnectivityService.shared.sendLatestHeartRate(bpm)
             }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(role: .destructive) {
-                        Task {
-                            _ = try? EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext)
-                        }
-                        isPrivacyScreenActive = true
-                    } label: {
-                        Image(systemName: "xmark.octagon.fill")
-                            .font(.headline.weight(.bold))
-                            .foregroundStyle(.red)
-                            .frame(width: 36, height: 36)
-                            .glassSurface(radius: 18, tint: .white.opacity(0.34), interactive: true)
-                    }
-                    .buttonStyle(ChillPlainButtonStyle())
-                    .accessibilityLabel("Panic close app")
-                    .accessibilityIdentifier(AccessibilityID.panicButton)
-                    .sensoryFeedback(trigger: isPrivacyScreenActive) { _, active in active ? .impact(weight: .heavy) : nil }
-                }
-            }
+            .toolbar { panicToolbarItem }
             .safeAreaInset(edge: .bottom) {
                 FloatingLogBar(add: {
                     isShowingLogSheet = true
@@ -303,18 +321,14 @@ struct DashboardView: View {
                     quickSkip()
                 }, isTonightLogged: entries.contains { Calendar.current.isDate($0.date, inSameDayAs: Date.now) })
             }
-            .fullScreenCover(isPresented: $isShowingLogSheet) {
-                LogNightSheet()
-            }
-            .fullScreenCover(isPresented: $isShowingCalendar) {
-                CalendarOverviewView()
-            }
             .navigationDestination(for: CareToolPage.self) { page in
                 careDestination(page)
             }
-            .fullScreenCover(isPresented: $isPrivacyScreenActive) {
-                PrivacyShieldView(dismiss: { isPrivacyScreenActive = false })
-            }
+            .modifier(DashboardCovers(
+                isShowingLogSheet: $isShowingLogSheet,
+                isShowingCalendar: $isShowingCalendar,
+                isPrivacyScreenActive: $isPrivacyScreenActive
+            ))
             .sensoryFeedback(.success, trigger: quickSkipHaptic)
         }
     }
@@ -409,6 +423,53 @@ struct DashboardView: View {
         modelContext.insert(entry)
         modelContext.saveChanges()
         quickSkipHaptic += 1
+    }
+}
+
+/// Inbound relays from the watch app.
+///
+/// Grouped into one modifier so the dashboard's modifier chain reads as
+/// intent rather than three near-identical NotificationCenter subscriptions.
+private struct WatchRelayObservers: ViewModifier {
+    let quickSkip: () -> Void
+    let logHydration: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestQuickSkip)) { _ in
+                quickSkip()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .watchDidLogHydration)) { _ in
+                logHydration()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestSOS)) { _ in
+                // "Ping my phone" from the Watch Safety screen routes this phone
+                // straight to the country-aware emergency page.
+                UserDefaults.standard.set(
+                    NotificationDestination.emergency.rawValue,
+                    forKey: DefaultsKey.pendingAppDestination
+                )
+            }
+    }
+}
+
+/// The dashboard's three full-screen covers.
+private struct DashboardCovers: ViewModifier {
+    @Binding var isShowingLogSheet: Bool
+    @Binding var isShowingCalendar: Bool
+    @Binding var isPrivacyScreenActive: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .fullScreenCover(isPresented: $isShowingLogSheet) {
+                LogNightSheet()
+            }
+            .fullScreenCover(isPresented: $isShowingCalendar) {
+                CalendarOverviewView()
+            }
+            .fullScreenCover(isPresented: $isPrivacyScreenActive) {
+                PrivacyShieldView(dismiss: { isPrivacyScreenActive = false })
+            }
     }
 }
 
@@ -3306,154 +3367,7 @@ private struct ProfileEditView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                DashboardBackdrop()
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Edit profile")
-                                .font(.largeTitle.bold())
-                                .foregroundStyle(palette.heroText)
-                                .disablesRootSwipeBack()
-
-                            Text("These details keep your overview and timer estimates personal.")
-                                .font(.callout)
-                                .foregroundStyle(palette.heroSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        .padding(.top, 44)
-
-                        VStack(spacing: 0) {
-                            ProfileSetupDateRow(
-                                title: String(localized: "Date of birth (\(profile.calculatedAge))"),
-                                date: $profile.dateOfBirth,
-                                systemImage: "calendar"
-                            )
-
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupMeasurementRow(title: String(localized: "Weight"), value: $profile.weightKg, range: 35...180, unit: "kg", systemImage: "scalemass.fill")
-
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupMeasurementRow(title: String(localized: "Height"), value: $profile.heightCm, range: 130...220, unit: "cm", systemImage: "ruler.fill")
-
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupTextField(
-                                title: String(localized: "Home address"),
-                                placeholder: String(localized: "Street, number, and city"),
-                                text: $profile.homeAddress,
-                                systemImage: "house.fill",
-                                axis: .vertical
-                            )
-
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupPickerRow(title: String(localized: "Country"), systemImage: "mappin.and.ellipse") {
-                                Picker("Country", selection: $country) {
-                                    Text("Netherlands").tag("Netherlands")
-                                    Text("Belgium").tag("Belgium")
-                                    Text("Germany").tag("Germany")
-                                    Text("United Kingdom").tag("United Kingdom")
-                                    Text("Ireland").tag("Ireland")
-                                    Text("France").tag("France")
-                                    Text("Spain").tag("Spain")
-                                    Text("United States").tag("United States")
-                                    Text("Australia").tag("Australia")
-                                    Text("Other").tag("Other")
-                                }
-                            }
-
-                            Text("Sets your default emergency number and the support resources shown across the app.")
-                                .font(.caption)
-                                .foregroundStyle(palette.heroSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 16)
-                                .padding(.top, 6)
-
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupPickerRow(title: String(localized: "Sex"), systemImage: "person.2.fill") {
-                                Picker("Sex", selection: sexBinding) {
-                                    ForEach(ProfileSex.allCases) { option in
-                                        Text(option.localizedDisplayName).tag(option)
-                                    }
-                                }
-                            }
-
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupPickerRow(title: String(localized: "Role"), systemImage: "arrow.left.arrow.right") {
-                                Picker("Role", selection: roleBinding) {
-                                    ForEach(SexualRole.allCases) { option in
-                                        Text(option.localizedDisplayName).tag(option)
-                                    }
-                                }
-                            }
-
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupToggleRow(
-                                title: String(localized: "On PrEP"),
-                                subtitle: profile.isOnPrEP ? String(localized: "Enabled") : String(localized: "Not enabled"),
-                                isOn: $profile.isOnPrEP,
-                                systemImage: "cross.case.fill"
-                            )
-
-                            if profile.isOnPrEP {
-                                ProfileSetupRowDivider()
-
-                                ProfileSetupPickerRow(title: String(localized: "PrEP schedule"), systemImage: "clock.badge.checkmark.fill") {
-                                    Picker("PrEP schedule", selection: prepScheduleBinding) {
-                                        ForEach(PrEPSchedule.allCases) { option in
-                                            Text(option.localizedDisplayName).tag(option)
-                                        }
-                                    }
-                                }
-
-                                ProfileSetupRowDivider()
-
-                                ProfileSetupDateRow(
-                                    title: String(localized: "PrEP since"),
-                                    date: $profile.prepStartDate,
-                                    systemImage: "calendar.badge.clock"
-                                )
-
-                                if dailyPrEPNotice {
-                                    ProfileSetupRowDivider()
-
-                                    Text("Daily PrEP needs about 7 days to reach maximum protection for receptive anal sex. Until then, use extra protection and follow medical advice.")
-                                        .font(.caption.weight(.semibold))
-                                        .foregroundStyle(.red)
-                                        .fixedSize(horizontal: false, vertical: true)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                        .padding(.vertical, 8)
-                                }
-                            }
-
-                            ProfileSetupRowDivider()
-
-                            Text("Changes save automatically.")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(Color.chillSecondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.vertical, 8)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
-                        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
-
-                        ProfileMedicationEditor(profile: profile)
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-                .scrollDismissesKeyboard(.interactively)
-            }
+            profileEditContent
             .navigationTitle("")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -3483,6 +3397,159 @@ private struct ProfileEditView: View {
         }
         .onChange(of: profile.prepStartDate) { _, _ in
             modelContext.saveChanges()
+        }
+    }
+
+    /// Form content, split out of a 181-line body.
+    @ViewBuilder
+    private var profileEditContent: some View {
+        ZStack {
+            DashboardBackdrop()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Edit profile")
+                            .font(.largeTitle.bold())
+                            .foregroundStyle(palette.heroText)
+                            .disablesRootSwipeBack()
+
+                        Text("These details keep your overview and timer estimates personal.")
+                            .font(.callout)
+                            .foregroundStyle(palette.heroSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.top, 44)
+
+                    VStack(spacing: 0) {
+                        ProfileSetupDateRow(
+                            title: String(localized: "Date of birth (\(profile.calculatedAge))"),
+                            date: $profile.dateOfBirth,
+                            systemImage: "calendar"
+                        )
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupMeasurementRow(title: String(localized: "Weight"), value: $profile.weightKg, range: 35...180, unit: "kg", systemImage: "scalemass.fill")
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupMeasurementRow(title: String(localized: "Height"), value: $profile.heightCm, range: 130...220, unit: "cm", systemImage: "ruler.fill")
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupTextField(
+                            title: String(localized: "Home address"),
+                            placeholder: String(localized: "Street, number, and city"),
+                            text: $profile.homeAddress,
+                            systemImage: "house.fill",
+                            axis: .vertical
+                        )
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupPickerRow(title: String(localized: "Country"), systemImage: "mappin.and.ellipse") {
+                            Picker("Country", selection: $country) {
+                                Text("Netherlands").tag("Netherlands")
+                                Text("Belgium").tag("Belgium")
+                                Text("Germany").tag("Germany")
+                                Text("United Kingdom").tag("United Kingdom")
+                                Text("Ireland").tag("Ireland")
+                                Text("France").tag("France")
+                                Text("Spain").tag("Spain")
+                                Text("United States").tag("United States")
+                                Text("Australia").tag("Australia")
+                                Text("Other").tag("Other")
+                            }
+                        }
+
+                        Text("Sets your default emergency number and the support resources shown across the app.")
+                            .font(.caption)
+                            .foregroundStyle(palette.heroSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 16)
+                            .padding(.top, 6)
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupPickerRow(title: String(localized: "Sex"), systemImage: "person.2.fill") {
+                            Picker("Sex", selection: sexBinding) {
+                                ForEach(ProfileSex.allCases) { option in
+                                    Text(option.localizedDisplayName).tag(option)
+                                }
+                            }
+                        }
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupPickerRow(title: String(localized: "Role"), systemImage: "arrow.left.arrow.right") {
+                            Picker("Role", selection: roleBinding) {
+                                ForEach(SexualRole.allCases) { option in
+                                    Text(option.localizedDisplayName).tag(option)
+                                }
+                            }
+                        }
+
+                        ProfileSetupRowDivider()
+
+                        ProfileSetupToggleRow(
+                            title: String(localized: "On PrEP"),
+                            subtitle: profile.isOnPrEP ? String(localized: "Enabled") : String(localized: "Not enabled"),
+                            isOn: $profile.isOnPrEP,
+                            systemImage: "cross.case.fill"
+                        )
+
+                        if profile.isOnPrEP {
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupPickerRow(title: String(localized: "PrEP schedule"), systemImage: "clock.badge.checkmark.fill") {
+                                Picker("PrEP schedule", selection: prepScheduleBinding) {
+                                    ForEach(PrEPSchedule.allCases) { option in
+                                        Text(option.localizedDisplayName).tag(option)
+                                    }
+                                }
+                            }
+
+                            ProfileSetupRowDivider()
+
+                            ProfileSetupDateRow(
+                                title: String(localized: "PrEP since"),
+                                date: $profile.prepStartDate,
+                                systemImage: "calendar.badge.clock"
+                            )
+
+                            if dailyPrEPNotice {
+                                ProfileSetupRowDivider()
+
+                                Text("Daily PrEP needs about 7 days to reach maximum protection for receptive anal sex. Until then, use extra protection and follow medical advice.")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.red)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.vertical, 8)
+                            }
+                        }
+
+                        ProfileSetupRowDivider()
+
+                        Text("Changes save automatically.")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 8)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+
+                    ProfileMedicationEditor(profile: profile)
+                }
+                .padding(20)
+                .padding(.bottom, 36)
+            }
+            .scrollIndicators(.hidden)
+            .scrollDismissesKeyboard(.interactively)
         }
     }
 }
