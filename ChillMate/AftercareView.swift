@@ -181,9 +181,9 @@ private struct AftercareEntryCard: View {
                 let end = Calendar.current.date(byAdding: .hour, value: 18, to: entry.endDate) ?? entry.endDate.addingTimeInterval(18 * 60 * 60)
                 let hours = try await HealthKitService.shared.sleepHours(from: entry.endDate, to: end)
 
-                // HealthKit returns 0 (not an error) when the window has no samples —
-                // common for a just-ended or still-ongoing night. Never overwrite an
-                // existing value with 0.
+                // HealthKit returns 0 (not an error) when the window has no samples,
+                // which is common for a just-ended or still-ongoing night. Never
+                // overwrite an existing value with 0.
                 guard hours > 0 else {
                     if !autoImport {
                         sleepImportMessage = String(localized: "No sleep found in Apple Health for this window yet.")
@@ -267,8 +267,8 @@ private struct AftercareEntryCard: View {
             modelContext.saveChanges()
 
             // Mirror the mood to Apple Health's State of Mind when the user
-            // already syncs logs to Health. Failures stay silent — the local
-            // check-in is the source of truth.
+            // already syncs logs to Health. Failures stay silent because the
+            // local check-in is the source of truth.
             if healthKitAutoSync {
                 let mood = AftercareMood(rawValue: entry.aftercareMood) ?? .okay
                 let completedAt = entry.aftercareCompletedAt ?? .now

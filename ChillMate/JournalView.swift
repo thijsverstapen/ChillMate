@@ -477,7 +477,7 @@ private struct JournalStatusPill: View {
     }
 }
 
-/// Read-only summary of a saved journal day — shown instead of the input form
+/// Read-only summary of a saved journal day, shown instead of the input form
 /// once a day has an entry, so a saved day reads as a finished overview rather
 /// than a blank form that looks like it still needs input.
 private struct JournalEntryOverview: View {

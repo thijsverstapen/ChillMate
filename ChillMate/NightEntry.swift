@@ -46,22 +46,107 @@ final class NightEntry {
     /// re-materialized, even while its child records are still importing.
     var typedRecordsVersion: Int = 0
 
-    /// Bumped by every setter that changes displayed content.
+    /// Number of edits made through this entry's own setters.
+    ///
+    /// Private because it is only half of the change key: `contentVersion` below is
+    /// the whole one. It has a default and is a plain Int, so it round-trips through
+    /// CloudKit like every other attribute.
+    ///
+    /// It carries the storage that 4.2.1 first added as `contentVersion`, which
+    /// never shipped: against the last released build this is still a single new
+    /// defaulted Int, the change SwiftData infers without a migration stage. Renaming
+    /// it was only safe because of that, and because it holds no user data at all.
+    /// The attributes below have both shipped and hold real data, which is why none
+    /// of them moved.
+    private var contentEditCount: Int = 0
+
+    /// Changes whenever anything this entry displays changes.
     ///
     /// Views that cache derived values (the dashboard's metrics, most of all) need
     /// to know an entry was *edited*, not just added or removed. Summing this
-    /// across the fetched rows gives a cheap key that changes on edits too — a
-    /// row-count comparison does not, which is how the dashboard came to show
+    /// across the fetched rows gives a cheap key that changes on edits too, which a
+    /// row-count comparison cannot do, and that is how the dashboard came to show
     /// stale figures after editing a night.
     ///
-    /// It has a default and is a plain Int, so it round-trips through CloudKit like
-    /// every other attribute. Overflow is harmless: this is an equality key, not a
-    /// counter anyone reads.
-    var contentVersion: Int = 0
+    /// It combines two halves because an entry's displayed content is stored in two
+    /// different ways:
+    ///
+    ///   * The JSON-blob-backed properties (substances, injection substances,
+    ///     partners, trigger tags, change reasons, aftercare symptoms) are already
+    ///     computed, so their setters bump `contentEditCount` as the edit happens.
+    ///   * The plain stored attributes (sleep, aftercare, safer-sex flags, dates)
+    ///     have no setter to hook. Giving them one means renaming the stored
+    ///     property so a computed property can take over its name, and renaming a
+    ///     persisted attribute renames the mirrored CloudKit field with it:
+    ///     everything already synced under the old field name would come back as
+    ///     the default. Their contribution is therefore derived on read, by folding
+    ///     their current values into `storedContentFingerprint`.
+    ///
+    /// Deriving that second half is what makes Apple Health sleep sync register:
+    /// it writes `sleptYet` and `sleepHours` after LogNightSheet has dismissed, so
+    /// the change lands while the dashboard is already back on screen and no setter
+    /// is involved at any point. Same for the aftercare water and food toggles and
+    /// the mood binding, which write their stored attributes directly.
+    ///
+    /// Two consequences of the derived half, both intended:
+    ///   * This identifies content, it does not count edits, so it can move in
+    ///     either direction. Compare it for equality only, never for order.
+    ///   * Writing a stored attribute the value it already holds leaves it
+    ///     unchanged, so a no-op write costs no recompute.
+    ///
+    /// Overflow in either half is harmless for the same reason: this is an equality
+    /// key, not a number anyone reads.
+    var contentVersion: Int {
+        contentEditCount &+ storedContentFingerprint
+    }
+
+    /// Folds the plain stored attributes the dashboard reads into one number.
+    ///
+    /// FNV-1a rather than `Hasher`, whose seed is randomized per process: a key that
+    /// changes across launches on its own is indistinguishable from an edit to
+    /// anything that caches or persists it. This stays deterministic.
+    ///
+    /// The list mirrors what DashboardMetrics and DailyRecoveryScore read, so
+    /// widening either means widening this. A field left out does not break
+    /// visibly, it just stops invalidating, which is the exact failure this whole
+    /// mechanism exists to prevent.
+    private var storedContentFingerprint: Int {
+        var hash: UInt64 = 0xcbf2_9ce4_8422_2325
+        func mix(_ value: UInt64) {
+            hash = (hash ^ value) &* 0x0000_0100_0000_01b3
+        }
+
+        // Each flag is mixed at its own position, so no two of them can trade
+        // places and leave the fold unchanged.
+        for flag in [
+            sleptYet, skippedNight, hadSex, usedCondom, wasPenetrated,
+            aftercareDrankWater, aftercareAteFood, aftercareCompletedAt != nil
+        ] {
+            mix(flag ? 1 : 0)
+        }
+
+        // Doubles go in as their exact bit pattern. Quantizing would need a
+        // tolerance nobody can justify, and `Int(someDouble)` traps outright on the
+        // NaN or infinity a HealthKit-sourced value could in principle carry.
+        mix(sleepHours.bitPattern)
+        mix((aftercareCompletedAt?.timeIntervalSince1970 ?? 0).bitPattern)
+        mix(date.timeIntervalSince1970.bitPattern)
+        mix(startDate.timeIntervalSince1970.bitPattern)
+
+        for byte in aftercareMood.utf8 {
+            mix(UInt64(byte))
+        }
+
+        return Int(bitPattern: UInt(truncatingIfNeeded: hash))
+    }
 
     /// Records that this entry's displayed content changed.
+    ///
+    /// Only the blob-backed setters below call this. Everything stored plainly is
+    /// picked up by `storedContentFingerprint` instead, which is why there is no
+    /// matching call for sleep, aftercare or the safer-sex flags.
     func markContentChanged() {
-        contentVersion &+= 1
+        contentEditCount &+= 1
     }
 
     init(
@@ -166,7 +251,7 @@ final class NightEntry {
     // writes blob-only rows, and those must keep resolving. So the exit condition
     // is a *release* condition, not a code one:
     //
-    //   1. 4.2.1 (this release) — dual-write continues. TypedRecordsMigration
+    //   1. 4.2.1 (this release): dual-write continues. TypedRecordsMigration
     //      stamps every local row typedRecordsVersion == 1.
     //   2. Once App Store adoption of >= 4.2.0 is effectively complete (no build
     //      older than typed records still syncing into a shared iCloud database,

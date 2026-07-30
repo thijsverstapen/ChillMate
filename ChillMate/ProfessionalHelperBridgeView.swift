@@ -135,7 +135,13 @@ private enum HelperSummaryBuilder {
         let recentTimers = timers.filter { $0.startedAt >= cutoff }
         let risky = recentEntries.filter { !$0.skippedNight && $0.hadSex && !$0.substances.isEmpty }
         let memoryGaps = recentEntries.filter(\.reportedMemoryGap)
-        let positiveTests = stiTests.filter(\.hasPositiveResult)
+        // Windowed like every other figure under the "Past 90 days" heading. These
+        // two were counted over the whole array, so they reported an all-time total
+        // under a 90 day label, and the array itself is a limited fetch, so the
+        // number silently stopped moving once the user passed that many tests.
+        // A clinician reads this sheet and has no way to see either problem.
+        let recentTests = stiTests.filter { $0.testDate >= cutoff }
+        let positiveTests = recentTests.filter(\.hasPositiveResult)
         let substances = ChillInsightCalculator.substanceCounts(entries: recentEntries).prefix(6).map { "\($0.label) (\($0.count))" }.joined(separator: ", ")
         let triggers = ChillInsightCalculator.triggerCounts(entries: recentEntries).prefix(6).map { "\($0.label) (\($0.count))" }.joined(separator: ", ")
         let medication = profile?.medications.map { "\($0.name) \($0.timingSummary)" }.joined(separator: "; ") ?? "Not set"
@@ -157,7 +163,7 @@ private enum HelperSummaryBuilder {
         Check-in records: \(recentTimers.count)
         Continued-after-pause records: \(recentTimers.filter { $0.redoseDecision == RedoseDecision.redosed.rawValue }.count)
         Memory gaps reported: \(memoryGaps.count)
-        STI tests saved: \(stiTests.count)
+        STI tests saved: \(recentTests.count)
         Positive STI tests: \(positiveTests.count)
 
         Patterns

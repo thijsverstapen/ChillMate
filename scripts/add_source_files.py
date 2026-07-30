@@ -33,6 +33,9 @@ FILE_TYPES = {
     ".swift": "sourcecode.swift",
     ".xcstrings": "text.json.xcstrings",
     ".plist": "text.plist.xml",
+    # The usage note offers --resource for assets, so the type it needs has to be
+    # here; without it that path raised "unknown file type" instead.
+    ".xcassets": "folder.assetcatalog",
 }
 
 
@@ -64,21 +67,32 @@ def add_file(text, filename, resource=False):
     file_id = make_id(FILE_ID_PREFIX, next_index(text, FILE_ID_PREFIX))
 
     # 1. PBXBuildFile
+    #
+    # str.replace returns the text untouched when the anchor is absent, so each
+    # insertion is checked. A silent no-op here writes back a project that looks
+    # fine and builds without the new file, which is the confusing failure this
+    # script exists to avoid.
+    build_anchor = "/* End PBXBuildFile section */"
+    if build_anchor not in text:
+        raise SystemExit(f"could not locate {build_anchor}")
     text = text.replace(
-        "/* End PBXBuildFile section */",
+        build_anchor,
         f"\t\t{build_id} /* {filename} in {phase_name} */ = {{isa = PBXBuildFile; "
         f"fileRef = {file_id} /* {filename} */; }};\n"
-        "/* End PBXBuildFile section */",
+        f"{build_anchor}",
         1,
     )
 
     # 2. PBXFileReference
+    reference_anchor = "/* End PBXFileReference section */"
+    if reference_anchor not in text:
+        raise SystemExit(f"could not locate {reference_anchor}")
     text = text.replace(
-        "/* End PBXFileReference section */",
+        reference_anchor,
         f"\t\t{file_id} /* {filename} */ = {{isa = PBXFileReference; "
         f"lastKnownFileType = {file_type}; path = {filename}; "
         'sourceTree = "<group>"; };\n'
-        "/* End PBXFileReference section */",
+        f"{reference_anchor}",
         1,
     )
 
@@ -111,9 +125,18 @@ def main(argv):
     names = [a for a in argv if not a.startswith("--")]
     if not names:
         raise SystemExit(__doc__)
-    text = PBXPROJ.read_text()
+    if not PBXPROJ.is_file():
+        raise SystemExit(f"no project file at {PBXPROJ}")
+
+    original = PBXPROJ.read_text()
+    text = original
     for name in names:
         text = add_file(text, name, resource=resource)
+
+    # Every file was already registered, so leave the project's mtime alone
+    # rather than rewriting it byte for byte and dirtying the working tree.
+    if text == original:
+        return
     PBXPROJ.write_text(text)
 
 

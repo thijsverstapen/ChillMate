@@ -95,8 +95,8 @@ final class NotificationService {
     ///     case .playful: "\(body) Small check, future-you says thanks."
     ///
     /// `body` arrives already localized, so the `.direct` substring could never
-    /// match in Dutch, German, French or Spanish — "Direct" silently behaved
-    /// exactly like "Gentle" for every non-English user — and `.playful` welded an
+    /// match in Dutch, German, French or Spanish ("Direct" silently behaved
+    /// exactly like "Gentle" for every non-English user), and `.playful` welded an
     /// English sentence onto translated text, producing mixed-language
     /// notifications. Callers now pass real per-tone translations, and the playful
     /// suffix is a localized format string rather than concatenation, so languages
@@ -279,10 +279,11 @@ final class NotificationService {
     // MARK: - Weekend night safety check-ins
 
     /// Gentle, passive "you okay?" check-ins during the window when a session is
-    /// most likely and help is hardest to find: the 00:00–06:00 hours of Saturday
-    /// and Sunday (i.e. Friday-night and Saturday-night sessions). Opt-in via
-    /// `weekendSafetyEnabled`; each carries the SAFETY_CHECKIN category's one-tap
-    /// "I'm safe" / "Get help" actions. Self-gates, so callers can fire it freely.
+    /// most likely and help is hardest to find: the 00:00 to 06:00 hours of
+    /// Saturday and Sunday (i.e. Friday-night and Saturday-night sessions). Opt-in
+    /// via `weekendSafetyEnabled`; each carries the SAFETY_CHECKIN category's
+    /// one-tap "I'm safe" / "Get help" actions. Self-gates, so callers can fire it
+    /// freely.
     func scheduleWeekendSafetyCheckIns() {
         clearWeekendSafetyCheckIns()
         guard UserDefaults.standard.bool(forKey: DefaultsKey.weekendSafetyEnabled) else { return }

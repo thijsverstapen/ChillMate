@@ -8,8 +8,8 @@ import SwiftUI
 
 /// Country-aware emergency-services number, honoring the user's manual override.
 ///
-/// THE single source of truth for "what number does this user dial". Everything —
-/// the phone UI, the watch relay, the support directory — resolves through here.
+/// THE single source of truth for "what number does this user dial". Everything
+/// resolves through here: the phone UI, the watch relay, the support directory.
 ///
 /// It used to be three separate implementations, and the copy in
 /// `WatchConnectivityService` only special-cased the United Kingdom, so the watch
@@ -64,7 +64,7 @@ enum EmergencyContactInfo {
     ///
     /// Built from `URLComponents` rather than force-unwrapping a literal, so there
     /// is no `!` anywhere on the emergency-call path. 112 is the fallback of last
-    /// resort here only because the resolved number failed to parse — the ordinary
+    /// resort here only because the resolved number failed to parse. The ordinary
     /// path is `dialURL`, which already honours the user's country and override.
     static var fallbackDialURL: URL {
         var components = URLComponents()
@@ -258,7 +258,7 @@ struct RecentlyDeletedItem: Codable, Identifiable {
 }
 
 enum RecentlyDeletedStore {
-    private static let key = "recentlyDeletedItems"
+    private static let key = DefaultsKey.recentlyDeletedItems
 
     static func items() -> [RecentlyDeletedItem] {
         guard let data = UserDefaults.standard.data(forKey: key),

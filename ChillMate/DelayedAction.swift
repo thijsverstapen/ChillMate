@@ -4,8 +4,8 @@ import SwiftUI
 ///
 /// The app sequenced animations with nine bare `asyncAfter` calls carrying magic
 /// delays (0.04, 0.06, 0.14, 0.35, 0.44, 0.50, 1.1, 6.0 seconds). Those closures
-/// cannot be cancelled, so they still fire after the view has gone away — running
-/// an animation or a navigation on a screen the user already left — and they
+/// cannot be cancelled, so they still fire after the view has gone away (running
+/// an animation or a navigation on a screen the user already left), and they
 /// ignore the reduce-motion preference entirely.
 ///
 /// A `Task` is cancellable, ties naturally to view lifetime, and checks
@@ -59,7 +59,7 @@ extension View {
 /// Compile-time-safe URLs for the fixed links the app ships.
 ///
 /// The care screens force-unwrapped 19 `URL(string:)` literals. They cannot fail
-/// as written, but a force unwrap turns any future typo into a crash — and these
+/// as written, but a force unwrap turns any future typo into a crash. And these
 /// specific links are the emergency, crisis, and help-resource ones, i.e. exactly
 /// where a crash is least acceptable.
 ///

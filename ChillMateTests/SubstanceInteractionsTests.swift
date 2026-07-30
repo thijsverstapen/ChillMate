@@ -6,7 +6,7 @@ extension Tag {
     @Tag static var safety: Self
 }
 
-// A struct with @Test methods is already a suite — no @Suite needed.
+// A struct with @Test methods is already a suite, so no @Suite is needed.
 struct SubstanceInteractionCheckerTests {
 
     @Test("A combination only warns when every substance in it is present", .tags(.safety))

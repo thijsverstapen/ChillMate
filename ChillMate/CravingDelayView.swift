@@ -100,8 +100,8 @@ private struct DelayOrb: View {
     /// The gradient circle and the glass surface are built once and stay put; only
     /// the digits and the caption sit inside the TimelineView.
     ///
-    /// Previously the whole orb — including `glassSurface`, which is a blurred
-    /// material — was rebuilt once a second for the full ten minutes of the delay
+    /// Previously the whole orb (including `glassSurface`, which is a blurred
+    /// material) was rebuilt once a second for the full ten minutes of the delay
     /// tool, when the only thing changing was the number.
     var body: some View {
         VStack(spacing: 14) {

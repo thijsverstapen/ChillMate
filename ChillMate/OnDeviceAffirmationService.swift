@@ -76,7 +76,7 @@ enum OnDeviceAffirmationService {
     }
 
     /// Generates a short, private weekly reflection from aggregate stats only.
-    /// No substance names, notes, or free text ever reach the model — counts and
+    /// No substance names, notes, or free text ever reach the model: counts and
     /// a generic sleep signal only, keeping the same safety stance as the
     /// affirmations. Returns nil when the model is unavailable or output is
     /// unusable, so the caller can simply hide the card.

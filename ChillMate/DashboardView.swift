@@ -36,8 +36,8 @@ struct DashboardView: View {
 
     /// Metrics are recomputed in `.task(id:)` rather than lazily inside `body`.
     ///
-    /// The previous cache keyed on `entries.count`, so editing an existing night —
-    /// changing substances, logging sleep, completing aftercare — left the count
+    /// The previous cache keyed on `entries.count`, so editing an existing night
+    /// (changing substances, logging sleep, completing aftercare) left the count
     /// unchanged and the dashboard kept showing stale numbers: stale daily score,
     /// stale streak, stale PEP countdown, and stale data pushed to the widget and
     /// the watch. It only refreshed when a row was added or deleted.
@@ -46,12 +46,19 @@ struct DashboardView: View {
     /// deferring the write into `Task { @MainActor }` to dodge the "Modifying state
     /// during view update" warning. Because the write landed after the pass, a
     /// second read in the same pass (`shouldEscalateHelp`) still saw an empty cache
-    /// and recomputed everything a second time — two full scans over every entry.
+    /// and recomputed everything a second time: two full scans over every entry.
     @State private var cachedMetrics: DashboardMetrics?
 
     /// Changes whenever anything the metrics depend on changes. `NightEntry`
-    /// exposes `contentVersion`, which its setters bump, so edits register even
-    /// though the row count is identical.
+    /// exposes `contentVersion` as a computed value with two halves: a stored
+    /// counter that its blob-backed setters bump, and a fold of the plain stored
+    /// attributes taken at read time. Edits therefore register even though the row
+    /// count is identical, including the ones no setter ever sees: sleep,
+    /// hydration, food, mood, and the skipped and sex flags.
+    ///
+    /// Because that second half is a fold and not a count, the sum below is a
+    /// fingerprint rather than a tally. It is not monotonic and can move in either
+    /// direction, so it must only ever be compared for equality, never for order.
     private var metricsInvalidationKey: MetricsKey {
         MetricsKey(
             entryCount: entries.count,
@@ -409,8 +416,8 @@ struct DashboardView: View {
     }
 
     private func quickSkip() {
-        // Prevent double-logging the same night — e.g. skip tapped twice, or once
-        // on the phone and once from the Watch, or when tonight is already logged.
+        // Prevent double-logging the same night: skip tapped twice, or once on the
+        // phone and once from the Watch, or when tonight is already logged.
         if entries.contains(where: { Calendar.current.isDate($0.date, inSameDayAs: .now) }) {
             return
         }
@@ -1354,7 +1361,7 @@ private struct DailyRecoveryScore {
     }
 
     /// `entries` arrives sorted by date descending, so the latest non-skipped row is
-    /// simply the first one — no scan needed. The substance check still has to look
+    /// simply the first one (no scan needed). The substance check still has to look
     /// at rows until it finds one, but stops there instead of always walking the
     /// whole table.
     ///
@@ -1420,7 +1427,7 @@ private struct DailyRecoveryScore {
             Factor(name: String(localized: "Substances"), caption: latestSubstances.isEmpty ? "clear" : "logged"),
             Factor(name: String(localized: "Anxiety"), caption: Self.anxietyCaption(latest, symptoms: latestSymptoms ?? [])),
             Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
-            Factor(name: String(localized: "Symptoms"), caption: latestSymptoms.isEmpty ? "none" : "\(latestSymptoms.count) selected"),
+            Factor(name: String(localized: "Symptoms"), caption: (latestSymptoms ?? []).isEmpty ? "none" : "\((latestSymptoms ?? []).count) selected"),
             Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
         ]
     }
@@ -2120,8 +2127,10 @@ private struct GetHelpNowBar: View {
     var escalated: Bool = false
     let open: () -> Void
 
+    @Environment(\.chillReduceMotion) private var reduceMotion
+
     /// A deep, saturated red (matching the emergency-call button) that keeps white
-    /// text readable — the icon-tint `chillIconRed` is too light for a solid fill.
+    /// text readable. The icon-tint `chillIconRed` is too light for a solid fill.
     private let barRed = Color(red: 216 / 255, green: 52 / 255, blue: 52 / 255)
 
     /// 0 → 1 continuous driver for the pulsing ring (a Bool doesn't oscillate
@@ -2155,6 +2164,18 @@ private struct GetHelpNowBar: View {
     }
 
     private func syncPulse() {
+        // Reduce Motion holds the ring steady instead of breathing. The escalated
+        // state still has to READ as escalated, so the ring stays at its bright
+        // value rather than being dropped: the people most likely to have Reduce
+        // Motion on are the last people who should lose a crisis affordance.
+        //
+        // A `repeatForever` animation also never settles, so leaving it running
+        // ignores the preference for as long as the bar is on screen.
+        guard !reduceMotion else {
+            pulse = escalated ? 1 : 0
+            return
+        }
+
         if escalated {
             withAnimation(.easeInOut(duration: 1.15).repeatForever(autoreverses: true)) { pulse = 1 }
         } else {
@@ -2907,7 +2928,7 @@ private struct FloatingLogBar: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            // Primary action — matches original clean design
+            // Primary action: matches original clean design
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(String(localized: "Private log"))
@@ -2951,7 +2972,7 @@ private struct FloatingLogBar: View {
             .padding(.horizontal, 18)
             .padding(.vertical, 14)
 
-            // Secondary action — clear-night quick log.
+            // Secondary action: clear-night quick log.
             // Hidden once tonight is already logged, or immediately hidden when tapped locally
             if !isTonightLogged && !hasQuickSkippedLocally {
                 Rectangle()

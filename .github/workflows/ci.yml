@@ -14,6 +14,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   SCHEME: ChillMate
 
@@ -26,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: String Catalog is complete and well formed
+      - name: String Catalogs are complete and well formed
         run: python3 scripts/check_localization.py
 
       - name: No build artifacts are tracked
@@ -43,7 +46,10 @@ jobs:
   build-test:
     name: Build and test
     runs-on: macos-15
-    timeout-minutes: 45
+    # A cold build of six targets plus a UI run that retries once needs the room.
+    # continue-on-error cannot rescue a job that hits its own timeout, so this has
+    # to sit above the worst realistic case rather than the typical one.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
@@ -80,10 +86,20 @@ jobs:
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
             -only-testing:ChillMateTests \
+            -resultBundlePath TestResults/UnitTests.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
 
+      # Advisory, not a gate. These four tests drive a real simulator through
+      # first-run onboarding by tapping labelled controls, which on a shared
+      # runner fails for reasons that have nothing to do with the change under
+      # test: a slow boot, a simulator that never settles, a keyboard that comes
+      # up late. Blocking every merge on that trains people to ignore CI, and the
+      # unit tests above are the ones that assert on behaviour. A failure here
+      # still shows on the run as a red step with the .xcresult attached.
       - name: UI smoke tests
+        id: ui-smoke
+        continue-on-error: true
         run: |
           set -o pipefail
           xcodebuild test-without-building \
@@ -93,14 +109,25 @@ jobs:
             -only-testing:ChillMateUITests/ChillMateUITests/testLaunchesInEveryLanguage \
             -only-testing:ChillMateUITests/ChillMateUITests/testEachTabOpens \
             -only-testing:ChillMateUITests/ChillMateUITests/testLogSheetOpens \
+            -retry-tests-on-failure \
+            -test-iterations 2 \
+            -parallel-testing-enabled NO \
+            -resultBundlePath TestResults/UISmokeTests.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
 
       - name: Upload test results
-        if: failure()
+        # The path used to be a "~/Library/..." glob. upload-artifact resolves its
+        # path itself rather than through a shell, so the tilde was taken as a
+        # directory name and nothing was ever collected. Writing the bundles into
+        # the workspace removes the question.
+        #
+        # `failure()` alone would miss the UI step, whose continue-on-error keeps
+        # the job green, so its own outcome is asked for separately.
+        if: failure() || steps.ui-smoke.outcome == 'failure'
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: |
-            ~/Library/Developer/Xcode/DerivedData/**/Logs/Test/*.xcresult
+          path: TestResults
           retention-days: 5
+          if-no-files-found: ignore

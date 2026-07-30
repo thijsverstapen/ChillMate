@@ -5,7 +5,7 @@ import Foundation
 /// The lock screen accepted unlimited PIN attempts. PBKDF2 at 200,000 iterations
 /// makes an *offline* attack on the stored hash expensive, but nothing at all
 /// stood between someone holding the unlocked device and the 10,000-guess space of
-/// a 4-digit PIN — the app's own minimum. At roughly a second per guess that is a
+/// a 4-digit PIN, the app's own minimum. At roughly a second per guess that is a
 /// few hours of tapping to reach a full log of someone's sex and substance use.
 ///
 /// Failures and the lockout deadline persist in UserDefaults so they survive the

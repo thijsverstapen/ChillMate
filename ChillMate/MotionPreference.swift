@@ -5,7 +5,7 @@ import SwiftUI
 ///
 /// The in-app `chillReducedMotion` setting was advertised in Settings →
 /// Accessibility but read in exactly one place: the onboarding flow in
-/// ProfileSetupView. Everything else animated regardless — the breathing orb, the
+/// ProfileSetupView. Everything else animated regardless: the breathing orb, the
 /// craving-delay countdown that animates for ten unbroken minutes, the per-minute
 /// PEP countdown, every glass transition, and the entire watch app. The setting
 /// looked like an accommodation and behaved like a decoration.
@@ -29,8 +29,8 @@ extension EnvironmentValues {
 
 /// Injects the combined preference and keeps it current.
 ///
-/// Applied once at the root so every descendant — including sheets and
-/// `fullScreenCover` content, which inherit the environment — sees it.
+/// Applied once at the root so every descendant sees it, including sheets and
+/// `fullScreenCover` content, which inherit the environment.
 struct ChillMotionPreferenceModifier: ViewModifier {
     @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
@@ -44,7 +44,7 @@ struct ChillMotionPreferenceModifier: ViewModifier {
 ///
 /// `.font(.system(size:))` is frozen: at the larger accessibility sizes the text
 /// keeps its design size, and the layout copes by clipping or by leaning on
-/// `minimumScaleFactor` to shrink it *further* — the opposite of what the user
+/// `minimumScaleFactor` to shrink it *further*, the opposite of what the user
 /// asked for. `@ScaledMetric` keeps the tuned size at the default Dynamic Type
 /// setting and scales from there, relative to the given text style.
 ///

@@ -38,9 +38,9 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 /// Applies and reports the app's language override.
 ///
 /// The in-app Language picker used to write `@AppStorage(DefaultsKey.appLanguage)` and
-/// nothing else. No code read that key to change the UI language — there was no
+/// nothing else. No code read that key to change the UI language: there was no
 /// `AppleLanguages` write, no `Locale` override, no `.environment(\.locale)`
-/// anywhere in the project — so the only thing it affected was the language passed
+/// anywhere in the project. So the only thing it affected was the language passed
 /// to on-device affirmation generation. Choosing "Deutsch" left the entire
 /// interface in English.
 ///
@@ -49,9 +49,21 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 /// Setting it makes the choice real. Bundle resolution is fixed at process start,
 /// so a language change takes effect on the next launch; `pendingRestart` lets the
 /// UI say so plainly rather than leaving the user to wonder.
+///
+/// Sharing that key with iOS means the in-app picker and Settings > ChillMate >
+/// Language are two controls over one value, so this type has to reconcile them
+/// rather than assume it is the only writer. See `applyStoredLanguageIfNeeded()`.
 enum LocalizationService {
     /// The system key controlling bundle localization resolution.
-    private static let appleLanguagesKey = "AppleLanguages"
+    private static let appleLanguagesKey = DefaultsKey.appleLanguages
+
+    /// The language ChillMate itself last wrote into `AppleLanguages`.
+    ///
+    /// Remembering what we asserted is the only way to recognise a value we did
+    /// not write, which is what a change made in Settings > ChillMate > Language
+    /// looks like from in here. Without it the two controls cannot be told apart
+    /// and the app can only ever re-assert its own stale copy.
+    private static let assertedLanguageKey = DefaultsKey.languageAssertedByChillMate
 
     /// The language the running process actually resolved its bundle against.
     /// Captured once at launch, before any override is written, so comparing
@@ -75,6 +87,19 @@ enum LocalizationService {
         selected != launchLanguage
     }
 
+    /// The language iOS currently has selected for this app, when it is one we
+    /// ship.
+    ///
+    /// Nil on a device set to a sixth language: `AppleLanguages` then names
+    /// something we have no `.lproj` for and the bundle picks its own fallback,
+    /// so there is no system choice here for us to honour or compare against.
+    private static var systemSelectedLanguage: AppLanguage? {
+        guard let first = UserDefaults.standard.stringArray(forKey: appleLanguagesKey)?.first else {
+            return nil
+        }
+        return AppLanguage.matching(first)
+    }
+
     /// Records the choice and pushes it into `AppleLanguages`.
     ///
     /// Call this from the picker and once at launch, so a choice made on a previous
@@ -88,21 +113,77 @@ enum LocalizationService {
         var ordered = [language.rawValue]
         ordered.append(contentsOf: AppLanguage.allCases.map(\.rawValue).filter { $0 != language.rawValue })
         defaults.set(ordered, forKey: appleLanguagesKey)
+        defaults.set(language.rawValue, forKey: assertedLanguageKey)
     }
 
-    /// Re-asserts the stored choice. Safe to call on every launch.
-    static func applyStoredLanguageIfNeeded() {
-        guard let stored = UserDefaults.standard.string(forKey: DefaultsKey.appLanguage),
-              let language = AppLanguage.matching(stored) else { return }
-        apply(language)
-    }
-
-    /// `Locale` for the selected language, for `.environment(\.locale)`.
+    /// Seeds, reconciles and re-asserts the language override. Safe to call on
+    /// every launch, and must run before the first localized string is read.
     ///
-    /// Dates, numbers and measurements honour this immediately — only catalog
+    /// `launchLanguage` is read first on purpose. It is a lazy static and
+    /// everything below can write `AppleLanguages`, so capturing it afterwards
+    /// would record the language we are asking for instead of the one this
+    /// process actually resolved, and `pendingRestart` could never be true.
+    static func applyStoredLanguageIfNeeded() {
+        let launched = launchLanguage
+        let defaults = UserDefaults.standard
+
+        guard let stored = defaults.string(forKey: DefaultsKey.appLanguage).flatMap(AppLanguage.matching) else {
+            // First run. The picker binds the stored key directly, so leaving it
+            // empty let a fresh Dutch install run in Dutch while the control read
+            // "English", and tapping Nederlands changed nothing: the binding was
+            // already at its stored value, so its onChange, which is where the
+            // real work happens, could not fire.
+            //
+            // Only seed when iOS itself selected a language we ship. On a device
+            // set to a sixth language the bundle falls back to English on its own;
+            // recording that fallback as a choice would pin English into
+            // `AppleLanguages` and drag date and number formatting to English with
+            // it, which the user never asked for.
+            if let system = systemSelectedLanguage, system == launched {
+                defaults.set(launched.rawValue, forKey: DefaultsKey.appLanguage)
+                defaults.set(launched.rawValue, forKey: assertedLanguageKey)
+            }
+            return
+        }
+
+        // `AppleLanguages` holding a language we did not write means it was
+        // changed in Settings > ChillMate > Language since our last run. That is
+        // the more recent decision, so it wins and becomes the stored choice.
+        // Re-asserting our copy instead left a user who once picked Deutsch here
+        // and later picked English in iOS Settings with English for exactly one
+        // launch and German ever after, while the app told them to relaunch to
+        // finish switching, which only put German back.
+        if let system = systemSelectedLanguage,
+           let asserted = defaults.string(forKey: assertedLanguageKey).flatMap(AppLanguage.matching),
+           system != asserted {
+            apply(system)
+            return
+        }
+
+        apply(stored)
+    }
+
+    /// `Locale` to put in `.environment(\.locale)`.
+    ///
+    /// Dates, numbers and measurements honour this immediately. Only catalog
     /// string lookup is bound to the launch bundle and needs the relaunch.
-    static var selectedLocale: Locale {
-        Locale(identifier: selected.rawValue)
+    ///
+    /// When the user has not picked a language in-app this is the system locale
+    /// untouched. When they have, only the language is swapped and everything
+    /// else is inherited: region, calendar, first weekday and the 24-hour-time
+    /// preference. Imposing a bare `Locale(identifier: "en")` would discard all
+    /// of those, so a UK phone with 24-Hour Time on would start rendering
+    /// "10:00 PM" and US month/day ordering in every DatePicker, including the
+    /// STI test dates and dose timestamps.
+    static var effectiveLocale: Locale {
+        guard let stored = UserDefaults.standard.string(forKey: DefaultsKey.appLanguage),
+              let language = AppLanguage.matching(stored) else {
+            return .autoupdatingCurrent
+        }
+
+        var components = Locale.Components(locale: .autoupdatingCurrent)
+        components.languageComponents.languageCode = Locale.LanguageCode(language.rawValue)
+        return Locale(components: components)
     }
 
     /// Deep link to this app's page in Settings, where iOS offers the same
@@ -116,10 +197,10 @@ enum LocalizationService {
 ///
 /// `rawValue` is the exact string persisted in UserDefaults under
 /// `DefaultsKey.country` and matched by `SupportResource.resources(for:)` and
-/// `EmergencyContactInfo.number(forCountry:)`. It stays English and stays stable —
-/// it is storage, not display. Display names come from `Locale`, which gives a
-/// correctly translated country name in all five languages for free; the picker
-/// previously hard-coded English names like "Netherlands" and "Germany".
+/// `EmergencyContactInfo.number(forCountry:)`. It stays English and stays stable
+/// because it is storage, not display. Display names come from `Locale`, which
+/// gives a correctly translated country name in all five languages for free; the
+/// picker previously hard-coded English names like "Netherlands" and "Germany".
 enum SupportedCountry: String, CaseIterable, Identifiable {
     case netherlands = "Netherlands"
     case belgium = "Belgium"

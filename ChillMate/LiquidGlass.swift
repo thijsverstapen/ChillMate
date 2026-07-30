@@ -143,7 +143,8 @@ private struct RootSwipeBackDisabler: UIViewRepresentable {
             while let current = responder {
                 if let nav = current as? UINavigationController {
                     // Suppress the interactive back-swipe while the stack is at its root, where
-                    // there is nothing to pop — the source of the iOS 26 slide-to-blank glitch.
+                    // there is nothing to pop. That case is the source of the iOS 26
+                    // slide-to-blank glitch.
                     // It re-enables automatically once a child view is pushed.
                     nav.interactivePopGestureRecognizer?.isEnabled = nav.viewControllers.count > 1
                     return
@@ -222,7 +223,7 @@ struct DailyScorePalette {
         color(from: RGB(0.09, 0.10, 0.16), to: RGB(0.08, 0.25, 0.21))
     }
 
-    // Background is always dark — text is always white
+    // Background is always dark, so text is always white
     var heroText: Color { .white }
     var heroSecondary: Color { .white.opacity(0.72) }
 
@@ -320,6 +321,15 @@ struct GlassSurfaceModifier: ViewModifier {
     /// Changing this one value restyles every card/sheet/row consistently.
     static let surfaceTint = Color.black.opacity(0.04)
 
+    /// Settings > Accessibility > "High contrast overlays".
+    ///
+    /// Read here rather than passed in, because this modifier is the one place
+    /// every card, sheet and row in the app is styled, so honouring it here is
+    /// what makes the toggle mean something everywhere at once. It is read
+    /// straight from defaults rather than the environment so it also reaches
+    /// sheets and full-screen covers, which get a fresh environment.
+    @AppStorage(DefaultsKey.highContrastMode) private var highContrastMode = false
+
     let radius: CGFloat
     let tint: Color
     let interactive: Bool
@@ -337,24 +347,31 @@ struct GlassSurfaceModifier: ViewModifier {
         // `interactive` still renders a brighter, top-lit rim so tappable
         // surfaces read as raised.
         let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
+
+        // High contrast deepens the surface behind the text and firms up the edge
+        // that separates one container from the next. The frosted material stays,
+        // so the app still looks like itself, but white text sits on a much darker
+        // backing and containers stop dissolving into a busy backdrop.
+        let surface = highContrastMode ? Color.black.opacity(0.55) : Self.surfaceTint
+        let edge: [Color] = highContrastMode
+            ? [.white.opacity(0.75), .white.opacity(0.55)]
+            : (interactive
+                ? [.white.opacity(0.30), .white.opacity(0.08)]
+                : [.white.opacity(0.12), .white.opacity(0.12)])
+        let edgeWidth: CGFloat = highContrastMode ? 1.5 : (interactive ? 0.75 : 0.5)
+
         return content
             .background {
                 ZStack {
                     shape.fill(.ultraThinMaterial)
-                    shape.fill(Self.surfaceTint)
+                    shape.fill(surface)
                 }
             }
             .environment(\.colorScheme, .dark)
             .overlay {
                 shape.strokeBorder(
-                    LinearGradient(
-                        colors: interactive
-                            ? [.white.opacity(0.30), .white.opacity(0.08)]
-                            : [.white.opacity(0.12), .white.opacity(0.12)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ),
-                    lineWidth: interactive ? 0.75 : 0.5
+                    LinearGradient(colors: edge, startPoint: .top, endPoint: .bottom),
+                    lineWidth: edgeWidth
                 )
             }
     }
@@ -393,11 +410,11 @@ extension View {
 // Single source of truth so every in-app logo matches the app icon exactly.
 //
 // The mark is rendered from the actual app-icon artwork ("ChillMateGlyph"
-// asset) — the C + checkmark glyph lifted out of `Assets/App Icon.png` with a
+// asset): the C + checkmark glyph lifted out of `Assets/App Icon.png` with a
 // transparent background. Using the real art (instead of re-drawing it with
 // bezier paths) guarantees a pixel-perfect match with the App Store icon.
 
-/// Scalable ChillMate brand mark — the C + checkmark glyph from the app icon.
+/// Scalable ChillMate brand mark, the C + checkmark glyph from the app icon.
 ///
 /// Usage:  `ChillMateBrandMark(size: 20)`
 struct ChillMateBrandMark: View {
@@ -441,7 +458,7 @@ extension Color {
     static let chillVisiblePink = Color(red: 185 / 255, green: 28 / 255, blue: 96 / 255)
     static let chillVisibleTeal = Color(red: 0 / 255, green: 104 / 255, blue: 132 / 255)
     static let chillVisibleAmber = Color(red: 146 / 255, green: 64 / 255, blue: 14 / 255)
-    // Bright icon / accent colors — designed for dark-background glass UI (iOS 26 style)
+    // Bright icon / accent colors, designed for dark-background glass UI (iOS 26 style)
     static let chillIconAmber  = Color(red: 251 / 255, green: 191 / 255, blue: 36 / 255)
     static let chillIconPink   = Color(red: 244 / 255, green: 114 / 255, blue: 182 / 255)
     static let chillIconOrange = Color(red: 251 / 255, green: 146 / 255, blue: 60 / 255)
@@ -477,24 +494,50 @@ struct ChillPillButtonStyle: ButtonStyle {
     }
 
     func makeBody(configuration: Configuration) -> some View {
-        let pressed = configuration.isPressed
-        configuration.label
-            .font(.headline.weight(.bold))
-            .foregroundStyle(prominent ? Color.white : (tint ?? Color.chillPrimary))
-            .padding(.horizontal, 20)
-            .padding(.vertical, 13)
-            .frame(minHeight: 50)
-            .background(fillStyle, in: Capsule(style: .continuous))
-            .overlay {
-                if !prominent {
-                    Capsule(style: .continuous)
-                        .strokeBorder((tint ?? Color.chillPrimary).opacity(0.22), lineWidth: 1)
+        // The body lives in a nested View so it can read the environment.
+        // `@Environment` on a ButtonStyle itself is not installed in the view
+        // graph, so it would silently keep its default value forever, which is
+        // exactly the class of inert code this release has been clearing out.
+        PressBody(
+            label: configuration.label,
+            pressed: configuration.isPressed,
+            prominent: prominent,
+            tint: tint,
+            fillStyle: fillStyle
+        )
+    }
+
+    private struct PressBody: View {
+        let label: Configuration.Label
+        let pressed: Bool
+        let prominent: Bool
+        let tint: Color?
+        let fillStyle: AnyShapeStyle
+
+        @Environment(\.chillReduceMotion) private var reduceMotion
+
+        var body: some View {
+            label
+                .font(.headline.weight(.bold))
+                .foregroundStyle(prominent ? Color.white : (tint ?? Color.chillPrimary))
+                .padding(.horizontal, 20)
+                .padding(.vertical, 13)
+                .frame(minHeight: 50)
+                .background(fillStyle, in: Capsule(style: .continuous))
+                .overlay {
+                    if !prominent {
+                        Capsule(style: .continuous)
+                            .strokeBorder((tint ?? Color.chillPrimary).opacity(0.22), lineWidth: 1)
+                    }
                 }
-            }
-            .shadow(color: prominent ? (tint ?? Color.chillPrimary).opacity(0.40) : .clear, radius: 12, y: 6)
-            .scaleEffect(pressed ? 0.96 : 1)
-            .animation(.spring(response: 0.28, dampingFraction: 0.82), value: pressed)
-            .contentShape(Capsule(style: .continuous))
+                .shadow(color: prominent ? (tint ?? Color.chillPrimary).opacity(0.40) : .clear, radius: 12, y: 6)
+                // The press bounce is pure decoration, so it goes under Reduce
+                // Motion. This is the app's shared action-button style, so gating
+                // it here carries the preference to every primary button at once.
+                .scaleEffect(reduceMotion ? 1 : (pressed ? 0.96 : 1))
+                .chillAnimation(.spring(response: 0.28, dampingFraction: 0.82), value: pressed, reduceMotion: reduceMotion)
+                .contentShape(Capsule(style: .continuous))
+        }
     }
 }
 

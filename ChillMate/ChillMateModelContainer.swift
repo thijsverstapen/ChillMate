@@ -35,6 +35,26 @@ enum ChillMateModelContainer {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 
+    /// True when the app was launched by the UI test target, which passes
+    /// `-UITestMode`. Its single effect is to turn CloudKit mirroring off.
+    ///
+    /// CI builds with `CODE_SIGNING_ALLOWED=NO`, which strips entitlements, and
+    /// asking SwiftData for a CloudKit-backed store without the iCloud entitlement
+    /// traps inside Core Data's mirroring setup on its own internal queue, where
+    /// the `do/catch` around `ModelContainer.init` cannot reach it. The process is
+    /// killed rather than falling back to the recovery store.
+    ///
+    /// `isRunningUnitTests` above does not cover this: the app process a UI test
+    /// launches never receives `XCTestConfigurationFilePath`.
+    ///
+    /// This deliberately does NOT seed a profile or otherwise skip onboarding. The
+    /// UI tests walk first-run onboarding themselves, which keeps that flow tested
+    /// rather than bypassed, so the only thing the app has to concede to being
+    /// under test is the entitlement it does not have.
+    static var isRunningUITests: Bool {
+        ProcessInfo.processInfo.arguments.contains("-UITestMode")
+    }
+
     @MainActor
     static func containerForDataDeletion() throws -> ModelContainer {
         try resolvedContainer()
@@ -58,7 +78,7 @@ enum ChillMateModelContainer {
         let schema = appSchema
         let configuration = ModelConfiguration(
             schema: schema,
-            cloudKitDatabase: .private("iCloud.com.codex.ChillMate")
+            cloudKitDatabase: isRunningUITests ? .none : .private("iCloud.com.codex.ChillMate")
         )
 
         let container = try ModelContainer(for: schema, migrationPlan: ChillMateMigrationPlan.self, configurations: [configuration])
@@ -98,7 +118,7 @@ enum ChillMateModelContainer {
 
 /// Materializes NightEntry's typed child records (substances, partners, trigger
 /// tags) from the legacy JSON blobs. Runs every launch but only touches rows
-/// still stamped `typedRecordsVersion == 0` — the stamp lives on the entry
+/// still stamped `typedRecordsVersion == 0`. The stamp lives on the entry
 /// itself (not a local flag), so a run against the in-memory recovery store or a
 /// failed save simply retries next launch, and rows synced later from an older
 /// build get picked up too. Blobs stay in place as a dual-written fallback, so
@@ -112,8 +132,8 @@ enum TypedRecordsMigration {
         // Once a run finds nothing left, later launches only need a bounded
         // "is there anything new?" probe rather than a full predicate fetch over
         // the whole table. A row synced later from an older build still gets
-        // picked up, because the probe is a real query — it is just capped at one
-        // row instead of materializing every match.
+        // picked up, because the probe is a real query, just capped at one row
+        // instead of materializing every match.
         let settled = defaults.bool(forKey: DefaultsKey.typedRecordsMigrationCompleted)
         var descriptor = FetchDescriptor<NightEntry>(
             predicate: #Predicate { $0.typedRecordsVersion == 0 }
@@ -149,26 +169,26 @@ enum TypedRecordsMigration {
     }
 }
 
-/// Versioned baseline for the schema as it shipped through 4.2.0.
+/// The single versioned schema describing the store.
 ///
-/// Establishing this before publish gave future schema changes an explicit
-/// migration foundation instead of relying solely on inferred lightweight
-/// migration.
+/// There is deliberately only one. Core Data rejects a migration plan whose
+/// versions resolve to the same model list, aborting store setup with
+/// "Duplicate version checksums detected.". The checksum covers model shape and
+/// nothing else, so differing `versionIdentifier` values do not make two
+/// identical shapes distinct. That abort is an Objective-C exception raised
+/// inside `ModelContainer.init`, which the `do/catch` in `container()` cannot
+/// catch, so it kills the app on launch instead of falling back to recovery.
+///
+/// 4.2.1 adds `NightEntry.contentEditCount`, an attribute carrying a default,
+/// which SwiftData resolves by inference with no stage required.
+///
+/// Before adding a stage for a change inference cannot handle, freeze the current
+/// shape first: copy the model types into a V1 namespace so it keeps describing
+/// the old layout, point a new V2 at the live types, and only then connect the
+/// two. Two versions that both return `ChillMateSchemaModels.all` are always the
+/// same version.
 enum ChillMateSchemaV1: VersionedSchema {
     static var versionIdentifier: Schema.Version { Schema.Version(1, 0, 0) }
-
-    static var models: [any PersistentModel.Type] { ChillMateSchemaModels.all }
-}
-
-/// 4.2.1: adds `NightEntry.contentVersion`, the edit counter that lets views
-/// distinguish "an entry changed" from "a row was added or removed".
-///
-/// The model list is identical — only an attribute was added, with a default, so
-/// SwiftData's lightweight inference handles it. The version is bumped anyway so
-/// the store records which shape it is on and a future stage that *does* need
-/// custom work has a defined predecessor to migrate from.
-enum ChillMateSchemaV2: VersionedSchema {
-    static var versionIdentifier: Schema.Version { Schema.Version(2, 0, 0) }
 
     static var models: [any PersistentModel.Type] { ChillMateSchemaModels.all }
 }
@@ -191,20 +211,12 @@ enum ChillMateSchemaModels {
 }
 
 enum ChillMateMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] {
-        [ChillMateSchemaV1.self, ChillMateSchemaV2.self]
-    }
+    static var schemas: [any VersionedSchema.Type] { [ChillMateSchemaV1.self] }
 
-    /// V1 → V2 is `.lightweight`: the only change is a new attribute carrying a
-    /// default, which SwiftData can infer. It is declared explicitly rather than
-    /// left to an empty `stages` array so the path between versions is stated in
-    /// code, and so the next stage that needs a `.custom` handler has an obvious
-    /// place to go.
-    static var stages: [MigrationStage] {
-        [
-            .lightweight(fromVersion: ChillMateSchemaV1.self, toVersion: ChillMateSchemaV2.self)
-        ]
-    }
+    /// Empty by design. See the note on `ChillMateSchemaV1`: a stage between two
+    /// identical model shapes aborts at launch, and every schema change so far
+    /// has been one SwiftData can infer.
+    static var stages: [MigrationStage] { [] }
 }
 
 extension Logger {
@@ -226,8 +238,8 @@ extension ModelContext {
 
     /// Fetches, logging any failure and returning an empty result.
     ///
-    /// Behaviour matches the `(try? fetch(...)) ?? []` this replaces — the caller
-    /// still gets an empty array — but a failing fetch now leaves a trace instead
+    /// Behaviour matches the `(try? fetch(...)) ?? []` this replaces (the caller
+    /// still gets an empty array), but a failing fetch now leaves a trace instead
     /// of being indistinguishable from a genuinely empty table. That distinction
     /// matters here: "no dose timers" and "the store could not be read" render the
     /// same way on screen but mean very different things.

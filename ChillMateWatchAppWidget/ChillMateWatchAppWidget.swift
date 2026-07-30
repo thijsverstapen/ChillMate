@@ -5,9 +5,11 @@ import WidgetKit
 
 /// Reads the snapshot the watch app writes into the shared App Group after every
 /// WatchConnectivity sync (see WatchConnectivityReceiver.publishWidgetSnapshot).
-/// Key strings are duplicated on the writer side by design — keep them in sync.
+/// Both ends now read their key strings from `WidgetSharedKey`, so they cannot drift.
 enum WidgetStore {
-    static let suite = UserDefaults(suiteName: WidgetSharedKey.suiteName)
+    /// Computed rather than a stored static: `UserDefaults?` is not `Sendable`, and
+    /// this target builds with Swift 6 strict concurrency.
+    static var suite: UserDefaults? { WidgetSharedKey.suite }
 
     static var streakDays: Int { suite?.integer(forKey: WidgetSharedKey.watchStreakDays) ?? 0 }
     static var score: Int { suite?.integer(forKey: WidgetSharedKey.watchScore) ?? 0 }

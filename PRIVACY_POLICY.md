@@ -1,4 +1,4 @@
-# Privacy Policy — ChillMate
+# ChillMate Privacy Policy
 
 **Last updated: 28 July 2026**
 **Developer: Thijs Verstappen**
@@ -8,7 +8,7 @@
 
 ## Overview
 
-ChillMate is a private, on-device harm-reduction companion. The app is designed from the ground up so that **all data stays on your device**. We do not collect, transmit, sell, or share any personal information — ever.
+ChillMate is a private, on-device harm-reduction companion. The app is designed from the ground up so that **all data stays on your device**. We do not collect, transmit, sell, or share any personal information, ever.
 
 This policy explains what data the app stores locally, what it does not do, and your rights as a user.
 
@@ -85,7 +85,7 @@ If you pair an Apple Watch, ChillMate mirrors a subset of your data to the watch
 - your emergency number,
 - the **name and phone number of your trusted contact**, so the watch can reach them without your phone.
 
-This transfer happens directly between your phone and your watch over Apple's Watch Connectivity, on your own devices. It does not pass through our servers — we have none.
+This transfer happens directly between your phone and your watch over Apple's Watch Connectivity, on your own devices. It does not pass through our servers. We have none.
 
 Two things worth knowing:
 

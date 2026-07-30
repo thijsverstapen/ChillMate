@@ -9,9 +9,16 @@ import SwiftUI
 /// date-stamped so it naturally resets each day. Previously each surface wrote
 /// its own dead key (`widgetHydrationLogged`) or posted an unobserved
 /// notification, so "log hydration" recorded nothing; this unifies them.
+///
+/// Note that the flag lives in the App Group suite, never in `UserDefaults.standard`,
+/// which is why there is no `DefaultsKey` entry for it. `WidgetLogHydrationIntent` in
+/// the Live Activity extension writes the same key into the same suite from its own
+/// copy of the string, because this file is compiled into the app target only. Change
+/// either the key or the suite at one end and hydration logging silently stops
+/// crossing the process boundary.
 enum HydrationLog {
     static let appGroup = WidgetSharedKey.suiteName
-    static let key = "lastHydrationLogDate"
+    static let key = WidgetSharedKey.hydrationLogDate
 
     private static var store: UserDefaults { UserDefaults(suiteName: appGroup) ?? .standard }
 

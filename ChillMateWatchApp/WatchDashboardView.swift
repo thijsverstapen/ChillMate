@@ -139,11 +139,17 @@ private struct WatchActiveTimerCard: View {
 
     /// Two timelines with different cadences instead of one at 1 Hz.
     ///
-    /// The whole card — label, Gauge, and the card background — used to be rebuilt
+    /// The whole card (label, Gauge, and the card background) used to be rebuilt
     /// every second for the entire length of a dose window, which on a watch is a
     /// real battery cost. The countdown text genuinely needs 1 Hz because it shows
     /// seconds; the gauge does not. Across a multi-hour window one second moves the
     /// bar by well under a hundredth of a percent, so it ticks every 15s.
+    ///
+    /// Neither timeline is gated behind Reduce Motion. That preference asks for
+    /// less motion, not for frozen content, and these views redraw a countdown and
+    /// a fill level rather than moving anything across the screen. Stalling a dose
+    /// window countdown would be a safety regression dressed up as an
+    /// accommodation.
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -251,7 +257,7 @@ private struct WatchHeartRateCard: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Heart rate")
                     .font(.headline)
-                Text(elevated ? String(localized: "\(Int(bpm)) bpm - slow down") : String(localized: "\(Int(bpm)) bpm"))
+                Text(elevated ? String(localized: "\(Int(bpm)) bpm, slow down") : String(localized: "\(Int(bpm)) bpm"))
                     .font(.caption2)
                     .foregroundStyle(elevated ? .red : .secondary)
             }
@@ -330,11 +336,30 @@ private struct WatchLinkRow: View {
 
 // MARK: - Breathing screen
 
+/// The only continuous animation in the watch app, and so the only place where
+/// Reduce Motion has to change the design instead of just switching an animation
+/// off. A breathing pacer with the motion removed and nothing put in its place is
+/// a dead circle: the user loses the one signal that tells them how long to keep
+/// inhaling. So the rhythm is carried by state that is not motion, the phase label
+/// and a per-second countdown driven by the same clock in every mode, and the
+/// circle simply holds its resting size when motion is suppressed.
+///
+/// The preference is read straight from SwiftUI's own environment rather than
+/// through the phone app's combined `chillReduceMotion`: MotionPreference.swift is
+/// compiled into the iOS target only, and the in-app toggle it folds in is not
+/// mirrored over WatchConnectivity. The system switch is per device anyway, so the
+/// user who set it on the watch gets exactly what they asked for here.
 private struct BreathingScreen: View {
     let hapticsEnabled: Bool
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var active = false
     @State private var scale: CGFloat = 1.0
     @State private var phaseLabel = String(localized: "Ready")
+    @State private var secondsLeft = 0
+
+    /// Seconds per phase. The entry row advertises this screen as "Calm in 4-4",
+    /// so breathe in and breathe out share one value.
+    private static let phaseSeconds = 4
 
     var body: some View {
         VStack(spacing: 16) {
@@ -345,11 +370,25 @@ private struct BreathingScreen: View {
                 Circle()
                     .fill(.mint.opacity(0.22))
                     .frame(width: 96 * scale, height: 96 * scale)
-                Text(phaseLabel)
-                    .font(.headline)
+                VStack(spacing: 2) {
+                    Text(phaseLabel)
+                        .font(.headline)
+                    // Kept in the layout while idle so starting a session does not
+                    // shove the phase label upward. Formatted rather than
+                    // interpolated into the Text so the count stays out of the
+                    // string catalog and still uses localized digits.
+                    Text(secondsLeft, format: .number)
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        .opacity(active ? 1 : 0)
+                        .accessibilityHidden(!active)
+                }
             }
             .frame(maxWidth: .infinity)
-            .animation(.easeInOut(duration: 4), value: scale)
+            // The gate is repeated here, not just at the mutation, because a nil
+            // animation also blocks any transaction inherited from an ancestor.
+            // Nothing can animate the circle behind Reduce Motion's back.
+            .animation(reduceMotion ? nil : .easeInOut(duration: Double(Self.phaseSeconds)), value: scale)
 
             Button(active ? String(localized: "Stop") : String(localized: "Start")) {
                 active.toggle()
@@ -366,19 +405,59 @@ private struct BreathingScreen: View {
             guard active else {
                 scale = 1.0
                 phaseLabel = String(localized: "Ready")
+                secondsLeft = 0
                 return
             }
-            while active {
-                phaseLabel = String(localized: "Breathe in")
-                withAnimation(.easeInOut(duration: 4)) { scale = 1.5 }
-                if hapticsEnabled { WKInterfaceDevice.current().play(.click) }
-                try? await Task.sleep(for: .seconds(4))
-                guard active else { break }
-                phaseLabel = String(localized: "Breathe out")
-                withAnimation(.easeInOut(duration: 4)) { scale = 1.0 }
-                if hapticsEnabled { WKInterfaceDevice.current().play(.click) }
-                try? await Task.sleep(for: .seconds(4))
+            await runSession()
+        }
+    }
+
+    /// Repeats the 4-4 cycle until the user stops or the task is cancelled.
+    ///
+    /// Cancellation is checked explicitly instead of being inferred from `active`.
+    /// Navigating away mid session cancels the task without flipping `active`, and
+    /// sleeping inside a cancelled task returns immediately, so a loop keyed on
+    /// `active` alone would spin at full speed and keep firing haptics.
+    @MainActor
+    private func runSession() async {
+        while active && !Task.isCancelled {
+            await runPhase(label: String(localized: "Breathe in"), expanded: true)
+            await runPhase(label: String(localized: "Breathe out"), expanded: false)
+        }
+    }
+
+    /// Runs one phase, then counts it down a second at a time.
+    ///
+    /// The countdown is what makes the pacer survive Reduce Motion, so it runs in
+    /// both modes: suppressing motion should cost the animation, not the exercise.
+    @MainActor
+    private func runPhase(label: String, expanded: Bool) async {
+        guard active, !Task.isCancelled else { return }
+
+        phaseLabel = label
+        secondsLeft = Self.phaseSeconds
+
+        if reduceMotion {
+            // Hold the resting size. Assigning it, rather than leaving `scale`
+            // alone, also recovers the layout if Reduce Motion is switched on
+            // partway through a session while the circle happens to be expanded.
+            scale = 1.0
+        } else {
+            withAnimation(.easeInOut(duration: Double(Self.phaseSeconds))) {
+                scale = expanded ? 1.5 : 1.0
             }
+        }
+
+        if hapticsEnabled { WKInterfaceDevice.current().play(.click) }
+
+        for _ in 0..<Self.phaseSeconds {
+            do {
+                try await Task.sleep(for: .seconds(1))
+            } catch {
+                return
+            }
+            guard active else { return }
+            secondsLeft -= 1
         }
     }
 }
@@ -515,7 +594,7 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     @Published var trustedContactPhone = ""
     /// Last number relayed by the phone. Persisted (see `emergencyNumberKey`) so a
     /// cold watch launch out of range of the phone still dials the user's real
-    /// emergency number instead of falling back to the 112 default — which does not
+    /// emergency number instead of falling back to the 112 default, which does not
     /// reach emergency services in the US or Australia.
     @Published var emergencyNumber = "112"
 
@@ -531,10 +610,10 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     @Published var quickSkipSentToday = false
 
     private let defaults = UserDefaults.standard
-    private let hydrationCountKey = "watchHydrationCount"
-    private let hydrationDayKey = "watchHydrationDay"
-    private let quickSkipDayKey = "watchQuickSkipDay"
-    private let emergencyNumberKey = "watchEmergencyNumber"
+    private let hydrationCountKey = WidgetSharedKey.watchHydrationCount
+    private let hydrationDayKey = WidgetSharedKey.watchHydrationDay
+    private let quickSkipDayKey = WidgetSharedKey.watchQuickSkipDay
+    private let emergencyNumberKey = WidgetSharedKey.watchEmergencyNumber
 
     private override init() {
         super.init()
@@ -601,7 +680,7 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     private func sendEvent(_ payload: [String: Any]) {
         // transferUserInfo / sendMessage require an activated session. In the rare
         // cold-start race where we're not activated yet, kick activation and drop
-        // this one event rather than risk a WCSession exception — state re-syncs on
+        // this one event rather than risk a WCSession exception. State re-syncs on
         // the next interaction.
         guard WCSession.default.activationState == .activated else {
             WCSession.default.activate()
@@ -665,7 +744,7 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
 
     /// Mirrors the synced state into the shared App Group so the watch-face
     /// complications (ChillMateWatchAppWidget) can render it. Key strings are
-    /// duplicated in the widget's WidgetStore by design — keep them in sync.
+    /// duplicated in the widget's WidgetStore by design. Keep them in sync.
     private func publishWidgetSnapshot() {
         guard let shared = UserDefaults(suiteName: WidgetSharedKey.suiteName) else { return }
         shared.set(recoveryStreakDays, forKey: WidgetSharedKey.watchStreakDays)

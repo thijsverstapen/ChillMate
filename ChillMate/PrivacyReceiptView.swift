@@ -128,7 +128,10 @@ private struct PrivacyReceiptRow: View {
     }
 }
 
-private struct EvidenceSource: Identifiable {
+/// Internal rather than file-private because `EvidenceLibrary` is internal and
+/// exposes arrays of this type to SafetyAutopilot, DrugCheckingEducation and
+/// ProfessionalHelperBridge.
+struct EvidenceSource: Identifiable {
     let id = UUID()
     let title: String
     let note: String

@@ -8,7 +8,7 @@ import Testing
 /// 4-digit PIN.
 ///
 /// These run against the real `UserDefaults.standard`, because that is where
-/// `PINThrottle` deliberately persists — an in-memory counter would reset on a
+/// `PINThrottle` deliberately persists. An in-memory counter would reset on a
 /// force-quit, which is the obvious way around a throttle. Each test clears the
 /// two keys before and after so it neither sees nor leaves state.
 @Suite(.serialized)

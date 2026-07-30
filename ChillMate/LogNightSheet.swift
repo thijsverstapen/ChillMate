@@ -7,6 +7,45 @@ import SwiftUI
 
 struct LogNightSheet: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(DefaultsKey.oneHandedControls) private var oneHandedControls = true
+
+    private var saveButton: some View {
+        Button("Save") {
+            save()
+        }
+        .disabled(!canSave)
+        .accessibilityIdentifier(AccessibilityID.logSaveButton)
+    }
+
+    /// Save pinned to the bottom, for Settings > Accessibility > "Prefer bottom
+    /// actions". Save is the reach-critical control on the app's longest form, and
+    /// the top-right corner is the hardest point to reach one-handed on a large
+    /// phone.
+    ///
+    /// `safeAreaInset` rather than a `.bottomBar` toolbar item: the bottom bar drew
+    /// the button floating over the last row of the form, because the form does not
+    /// inset itself for it, and giving the bar a background did not fix it.
+    /// `safeAreaInset` both places the bar and shrinks the scrollable area, so no
+    /// row can ever end up hidden behind Save.
+    private var bottomSaveBar: some View {
+        Button {
+            save()
+        } label: {
+            // The label carries the width, not an outer frame: the pill style sizes
+            // itself to its label, so stretching from outside leaves a narrow
+            // capsule floating in a full-width bar.
+            Text("Save").frame(maxWidth: .infinity)
+        }
+        .buttonStyle(ChillPillButtonStyle())
+        .disabled(!canSave)
+        .opacity(canSave ? 1 : 0.5)
+        .accessibilityIdentifier(AccessibilityID.logSaveButton)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 6)
+        .background(.ultraThinMaterial)
+    }
+
     @Environment(\.modelContext) private var modelContext
     @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
     @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthKitSleepReadEnabled = false
@@ -115,18 +154,24 @@ struct LogNightSheet: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
+            .accessibilityIdentifier(AccessibilityID.logSheet)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     BackChevronButton {
                         attemptDismiss()
                     }
+                    .accessibilityIdentifier(AccessibilityID.logCancelButton)
                 }
 
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        save()
-                    }
-                    .disabled(!canSave)
+                // Settings > Accessibility > "Prefer bottom actions" moves Save to
+                // a pinned bar at the bottom instead (see `bottomSaveBar`).
+                if !oneHandedControls {
+                    ToolbarItem(placement: .confirmationAction) { saveButton }
+                }
+            }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                if oneHandedControls {
+                    bottomSaveBar
                 }
             }
             .discardChangesDialog(isPresented: $isShowingDiscardWarning) {

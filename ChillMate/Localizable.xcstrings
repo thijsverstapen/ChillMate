@@ -59,7 +59,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ Petite vérification, votre futur vous dira merci."
+            "value": "%@ Petite vérification, ton futur toi te dira merci."
           }
         },
         "nl": {
@@ -1387,7 +1387,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "La 3-MMC masque votre degré d'ivresse, ce qui pousse facilement à boire au-delà de vos limites. La combinaison augmente aussi le rythme cardiaque et la tension, et rend le redosage plus difficile à juger."
+            "value": "La 3-MMC masque ton degré d'ivresse, ce qui pousse facilement à boire au-delà de tes limites. La combinaison augmente aussi le rythme cardiaque et la tension, et rend le redosage plus difficile à juger."
           }
         },
         "nl": {
@@ -1653,7 +1653,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un récapitulatif du dimanche soir de votre série et de votre score."
+            "value": "Un récapitulatif du dimanche soir de ta série et de ton score."
           }
         },
         "nl": {
@@ -2263,7 +2263,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un rappel en douceur pour vous faire dépister régulièrement."
+            "value": "Un rappel en douceur pour te faire dépister régulièrement."
           }
         },
         "nl": {
@@ -3955,7 +3955,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ajoutez une personne de confiance dans Informations d'urgence."
+            "value": "Ajoute une personne de confiance dans Informations d'urgence."
           }
         },
         "nl": {
@@ -3990,7 +3990,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ajoutez maintenant un Chill, un Chill ignoré, du sommeil ou un moment de récupération si vous le pouvez."
+            "value": "Ajoute maintenant un Chill, un Chill ignoré, du sommeil ou un moment de récupération si tu peux."
           }
         },
         "nl": {
@@ -4059,7 +4059,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Renseignez taille et poids dans Profil pour personnaliser la fenêtre de rappel."
+            "value": "Renseigne taille et poids dans Profil pour personnaliser la fenêtre de rappel."
           }
         },
         "nl": {
@@ -4494,7 +4494,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ajoutez maintenant le sommeil, des notes ou un Chill ignoré si vous le pouvez."
+            "value": "Ajoute maintenant le sommeil, des notes ou un Chill ignoré si tu peux."
           }
         },
         "nl": {
@@ -5250,6 +5250,34 @@
         }
       }
     },
+    "Alcohol and cocaine together can increase strain on the heart and reduce judgment.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol und Kokain zusammen können das Herz stärker belasten und das Urteilsvermögen verschlechtern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El alcohol y la cocaína juntos pueden aumentar la carga sobre el corazón y reducir tu juicio."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'alcool et la cocaïne ensemble peuvent augmenter la charge sur le cœur et réduire ton discernement."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alcohol en cocaïne samen kunnen je hart zwaarder belasten en je inschattingsvermogen verminderen."
+          }
+        }
+      }
+    },
     "Alcohol and ketamine together combine depressant effects and can cause deeper disorientation and breathing problems.": {
       "localizations": {
         "de": {
@@ -5302,7 +5330,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "L'alcool vous déshydrate pendant que la MDMA augmente votre température corporelle, et chacun masque la force de l'autre. Ensemble, ils augmentent le risque de surchauffe, de déshydratation et d'une descente bien plus dure."
+            "value": "L'alcool te déshydrate pendant que la MDMA augmente ta température corporelle, et chacun masque la force de l'autre. Ensemble, ils augmentent le risque de surchauffe, de déshydratation et d'une descente bien plus dure."
           }
         },
         "nl": {
@@ -5429,6 +5457,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Alfablokker"
+          }
+        }
+      }
+    },
+    "Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alphablocker mit Viagra oder Kamagra können das Risiko für Schwindel oder Ohnmacht erhöhen. Kläre das mit einer Ärztin oder einem Arzt, bevor du kombinierst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los alfabloqueantes con Viagra o Kamagra pueden aumentar el riesgo de mareo o desmayo. Consulta a un médico antes de combinarlos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les alphabloquants avec du Viagra ou du Kamagra peuvent augmenter le risque de vertiges ou d'évanouissement. Parles-en à un médecin avant de combiner."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alfablokkers met Viagra of Kamagra kunnen de kans op duizeligheid of flauwvallen vergroten. Overleg met een arts voordat je dit combineert."
           }
         }
       }
@@ -6562,41 +6618,6 @@
         }
       }
     },
-    "Automatic encrypted on-device recovery is updated when ChillMate moves to the background. Last update: \\(stamp).": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die automatische verschlüsselte Wiederherstellung auf dem Gerät wird aktualisiert, sobald ChillMate in den Hintergrund wechselt. Letzte Aktualisierung: \\(stamp)."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Automatic encrypted on-device recovery is updated when ChillMate moves to the background. Last update: \\(stamp)."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La recuperación cifrada automática en el dispositivo se actualiza cuando ChillMate pasa a segundo plano. Última actualización: \\(stamp)."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La récupération chiffrée automatique sur l'appareil est mise à jour quand ChillMate passe en arrière-plan. Dernière mise à jour : \\(stamp)."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Automatisch versleuteld herstel op dit apparaat wordt bijgewerkt zodra ChillMate naar de achtergrond gaat. Laatste update: \\(stamp)."
-          }
-        }
-      }
-    },
     "Automatic encrypted on-device recovery starts after you have saved local data and the app has moved to the background once.": {
       "extractionState": "manual",
       "localizations": {
@@ -6621,13 +6642,41 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "La récupération chiffrée automatique démarre une fois que vous avez enregistré des données locales et que l'app est passée une fois en arrière-plan."
+            "value": "La récupération chiffrée automatique démarre une fois que tu as enregistré des données locales et que l'app est passée une fois en arrière-plan."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Automatisch versleuteld herstel op dit apparaat start zodra je lokale gegevens hebt opgeslagen en de app één keer naar de achtergrond is gegaan."
+          }
+        }
+      }
+    },
+    "Automatic recovery could not open the encrypted on-device backup.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die automatische Wiederherstellung konnte das verschlüsselte Backup auf diesem Gerät nicht öffnen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La recuperación automática no pudo abrir la copia de seguridad cifrada del dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La récupération automatique n'a pas pu ouvrir la sauvegarde chiffrée sur l'appareil."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch herstel kon de versleutelde back-up op dit apparaat niet openen."
           }
         }
       }
@@ -8205,7 +8254,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le cannabis supprime l'envie de vomir, l'une des défenses du corps contre l'intoxication alcoolique. Combinés, l'altération et les vertiges augmentent aussi fortement. Si une personne ne se réveille pas, placez-la sur le côté et appelez les secours."
+            "value": "Le cannabis supprime l'envie de vomir, l'une des défenses du corps contre l'intoxication alcoolique. Combinés, l'altération et les vertiges augmentent aussi fortement. Si une personne ne se réveille pas, place-la sur le côté et appelle les secours."
           }
         },
         "nl": {
@@ -8359,6 +8408,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Centrum Seksueel Geweld"
+          }
+        }
+      }
+    },
+    "Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestimmte Antidepressiva (MAO-Hemmer) mit MDMA, 3-MMC, Kokain oder Psychedelika können gefährlich sein. Vermeide das und hol dir professionellen Rat."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ciertos antidepresivos (IMAO) con MDMA, 3-MMC, cocaína o psicodélicos pueden ser peligrosos. Evítalo y busca consejo profesional."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certains antidépresseurs (IMAO) avec de la MDMA, de la 3-MMC, de la cocaïne ou des psychédéliques peuvent être dangereux. Évite ça et demande un avis professionnel."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bepaalde antidepressiva (MAO-remmers) met MDMA, 3-MMC, cocaïne of psychedelica kunnen gevaarlijk zijn. Vermijd dit en vraag professioneel advies."
           }
         }
       }
@@ -9503,7 +9580,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Chill, Chill ignoré, sommeil, récupération ? Petite vérification, votre futur vous dira merci."
+            "value": "Chill, Chill ignoré, sommeil, récupération ? Petite vérification, ton futur toi te dira merci."
           }
         },
         "nl": {
@@ -9645,41 +9722,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "ChillMate kon niet alles verwijderen: %@"
-          }
-        }
-      }
-    },
-    "ChillMate could not delete everything: \\(error.localizedDescription)": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate konnte nicht alles löschen: \\(error.localizedDescription)"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate could not delete everything: \\(error.localizedDescription)"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate no ha podido eliminarlo todo: \\(error.localizedDescription)"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate n'a pas pu tout supprimer : \\(error.localizedDescription)"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate kon niet alles verwijderen: \\(error.localizedDescription)"
           }
         }
       }
@@ -9830,7 +9872,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "ChillMate hat in 3 Wochen %lld Chills mit hohem Risiko erfasst. Das fordert Körper und Kopf wirklich. Beratung, eine Sexualgesundheitsstelle oder deine Hausärztin können helfen – ohne Urteil."
+            "value": "ChillMate hat in 3 Wochen %lld Chills mit hohem Risiko erfasst. Das fordert Körper und Kopf wirklich. Beratung, eine Sexualgesundheitsstelle oder deine Hausärztin können helfen, ohne Urteil."
           }
         },
         "en": {
@@ -9848,48 +9890,13 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "ChillMate a noté %lld Chills à haut risque en 3 semaines. Votre corps et votre esprit en portent la charge. Un professionnel, un service de santé sexuelle ou votre médecin peuvent aider, sans jugement."
+            "value": "ChillMate a noté %lld Chills à haut risque en 3 semaines. Ton corps et ton esprit en portent la charge. Un professionnel, un service de santé sexuelle ou ton médecin peuvent aider, sans jugement."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "ChillMate heeft in 3 weken %lld Chills met hoog risico vastgelegd. Dat vraagt echt iets van je lichaam en je hoofd. Een hulpverlener, soa-poli of huisarts kan helpen, zonder oordeel."
-          }
-        }
-      }
-    },
-    "ChillMate has logged \\(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, sexual-health service, or GP can help, without judgment.": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate hat in 3 Wochen \\(count) Chills mit hohem Risiko erfasst. Das fordert Körper und Kopf wirklich. Beratung, eine Sexualgesundheitsstelle oder deine Hausärztin können helfen – ohne Urteil."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate has logged \\(count) high-risk Chills in 3 weeks. Your body and mind carry a real load from that. A counselor, sexual-health service, or GP can help, without judgment."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate ha registrado \\(count) Chills de alto riesgo en 3 semanas. Tu cuerpo y tu mente cargan con eso. Un profesional, un servicio de salud sexual o tu médico pueden ayudar, sin juzgar."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate a noté \\(count) Chills à haut risque en 3 semaines. Votre corps et votre esprit en portent la charge. Un professionnel, un service de santé sexuelle ou votre médecin peuvent aider, sans jugement."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ChillMate heeft in 3 weken \\(count) Chills met hoog risico vastgelegd. Dat vraagt echt iets van je lichaam en je hoofd. Een hulpverlener, soa-poli of huisarts kan helpen, zonder oordeel."
           }
         }
       }
@@ -12091,41 +12098,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kon bewaartermijn niet toepassen: %@"
-          }
-        }
-      }
-    },
-    "Could not apply retention: \\(error.localizedDescription)": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aufbewahrung konnte nicht angewendet werden: \\(error.localizedDescription)"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Could not apply retention: \\(error.localizedDescription)"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No se ha podido aplicar la retención: \\(error.localizedDescription)"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossible d'appliquer la conservation : \\(error.localizedDescription)"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kon bewaartermijn niet toepassen: \\(error.localizedDescription)"
           }
         }
       }
@@ -15989,6 +15961,34 @@
         }
       }
     },
+    "Encrypted iCloud backup could not update.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsseltes iCloud-Backup konnte nicht aktualisiert werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo actualizar la copia de seguridad cifrada de iCloud."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sauvegarde iCloud chiffrée n'a pas pu être mise à jour."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versleutelde iCloud-back-up kon niet worden bijgewerkt."
+          }
+        }
+      }
+    },
     "Encrypted iCloud backup saved.": {
       "extractionState": "manual",
       "localizations": {
@@ -16020,6 +16020,90 @@
           "stringUnit": {
             "state": "translated",
             "value": "Versleutelde iCloud-back-up opgeslagen."
+          }
+        }
+      }
+    },
+    "Encrypted iCloud backup updated.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsseltes iCloud-Backup aktualisiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia de seguridad cifrada de iCloud actualizada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauvegarde iCloud chiffrée mise à jour."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versleutelde iCloud-back-up bijgewerkt."
+          }
+        }
+      }
+    },
+    "Encrypted on-device recovery backup could not update.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsseltes Wiederherstellungs-Backup auf dem Gerät konnte nicht aktualisiert werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo actualizar la copia de recuperación cifrada en el dispositivo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sauvegarde de récupération chiffrée sur l'appareil n'a pas pu être mise à jour."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versleutelde herstelback-up op dit apparaat kon niet worden bijgewerkt."
+          }
+        }
+      }
+    },
+    "Encrypted on-device recovery backup updated.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsseltes Wiederherstellungs-Backup auf dem Gerät aktualisiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia de recuperación cifrada en el dispositivo actualizada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauvegarde de récupération chiffrée sur l'appareil mise à jour."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versleutelde herstelback-up op dit apparaat bijgewerkt."
           }
         }
       }
@@ -18005,7 +18089,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "GHB und Poppers senken beide den Blutdruck. Zusammen können sie Ohnmacht, einen Sturz oder Bewusstlosigkeit auslösen – in einem Moment, in dem du dich nicht schützen kannst."
+            "value": "GHB und Poppers senken beide den Blutdruck. Zusammen können sie Ohnmacht, einen Sturz oder Bewusstlosigkeit auslösen. Und das in einem Moment, in dem du dich nicht schützen kannst."
           }
         },
         "en": {
@@ -18023,7 +18107,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le GHB et les poppers font tous deux baisser la tension. Ensemble, ils peuvent provoquer un évanouissement, une chute ou une perte de conscience à un moment où vous ne pouvez pas vous protéger."
+            "value": "Le GHB et les poppers font tous deux baisser la tension. Ensemble, ils peuvent provoquer un évanouissement, une chute ou une perte de conscience à un moment où tu ne peux pas te protéger."
           }
         },
         "nl": {
@@ -18058,6 +18142,62 @@
           "stringUnit": {
             "state": "translated",
             "value": "GHB of GBL met alcohol, benzo's, opioïden of ketamine"
+          }
+        }
+      }
+    },
+    "GHB/GBL effects can be hard to predict and can become serious quickly.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Wirkung von GHB/GBL ist schwer vorhersehbar und kann schnell ernst werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los efectos del GHB/GBL son difíciles de prever y pueden volverse graves rápidamente."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les effets du GHB/GBL sont difficiles à prévoir et peuvent devenir graves rapidement."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De effecten van GHB/GBL zijn moeilijk te voorspellen en kunnen snel ernstig worden."
+          }
+        }
+      }
+    },
+    "GHB/GBL with alcohol, ketamine, sedatives, or opioids can cause unconsciousness or breathing problems.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GHB/GBL mit Alkohol, Ketamin, Beruhigungsmitteln oder Opioiden kann Bewusstlosigkeit oder Atemprobleme auslösen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El GHB/GBL con alcohol, ketamina, sedantes u opioides puede provocar pérdida de conciencia o problemas respiratorios."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le GHB/GBL avec de l'alcool, de la kétamine, des sédatifs ou des opioïdes peut provoquer une perte de connaissance ou des problèmes respiratoires."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GHB/GBL met alcohol, ketamine, kalmerende middelen of opioïden kan bewusteloosheid of ademhalingsproblemen veroorzaken."
           }
         }
       }
@@ -22931,7 +23071,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le Kamagra et la 3-MMC ajoutent une contrainte cardiaque pendant une session souvent déjà longue. Surveillez l'oppression thoracique et un cœur qui s'emballe sans se calmer."
+            "value": "Le Kamagra et la 3-MMC ajoutent une contrainte cardiaque pendant une session souvent déjà longue. Surveille l'oppression thoracique et un cœur qui s'emballe sans se calmer."
           }
         },
         "nl": {
@@ -22966,7 +23106,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le Kamagra et la MDMA ajoutent une contrainte cardiaque et peuvent faire baisser la tension plus que prévu. Faites des pauses et arrêtez si votre poitrine se serre."
+            "value": "Le Kamagra et la MDMA ajoutent une contrainte cardiaque et peuvent faire baisser la tension plus que prévu. Fais des pauses et arrête-toi si ta poitrine se serre."
           }
         },
         "nl": {
@@ -23001,13 +23141,41 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le Kamagra et la cocaïne sollicitent tous deux le cœur tout en tirant votre circulation dans des directions opposées, augmentant le risque de douleurs thoraciques et d'arythmie."
+            "value": "Le Kamagra et la cocaïne sollicitent tous deux le cœur tout en tirant ta circulation dans des directions opposées, augmentant le risque de douleurs thoraciques et d'arythmie."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Kamagra en cocaïne belasten allebei je hart en trekken je bloedsomloop twee kanten op, waardoor de kans op pijn op de borst en hartritmestoornissen stijgt."
+          }
+        }
+      }
+    },
+    "Kamagra is sildenafil, the same active ingredient as Viagra. Taking both stacks one dose on top of another and raises the risk of a blood pressure drop, headache, vision changes, and an erection that will not go down. An erection lasting more than four hours needs urgent medical care.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamagra ist Sildenafil, derselbe Wirkstoff wie Viagra. Beides zu nehmen stapelt eine Dosis auf die andere und erhöht das Risiko für einen Blutdruckabfall, Kopfschmerzen, Sehstörungen und eine Erektion, die nicht abklingt. Eine Erektion, die länger als vier Stunden dauert, braucht dringend ärztliche Hilfe."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El Kamagra es sildenafilo, el mismo principio activo que el Viagra. Tomar ambos acumula una dosis sobre otra y aumenta el riesgo de bajada de tensión, dolor de cabeza, cambios en la visión y una erección que no baja. Una erección de más de cuatro horas necesita atención médica urgente."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Kamagra, c'est du sildénafil, le même principe actif que le Viagra. Prendre les deux empile une dose sur l'autre et augmente le risque de chute de tension, de maux de tête, de troubles de la vision et d'une érection qui ne retombe pas. Une érection de plus de quatre heures nécessite des soins médicaux urgents."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamagra is sildenafil, dezelfde werkzame stof als Viagra. Allebei nemen stapelt de ene dosis op de andere en vergroot de kans op een bloeddrukdaling, hoofdpijn, veranderd zicht en een erectie die niet zakt. Een erectie die langer dan vier uur duurt, heeft met spoed medische zorg nodig."
           }
         }
       }
@@ -23527,41 +23695,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Laatste versleutelde iCloud-back-up: %@."
-          }
-        }
-      }
-    },
-    "Latest encrypted iCloud backup: \\(stamp).": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Letztes verschlüsseltes iCloud-Backup: \\(stamp)."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Latest encrypted iCloud backup: \\(stamp)."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Última copia de seguridad cifrada en iCloud: \\(stamp)."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dernière sauvegarde iCloud chiffrée : \\(stamp)."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Laatste versleutelde iCloud-back-up: \\(stamp)."
           }
         }
       }
@@ -24229,6 +24362,34 @@
         }
       }
     },
+    "Lock ChillMate with Face ID or a PIN, keep everything encrypted on this iPhone, and hide the screen in one tap. It offers reflection and safety information from verified sources. It is not medical advice.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sperre ChillMate mit Face ID oder einer PIN, halte alles verschlüsselt auf diesem iPhone und verbirg den Bildschirm mit einem Tippen. Es bietet Reflexion und Sicherheitsinformationen aus geprüften Quellen. Es ist keine medizinische Beratung."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloquea ChillMate con Face ID o un PIN, mantén todo cifrado en este iPhone y oculta la pantalla con un toque. Ofrece reflexión e información de seguridad de fuentes verificadas. No es consejo médico."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verrouille ChillMate avec Face ID ou un code, garde tout chiffré sur cet iPhone et masque l'écran en une touche. L'app propose de la réflexion et des informations de sécurité issues de sources vérifiées. Ce n'est pas un avis médical."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergrendel ChillMate met Face ID of een pincode, houd alles versleuteld op deze iPhone en verberg het scherm met één tik. Het biedt reflectie en veiligheidsinformatie uit geverifieerde bronnen. Het is geen medisch advies."
+          }
+        }
+      }
+    },
     "Lock with Face ID": {
       "localizations": {
         "de": {
@@ -24679,6 +24840,34 @@
         }
       }
     },
+    "Log the parts you want to remember, like sleep, substances, and aftercare. Then see your Chills, patterns, and wellbeing score in one private overview.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halte fest, woran du dich erinnern willst, etwa Schlaf, Substanzen und Aftercare. Sieh danach deine Chills, Muster und deinen Wohlbefinden-Score in einer privaten Übersicht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registra lo que quieras recordar, como el sueño, las sustancias y el aftercare. Después verás tus Chills, tus patrones y tu puntuación de bienestar en un resumen privado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Note ce que tu veux retenir, comme le sommeil, les substances et l'aftercare. Retrouve ensuite tes Chills, tes tendances et ton score de bien-être dans un aperçu privé."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leg vast wat je wilt onthouden, zoals slaap, middelen en aftercare. Zie daarna je Chills, patronen en welzijnsscore in één privéoverzicht."
+          }
+        }
+      }
+    },
     "Log to activate": {
       "comment": "Label for the daily score tile when the score is not yet active.",
       "isCommentAutoGenerated": true,
@@ -25104,7 +25293,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "La MDMA et la kétamine ensemble accentuent la désorientation et rendent plus difficile d'évaluer votre environnement, vos limites et les personnes autour de vous. Le consentement devient plus dur à donner et à lire."
+            "value": "La MDMA et la kétamine ensemble accentuent la désorientation et rendent plus difficile d'évaluer ton environnement, tes limites et les personnes autour de toi. Le consentement devient plus dur à donner et à lire."
           }
         },
         "nl": {
@@ -25231,41 +25420,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gemarkeerd als overgeslagen. %@"
-          }
-        }
-      }
-    },
-    "Marked skipped. \\(sleep)": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Als ausgelassen markiert. \\(sleep)"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Marked skipped. \\(sleep)"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Marcado como omitido. \\(sleep)"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Marqué comme ignoré. \\(sleep)"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gemarkeerd als overgeslagen. \\(sleep)"
           }
         }
       }
@@ -26410,6 +26564,34 @@
         }
       }
     },
+    "Multiple stimulants can stack heart strain, anxiety, and overheating.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehrere Stimulanzien können Herzbelastung, Angst und Überhitzung aufeinander stapeln."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varios estimulantes pueden acumular carga cardíaca, ansiedad y sobrecalentamiento."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plusieurs stimulants peuvent cumuler la charge cardiaque, l'anxiété et la surchauffe."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meerdere stimulerende middelen kunnen hartbelasting, angst en oververhitting op elkaar stapelen."
+          }
+        }
+      }
+    },
     "Multiple stimulants such as cocaine, 3MMC, and MDMA": {
       "localizations": {
         "de": {
@@ -27121,6 +27303,34 @@
         }
       }
     },
+    "Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nitrate, Nicorandil oder Riociguat mit Viagra, Kamagra oder Poppers können einen schweren Blutdruckabfall auslösen. Nicht kombinieren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los nitratos, el nicorandil o el riociguat con Viagra, Kamagra o poppers pueden provocar una caída grave de la tensión. No los combines."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les nitrates, le nicorandil ou le riociguat avec du Viagra, du Kamagra ou des poppers peuvent provoquer une chute sévère de la tension. Ne pas combiner."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nitraten, nicorandil of riociguat met Viagra, Kamagra of poppers kunnen een ernstige bloeddrukdaling veroorzaken. Niet combineren."
+          }
+        }
+      }
+    },
     "No Chill has been logged today. Add one only if there is something worth saving.": {
       "localizations": {
         "de": {
@@ -27434,7 +27644,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aucun compte e-mail n’est configuré sur cet appareil. Vous pouvez écrire directement à chillmate@icloud.com."
+            "value": "Aucun compte e-mail n’est configuré sur cet appareil. Tu peux écrire directement à chillmate@icloud.com."
           }
         },
         "nl": {
@@ -27624,6 +27834,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Niet bekend"
+          }
+        }
+      }
+    },
+    "No known major preset warning matched. Unknown amount, contents, health conditions, and medication changes can still matter.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine bekannte größere voreingestellte Warnung gefunden. Unbekannte Menge, Zusammensetzung, gesundheitliche Vorbelastungen und Änderungen bei Medikamenten können trotzdem eine Rolle spielen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguna alerta preestablecida importante coincide. La cantidad, la composición, tu estado de salud y los cambios de medicación pueden importar igualmente."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune alerte préenregistrée majeure ne correspond. La quantité, la composition, ton état de santé et les changements de médicaments peuvent quand même compter."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen bekende grote vooraf ingestelde waarschuwing gevonden. Onbekende hoeveelheid, samenstelling, gezondheidsklachten en veranderingen in medicatie kunnen nog steeds uitmaken."
           }
         }
       }
@@ -29184,7 +29422,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "In den Nächten von Freitag und Samstag (0–6 Uhr) ein diskreter, passiver Check mit „Mir geht es gut“ oder „Hilfe holen“ per Tipp. Wird dann gesendet, wenn eine Session am wahrscheinlichsten ist."
+            "value": "In den Nächten von Freitag und Samstag (0 bis 6 Uhr) ein diskreter, passiver Check mit „Mir geht es gut“ oder „Hilfe holen“ per Tipp. Wird dann gesendet, wenn eine Session am wahrscheinlichsten ist."
           }
         },
         "en": {
@@ -29208,7 +29446,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Op vrijdag- en zaterdagnacht (00:00–6:00) een discrete, passieve check met één tik voor “Ik ben veilig” of “Hulp nodig”. Verstuurd wanneer een sessie het waarschijnlijkst is."
+            "value": "Op vrijdag- en zaterdagnacht (van 0 tot 6 uur) een discrete, passieve check met één tik voor “Ik ben veilig” of “Hulp nodig”. Verstuurd wanneer een sessie het waarschijnlijkst is."
           }
         }
       }
@@ -29252,7 +29490,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "In Wochenendnächten (0–6 Uhr) ein diskretes „Alles okay?“ mit Hilfe per Tipp."
+            "value": "In Wochenendnächten (0 bis 6 Uhr) ein diskretes „Alles okay?“ mit Hilfe per Tipp."
           }
         },
         "en": {
@@ -29276,7 +29514,7 @@
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "In weekendnachten (00:00–6:00) een discrete “gaat het?” met hulp op één tik."
+            "value": "In weekendnachten (van 0 tot 6 uur) een discrete “gaat het?” met hulp op één tik."
           }
         }
       }
@@ -29769,6 +30007,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Open 113.nl"
+          }
+        }
+      }
+    },
+    "Open ChillMate in iOS Settings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate in den iOS-Einstellungen öffnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir ChillMate en los ajustes de iOS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir ChillMate dans les réglages iOS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate openen in iOS-instellingen"
           }
         }
       }
@@ -30805,7 +31071,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vous sortez ce soir ? Touchez si vous voulez du soutien, ou dites-nous que vous êtes en sécurité."
+            "value": "Tu sors ce soir ? Touche si tu veux du soutien, ou dis-nous que tu es en sécurité."
           }
         },
         "nl": {
@@ -32511,6 +32777,62 @@
         }
       }
     },
+    "Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppers können den Blutdruck stark abfallen lassen, besonders zusammen mit Viagra, Kamagra oder ähnlichen Medikamenten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los poppers pueden bajar bruscamente la tensión, sobre todo con Viagra, Kamagra o medicación similar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les poppers peuvent faire chuter fortement la tension, surtout avec du Viagra, du Kamagra ou un médicament similaire."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppers kunnen je bloeddruk scherp laten dalen, zeker samen met Viagra, Kamagra of vergelijkbare medicatie."
+          }
+        }
+      }
+    },
+    "Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppers mit Viagra oder Kamagra können den Blutdruck stark abfallen lassen. Vermeide diese Kombination."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los poppers con Viagra o Kamagra pueden bajar bruscamente la tensión. Evita esta combinación."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les poppers avec du Viagra ou du Kamagra peuvent faire chuter fortement la tension. Évite cette combinaison."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poppers met Viagra of Kamagra kunnen je bloeddruk scherp laten dalen. Vermijd deze combinatie."
+          }
+        }
+      }
+    },
     "Poppers with Viagra, Kamagra, or other erectile dysfunction medication": {
       "localizations": {
         "de": {
@@ -32987,6 +33309,34 @@
         }
       }
     },
+    "Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschriebene stimulierende Medikamente mit MDMA, 3MMC oder Kokain können das Risiko einer Überlastung durch Stimulanzien erhöhen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La medicación estimulante recetada con MDMA, 3MMC o cocaína puede aumentar el riesgo de sobrecarga de estimulantes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un médicament stimulant prescrit avec de la MDMA, de la 3MMC ou de la cocaïne peut augmenter le risque de surcharge en stimulants."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorgeschreven stimulerende medicatie met MDMA, 3MMC of cocaïne kan de kans op overbelasting door stimulantia vergroten."
+          }
+        }
+      }
+    },
     "Prescription amount": {
       "localizations": {
         "de": {
@@ -33459,7 +33809,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vérification privée. Ouvrez ChillMate pour les détails."
+            "value": "Vérification privée. Ouvre ChillMate pour les détails."
           }
         },
         "nl": {
@@ -35230,41 +35580,6 @@
         }
       }
     },
-    "Reminder window adjusted from \\(kg) kg and \\(cm) cm.": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Erinnerungsfenster angepasst an \\(kg) kg und \\(cm) cm."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reminder window adjusted from \\(kg) kg and \\(cm) cm."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ventana de recordatorio ajustada a \\(kg) kg y \\(cm) cm."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fenêtre de rappel ajustée d'après \\(kg) kg et \\(cm) cm."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Herinneringsvenster afgestemd op \\(kg) kg en \\(cm) cm."
-          }
-        }
-      }
-    },
     "Reminder: %@": {
       "comment": "A label that appears under an STD test date, indicating that the result is due. The argument is the date when the result is due.",
       "isCommentAutoGenerated": true,
@@ -35558,7 +35873,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Rouvrez ChillMate pour terminer le changement de langue."
+            "value": "Rouvre ChillMate pour terminer le changement de langue."
           }
         },
         "nl": {
@@ -35592,7 +35907,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Signalez un bug, partagez une idée ou posez une question"
+            "value": "Signale un bug, partage une idée ou pose une question"
           }
         },
         "nl": {
@@ -35626,7 +35941,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Signalez un bug, partagez une idée ou posez une question. La version de votre app est ajoutée automatiquement."
+            "value": "Signale un bug, partage une idée ou pose une question. La version de ton app est ajoutée automatiquement."
           }
         },
         "nl": {
@@ -36040,41 +36355,6 @@
         }
       }
     },
-    "Restored \\(summary.totalItems) items from iCloud.": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(summary.totalItems) Objekte aus iCloud wiederhergestellt."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restored \\(summary.totalItems) items from iCloud."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(summary.totalItems) elementos restaurados desde iCloud."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(summary.totalItems) éléments restaurés depuis iCloud."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(summary.totalItems) items hersteld vanuit iCloud."
-          }
-        }
-      }
-    },
     "Resume": {
       "comment": "A button that dismisses a system-provided screen-paused UI.",
       "isCommentAutoGenerated": true,
@@ -36347,6 +36627,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Risicovolle logs"
+          }
+        }
+      }
+    },
+    "Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ritonavir oder Cobicistat können den Spiegel mancher Substanzen und von Potenzmitteln erhöhen. Frag eine Ärztin, einen Arzt oder eine Apotheke."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El ritonavir o el cobicistat pueden aumentar los niveles de algunas sustancias y de la medicación para la disfunción eréctil. Pregunta a un médico o farmacéutico."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le ritonavir ou le cobicistat peuvent augmenter les niveaux de certaines substances et des médicaments contre les troubles de l'érection. Demande à un médecin ou à un pharmacien."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ritonavir of cobicistat kunnen de spiegels van sommige middelen en van erectiemedicatie verhogen. Vraag een arts of apotheker."
           }
         }
       }
@@ -37801,6 +38109,34 @@
         }
       }
     },
+    "Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beruhigungsmittel oder Opioide mit Alkohol, Ketamin, Cannabis oder GHB/GBL können Atmung, Erinnerung und die Klarheit über Einvernehmlichkeit verschlechtern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los sedantes o los opioides con alcohol, ketamina, cannabis o GHB/GBL pueden empeorar la respiración, la memoria y la claridad del consentimiento."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les sédatifs ou les opioïdes avec de l'alcool, de la kétamine, du cannabis ou du GHB/GBL peuvent dégrader la respiration, la mémoire et la clarté du consentement."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalmerende middelen of opioïden met alcohol, ketamine, cannabis of GHB/GBL kunnen ademhaling, geheugen en helderheid over toestemming verslechteren."
+          }
+        }
+      }
+    },
     "See Chills, sleep, substances, and aftercare in one private overview. After your first log, the app's mood gently follows your wellbeing score.": {
       "extractionState": "stale",
       "localizations": {
@@ -38962,7 +39298,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Donnez autant de détails que vous le souhaitez"
+            "value": "Donne autant de détails que tu veux"
           }
         },
         "nl": {
@@ -39947,7 +40283,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sommeil, notes ou un Chill ignoré ? Petite vérification, votre futur vous dira merci."
+            "value": "Sommeil, notes ou un Chill ignoré ? Petite vérification, ton futur toi te dira merci."
           }
         },
         "nl": {
@@ -40270,7 +40606,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pour que je puisse vous répondre"
+            "value": "Pour que je puisse te répondre"
           }
         },
         "nl": {
@@ -40361,6 +40697,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Zacht en ondersteunend"
+          }
+        }
+      }
+    },
+    "Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manche Antidepressiva oder Stimmungsmedikamente können mit MDMA, 3-MMC, Kokain oder Psychedelika wechselwirken."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Algunos antidepresivos o medicación para el ánimo pueden interactuar con MDMA, 3-MMC, cocaína o psicodélicos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certains antidépresseurs ou médicaments de l'humeur peuvent interagir avec la MDMA, la 3-MMC, la cocaïne ou les psychédéliques."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sommige antidepressiva of stemmingsmedicatie kunnen wisselwerken met MDMA, 3-MMC, cocaïne of psychedelica."
           }
         }
       }
@@ -42465,6 +42829,34 @@
         }
       }
     },
+    "Tap the one you’re in right now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe auf den Moment, in dem du gerade bist"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca el momento en el que estás ahora"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touche celui où tu es en ce moment"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tik op het moment waarin je nu zit"
+          }
+        }
+      }
+    },
     "Tap to change photo": {
       "localizations": {
         "de": {
@@ -42516,7 +42908,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "En appuyant sur envoyer, un e-mail s’ouvre avec votre message et la version de votre app déjà remplis, prêt à envoyer."
+            "value": "En appuyant sur envoyer, un e-mail s’ouvre avec ton message et la version de ton app déjà remplis, prêt à envoyer."
           }
         },
         "nl": {
@@ -42732,7 +43124,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Merci, votre commentaire a été envoyé."
+            "value": "Merci, ton commentaire a été envoyé."
           }
         },
         "nl": {
@@ -42775,33 +43167,93 @@
       "extractionState": "manual",
       "localizations": {
         "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Diese PIN stimmt nicht. Noch %lld Versuche."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Diese PIN stimmt nicht. Noch %lld Versuch."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Diese PIN stimmt nicht. Noch %lld Versuche."
+                }
+              }
+            }
           }
         },
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "That PIN did not match. %lld attempts left."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "That PIN did not match. %lld attempt left."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "That PIN did not match. %lld attempts left."
+                }
+              }
+            }
           }
         },
         "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ese PIN no coincide. Quedan %lld intentos."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Ese PIN no coincide. Queda %lld intento."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Ese PIN no coincide. Quedan %lld intentos."
+                }
+              }
+            }
           }
         },
         "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ce code ne correspond pas. Encore %lld tentatives."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Ce code ne correspond pas. Encore %lld tentative."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Ce code ne correspond pas. Encore %lld tentatives."
+                }
+              }
+            }
           }
         },
         "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Die pincode klopt niet. Nog %lld pogingen."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Die pincode klopt niet. Nog %lld poging."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Die pincode klopt niet. Nog %lld pogingen."
+                }
+              }
+            }
           }
         }
       }
@@ -42829,7 +43281,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "L’envoi a échoué. Veuillez réessayer."
+            "value": "L’envoi a échoué. Réessaie."
           }
         },
         "nl": {
@@ -43032,6 +43484,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Het liefste wat je kunt doen, is misschien vroeg naar bed."
+          }
+        }
+      }
+    },
+    "The moment you’re in rises to the top": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Moment, in dem du gerade bist, rückt nach oben"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El momento en el que estás sube arriba"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le moment où tu es remonte en haut"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het moment waarin je zit, komt bovenaan"
           }
         }
       }
@@ -44743,33 +45223,93 @@
       "extractionState": "manual",
       "localizations": {
         "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zu viele Versuche. Versuch es in %lld Minuten erneut."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Zu viele Versuche. Versuch es in %lld Minute erneut."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Zu viele Versuche. Versuch es in %lld Minuten erneut."
+                }
+              }
+            }
           }
         },
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Too many attempts. Try again in %lld minutes."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Too many attempts. Try again in %lld minute."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Too many attempts. Try again in %lld minutes."
+                }
+              }
+            }
           }
         },
         "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Demasiados intentos. Inténtalo de nuevo en %lld minutos."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Demasiados intentos. Inténtalo de nuevo en %lld minuto."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Demasiados intentos. Inténtalo de nuevo en %lld minutos."
+                }
+              }
+            }
           }
         },
         "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trop de tentatives. Réessayez dans %lld minutes."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Trop de tentatives. Réessaie dans %lld minute."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Trop de tentatives. Réessaie dans %lld minutes."
+                }
+              }
+            }
           }
         },
         "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Te veel pogingen. Probeer het over %lld minuten opnieuw."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Te veel pogingen. Probeer het over %lld minuut opnieuw."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Te veel pogingen. Probeer het over %lld minuten opnieuw."
+                }
+              }
+            }
           }
         }
       }
@@ -44778,33 +45318,93 @@
       "extractionState": "manual",
       "localizations": {
         "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zu viele Versuche. Versuch es in %lld Sekunden erneut."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Zu viele Versuche. Versuch es in %lld Sekunde erneut."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Zu viele Versuche. Versuch es in %lld Sekunden erneut."
+                }
+              }
+            }
           }
         },
         "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Too many attempts. Try again in %lld seconds."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Too many attempts. Try again in %lld second."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Too many attempts. Try again in %lld seconds."
+                }
+              }
+            }
           }
         },
         "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Demasiados intentos. Inténtalo de nuevo en %lld segundos."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Demasiados intentos. Inténtalo de nuevo en %lld segundo."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Demasiados intentos. Inténtalo de nuevo en %lld segundos."
+                }
+              }
+            }
           }
         },
         "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trop de tentatives. Réessayez dans %lld secondes."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Trop de tentatives. Réessaie dans %lld seconde."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Trop de tentatives. Réessaie dans %lld secondes."
+                }
+              }
+            }
           }
         },
         "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Te veel pogingen. Probeer het over %lld seconden opnieuw."
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Te veel pogingen. Probeer het over %lld seconde opnieuw."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Te veel pogingen. Probeer het over %lld seconden opnieuw."
+                }
+              }
+            }
           }
         }
       }
@@ -44890,7 +45490,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Suivez en privé"
+            "value": "Suivi privé"
           }
         },
         "nl": {
@@ -45333,7 +45933,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Activez ceci pour conserver une sauvegarde chiffrée dans iCloud Drive et la restaurer depuis les Réglages ou la configuration."
+            "value": "Active ceci pour conserver une sauvegarde chiffrée dans iCloud Drive et la restaurer depuis les Réglages ou la configuration."
           }
         },
         "nl": {
@@ -46538,7 +47138,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le Viagra et la 3-MMC ajoutent une contrainte cardiaque pendant une session souvent déjà longue. Surveillez l'oppression thoracique et un cœur qui s'emballe sans se calmer."
+            "value": "Le Viagra et la 3-MMC ajoutent une contrainte cardiaque pendant une session souvent déjà longue. Surveille l'oppression thoracique et un cœur qui s'emballe sans se calmer."
           }
         },
         "nl": {
@@ -46573,7 +47173,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le Viagra et la MDMA ajoutent une contrainte cardiaque et peuvent faire baisser la tension plus que prévu. Faites des pauses, restez au frais et arrêtez si votre poitrine se serre."
+            "value": "Le Viagra et la MDMA ajoutent une contrainte cardiaque et peuvent faire baisser la tension plus que prévu. Fais des pauses, reste au frais et arrête-toi si ta poitrine se serre."
           }
         },
         "nl": {
@@ -46608,7 +47208,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Le Viagra et la cocaïne tirent votre circulation dans des directions opposées tout en sollicitant le cœur. Cela augmente le risque de douleurs thoraciques et d'arythmie, surtout lors d'une longue session."
+            "value": "Le Viagra et la cocaïne tirent ta circulation dans des directions opposées tout en sollicitant le cœur. Cela augmente le risque de douleurs thoraciques et d'arythmie, surtout lors d'une longue session."
           }
         },
         "nl": {
@@ -48402,7 +49002,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vous avez déjà une entrée pour aujourd'hui."
+            "value": "Tu as déjà une entrée pour aujourd'hui."
           }
         },
         "nl": {
@@ -51181,7 +51781,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vous avez noté %lld Chills avec sexe et substances ces 3 dernières semaines. Cette fréquence comporte des risques pour la santé. Un médecin, un service de santé sexuelle ou un professionnel peuvent vous soutenir."
+            "value": "Tu as noté %lld Chills avec sexe et substances ces 3 dernières semaines. Cette fréquence comporte des risques pour la santé. Un médecin, un service de santé sexuelle ou un professionnel peuvent te soutenir."
           }
         },
         "nl": {
@@ -51252,83 +51852,13 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vous avez noté %lld Chills avec sexe et substances ces 3 dernières semaines. Cela mérite une conversation posée avec votre médecin ou une personne de confiance."
+            "value": "Tu as noté %lld Chills avec sexe et substances ces 3 dernières semaines. Cela mérite une conversation posée avec ton médecin ou une personne de confiance."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
             "value": "Je hebt de afgelopen 3 weken %lld Chills met seks en middelen vastgelegd. Dat is een rustig gesprek met je huisarts of iemand die je vertrouwt waard."
-          }
-        }
-      }
-    },
-    "You have logged \\(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, sexual-health service, or counselor can support you.": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Du hast in den letzten 3 Wochen \\(count) Chills mit Sex und Substanzen eingetragen. Diese Häufigkeit bringt Gesundheitsrisiken mit sich. Hausärztin, Sexualgesundheitsstelle oder Beratung können dich unterstützen."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You have logged \\(count) Chills involving sex and substances in the last 3 weeks. That level of frequency carries health risks. A GP, sexual-health service, or counselor can support you."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Has registrado \\(count) Chills con sexo y sustancias en las últimas 3 semanas. Esa frecuencia conlleva riesgos para la salud. Un médico, un servicio de salud sexual o un profesional pueden apoyarte."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vous avez noté \\(count) Chills avec sexe et substances ces 3 dernières semaines. Cette fréquence comporte des risques pour la santé. Un médecin, un service de santé sexuelle ou un professionnel peuvent vous soutenir."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Je hebt de afgelopen 3 weken \\(count) Chills met seks en middelen vastgelegd. Die frequentie brengt gezondheidsrisico's mee. Een huisarts, soa-poli of hulpverlener kan je steunen."
-          }
-        }
-      }
-    },
-    "You have logged \\(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person.": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Du hast in den letzten 3 Wochen \\(count) Chills mit Sex und Substanzen eingetragen. Das ist ein ruhiges Gespräch mit deiner Hausärztin oder einer Vertrauensperson wert."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You have logged \\(count) Chills with sex and substances in the last 3 weeks. That is worth a quiet conversation with your GP or a trusted person."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Has registrado \\(count) Chills con sexo y sustancias en las últimas 3 semanas. Merece una conversación tranquila con tu médico o alguien de confianza."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vous avez noté \\(count) Chills avec sexe et substances ces 3 dernières semaines. Cela mérite une conversation posée avec votre médecin ou une personne de confiance."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Je hebt de afgelopen 3 weken \\(count) Chills met seks en middelen vastgelegd. Dat is een rustig gesprek met je huisarts of iemand die je vertrouwt waard."
           }
         }
       }
@@ -52065,7 +52595,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Votre e-mail (facultatif)"
+            "value": "Ton e-mail (facultatif)"
           }
         },
         "nl": {
@@ -52223,38 +52753,38 @@
         }
       }
     },
-    "Your last 3 months, in one place": {
+    "Your last 3 months, in one place": {
       "comment": "Title of the intro page.",
       "isCommentAutoGenerated": true,
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Deine letzten 3 Monate an einem Ort"
+            "value": "Deine letzten 3 Monate an einem Ort"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your last 3 months, in one place"
+            "value": "Your last 3 months, in one place"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tus últimos 3 meses, en un solo lugar"
+            "value": "Tus últimos 3 meses, en un solo lugar"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vos 3 derniers mois, au même endroit"
+            "value": "Tes 3 derniers mois, au même endroit"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Je laatste 3 maanden, op één plek"
+            "value": "Je laatste 3 maanden, op één plek"
           }
         }
       }
@@ -52338,7 +52868,7 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Votre message"
+            "value": "Ton message"
           }
         },
         "nl": {
@@ -53236,41 +53766,6 @@
         }
       }
     },
-    "\\(hours) h sleep": {
-      "extractionState": "manual",
-      "localizations": {
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(hours) Std. Schlaf"
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(hours) h sleep"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(hours) h de sueño"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(hours) h de sommeil"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "\\(hours) u slaap"
-          }
-        }
-      }
-    },
     "alcohol rebound, stimulant comedown, lack of sleep, or feeling overstimulated": {
       "localizations": {
         "de": {
@@ -53931,6 +54426,34 @@
         }
       }
     },
+    "iCloud backup is ready. ChillMate will save encrypted backup files to iCloud Drive.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das iCloud-Backup ist bereit. ChillMate speichert verschlüsselte Backup-Dateien in iCloud Drive."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La copia de seguridad de iCloud está lista. ChillMate guardará archivos de copia cifrados en iCloud Drive."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sauvegarde iCloud est prête. ChillMate enregistrera des fichiers de sauvegarde chiffrés dans iCloud Drive."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud-back-up staat klaar. ChillMate slaat versleutelde back-upbestanden op in iCloud Drive."
+          }
+        }
+      }
+    },
     "iCloud backups deleted.": {
       "extractionState": "manual",
       "localizations": {
@@ -54025,6 +54548,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "iCloud-herstel"
+          }
+        }
+      }
+    },
+    "iOS Settings can set ChillMate’s language too. Whichever you change last is the one that applies.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auch in den iOS-Einstellungen lässt sich die Sprache von ChillMate festlegen. Was du zuletzt änderst, gilt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los ajustes de iOS también pueden definir el idioma de ChillMate. Se aplica el último cambio que hagas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les réglages iOS peuvent aussi définir la langue de ChillMate. C'est le dernier changement qui s'applique."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je kunt de taal van ChillMate ook in iOS-instellingen zetten. Wat je als laatste wijzigt, is wat geldt."
           }
         }
       }

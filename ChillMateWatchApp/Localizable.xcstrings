@@ -34,30 +34,30 @@
         }
       }
     },
-    "%lld bpm - slow down": {
+    "%lld bpm, slow down": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld bpm - mach langsamer"
+            "value": "%lld bpm, mach langsamer"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld ppm - baja el ritmo"
+            "value": "%lld ppm, baja el ritmo"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld bpm - ralentis"
+            "value": "%lld bpm, ralentis"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld bpm - rustig aan"
+            "value": "%lld bpm, rustig aan"
           }
         }
       }

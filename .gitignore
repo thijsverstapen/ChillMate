@@ -35,3 +35,10 @@ DerivedDataDevice/
 
 # Stray shell-redirect artifacts (a file literally named "-" was committed once)
 /-
+
+# Python bytecode from the scripts/ checks
+__pycache__/
+*.pyc
+
+# xcresult bundles written by the CI test steps into the workspace
+TestResults/

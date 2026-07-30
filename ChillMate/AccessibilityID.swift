@@ -3,10 +3,10 @@ import Foundation
 /// Stable, locale-independent identifiers for UI tests.
 ///
 /// The UI tests queried controls by their English display label
-/// (`app.tabBars.buttons["More"]`), which meant they could only pass in English —
-/// including `testLaunchesInEveryLanguage`, whose entire point is the other four.
-/// Identifiers are never localized, so a test written against these works in every
-/// language.
+/// (`app.tabBars.buttons["More"]`), which meant they could only pass in English.
+/// That included `testLaunchesInEveryLanguage`, whose entire point is the other
+/// four. Identifiers are never localized, so a test written against these works in
+/// every language.
 ///
 /// Kept in the app target (not the test target) so the identifier and the view
 /// that carries it live together and cannot drift apart.

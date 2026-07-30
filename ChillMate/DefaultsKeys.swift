@@ -1,17 +1,30 @@
 import Foundation
 
-/// The single registry of every UserDefaults key ChillMate reads or writes.
+/// The registry of the UserDefaults keys the app target reads or writes.
 ///
-/// These keys were previously repeated as bare string literals at each use site
-/// — `trustedContactPhone` in eight places, `requiresFaceID`, `notificationsEnabled`,
-/// `chillReducedMotion` and others in six each — across `@AppStorage` declarations,
-/// `UserDefaults.standard` calls, the widget, and the watch app. A typo in any one
-/// of those silently bound to a *different* key that reads back as `false`/`""`
-/// rather than failing, which is exactly how `chillReducedMotion` ended up wired
-/// into onboarding only while Settings advertised it app-wide.
+/// These keys were previously repeated as bare string literals at each use site:
+/// `trustedContactPhone` in eight places, `requiresFaceID`, `notificationsEnabled`,
+/// `chillReducedMotion` and others in six each, spread across `@AppStorage`
+/// declarations, `UserDefaults.standard` calls, the widget, and the watch app. A
+/// typo in any one of those silently bound to a *different* key that reads back as
+/// `false`/`""` rather than failing, which is exactly how `chillReducedMotion` ended
+/// up wired into onboarding only while Settings advertised it app-wide.
 ///
-/// Every key lives here now, so a typo is a compile error. `@AppStorage` requires a
-/// literal-typed String, which these constants satisfy.
+/// Going through a constant here turns such a typo into a compile error. There is no
+/// cost to it: `@AppStorage` only needs a `String`, so a constant drops in wherever a
+/// literal used to sit.
+///
+/// Not every `forKey:` in the codebase resolves to this enum, and two of those cases
+/// are deliberate rather than oversights:
+///
+/// 1. `ProfessionalHelperBridgeView` passes "paperRect" and "printableRect" to
+///    `setValue(_:forKey:)` on a `UIPrintPageRenderer`. Those are KVC property names
+///    on a UIKit object, not UserDefaults keys, and declaring them here would invite
+///    someone to look them up in the wrong store.
+/// 2. Keys that cross a process boundary into the widget, the Live Activity or the
+///    watch belong in `WidgetSharedKey`, which is compiled into all four targets.
+///    This file is a member of the app target only, so a copy here could quietly
+///    drift from the copy an extension actually writes.
 enum DefaultsKey {
     // MARK: Lock & privacy
     static let requiresFaceID = "requiresFaceID"
@@ -21,6 +34,17 @@ enum DefaultsKey {
     static let screenPrivacyEnabled = "screenPrivacyEnabled"
     static let pinFailedAttempts = "pinFailedAttempts"
     static let pinLockoutUntil = "pinLockoutUntil"
+    /// Legacy salted SHA256 PIN credentials, from before PINs moved to PBKDF2 in the
+    /// Keychain. `LocalSecurityService` reads them once so a PIN set on an older build
+    /// still unlocks the app, then deletes them as it re-derives the credentials into
+    /// the Keychain. Nothing writes them any more.
+    ///
+    /// The two strings are byte-for-byte what earlier builds stored. They are the only
+    /// way back in for someone who set a PIN before the Keychain migration, so a
+    /// changed value here would not fail loudly, it would lock that person out of
+    /// their own log with a PIN they typed correctly.
+    static let legacyAppPINHash = "appPINHash"
+    static let legacyAppPINSalt = "appPINSalt"
 
     // MARK: Notifications
     static let notificationsEnabled = "notificationsEnabled"
@@ -54,7 +78,7 @@ enum DefaultsKey {
     /// `BackgroundPhotoStore.migrateFromUserDefaultsIfNeeded()`, which moves it to a
     /// file and clears it.
     static let appBackgroundPhotoData = "appBackgroundPhotoData"
-    /// Short fingerprint of the file-backed background photo — no image bytes.
+    /// Short fingerprint of the file-backed background photo (no image bytes).
     static let appBackgroundPhotoFingerprint = "appBackgroundPhotoFingerprint"
     static let highContrastMode = "highContrastMode"
     static let chillReducedMotion = "chillReducedMotion"
@@ -76,14 +100,23 @@ enum DefaultsKey {
     static let lastOnDeviceRecoverySnapshotTimestamp = "lastOnDeviceRecoverySnapshotTimestamp"
     static let lastOnDeviceRecoveryRestoreTimestamp = "lastOnDeviceRecoveryRestoreTimestamp"
     static let dataRetentionMonths = "dataRetentionMonths"
+    /// Per-install identifier stamped into encrypted backup files, so a restore can
+    /// tell a backup this device made from one another device made. Minted on first
+    /// read and never rotated: rotating it would make every existing backup look
+    /// foreign. Read and written by `EncryptedBackupDevice` in
+    /// `EncryptedBackupService`, in `UserDefaults.standard`.
+    static let encryptedBackupDeviceID = "encryptedBackupDeviceID"
 
     // MARK: Session state
     static let lastAppUseTimestamp = "lastAppUseTimestamp"
     static let hasActiveDrugTimer = "hasActiveDrugTimer"
     static let hasShownFirstLaunchSplash = "hasShownFirstLaunchSplash"
     static let drugTimerTrackedPeople = "drugTimerTrackedPeople"
-    static let hydrationLastLoggedDay = "hydrationLastLoggedDay"
     static let typedRecordsMigrationCompleted = "typedRecordsMigrationCompleted"
+    // The daily hydration flag is deliberately absent. It is written by the Live
+    // Activity's Log water button and by the Siri intent as well as by the app, so it
+    // lives in the App Group suite under `HydrationLog`, not in
+    // `UserDefaults.standard`. A constant here would name the wrong store.
 
     // MARK: Watch mirror (read on the watch, written on the phone)
     static let watchHydrationReminders = "watchHydrationReminders"
@@ -117,6 +150,20 @@ enum DefaultsKey {
     static let healthKitSexualActivityWriteEnabled = "healthKitSexualActivityWriteEnabled"
     static let stiReminderMonths = "stiReminderMonths"
     static let watchStressAndTemperatureDetection = "watchStressAndTemperatureDetection"
+    static let recentlyDeletedItems = "recentlyDeletedItems"
+
+    // MARK: Language
+
+    /// The system key iOS reads to resolve which `.lproj` a bundle serves. Not ours:
+    /// the per-app Language screen in Settings writes it too, which is why
+    /// `LocalizationService` has to reconcile rather than assume it is the only
+    /// writer. Registered here so the spelling has one home.
+    static let appleLanguages = "AppleLanguages"
+
+    /// The language ChillMate itself last wrote into `appleLanguages`. Remembering
+    /// what we asserted is the only way to recognise a value we did not write, which
+    /// is what a change made in Settings looks like from inside the app.
+    static let languageAssertedByChillMate = "appLanguageAssertedByChillMate"
 
     /// App-group suite shared with the widget and Live Activity extensions.
     /// Defined in `WidgetSharedKey`, which is a member of all four targets.

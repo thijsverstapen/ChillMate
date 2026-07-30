@@ -372,8 +372,8 @@ private struct RiskAssessmentPanel: View {
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
 
-                    ForEach(assessment.interactionWarnings, id: \.self) { warning in
-                        RiskWarningLine(warning: warning)
+                    ForEach(assessment.interactionFindings) { finding in
+                        RiskWarningLine(finding: finding)
                     }
 
                     Text("If someone is unconscious, very confused, overheating, having chest pain, breathing oddly, or cannot be woken: call 112.")
@@ -420,56 +420,101 @@ private struct RiskLevelRow: View {
     }
 }
 
-private enum EvidenceTier: String {
-    case known = "Known interaction"
-    case likely = "Likely risk"
-    case limited = "Limited evidence"
-    case unknown = "Unknown"
+/// One row of the assessment's warning list, carrying the severity its source
+/// rated it at.
+///
+/// The screen draws on two sources that cannot see each other's inputs: the preset
+/// chain in `CombinationAssessment`, which is the only place medication
+/// interactions live, and `SubstanceInteractionChecker`, whose curated table rates
+/// substance pairs. Carrying an explicit level on both is what lets the merge
+/// compare them.
+///
+/// It also replaces the badge this screen used to show, which was picked by
+/// searching the warning text for English words such as "avoid" or "dangerous".
+/// That guess collapsed to the mildest badge for every non-English user, and it
+/// stamped the "nothing matched" line with a risk badge because that sentence
+/// happens to contain the word "can".
+struct InteractionFinding: Identifiable, Hashable {
+    let text: String
+    /// Nil only on the "nothing matched" line, which is informational and gets no
+    /// severity badge.
+    let level: SubstanceInteraction.Level?
 
-    var tint: Color {
-        switch self {
-        case .known:
-            .red
-        case .likely:
-            .orange
-        case .limited:
-            Color.chillSecondaryBlue
-        case .unknown:
-            Color.chillSecondary
-        }
-    }
+    var id: String { text }
 }
 
 private struct RiskWarningLine: View {
-    let warning: String
+    let finding: InteractionFinding
 
-    private var tier: EvidenceTier {
-        let lower = warning.lowercased()
-        if lower.contains("do not combine") || lower.contains("avoid") || lower.contains("dangerous") {
-            return .known
+    /// Capsule colour for the severity badge.
+    ///
+    /// Deliberately not `SubstanceInteraction.Level.color`: that palette is tuned
+    /// for coloured text on a tinted card, and its yellow leaves white capsule text
+    /// hard to read. These are the three tints this screen already draws white
+    /// labels on, in the risk rows directly above.
+    private func badgeTint(for level: SubstanceInteraction.Level) -> Color {
+        switch level {
+        case .caution:
+            Color.chillSecondaryBlue
+        case .serious:
+            .orange
+        case .critical:
+            .red
         }
-        if lower.contains("can") || lower.contains("increase") || lower.contains("raise") {
-            return .likely
-        }
-        if lower.contains("unknown") || lower.contains("no known") {
-            return .unknown
-        }
-        return .limited
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(tier.localizedDisplayName)
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(Capsule().fill(tier.tint))
+            if let level = finding.level {
+                Text(level.label)
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Capsule().fill(badgeTint(for: level)))
+            }
 
-            Label(warning, systemImage: "exclamationmark.circle.fill")
+            Label(finding.text, systemImage: "exclamationmark.circle.fill")
                 .font(.callout)
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// A hazard both warning sources can describe, used to keep the merged list from
+/// saying the same thing twice in two different voices.
+///
+/// Only the preset lines a curated table entry can genuinely stand in for are
+/// classified. Anything unclassified on either side is always kept, so a table row
+/// added later can never silently swallow a preset warning.
+private enum HazardTopic: Hashable {
+    /// GHB or GBL stacked with another depressant.
+    case ghbDepressantStack
+    /// Poppers with Viagra or Kamagra.
+    case poppersWithErectileMedication
+    /// Two or more of MDMA, 3-MMC and cocaine.
+    case stimulantStack
+    /// Alcohol with cocaine.
+    case alcoholWithCocaine
+
+    /// Classifies a curated table entry, or returns nil when no preset line covers
+    /// the same ground.
+    init?(_ substances: Set<Substance>) {
+        let stimulants: Set<Substance> = [.mdma, .threeMMC, .cocaine]
+
+        if substances.contains(.ghb) || substances.contains(.gbl),
+           substances.contains(.alcohol) || substances.contains(.ketamine) {
+            self = .ghbDepressantStack
+        } else if substances.contains(.poppers),
+                  substances.contains(.viagra) || substances.contains(.kamagra) {
+            self = .poppersWithErectileMedication
+        } else if substances == [.cocaine, .alcohol] {
+            self = .alcoholWithCocaine
+        } else if substances.count >= 2, substances.isSubset(of: stimulants) {
+            self = .stimulantStack
+        } else {
+            return nil
         }
     }
 }
@@ -491,7 +536,11 @@ private extension RiskLevel {
     }
 }
 
-private struct CombinationAssessment {
+/// Internal rather than private so the tests can assert on what the risk checker
+/// screen actually produces for a selection. The interaction table used to be
+/// verified in isolation, which let a green suite coexist with a screen that never
+/// consulted it.
+struct CombinationAssessment {
     let substances: [Substance]
     let medicationText: String
     let timing: CombinationTiming
@@ -601,64 +650,150 @@ private struct CombinationAssessment {
         }
     }
 
+    /// Every interaction warning this screen shows, in the order it shows them.
+    ///
+    /// Two sources feed it. The preset chain in `presetFindings(supersededBy:)` is
+    /// the only one that can see the medication the user typed, so it leads and
+    /// stays intact. The curated `SubstanceInteractionChecker` table rates
+    /// substance pairs and knows nothing about medication, so its rows follow in
+    /// their own most severe first order.
+    ///
+    /// Until 4.2.1 the table was never consulted here at all. A pairing the table
+    /// rates serious, alcohol with ketamine being the plainest example, matched no
+    /// preset branch and so fell through to the "nothing matched" line below, which
+    /// told the user there was nothing worth knowing about a depressant stack.
+    var interactionFindings: [InteractionFinding] {
+        let rated = SubstanceInteractionChecker.warnings(for: substanceSet)
+
+        // Highest rating the table gave each hazard the preset chain also
+        // describes. A preset line only steps aside for a table row that covers its
+        // hazard at least as severely, so merging can add detail but can never
+        // soften a warning the user would otherwise have seen.
+        var ratedTopics: [HazardTopic: SubstanceInteraction.Level] = [:]
+        for interaction in rated {
+            guard let topic = HazardTopic(interaction.substances) else { continue }
+            ratedTopics[topic] = max(ratedTopics[topic] ?? interaction.level, interaction.level)
+        }
+
+        // Belt and braces against the same sentence arriving from both sources:
+        // the topic rules above should already prevent it, but a duplicate row here
+        // would also collide in SwiftUI, which identifies these rows by their text.
+        var seenText: Set<String> = []
+        let merged = (presetFindings(supersededBy: ratedTopics)
+            + rated.map { InteractionFinding(text: $0.warning, level: $0.level) })
+            .filter { seenText.insert($0.text).inserted }
+
+        guard merged.isEmpty else { return merged }
+
+        return [
+            InteractionFinding(
+                text: String(localized: "No known major preset warning matched. Unknown amount, contents, health conditions, and medication changes can still matter."),
+                level: nil
+            )
+        ]
+    }
+
+    /// Flat warning text in display order. `RiskCheckRecord` stores plain strings,
+    /// so a saved check keeps exactly the wording the user was shown.
     var interactionWarnings: [String] {
-        var warnings: [String] = []
+        interactionFindings.map(\.text)
+    }
+
+    /// The hand-written preset chain, unchanged in content and order, minus any
+    /// line the curated table already covers at an equal or higher rating.
+    ///
+    /// Severities are stated here rather than guessed from the wording, so the
+    /// merge has something to compare. They match the badge colours these lines
+    /// already carried, with the one deliberate exception noted at the GHB branch.
+    private func presetFindings(supersededBy ratedTopics: [HazardTopic: SubstanceInteraction.Level]) -> [InteractionFinding] {
+        var findings: [InteractionFinding] = []
+
+        func add(_ text: String, _ level: SubstanceInteraction.Level, superseding topic: HazardTopic? = nil) {
+            if let topic, let rated = ratedTopics[topic], rated >= level { return }
+            findings.append(InteractionFinding(text: text, level: level))
+        }
 
         if hasMedicationCategory(.nitrateLike) && (hasErectileMedication || substanceSet.contains(.poppers)) {
-            warnings.append("Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine.")
+            add(String(localized: "Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine."), .critical)
         }
 
         if hasMedicationCategory(.alphaBlocker) && hasErectileMedication {
-            warnings.append("Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining.")
+            add(String(localized: "Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining."), .serious)
         }
 
         if hasGHBLike {
             if substanceSet.contains(.alcohol) || substanceSet.contains(.ketamine) || hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid) {
-                warnings.append("GHB/GBL with alcohol, ketamine, sedatives, or opioids can cause unconsciousness or breathing problems.")
+                // Rated critical rather than the middle badge this line used to
+                // show. It describes the depressant stacking mechanism that has
+                // killed people, and the table rates the same pairing critical.
+                //
+                // It can only stand aside for the table when the other depressant is
+                // a substance. Sedative and opioid medication is invisible to the
+                // table, so whenever one of those matched, this is the only line
+                // that speaks for it.
+                let sedatingMedication = hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)
+                add(
+                    String(localized: "GHB/GBL with alcohol, ketamine, sedatives, or opioids can cause unconsciousness or breathing problems."),
+                    .critical,
+                    superseding: sedatingMedication ? nil : .ghbDepressantStack
+                )
             } else {
-                warnings.append("GHB/GBL effects can be hard to predict and can become serious quickly.")
+                add(String(localized: "GHB/GBL effects can be hard to predict and can become serious quickly."), .serious)
             }
         }
 
         if substanceSet.contains(.poppers) {
             if substanceSet.contains(.viagra) || substanceSet.contains(.kamagra) {
-                warnings.append("Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination.")
+                add(
+                    String(localized: "Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination."),
+                    .critical,
+                    superseding: .poppersWithErectileMedication
+                )
             } else {
-                warnings.append("Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication.")
+                add(String(localized: "Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication."), .serious)
             }
         }
 
         if (hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)) &&
             (substanceSet.contains(.alcohol) || substanceSet.contains(.ketamine) || substanceSet.contains(.cannabis) || hasGHBLike) {
-            warnings.append("Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse.")
+            add(String(localized: "Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse."), .serious)
         }
 
         if stimulants.count >= 2 {
-            warnings.append("Multiple stimulants can stack heart strain, anxiety, and overheating.")
+            // Every pairing that can trigger this line has its own table row, and
+            // those name the specific two substances, so this generic summary always
+            // gives way when the table speaks.
+            add(
+                String(localized: "Multiple stimulants can stack heart strain, anxiety, and overheating."),
+                .serious,
+                superseding: .stimulantStack
+            )
         }
 
         if hasMedicationCategory(.stimulantMedication) && !stimulants.isEmpty {
-            warnings.append("Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk.")
+            add(String(localized: "Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk."), .serious)
         }
 
         if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
-            warnings.append("Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice.")
+            add(String(localized: "Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice."), .critical)
         } else if hasMedicationCategory(.serotonergic) && !serotonergicSubstances.isEmpty {
-            warnings.append("Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics.")
+            add(String(localized: "Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics."), .serious)
         }
 
         if hasMedicationCategory(.ritonavirBooster) && (hasErectileMedication || substanceSet.contains(.mdma) || substanceSet.contains(.threeMMC)) {
-            warnings.append("Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist.")
+            add(String(localized: "Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist."), .serious)
         }
 
         if substanceSet.contains(.alcohol) && substanceSet.contains(.cocaine) {
-            warnings.append("Alcohol and cocaine together can increase strain on the heart and reduce judgment.")
+            // The table entry for this pair names cocaethylene and why it matters,
+            // so it supersedes this line rather than repeating it.
+            add(
+                String(localized: "Alcohol and cocaine together can increase strain on the heart and reduce judgment."),
+                .serious,
+                superseding: .alcoholWithCocaine
+            )
         }
 
-        if warnings.isEmpty {
-            warnings.append("No known major preset warning matched. Unknown amount, contents, health conditions, and medication changes can still matter.")
-        }
-
-        return warnings
+        return findings
     }
 }

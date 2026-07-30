@@ -43,7 +43,7 @@ final class WatchConnectivityService: NSObject {
 
         // Errors were swallowed by `try?` and an empty errorHandler. Since `context`
         // only ever merges and never shrinks, it can grow past
-        // updateApplicationContext's payload limit — at which point the watch
+        // updateApplicationContext's payload limit, at which point the watch
         // silently stops receiving updates, including the emergency number.
         do {
             try WCSession.default.updateApplicationContext(context)
@@ -95,8 +95,8 @@ final class WatchConnectivityService: NSObject {
         let phone = d.string(forKey: DefaultsKey.trustedContactPhone) ?? ""
         // Resolved through EmergencyContactInfo, not re-derived here. The previous
         // inline copy only special-cased the United Kingdom, so the watch relayed
-        // 112 to users in the United States and Australia — a number that does not
-        // reach emergency services there — on the device most likely to be in reach
+        // 112 to users in the United States and Australia (a number that does not
+        // reach emergency services there) on the device most likely to be in reach
         // during an actual emergency.
         let emergency = EmergencyContactInfo.resolvedNumber(in: d)
         push([

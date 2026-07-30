@@ -27,7 +27,9 @@ struct ChillMateApp: App {
             // Dates, numbers and measurements follow the chosen language right away.
             // Catalog string lookup is bound to the bundle resolved at process start,
             // so that part lands on the next launch (the picker says so).
-            .environment(\.locale, LocalizationService.selectedLocale)
+            // Resolves to the untouched system locale when no language was chosen,
+            // so a user's region and 24-hour-time preference survive.
+            .environment(\.locale, LocalizationService.effectiveLocale)
             // Publishes the combined system + in-app reduce-motion preference to
             // every descendant, including sheets and covers.
             .chillMotionPreference()

@@ -6,16 +6,8 @@ import SwiftUI
 
 struct PrivateInsightsView: View {
     @Environment(\.dismiss) private var dismiss
-    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
-    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
-    @Query(ChillMateQueries.recentJournalEntries) private var journals: [JournalEntry]
 
     @State private var windowDays = 90
-
-    private var recentEntries: [NightEntry] {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -windowDays, to: .now) ?? .distantPast
-        return entries.filter { $0.date >= cutoff }
-    }
 
     var body: some View {
         Group {
@@ -37,20 +29,7 @@ struct PrivateInsightsView: View {
                         }
                         .pickerStyle(.segmented)
 
-                        InsightMetricGrid(entries: recentEntries, timers: timers, journals: journals)
-                        InsightMilestoneCard(
-                            currentStreak: ChillInsightCalculator.recoveryStreakDays(entries: entries),
-                            longestStreak: ChillInsightCalculator.longestClearStreak(entries: entries)
-                        )
-                        InsightHeatmapCard(levels: ChillInsightCalculator.heatmap(entries: entries, days: 35))
-                        TrendListCard(title: String(localized: "What led to it?"), emptyText: String(localized: "Add trigger tags in logs to build this map."), counts: ChillInsightCalculator.triggerCounts(entries: recentEntries), tint: Color.chillSecondaryBlue)
-                        TrendListCard(title: String(localized: "What changed?"), emptyText: String(localized: "When risky logs increase, reasons you tag will appear here."), counts: ChillInsightCalculator.changeReasonCounts(entries: recentEntries), tint: .orange)
-                        TrendListCard(title: String(localized: "Substances"), emptyText: String(localized: "No substances logged in the selected window."), counts: ChillInsightCalculator.substanceCounts(entries: recentEntries), tint: Color.chillPrimary)
-                        InsightSleepCorrelationCard(
-                            substanceAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: true),
-                            clearAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: false)
-                        )
-                        PersonalBaselineCard(entries: recentEntries, timers: timers)
+                        PrivateInsightsSections(windowDays: windowDays)
                     }
                     .padding(20)
                     .padding(.bottom, 36)
@@ -62,17 +41,108 @@ struct PrivateInsightsView: View {
     }
 }
 
+/// The data half of `PrivateInsightsView`.
+///
+/// Split out so the selected window can reach the fetches themselves. The picker
+/// value is `@State` on the screen above and a `@Query` predicate can only be built
+/// in `init`, so the window scoped queries need a view that SwiftUI re-creates when
+/// the picker moves.
+private struct PrivateInsightsSections: View {
+    let windowDays: Int
+
+    /// Not windowed, on purpose: the milestone card reads the whole logged history
+    /// to find a personal best, and the heatmap draws a fixed 35 days.
+    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
+
+    /// Windowed in the query rather than filtered afterwards, because the tiles
+    /// built from these two are counters. Counting inside the row limits on
+    /// `recentTimers` and `recentJournalEntries` would freeze both tiles for anyone
+    /// who logs past those limits. See `ChillMateQueries.timers(since:)`.
+    @Query private var timers: [DrugDoseTimerRecord]
+    @Query private var journals: [JournalEntry]
+
+    init(windowDays: Int) {
+        self.windowDays = windowDays
+        let start = ChillMateQueries.windowStart(daysBack: windowDays)
+        _timers = Query(ChillMateQueries.timers(since: start))
+        _journals = Query(ChillMateQueries.journalEntries(since: start))
+    }
+
+    /// Night entries are narrowed in memory instead, because the unwindowed list is
+    /// needed here anyway and its 1,000 row limit sits far above anything a 30 or 90
+    /// day window can hold.
+    private var recentEntries: [NightEntry] {
+        let cutoff = ChillMateQueries.windowStart(daysBack: windowDays)
+        return entries.filter { $0.date >= cutoff }
+    }
+
+    var body: some View {
+        Group {
+            InsightMetricGrid(entries: recentEntries, timers: timers, journals: journals, windowDays: windowDays)
+            InsightMilestoneCard(
+                currentStreak: ChillInsightCalculator.recoveryStreakDays(entries: entries),
+                longestStreak: ChillInsightCalculator.longestClearStreak(entries: entries)
+            )
+            InsightHeatmapCard(levels: ChillInsightCalculator.heatmap(entries: entries, days: 35))
+            TrendListCard(title: String(localized: "What led to it?"), emptyText: String(localized: "Add trigger tags in logs to build this map."), counts: ChillInsightCalculator.triggerCounts(entries: recentEntries), tint: Color.chillSecondaryBlue)
+            TrendListCard(title: String(localized: "What changed?"), emptyText: String(localized: "When risky logs increase, reasons you tag will appear here."), counts: ChillInsightCalculator.changeReasonCounts(entries: recentEntries), tint: .orange)
+            TrendListCard(title: String(localized: "Substances"), emptyText: String(localized: "No substances logged in the selected window."), counts: ChillInsightCalculator.substanceCounts(entries: recentEntries), tint: Color.chillPrimary)
+            InsightSleepCorrelationCard(
+                substanceAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: true),
+                clearAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: false)
+            )
+            PersonalBaselineCard(entries: recentEntries, timers: timers, windowDays: windowDays)
+        }
+    }
+}
+
+/// Names the period the numbers beside it cover.
+///
+/// Four bare tiles of digits read as lifetime totals, and the segmented picker is
+/// the only other thing on the screen that mentions a period. Reuses the existing
+/// "%lld days" string so it stays translated in every language the app ships.
+private struct InsightWindowCaption: View {
+    let days: Int
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: "calendar")
+            Text(String(localized: "\(days) days"))
+        }
+        .font(.caption.weight(.bold))
+        .foregroundStyle(Color.chillSecondary)
+        .accessibilityElement(children: .combine)
+    }
+}
+
 private struct InsightMetricGrid: View {
     let entries: [NightEntry]
     let timers: [DrugDoseTimerRecord]
     let journals: [JournalEntry]
+    let windowDays: Int
+
+    /// Counted over the selected window like the three tiles around it. This tile
+    /// used to show `ChillInsightCalculator.riskyLogTrend`, whose recent bucket is a
+    /// fixed 21 days, so at the 90 day setting it reported three weeks of logs under
+    /// a caption promising three months.
+    private var riskyLogCount: Int {
+        entries.filter { !$0.skippedNight && $0.hadSex && !$0.substances.isEmpty }.count
+    }
+
+    private var continuedCount: Int {
+        timers.filter { $0.redoseDecision == RedoseDecision.redosed.rawValue }.count
+    }
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-            InsightMetric(title: String(localized: "Chills"), value: "\(entries.filter { !$0.skippedNight }.count)", symbol: "moon.stars.fill", tint: Color.chillSecondaryBlue)
-            InsightMetric(title: String(localized: "Risky logs"), value: "\(ChillInsightCalculator.riskyLogTrend(entries: entries).recent)", symbol: "exclamationmark.triangle.fill", tint: .orange)
-            InsightMetric(title: String(localized: "Continued"), value: "\(timers.filter { $0.redoseDecision == RedoseDecision.redosed.rawValue }.count)", symbol: "arrow.clockwise.circle.fill", tint: .red)
-            InsightMetric(title: String(localized: "Journal"), value: "\(journals.count)", symbol: "book.closed.fill", tint: Color.chillMint)
+        VStack(alignment: .leading, spacing: 10) {
+            InsightWindowCaption(days: windowDays)
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                InsightMetric(title: String(localized: "Chills"), value: "\(entries.filter { !$0.skippedNight }.count)", symbol: "moon.stars.fill", tint: Color.chillSecondaryBlue)
+                InsightMetric(title: String(localized: "Risky logs"), value: "\(riskyLogCount)", symbol: "exclamationmark.triangle.fill", tint: .orange)
+                InsightMetric(title: String(localized: "Continued"), value: "\(continuedCount)", symbol: "arrow.clockwise.circle.fill", tint: .red)
+                InsightMetric(title: String(localized: "Journal"), value: "\(journals.count)", symbol: "book.closed.fill", tint: Color.chillMint)
+            }
         }
     }
 }
@@ -104,6 +174,7 @@ private struct InsightMetric: View {
 private struct PersonalBaselineCard: View {
     let entries: [NightEntry]
     let timers: [DrugDoseTimerRecord]
+    let windowDays: Int
 
     private var averageSleep: Double {
         let values = entries.filter(\.sleptYet).map(\.sleepHours)
@@ -118,6 +189,7 @@ private struct PersonalBaselineCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             CareSectionTitle(title: String(localized: "Your baseline"), symbol: "person.text.rectangle.fill")
+            InsightWindowCaption(days: windowDays)
             InsightLine(title: String(localized: "Average logged sleep"), value: averageSleep == 0 ? "Not enough data" : "\(averageSleep.formatted(.number.precision(.fractionLength(1)))) h")
             InsightLine(title: String(localized: "Late timer starts"), value: "\(lateTimers)")
             InsightLine(title: String(localized: "Memory gaps"), value: "\(entries.filter(\.reportedMemoryGap).count)")
@@ -187,6 +259,14 @@ struct TrendCount: Identifiable {
 }
 
 enum ChillInsightCalculator {
+    /// Days since the most recent night that involved substances.
+    ///
+    /// Reads `entries` as a whole history, so callers pass an unwindowed list. That
+    /// list is itself capped at 1,000 rows by `ChillMateQueries.recentEntries`, so
+    /// somebody who logs 1,000 consecutive substance-free nights, roughly 2.7 years
+    /// of daily logging, drops their last use off the end of it and would see 0 here
+    /// instead of a very long streak. Raising that limit is the fix on the day this
+    /// stops being hypothetical.
     static func recoveryStreakDays(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
         guard let latestUse = entries
             .filter({ !$0.substances.isEmpty })
@@ -279,6 +359,9 @@ extension ChillInsightCalculator {
     }
 
     /// Longest run of consecutive substance-free days ("personal best").
+    ///
+    /// Same history contract as `recoveryStreakDays(entries:now:calendar:)`: a
+    /// personal best older than the 1,000 most recent logs cannot be seen from here.
     static func longestClearStreak(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
         let substanceDays = entries
             .filter { !$0.substances.isEmpty }
@@ -413,7 +496,7 @@ private struct InsightSleepCorrelationCard: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.chillText)
             Spacer()
-            Text(hours.map { "\($0.formatted(.number.precision(.fractionLength(0...1)))) h" } ?? "—")
+            Text(hours.map { "\($0.formatted(.number.precision(.fractionLength(0...1)))) h" } ?? "-")
                 .font(.subheadline.weight(.bold).monospacedDigit())
                 .foregroundStyle(Color.chillSecondary)
         }

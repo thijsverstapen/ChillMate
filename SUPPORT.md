@@ -1,4 +1,4 @@
-# Support — ChillMate
+# ChillMate Support
 
 **Questions or issues?** Email **tjw.verstappen@gmail.com** and we'll get back to you as soon as possible.
 
@@ -9,13 +9,13 @@
 ### Getting started
 
 **What is ChillMate?**
-ChillMate is a private harm-reduction companion for adults who use substances. It helps you stay safer before, during, and after a night out — with care tools, safety features, personal logs, and private insights. No account, no cloud, no judgment.
+ChillMate is a private harm-reduction companion for adults who use substances. It helps you stay safer before, during, and after a night out, with care tools, safety features, personal logs, and private insights. No account, no cloud, no judgment.
 
 **Does ChillMate require an account?**
 No. The app works entirely on your device with no registration, login, or internet connection required.
 
 **Is my data private?**
-Yes — completely. All data is stored locally on your device and never transmitted anywhere. See the full [Privacy Policy](PRIVACY_POLICY.md) for details.
+Yes, completely. All data is stored locally on your device and never transmitted anywhere. See the full [Privacy Policy](PRIVACY_POLICY.md) for details.
 
 **What iOS version do I need?**
 ChillMate requires iOS 26 or later and an iPhone.
@@ -38,7 +38,7 @@ A skip is a logged night where you chose not to use substances. Tracking skips h
 ### Care Tools
 
 **What is Safety Autopilot?**
-Safety Autopilot looks at your recent logs and current situation and suggests the single most relevant action — for example, starting a recovery check-in, reviewing your safer-use plan, or contacting a trusted person.
+Safety Autopilot looks at your recent logs and current situation and suggests the single most relevant action. That might be starting a recovery check-in, reviewing your safer-use plan, or contacting a trusted person.
 
 **How does Panic Support work?**
 Panic Support guides you through breathing exercises and grounding techniques when you're feeling overwhelmed. It also gives you one-tap access to a trusted contact.
@@ -47,7 +47,7 @@ Panic Support guides you through breathing exercises and grounding techniques wh
 The Plan tool is a before-session checklist. You can note what you intend to use, set intentions, add a trusted contact's number, and review harm-reduction reminders before a night out.
 
 **How do drug check-in timers work?**
-Check-in timers let you set reminders during a session — for example, to drink water, check in with a friend, or assess how you're feeling. You receive local notifications at the intervals you choose.
+Check-in timers let you set reminders during a session, for example to drink water, check in with a friend, or assess how you're feeling. You receive local notifications at the intervals you choose.
 
 **What does Recovery Mode do?**
 Recovery Mode helps you track goals and manage cravings during a break or recovery period. You can log how you're feeling each day and monitor your streak.
@@ -60,7 +60,7 @@ Recovery Mode helps you track goals and manage cravings during a break or recove
 The Risk Checker flags potential combination risks based on the substances you've logged. It is for informational reference only and does not replace professional medical advice.
 
 **What is the wellness score?**
-Your daily wellness score is a private number calculated from your recent logs — taking into account sleep, frequency, recovery days, and other factors. It is for personal reflection only and has no clinical meaning.
+Your daily wellness score is a private number calculated from your recent logs, taking into account sleep, frequency, recovery days, and other factors. It is for personal reflection only and has no clinical meaning.
 
 **What is the Helper Bridge?**
 Helper Bridge generates a plain-language summary of your recent patterns that you can share with a trusted friend, partner, or healthcare provider. You choose what to include and who to send it to.
@@ -73,7 +73,7 @@ Helper Bridge generates a plain-language summary of your recent patterns that yo
 You can save trusted contact details, an ICE (In Case of Emergency) message, and optional location notes. This information is stored only on your device.
 
 **How do I send an emergency message?**
-Open **Care Tools → Emergency Information**, review your details, and tap **Send message**. This opens your Messages app with a pre-filled message — you confirm before sending.
+Open **Care Tools → Emergency Information**, review your details, and tap **Send message**. This opens your Messages app with a pre-filled message. You confirm before sending.
 
 ---
 

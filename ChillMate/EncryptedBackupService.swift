@@ -118,8 +118,8 @@ final class ICloudBackupService {
     /// Every backup wrote a new timestamped archive and nothing ever removed them,
     /// so a user backing up daily filled their iCloud Drive without bound. The only
     /// cleanup available was `deleteBackups()`, which removes all of them.
-    /// Keeping a handful preserves the point of timestamped copies — rolling back
-    /// past a bad import — without the unbounded growth.
+    /// Keeping a handful preserves the point of timestamped copies (rolling back
+    /// past a bad import) without the unbounded growth.
     private let archiveRetentionCount = 10
 
     func saveLatestBackup(localContext: ModelContext) throws -> Date {
@@ -231,8 +231,30 @@ struct ChillMateBackupImportSummary {
         profiles + nightEntries + stdTests + drugTimers + saferPlans + riskChecks + journals
     }
 
+    /// One line describing what an import or restore brought back.
+    ///
+    /// Assembled from seven separately localized fragments and joined by
+    /// `ListFormatStyle` rather than written as one English sentence with commas
+    /// and a hard-coded "and". Each noun can then take its own plural form, and
+    /// languages that build lists differently ("A, B und C") stay correct without
+    /// a translator having to reproduce English punctuation.
+    ///
+    /// This text is shown in the restore confirmation and, before the Settings
+    /// call sites stopped duplicating it, was persisted as the iCloud status line
+    /// too. It is user-facing either way, so it cannot stay an English literal in
+    /// an app that ships five languages.
     var displayText: String {
-        "Imported \(totalItems) items: \(profiles) profiles, \(nightEntries) logs, \(stdTests) STI tests, \(drugTimers) timers, \(saferPlans) plans, \(riskChecks) risk checks, and \(journals) journal entries."
+        let breakdown = [
+            String(localized: "\(profiles) profiles", comment: "Restore summary fragment: number of user profiles"),
+            String(localized: "\(nightEntries) logs", comment: "Restore summary fragment: number of logged nights"),
+            String(localized: "\(stdTests) STI tests", comment: "Restore summary fragment: number of STI test records"),
+            String(localized: "\(drugTimers) timers", comment: "Restore summary fragment: number of dose timers"),
+            String(localized: "\(saferPlans) plans", comment: "Restore summary fragment: number of safer session plans"),
+            String(localized: "\(riskChecks) risk checks", comment: "Restore summary fragment: number of combination risk checks"),
+            String(localized: "\(journals) journal entries", comment: "Restore summary fragment: number of journal entries")
+        ].formatted(.list(type: .and))
+
+        return String(localized: "Imported \(totalItems) items: \(breakdown).")
     }
 }
 

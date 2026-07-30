@@ -198,8 +198,11 @@ struct AppLockView<Content: View>: View {
     }
 
     private func lockoutMessage(_ seconds: Int) -> String {
+        // Rounds up. Integer division reported "1 minute" with 119 seconds still to
+        // go, so the countdown sat on the same number for a full extra minute and
+        // read as a stuck screen.
         seconds >= 60
-            ? String(localized: "Too many attempts. Try again in \(seconds / 60) minutes.")
+            ? String(localized: "Too many attempts. Try again in \((seconds + 59) / 60) minutes.")
             : String(localized: "Too many attempts. Try again in \(seconds) seconds.")
     }
 
@@ -339,7 +342,7 @@ enum AppAuthenticator {
     /// failed Face ID attempts lock biometrics out at the system level, so a user
     /// with Face ID but no app PIN was then shut out of their own health data with
     /// no way back in. `.deviceOwnerAuthentication` tries biometrics first and
-    /// offers the device passcode when they fail or are unavailable — the same
+    /// offers the device passcode when they fail or are unavailable: the same
     /// guarantee, with a recovery path.
     static func authenticate(reason: String) async throws -> Bool {
         let context = LAContext()
@@ -385,8 +388,8 @@ enum LocalSecurityService {
         keychainSave(data: saltData, account: keychainSaltAccount)
 
         // Remove any legacy UserDefaults credentials
-        UserDefaults.standard.removeObject(forKey: "appPINHash")
-        UserDefaults.standard.removeObject(forKey: "appPINSalt")
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.legacyAppPINHash)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.legacyAppPINSalt)
     }
 
     static func verifyPINFromKeychain(_ pin: String) -> Bool {
@@ -402,8 +405,8 @@ enum LocalSecurityService {
         }
 
         // Fall back to legacy SHA256 UserDefaults credentials and migrate on success
-        let legacyHash = UserDefaults.standard.string(forKey: "appPINHash") ?? ""
-        let legacySalt = UserDefaults.standard.string(forKey: "appPINSalt") ?? ""
+        let legacyHash = UserDefaults.standard.string(forKey: DefaultsKey.legacyAppPINHash) ?? ""
+        let legacySalt = UserDefaults.standard.string(forKey: DefaultsKey.legacyAppPINSalt) ?? ""
         if !legacyHash.isEmpty, sha256Hash(pin: pin, salt: legacySalt) == legacyHash {
             savePINToKeychain(pin: pin)
             return true
@@ -414,7 +417,7 @@ enum LocalSecurityService {
 
     static func hasPINCredentials() -> Bool {
         keychainRead(account: keychainHashAccount) != nil ||
-        !(UserDefaults.standard.string(forKey: "appPINHash") ?? "").isEmpty
+        !(UserDefaults.standard.string(forKey: DefaultsKey.legacyAppPINHash) ?? "").isEmpty
     }
 
     static func isValidPIN(_ pin: String) -> Bool {
@@ -423,8 +426,8 @@ enum LocalSecurityService {
 
     static func clearPIN() {
         UserDefaults.standard.removeObject(forKey: DefaultsKey.requiresPIN)
-        UserDefaults.standard.removeObject(forKey: "appPINHash")
-        UserDefaults.standard.removeObject(forKey: "appPINSalt")
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.legacyAppPINHash)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.legacyAppPINSalt)
         keychainDelete(account: keychainHashAccount)
         keychainDelete(account: keychainSaltAccount)
     }
@@ -435,7 +438,7 @@ enum LocalSecurityService {
         }
     }
 
-    // PBKDF2 with 200,000 iterations — brute-force resistant
+    // PBKDF2 with 200,000 iterations, brute-force resistant
     private static func pbkdf2Hash(pin: String, salt: Data) -> Data {
         let pinData = Data(pin.utf8)
         var derivedKey = Data(repeating: 0, count: 32)
@@ -507,8 +510,8 @@ enum LocalSecurityService {
     ///
     /// The previous version enumerated Application Support, Documents, Caches,
     /// Library *and* tmp. Caches and tmp both live inside Library, so their contents
-    /// were visited twice — once via Library's recursive walk and once via their
-    /// own — doubling an already file-system-heavy pass that grows with the store
+    /// were visited twice, once via Library's recursive walk and once via their
+    /// own, doubling an already file-system-heavy pass that grows with the store
     /// and runs on every launch and foreground.
     ///
     /// Enumerating Library alone covers Application Support and Caches. Documents

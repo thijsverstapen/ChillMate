@@ -181,6 +181,16 @@ enum SubstanceInteractionChecker {
             warning: String(localized: "Adding 3-MMC to a psychedelic raises heart rate and anxiety and makes the experience harder to steer. Panic is a common outcome.")
         ),
 
+        // MARK: Erectile medication doubled up
+        //
+        // Selecting both used to produce no warning at all, which reads as approval
+        // for what is really one dose taken twice.
+        SubstanceInteraction(
+            substances: [.viagra, .kamagra],
+            level: .serious,
+            warning: String(localized: "Kamagra is sildenafil, the same active ingredient as Viagra. Taking both stacks one dose on top of another and raises the risk of a blood pressure drop, headache, vision changes, and an erection that will not go down. An erection lasting more than four hours needs urgent medical care.")
+        ),
+
         // MARK: Erectile medication + stimulants
         //
         // Distinct from the poppers pairs above: those are a blood-pressure collapse,
@@ -219,6 +229,12 @@ enum SubstanceInteractionChecker {
     ]}
 
     /// Warnings for the selected set, most severe first.
+    ///
+    /// `CombinationAssessment` merges these into the risk checker screen, so an
+    /// entry added to the table above reaches users without further wiring. It
+    /// drops any of its own preset lines that a row here already covers at an equal
+    /// or higher level, which is why the level on each row is load-bearing and not
+    /// just a colour.
     ///
     /// The tie-break on `id` matters now that the table carries several entries at
     /// the same level: `sorted(by:)` is not guaranteed stable, so without it two

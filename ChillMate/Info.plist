@@ -41,8 +41,8 @@
 	<false/>
 	<!-- "remote-notification" backs CloudKit silent-push sync (the app registers
 	     for remote notifications when iCloud backup is on). "fetch" was declared
-	     but never implemented — there is no BGTaskScheduler registration and no
-	     performFetchWithCompletionHandler — so it was removed: an unused
+	     but never implemented (there is no BGTaskScheduler registration and no
+	     performFetchWithCompletionHandler), so it was removed: an unused
 	     background mode is a review flag under App Store guideline 2.5.4. -->
 	<key>UIBackgroundModes</key>
 	<array>

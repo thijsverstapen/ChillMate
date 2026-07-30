@@ -69,10 +69,14 @@ struct AppHomeView: View {
 
         do {
             if let summary = try EncryptedBackupService.shared.restoreOnDeviceRecoverySnapshotIfNeeded(into: modelContext) {
-                lastOnDeviceRecoveryStatus = "Recovered \(summary.totalItems) encrypted items from this iPhone."
+                // These status lines are persisted and re-rendered much later in the
+                // privacy timeline and the Settings backup card, so they have to be
+                // translated at the moment they are written. Nothing localizes them
+                // on the way back out of UserDefaults.
+                lastOnDeviceRecoveryStatus = String(localized: "Recovered \(summary.totalItems) encrypted items from this iPhone.")
             }
         } catch {
-            lastOnDeviceRecoveryStatus = "Automatic recovery could not open the encrypted on-device backup."
+            lastOnDeviceRecoveryStatus = String(localized: "Automatic recovery could not open the encrypted on-device backup.")
         }
     }
 
@@ -84,22 +88,26 @@ struct AppHomeView: View {
         // backgrounding.
         do {
             if try EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext) {
-                lastOnDeviceRecoveryStatus = "Encrypted on-device recovery backup updated."
+                lastOnDeviceRecoveryStatus = String(localized: "Encrypted on-device recovery backup updated.")
             }
         } catch {
-            lastOnDeviceRecoveryStatus = "Encrypted on-device recovery backup could not update."
+            lastOnDeviceRecoveryStatus = String(localized: "Encrypted on-device recovery backup could not update.")
         }
 
         guard iCloudBackupEnabled else { return }
         do {
             let date = try ICloudBackupService.shared.saveLatestBackup(localContext: modelContext)
             lastICloudBackupTimestamp = date.timeIntervalSince1970
-            lastICloudBackupStatus = "Encrypted iCloud backup updated."
+            // saveLatestBackup already wrote a translated status line. This write
+            // is a deliberate refinement of it, not a restatement: an automatic
+            // background refresh is worth wording differently from a tap on "Back
+            // up now", so it goes through String(localized:) as well.
+            lastICloudBackupStatus = String(localized: "Encrypted iCloud backup updated.")
         } catch {
             // Signed out of iCloud is an expected state, not a failure worth an
             // alarming banner; keep the wording calm and actionable.
             lastICloudBackupStatus = ICloudBackupService.shared.isAvailable
-                ? "Encrypted iCloud backup could not update."
+                ? String(localized: "Encrypted iCloud backup could not update.")
                 : String(localized: "iCloud backup is paused. Sign in to iCloud with iCloud Drive on to resume.")
         }
     }
@@ -131,28 +139,33 @@ private struct MainTabView: View {
                 historySegment = .calendar
                 selectedTab = .history
             })
-            .tabItem {
-                Label("Home", systemImage: "house.fill")
-            }
             // Locale-independent handles for UI tests. The tests used to query
             // tab bar items by their English label, so they could only ever
-            // pass in English — including the run that launches in all five
+            // pass in English, including the run that launches in all five
             // languages.
-            .accessibilityIdentifier(AccessibilityID.homeTab)
+            //
+            // The identifier belongs on the Label INSIDE `tabItem`, not on the
+            // tab's content view. Applied outside, it lands on the screen the tab
+            // presents and never reaches the tab bar button, so
+            // `app.tabBars.buttons["tab.home"]` matches nothing.
+            .tabItem {
+                Label("Home", systemImage: "house.fill")
+                    .accessibilityIdentifier(AccessibilityID.homeTab)
+            }
             .tag(AppTab.home)
 
             HistoryTabView(segment: $historySegment)
                 .tabItem {
                     Label("History", systemImage: "clock.arrow.circlepath")
+                        .accessibilityIdentifier(AccessibilityID.historyTab)
                 }
-                .accessibilityIdentifier(AccessibilityID.historyTab)
                 .tag(AppTab.history)
 
             MoreHubView()
                 .tabItem {
                     Label("More", systemImage: "ellipsis.circle.fill")
+                        .accessibilityIdentifier(AccessibilityID.moreTab)
                 }
-                .accessibilityIdentifier(AccessibilityID.moreTab)
                 .tag(AppTab.more)
         }
         .tint(.chillPrimary)
@@ -1089,7 +1102,11 @@ struct ProfileSetupView: View {
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
     @AppStorage(DefaultsKey.healthKitWorkoutReadEnabled) private var healthKitWorkoutReadEnabled = false
-    @AppStorage(DefaultsKey.appLanguage) private var appLanguage = "en"
+    // Defaults to the language the app actually resolved, not a hard "en".
+    // LocalizationService seeds the stored key at launch on every device whose
+    // language ChillMate ships, so this fallback only matters on a device set to
+    // a sixth language, where the app really is running in English.
+    @AppStorage(DefaultsKey.appLanguage) private var appLanguage = LocalizationService.selected.rawValue
     @AppStorage(DefaultsKey.country) private var country = "Netherlands"
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
@@ -1337,6 +1354,32 @@ struct ProfileSetupView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 10)
                         }
+
+                        // This picker and Settings > ChillMate > Language write the
+                        // same iOS preference, and the app now lets the more recent
+                        // of the two win. Two controls over one value are only
+                        // confusing while they pretend not to know about each other,
+                        // so name the relationship and offer the way over there.
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(String(localized: "iOS Settings can set ChillMate’s language too. Whichever you change last is the one that\u{00A0}applies."))
+                                .font(.caption)
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            if let settingsURL = LocalizationService.systemSettingsURL {
+                                Link(destination: settingsURL) {
+                                    Label(
+                                        String(localized: "Open ChillMate in iOS Settings"),
+                                        systemImage: "gear"
+                                    )
+                                    .font(.caption.weight(.semibold))
+                                }
+                                .tint(Color.chillPrimary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 10)
 
                         ProfileSetupRowDivider()
 
@@ -1683,7 +1726,7 @@ struct ProfileSetupView: View {
 
     #if canImport(DeclaredAgeRange)
     /// Asks Apple for a privacy-preserving age-range signal (18+ gate). The app
-    /// only learns whether the account is 18+ or under — never a birthdate.
+    /// only learns whether the account is 18+ or under, never a birthdate.
     /// Declining, or any error (Simulator / unsupported region throws
     /// `.notAvailable`), simply falls back to the self-entered date of birth.
     @MainActor
@@ -1919,7 +1962,7 @@ struct ProfileSetupView: View {
                 if ICloudBackupService.shared.isAvailable {
                     iCloudBackupEnabled = true
                     lastICloudBackupStatus = ICloudBackupService.shared.statusLine
-                    permissionMessage = "iCloud backup is ready. ChillMate will save encrypted backup files to iCloud Drive."
+                    permissionMessage = String(localized: "iCloud backup is ready. ChillMate will save encrypted backup files to iCloud Drive.")
                 } else {
                     iCloudBackupEnabled = false
                     permissionMessage = ICloudBackupError.iCloudUnavailable.localizedDescription
@@ -1938,12 +1981,12 @@ struct ProfileSetupView: View {
                 let summary = try ICloudBackupService.shared.restoreLatestBackup(into: modelContext)
                 await MainActor.run {
                     iCloudBackupEnabled = true
-                    backupImportMessage = "Restored from iCloud. \(summary.displayText)"
+                    backupImportMessage = String(localized: "Restored from iCloud. \(summary.displayText)")
                     isRestoringICloudBackup = false
                 }
             } catch {
                 await MainActor.run {
-                    backupImportMessage = "Could not restore iCloud backup: \(error.localizedDescription)"
+                    backupImportMessage = String(localized: "Could not restore iCloud backup: \(error.localizedDescription)")
                     isRestoringICloudBackup = false
                 }
             }
@@ -1982,7 +2025,7 @@ struct ProfileSetupView: View {
                 }
             } catch {
                 await MainActor.run {
-                    backupImportMessage = "Could not import backup: \(error.localizedDescription)"
+                    backupImportMessage = String(localized: "Could not import backup: \(error.localizedDescription)")
                     isImportingBackup = false
                 }
             }
@@ -3281,7 +3324,7 @@ private struct ChillMateOnboardingLogo: View {
     var size: CGFloat = 136
 
     var body: some View {
-        // Real app-icon glyph (C + checkmark) — see ChillMateBrandMark.
+        // Real app-icon glyph (C + checkmark). See ChillMateBrandMark.
         // `checkmarkInPlace` drives a gentle pop-in entrance so the mark
         // animates onto screen while always resolving to the exact icon art.
         Image("ChillMateGlyph")
@@ -3316,7 +3359,7 @@ private struct MorphingIntroHero: View {
     // `morphT` (0…1) tracks the finger during a swipe, blending the active scene into
     // the one being dragged toward. At rest it is 0, so the active scene sits at full
     // and everything else is parked small and transparent. Releasing without committing
-    // springs the parallax back to 0, which unwinds the blend — the morph is reversible.
+    // springs the parallax back to 0, which unwinds the blend, so the morph is reversible.
     var body: some View {
         ZStack {
             ForEach(Array(kinds.enumerated()), id: \.offset) { _, kind in
@@ -3338,7 +3381,7 @@ private struct MorphingIntroHero: View {
                     isCompleting: isCompleting && isActive,
                     checkmarkInPlace: checkmarkInPlace,
                     // Constant index: the scenes are assembled once and never
-                    // re-enter on page change — the blend above carries the motion.
+                    // re-enter on page change. The blend above carries the motion.
                     pageIndex: 0
                 )
                 .opacity(opacity)
@@ -3416,7 +3459,7 @@ private struct IntroHeroScene: View {
         }
     }
 
-    // MARK: – Welcome: logomark bloom (continues the launch splash)
+    // MARK: - Welcome: logomark bloom (continues the launch splash)
 
     private var welcomeScene: some View {
         ZStack {
@@ -3447,7 +3490,7 @@ private struct IntroHeroScene: View {
         .shadow(color: Color.chillPrimary.opacity(0.34), radius: 30, y: 16)
     }
 
-    // MARK: – Summary: animated bar chart + logo
+    // MARK: - Summary: animated bar chart + logo
 
     private var summaryScene: some View {
         ZStack {
@@ -3486,7 +3529,7 @@ private struct IntroHeroScene: View {
         }
     }
 
-    // MARK: – Log: pills fly in with stagger
+    // MARK: - Log: pills fly in with stagger
 
     private var logScene: some View {
         ZStack {
@@ -3516,10 +3559,10 @@ private struct IntroHeroScene: View {
         }
     }
 
-    // MARK: – Care: real circular orbit
+    // MARK: - Care: real circular orbit
 
-    /// Teaches the four Home "moments" — the same icons, colours, and order the
-    /// user meets on the dashboard — and lets the user *do* the core Home behaviour
+    /// Teaches the four Home "moments" (the same icons, colours, and order the
+    /// user meets on the dashboard) and lets the user *do* the core Home behaviour
     /// once: tap the moment you're in, and it rises to the top with a "Now" badge,
     /// exactly the way the real dashboard rearranges itself.
     private var careScene: some View {
@@ -3618,7 +3661,7 @@ private struct IntroHeroScene: View {
         .foregroundStyle(.white.opacity(0.66))
     }
 
-    // MARK: – Privacy: ping rings + face ID
+    // MARK: - Privacy: ping rings + face ID
 
     private var privacyScene: some View {
         ZStack {
@@ -3684,7 +3727,7 @@ private struct IntroHeroScene: View {
         .shadow(color: Color.chillPrimary.opacity(0.34), radius: 30, y: 16)
     }
 
-    // MARK: – Notice: staggered lines + pulsing badge
+    // MARK: - Notice: staggered lines + pulsing badge
 
     private var noticeScene: some View {
         ZStack {
@@ -3719,7 +3762,7 @@ private struct IntroHeroScene: View {
         .rotationEffect(.degrees(bob(1, amount: 1.2)))
     }
 
-    // MARK: – Ready: sparkle orbit + person + logo bounce
+    // MARK: - Ready: sparkle orbit + person + logo bounce
 
     private var readyScene: some View {
         ZStack {
@@ -3762,7 +3805,7 @@ private struct IntroHeroScene: View {
         .shadow(color: Color.chillMint.opacity(0.30), radius: 30, y: 18)
     }
 
-    // MARK: – Helpers
+    // MARK: - Helpers
 
     private func bob(_ item: Int, amount: CGFloat) -> CGFloat {
         let raw = (phase * (0.30 + Double(item) * 0.035) + Double(item) * 0.27)

@@ -34,8 +34,8 @@ struct MomentGroupsSection: View {
     }
 }
 
-/// The shared full-width tool container used everywhere tools are listed — the Home
-/// "moment" groups and every group landing page — so tool containers look identical
+/// The shared full-width tool container used everywhere tools are listed (the Home
+/// "moment" groups and every group landing page), so tool containers look identical
 /// across pages: colored icon, title (with an optional "Now" badge), a subtitle or
 /// live hint, and a chevron.
 struct ToolRow: View {

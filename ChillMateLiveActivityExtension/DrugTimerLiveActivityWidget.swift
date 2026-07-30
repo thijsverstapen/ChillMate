@@ -9,11 +9,17 @@ struct WidgetLogHydrationIntent: AppIntent {
     static let openAppWhenRun = false
 
     func perform() async throws -> some IntentResult & ReturnsValue<String> {
-        // Shared contract with the app's HydrationLog: a date-stamped daily flag in
-        // the App Group (key "lastHydrationLogDate"). Previously wrote a dead
-        // "widgetHydrationLogged" boolean that nothing read.
+        // Shared contract with the app's `HydrationLog` (ChillMate/AppIntents.swift):
+        // a date-stamped daily flag in the App Group suite under "lastHydrationLogDate".
+        // Previously this wrote a dead "widgetHydrationLogged" boolean that nothing read.
+        //
+        // The key is still spelled out at both ends because this file is compiled into
+        // the Live Activity extension only and `HydrationLog` into the app only, so
+        // neither can see the other's constant. Suite and spelling have to match exactly
+        // or a tap on Log water records into a store the app never reads, with no error.
+        // The one fix is a constant in `WidgetSharedKey`, which every target compiles.
         let defaults = UserDefaults(suiteName: WidgetSharedKey.suiteName) ?? .standard
-        defaults.set(Date.now.timeIntervalSince1970, forKey: "lastHydrationLogDate")
+        defaults.set(Date.now.timeIntervalSince1970, forKey: WidgetSharedKey.hydrationLogDate)
         return .result(value: "Logged.")
     }
 }
@@ -89,7 +95,7 @@ private struct ChillMateWidgetDescriptorView: View {
                     .trim(from: 0, to: entry.scoreIsActive ? CGFloat(min(entry.dailyScore, 100)) / 100 : 0.6)
                     .stroke(.cyan, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                     .rotationEffect(.degrees(-90))
-                Text(entry.scoreIsActive ? "\(entry.dailyScore)" : "—")
+                Text(entry.scoreIsActive ? "\(entry.dailyScore)" : "n/a")
                     .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
             }
@@ -124,7 +130,7 @@ private struct ChillMateWidgetDescriptorView: View {
                         .trim(from: 0, to: entry.scoreIsActive ? CGFloat(min(entry.dailyScore, 100)) / 100 : 0.6)
                         .stroke(.cyan, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                         .rotationEffect(.degrees(-90))
-                    Text(entry.scoreIsActive ? "\(entry.dailyScore)" : "—")
+                    Text(entry.scoreIsActive ? "\(entry.dailyScore)" : "n/a")
                         .font(.system(size: 22, weight: .black, design: .rounded))
                         .foregroundStyle(.white)
                 }

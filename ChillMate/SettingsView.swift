@@ -163,8 +163,8 @@ struct SettingsView: View {
     }
 
     private var appVersionText: String {
-        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
-        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "—"
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "n/a"
+        let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "n/a"
         return "ChillMate \(version) (\(build))"
     }
 
@@ -723,7 +723,7 @@ struct SettingsView: View {
                 }
             } catch {
                 await MainActor.run {
-                    message = "Could not import backup: \(error.localizedDescription)"
+                    message = String(localized: "Could not import backup: \(error.localizedDescription)")
                     isWorking = false
                 }
             }
@@ -806,15 +806,19 @@ struct SettingsView: View {
                 let date = try ICloudBackupService.shared.saveLatestBackup(localContext: modelContext)
                 await MainActor.run {
                     lastICloudBackupTimestamp = date.timeIntervalSince1970
-                    lastICloudBackupStatus = "Encrypted iCloud backup saved \(date.formatted(date: .abbreviated, time: .shortened))."
-                    message = lastICloudBackupStatus
+                    // The service already wrote the durable status line, translated.
+                    // Restating it here in an English literal is what overwrote that
+                    // translation, so the call site now sets only the transient
+                    // confirmation. Same rule in the restore and delete paths below.
+                    let stamp = date.formatted(date: .abbreviated, time: .shortened)
+                    message = String(localized: "Encrypted iCloud backup saved \(stamp).")
                     isWorking = false
                 }
             } catch {
                 await MainActor.run {
-                    // Do NOT write error to lastICloudBackupStatus — it is a shared key
+                    // Do NOT write error to lastICloudBackupStatus. It is a shared key
                     // shown across views and would propagate the error everywhere.
-                    message = "Could not save to iCloud: \(error.localizedDescription)"
+                    message = String(localized: "Could not save to iCloud: \(error.localizedDescription)")
                     isWorking = false
                 }
             }
@@ -828,14 +832,13 @@ struct SettingsView: View {
             do {
                 let summary = try ICloudBackupService.shared.restoreLatestBackup(into: modelContext)
                 await MainActor.run {
-                    lastICloudBackupStatus = summary.displayText
-                    message = "Restored from iCloud. \(summary.displayText)"
+                    message = String(localized: "Restored from iCloud. \(summary.displayText)")
                     isWorking = false
                 }
             } catch {
                 await MainActor.run {
-                    // Do NOT write error to lastICloudBackupStatus — keep errors local.
-                    message = "Could not restore from iCloud: \(error.localizedDescription)"
+                    // Do NOT write error to lastICloudBackupStatus, keep errors local.
+                    message = String(localized: "Could not restore from iCloud: \(error.localizedDescription)")
                     isWorking = false
                 }
             }
@@ -850,13 +853,12 @@ struct SettingsView: View {
                 try ICloudBackupService.shared.deleteBackups()
                 await MainActor.run {
                     lastICloudBackupTimestamp = 0
-                    lastICloudBackupStatus = "iCloud backups deleted."
-                    message = lastICloudBackupStatus
+                    message = String(localized: "iCloud backups deleted.")
                     isWorking = false
                 }
             } catch {
                 await MainActor.run {
-                    message = "Could not delete iCloud backups: \(error.localizedDescription)"
+                    message = String(localized: "Could not delete iCloud backups: \(error.localizedDescription)")
                     isWorking = false
                 }
             }
