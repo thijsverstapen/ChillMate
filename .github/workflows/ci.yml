@@ -45,7 +45,13 @@ jobs:
 
   build-test:
     name: Build and test
-    runs-on: macos-15
+    # Must ship Xcode 26 or newer. ChillMate.xcodeproj is saved in project format
+    # 100, and an older Xcode cannot even open it: macos-15 failed in 20 seconds
+    # with "the project cannot be opened because it is in a future Xcode project
+    # file format (100)", before compiling a single file. `macos-latest` is not a
+    # fix either, because GitHub keeps that label on the previous stable image for
+    # a while after a new one ships.
+    runs-on: macos-26
     # A cold build of six targets plus a UI run that retries once needs the room.
     # continue-on-error cannot rescue a job that hits its own timeout, so this has
     # to sit above the worst realistic case rather than the typical one.
