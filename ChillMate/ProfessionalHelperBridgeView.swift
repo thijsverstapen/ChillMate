@@ -70,7 +70,7 @@ struct ProfessionalHelperBridgeView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .task(id: summary) {
                 pdfURL = HealthSummaryPDF.render(
                     title: String(localized: "ChillMate private summary"),

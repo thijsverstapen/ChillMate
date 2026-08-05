@@ -36,7 +36,7 @@ struct RecentlyDeletedView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
         }

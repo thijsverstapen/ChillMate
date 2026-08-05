@@ -68,7 +68,7 @@ struct CravingDelayView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .fullScreenCover(isPresented: $isShowingTimer) {
                 DrugTimerView()
             }

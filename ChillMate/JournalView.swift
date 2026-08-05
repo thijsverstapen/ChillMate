@@ -174,7 +174,7 @@ struct JournalView: View {
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .endEditingOnTap()
             .onAppear(perform: loadSelectedJournalEntry)
             .onChange(of: date) { _, _ in

@@ -89,7 +89,7 @@ struct DashboardView: View {
     @ViewBuilder
     private func careDestination(_ page: CareToolPage) -> some View {
         careLeaf(page)
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar(.hidden, for: .tabBar)
@@ -268,7 +268,7 @@ struct DashboardView: View {
                     .scrollIndicators(.hidden)
                 }
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .toolbarBackground(.hidden, for: .navigationBar)
             .task(id: metricsInvalidationKey) {
                 // Rebuilt here rather than lazily inside `body`, so the work happens
@@ -867,7 +867,7 @@ struct CalendarOverviewView: View {
             // cover never pushes, so the edge swipe acts as a dismiss, not a pop.
             NavigationStack {
                 calendarContent
-                    .navigationTitle("")
+                    .navigationTitle(Text(verbatim: ""))
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbarBackground(.hidden, for: .navigationBar)
                     .toolbar {
@@ -1889,7 +1889,7 @@ private struct ProfessionalHelpView: View {
                     .padding(20)
                 }
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
@@ -3211,7 +3211,7 @@ struct ProfileOverviewView: View {
                     .padding(.bottom, 40)
                 }
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: ProfileSectionPage.self) { page in
@@ -3389,7 +3389,7 @@ private struct ProfileEditView: View {
     var body: some View {
         NavigationStack {
             profileEditContent
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     BackChevronButton {
@@ -3922,7 +3922,7 @@ private struct ProfileSectionDetailView: View {
                 .padding(.bottom, 36)
             }
         }
-        .navigationTitle("")
+        .navigationTitle(Text(verbatim: ""))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)

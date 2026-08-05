@@ -61,7 +61,7 @@ struct PrivacyReceiptView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
         }
     }
 }

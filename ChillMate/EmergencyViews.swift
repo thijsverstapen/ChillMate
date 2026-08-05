@@ -85,7 +85,7 @@ struct EmergencyNetherlandsView: View {
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .endEditingOnTap()
@@ -422,7 +422,7 @@ struct EmergencyCardView: View {
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .endEditingOnTap()
         }
     }

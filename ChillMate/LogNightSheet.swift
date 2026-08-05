@@ -151,7 +151,7 @@ struct LogNightSheet: View {
 
                 logForm
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .accessibilityIdentifier(AccessibilityID.logSheet)

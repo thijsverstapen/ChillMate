@@ -42,7 +42,7 @@ struct ConsentBoundariesView: View {
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .endEditingOnTap()
         }
     }

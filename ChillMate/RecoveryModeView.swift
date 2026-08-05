@@ -65,7 +65,7 @@ struct RecoveryModeView: View {
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .fullScreenCover(isPresented: $isShowingCravingDelay) {
                 CareCoverHost { CravingDelayView() }
             }

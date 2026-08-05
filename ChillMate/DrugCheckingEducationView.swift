@@ -43,7 +43,7 @@ struct DrugCheckingEducationView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
         }
     }
 }

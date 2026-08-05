@@ -94,7 +94,7 @@ struct PanicSupportView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
         }
     }
 

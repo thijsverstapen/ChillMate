@@ -29,7 +29,7 @@ struct SafeRouteHomeView: View {
 
                 routeForm
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .endEditingOnTap()
             .onChange(of: destination) { _, newValue in
                 searchDestinationSuggestions(for: newValue)

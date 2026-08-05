@@ -50,7 +50,7 @@ struct FeedbackView: View {
 
             feedbackForm
         }
-        .navigationTitle("")
+        .navigationTitle(Text(verbatim: ""))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {

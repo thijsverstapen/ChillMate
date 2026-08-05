@@ -177,7 +177,7 @@ struct SettingsView: View {
             }
                 .scrollIndicators(.hidden)
                 .scrollDismissesKeyboard(.interactively)
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: SettingsSectionPage.self) { page in
@@ -505,7 +505,7 @@ struct SettingsView: View {
             .scrollIndicators(.hidden)
             .scrollDismissesKeyboard(.interactively)
         }
-        .navigationTitle("")
+        .navigationTitle(Text(verbatim: ""))
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar(.hidden, for: .tabBar)
@@ -1685,7 +1685,7 @@ private struct PINSetupView: View {
                 }
                 .padding(20)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     BackChevronButton {
@@ -2126,7 +2126,7 @@ private struct DeleteAccountConfirmationView: View {
                 }
                 .padding(20)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     BackChevronButton {

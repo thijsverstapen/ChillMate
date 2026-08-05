@@ -65,7 +65,7 @@ struct PrivacyPolicyView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
         }
     }
 }
@@ -134,7 +134,7 @@ struct TermsOfUseView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
         }
     }
 }

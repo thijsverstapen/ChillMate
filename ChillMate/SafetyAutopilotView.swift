@@ -73,7 +73,7 @@ struct SafetyAutopilotView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .fullScreenCover(isPresented: $showHelperSummary) {
                 CareCoverHost { ProfessionalHelperBridgeView() }
             }

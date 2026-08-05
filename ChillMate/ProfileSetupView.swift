@@ -563,7 +563,7 @@ private struct MoreHubView: View {
         .toolbar(.hidden, for: .navigationBar)
         .navigationDestination(for: MoreHubPage.self) { page in
             moreHubDestination(page)
-                .navigationTitle("")
+                .navigationTitle(Text(verbatim: ""))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbarBackground(.hidden, for: .navigationBar)
                 .toolbar(.hidden, for: .tabBar)
@@ -739,7 +739,7 @@ struct SupportDeveloperView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .task { await store.loadProducts() }
             .alert(alertTitle, isPresented: Binding(
                 get: { alertMessage != nil },
@@ -1256,7 +1256,7 @@ struct ProfileSetupView: View {
                     .transition(.opacity)
                 }
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
             .liquidGlassAlert(
                 isPresented: $isShowingPermissionWarning,
                 title: String(localized: "Continue without everything on?"),

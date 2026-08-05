@@ -36,7 +36,7 @@ struct PrivateInsightsView: View {
                 }
                 .scrollIndicators(.hidden)
             }
-            .navigationTitle("")
+            .navigationTitle(Text(verbatim: ""))
         }
     }
 }
@@ -496,7 +496,7 @@ private struct InsightSleepCorrelationCard: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color.chillText)
             Spacer()
-            Text(hours.map { "\($0.formatted(.number.precision(.fractionLength(0...1)))) h" } ?? "-")
+            Text(verbatim: hours.map { "\($0.formatted(.number.precision(.fractionLength(0...1)))) h" } ?? "-")
                 .font(.subheadline.weight(.bold).monospacedDigit())
                 .foregroundStyle(Color.chillSecondary)
         }
