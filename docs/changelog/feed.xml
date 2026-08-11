@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>ChillMate releases</title>
+  <subtitle>What changed in each release of ChillMate.</subtitle>
+  <link href="https://thijsverstapen.github.io/ChillMate/changelog/feed.xml" rel="self" />
+  <link href="https://thijsverstapen.github.io/ChillMate/changelog/" />
+  <id>https://thijsverstapen.github.io/ChillMate/changelog/</id>
+  <updated>2026-08-11T12:00:00Z</updated>
+  <author><name>Thijs Verstappen</name></author>
+  <entry>
+    <title>ChillMate 4.2.1: Fixes, and one that mattered</title>
+    <link href="https://thijsverstapen.github.io/ChillMate/changelog/#v4-2-1" />
+    <id>tag:thijsverstapen.github.io,2026-08-11:chillmate-4.2.1</id>
+    <updated>2026-08-11T12:00:00Z</updated>
+    <summary>Fixed a crash on opening the app after upgrading from 4.2.0, caused by two schema versions sharing a checksum. Choosing a language inside the app no longer drops your region, so dates, numbers and 24-hour time stay right. Translated the last untranslated strings, including every combination-checker warning, in all five languages. Accessibility fixes: high contrast now reaches card surfaces, the one-handed layout toggle does something again, and reduced motion is honoured in more places. Continuous integration runs and passes for the first time.</summary>
+  </entry>
+  <entry>
+    <title>ChillMate 4.1.0: A home that knows the moment</title>
+    <link href="https://thijsverstapen.github.io/ChillMate/changelog/#v4-1-0" />
+    <id>tag:thijsverstapen.github.io,2026-07-14:chillmate-4.1.0</id>
+    <updated>2026-07-14T12:00:00Z</updated>
+    <summary>Redesigned home: tools grouped into four moments, before you go, while you are out, aftercare and health, and your patterns. It arranges itself. When a dose timer is running, or it is the morning after, the tool you need rises to the top. Get help now is pinned to the top, so breathing, grounding and emergency calls are never something to hunt for. Three calm tabs: Home, History and More. Calendar and journal now live together under History. Optional weekend night check-ins on Friday and Saturday, with one-tap I am safe or Get help. Choose exactly which reminders you want during setup.</summary>
+  </entry>
+  <entry>
+    <title>ChillMate 4.0.0: The Apple Watch update</title>
+    <link href="https://thijsverstapen.github.io/ChillMate/changelog/#v4-0-0" />
+    <id>tag:thijsverstapen.github.io,2026-06-24:chillmate-4.0.0</id>
+    <updated>2026-06-24T12:00:00Z</updated>
+    <summary>All-new Apple Watch app: streak, live dose timers, hydration, discreet check-ins and a breathing exercise. Safety screen on the watch: call your trusted contact or emergency services in one tap. Watch face complications and Smart Stack support. Support directory now also covers the United States, Ireland and Australia, with the right emergency number everywhere in the app. ChillMate hides its contents in the App Switcher and while your screen is recorded or mirrored. Insights: a five-week overview map, your personal best streak, and how you sleep after clear nights, over 30 or 90 days. Aftercare mood can sync to Apple Health&#x27;s State of Mind, and sleep fills in automatically. Export your private summary as a PDF for a doctor&#x27;s visit. The watch app speaks Dutch, German, French and Spanish.</summary>
+  </entry>
+</feed>

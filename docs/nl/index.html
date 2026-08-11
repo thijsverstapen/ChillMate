@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChillMate · Een rustige, privéplek om voor jezelf te zorgen</title>
-  <meta name="description" content="ChillMate houdt je logboek, plannen, herinneringen en veiligheidstools in één privéoverzicht. Alles blijft op je iPhone. Geen account, geen advertenties, geen tracking." />
+  <meta name="description" content="Een privéoverzicht van je eigen nachten, plannen, herinneringen en veiligheidstools, volledig op je iPhone. Gratis, open source, geen account en geen server." />
   <meta name="theme-color" content="#0e1430" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
   <link rel="canonical" href="https://thijsverstapen.github.io/ChillMate/nl/" />
@@ -17,22 +17,23 @@
   <link rel="icon" href="../assets/mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/icon-180.png" />
   <link rel="manifest" href="/ChillMate/manifest.webmanifest" />
+  <link rel="alternate" type="application/atom+xml" title="ChillMate releases" href="/ChillMate/changelog/feed.xml" />
 
   <meta property="og:site_name" content="ChillMate" />
   <meta property="og:title" content="ChillMate · Een rustige, privéplek om voor jezelf te zorgen" />
-  <meta property="og:description" content="ChillMate houdt je logboek, plannen, herinneringen en veiligheidstools in één privéoverzicht. Alles blijft op je iPhone. Geen account, geen advertenties, geen tracking." />
+  <meta property="og:description" content="Een privéoverzicht van je eigen nachten, plannen, herinneringen en veiligheidstools, volledig op je iPhone. Gratis, open source, geen account en geen server." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://thijsverstapen.github.io/ChillMate/nl/" />
   <meta property="og:locale" content="nl" />
-  <meta property="og:image" content="https://thijsverstapen.github.io/ChillMate/assets/og.png" />
+  <meta property="og:image" content="https://thijsverstapen.github.io/ChillMate/assets/og-nl.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="ChillMate. A calm, private place to look after yourself." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="ChillMate · Een rustige, privéplek om voor jezelf te zorgen" />
-  <meta name="twitter:description" content="ChillMate houdt je logboek, plannen, herinneringen en veiligheidstools in één privéoverzicht. Alles blijft op je iPhone. Geen account, geen advertenties, geen tracking." />
-  <meta name="twitter:image" content="https://thijsverstapen.github.io/ChillMate/assets/og.png" />
-<script>try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+  <meta name="twitter:description" content="Een privéoverzicht van je eigen nachten, plannen, herinneringen en veiligheidstools, volledig op je iPhone. Gratis, open source, geen account en geen server." />
+  <meta name="twitter:image" content="https://thijsverstapen.github.io/ChillMate/assets/og-nl.png" />
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <style>/* ChillMate site styles.
 
    The app is dark only. The site defaults to dark to match it, but honours a
@@ -493,6 +494,102 @@ h2:hover .anchor, h3:hover .anchor, .anchor:focus-visible { opacity: 1; }
 .hero .phone { max-width: 250px; }
 .hero-phone-wrap { display: grid; place-items: center; }
 
+/* ---------- the watch ---------- */
+
+.watch { width: 100%; max-width: 190px; margin-inline: auto; }
+.watch-shell {
+  position: relative;
+  border-radius: 27%;
+  padding: 8px;
+  background: linear-gradient(160deg, #3a4160 0%, #1e2439 45%, #12172b 100%);
+  box-shadow: var(--shadow-phone), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.watch-screen {
+  border-radius: 22%;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 416 / 496;
+}
+.watch-screen img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* The digital crown and side button, drawn rather than photographed so the
+   watch reads as hardware at any size. */
+.watch-shell::after,
+.watch-shell::before {
+  content: "";
+  position: absolute;
+  right: -3px;
+  background: linear-gradient(90deg, #4a5170, #262c44);
+  border-radius: 3px;
+}
+.watch-shell::before { top: 27%; width: 5px; height: 13%; }
+.watch-shell::after { top: 46%; width: 4px; height: 10%; opacity: 0.75; }
+
+.quote {
+  margin: 16px 0 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--mint);
+  background: color-mix(in srgb, var(--mint) 7%, transparent);
+  border-radius: 0 14px 14px 0;
+}
+.quote p { margin: 0; color: var(--text); font-size: 1.06rem; }
+.quote cite { display: block; margin-top: 7px; font-size: 0.86rem; color: var(--text-dim); font-style: normal; }
+
+/* ---------- three-beat night ---------- */
+
+.beats { display: grid; gap: 14px; counter-reset: beat; }
+@media (min-width: 780px) { .beats { grid-template-columns: repeat(3, 1fr); } }
+.beat {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 20px 22px;
+}
+.beat::before {
+  counter-increment: beat;
+  content: counter(beat);
+  display: grid;
+  place-items: center;
+  width: 30px; height: 30px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+.beat .eyebrow { margin: 0 0 3px; }
+.beat h3 { margin: 0 0 6px; font-size: 1.06rem; font-weight: 730; }
+.beat p { margin: 0; font-size: 0.95rem; color: var(--text-dim); }
+
+/* ---------- what it refuses to do ---------- */
+
+.refusals { list-style: none; padding: 0; margin: 8px 0 0; }
+.refusals li {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  max-width: none;
+}
+.refusals li:last-child { border-bottom: 0; padding-bottom: 0; }
+.refusals .icon { width: 20px; height: 20px; margin-top: 3px; color: var(--danger); }
+.refusals b { display: block; color: var(--text); font-weight: 700; }
+.refusals span { color: var(--text-dim); font-size: 0.95rem; }
+
+/* ---------- scenarios ---------- */
+
+.scenarios { list-style: none; padding: 0; margin: 6px 0 0; }
+.scenarios li {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  margin: 12px 0;
+  color: var(--text-soft);
+}
+.scenarios .icon { width: 18px; height: 18px; margin-top: 3px; color: var(--primary); }
+
 /* ---------- the guided walk ---------- */
 
 .walk { display: grid; gap: 34px; }
@@ -808,10 +905,17 @@ footer .made { margin-left: auto; }
 
 /* ---------- reveal on scroll ---------- */
 
-.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
-.reveal.is-in { opacity: 1; transform: none; }
+/* Gated on `.js`, which an inline script in <head> adds. Without that gate a
+   blocked, failed or slow site.js left nine sections of the home page at
+   opacity 0 with nothing to ever turn them back on: no animation is a fine
+   degradation, no content is not. */
+.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.js .reveal.is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; }
+  .js .reveal { opacity: 1; transform: none; }
+}
+@media print {
+  .js .reveal { opacity: 1 !important; transform: none !important; }
 }
 
 /* ---------- the mark draws itself ---------- */
@@ -973,7 +1077,7 @@ footer .made { margin-left: auto; }
     <div class="head-right">
       <nav class="site-nav" aria-label="Home">
       <a href="./" aria-current="page">Home</a>
-      <a href="../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
+      <a href="./privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
       <a href="./support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Hulp</a>
       <a href="../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Over</a>
       <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
@@ -998,22 +1102,22 @@ footer .made { margin-left: auto; }
 
   <section class="hero">
     <div>
-      <h1>Een rustige, privéplek om voor jezelf te zorgen.</h1>
-      <p class="lede">ChillMate houdt je logboek, reflecties, plannen, herinneringen en veiligheidstools in één privéoverzicht. Alles blijft op je iPhone. Geen account, geen advertenties, geen trackers, niets wordt verkocht.</p>
+      <h1>Een rustige, privéplek om voor jezelf te zorgen.</h1>
+      <p class="lede">ChillMate houdt je nachten, plannen, herinneringen en veiligheidstools in één privéoverzicht op je iPhone. Het is gratis, het is open source, en er is geen server, dus er is nergens anders waar het kan staan.</p>
 
       <div class="cta-row">
-        <a class="btn btn-primary" href="./support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Hulp en ondersteuning</a>
-        <a class="btn btn-ghost" href="#privacy"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Hoe privacy werkt</a>
+        <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Laat%20het%20me%20weten%20als%20ChillMate%20er%20is&body=Je%20hoeft%20niets%20te%20schrijven.%20Ik%20antwoord%20%C3%A9%C3%A9n%20keer%2C%20op%20de%20dag%20van%20de%20lancering%2C%20en%20verwijder%20daarna%20je%20adres."><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Laat het me weten als hij er is</a>
+        <a class="btn btn-ghost" href="#inside"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>Bekijk hoe het werkt</a>
       </div>
 
-      <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Nog niet in de App Store. Deze pagina linkt ernaar zodra dat wel zo is.</p>
+      <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Nog niet in de App Store. Stuur een lege mail en je hoort één keer van me, op de dag dat hij er is.</p>
     </div>
 
     <div class="hero-phone-wrap">
       <div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="../assets/shots/home.png" width="560" height="1217" alt="Alles in één oogopslag" decoding="async" fetchpriority="high" />
+            <img src="../assets/shots/home.png" width="560" height="1217" alt="Wat het vannacht ook werd" decoding="async" fetchpriority="high" />
             <span class="phone-island"></span>
           </div>
         </div>
@@ -1021,20 +1125,35 @@ footer .made { margin-left: auto; }
     </div>
   </section>
 
+  <section class="section reveal" id="who">
+    <p class="eyebrow">Voor wie het is</p>
+    <div class="card">
+      <h2><svg class="icon" style="color:var(--pink)" aria-hidden="true"><use href="#i-hand"/></svg>Gemaakt voor de nachten waar dit echt over gaat</h2>
+      <p>Chems, hookups, of allebei. ChillMate heeft daar geen mening over en zal je nooit vragen een nacht te verantwoorden. Wat het wel doet: de praktische dingen vasthouden die je liever niet om vier uur &#x27;s nachts uitzoekt.</p>
+      <ul class="checks">
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Een risicocheck die weet wat je al gebruikt, inclusief je eigen recept.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Een check-intimer, zodat iemand weet dat je thuis bent zonder dat je hoeft te appen.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Een PEP-venster dat begint te tellen op het moment dat het ertoe kan doen.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Testherinneringen die op je vergrendelscherm nooit zeggen waarom.</span></li>
+      </ul>
+      <p>De app noemt een nacht een <strong>Chill</strong>. De jouwe, wat het ook was.</p>
+    </div>
+  </section>
+
   <section class="section">
     <p class="eyebrow">Een kijkje binnen</p>
-    <h2 id="inside">Vijf schermen, en waar ze voor zijn.</h2>
+    <h2 id="inside">Vijf schermen, en waar ze voor zijn.</h2>
 
     <div class="walk" data-walk>
       <div class="walk-stage" aria-hidden="true">
         <div class="phone">
           <div class="phone-shell">
             <div class="phone-screen">
-          <img src="../assets/shots/home.png" width="560" height="1217" alt="Alles in één oogopslag" loading="lazy" decoding="async" />
-          <img src="../assets/shots/help.png" width="560" height="1217" alt="Een kamer met het licht gedimd" loading="lazy" decoding="async" />
-          <img src="../assets/shots/privacy.png" width="560" height="1217" alt="Een eerlijke kaart van je eigen gegevens" loading="lazy" decoding="async" />
-          <img src="../assets/shots/support.png" width="560" height="1217" alt="Echte hulpverlening, offline" loading="lazy" decoding="async" />
-          <img src="../assets/shots/more.png" width="560" height="1217" alt="Niets weggestopt" loading="lazy" decoding="async" />
+          <img src="../assets/shots/home.png" width="560" height="1217" alt="Wat het vannacht ook werd" loading="lazy" decoding="async" />
+          <img src="../assets/shots/risk.png" width="560" height="1217" alt="En weigert te zeggen dat het veilig is" loading="lazy" decoding="async" />
+          <img src="../assets/shots/help.png" width="560" height="1217" alt="Voor als het al misgaat" loading="lazy" decoding="async" />
+          <img src="../assets/shots/support.png" width="560" height="1217" alt="Hulp van mensen, niet van een app" loading="lazy" decoding="async" />
+          <img src="../assets/shots/privacy.png" width="560" height="1217" alt="In de app, niet alleen in een beleidstekst" loading="lazy" decoding="async" />
               <span class="phone-island"></span>
             </div>
           </div>
@@ -1042,80 +1161,102 @@ footer .made { margin-left: auto; }
       </div>
       <div class="walk-steps">
       <div class="walk-step reveal">
-        <p class="eyebrow">Home</p>
+        <p class="eyebrow">Hij schikt zichzelf</p>
         <div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="../assets/shots/home.png" width="560" height="1217" alt="Alles in één oogopslag" loading="lazy" decoding="async" />
+            <img src="../assets/shots/home.png" width="560" height="1217" alt="Wat het vannacht ook werd" loading="lazy" decoding="async" />
             <span class="phone-island"></span>
           </div>
         </div>
       </div>
-        <h3>Alles in één oogopslag</h3>
-        <p>Je reeks, je score en de hulpmiddelen die bij dit moment passen. Hulp nodig staat altijd bovenaan, zodat ademhaling, grounding en een noodoproep nooit iets zijn dat je moet zoeken.</p>
+        <h3>Wat het vannacht ook werd</h3>
+        <p>Leg een nacht vast en het beginscherm herschikt zich eromheen. Hier heeft hij bedacht dat een PEP-gesprek de moeite waard kan zijn, en de aftelling apart bovenaan gezet. Hulp nodig staat altijd boven alles.</p>
       </div>
 
       <div class="walk-step reveal">
-        <p class="eyebrow">Paniekhulp</p>
+        <p class="eyebrow">Hij zegt wat bekend is</p>
         <div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="../assets/shots/help.png" width="560" height="1217" alt="Een kamer met het licht gedimd" loading="lazy" decoding="async" />
+            <img src="../assets/shots/risk.png" width="560" height="1217" alt="En weigert te zeggen dat het veilig is" loading="lazy" decoding="async" />
             <span class="phone-island"></span>
           </div>
         </div>
       </div>
-        <h3>Een kamer met het licht gedimd</h3>
-        <p>Een prikkelarme plek voor angst of als je je niet lekker voelt. Start de ademhalingstimer, loop de groundingstappen door, en bel pas iemand als je dat zelf wilt.</p>
+        <h3>En weigert te zeggen dat het veilig is</h3>
+        <p>Kies wat er speelt, inclusief je eigen medicijnen, en de risicocheck vertelt je wat er over die combinatie gedocumenteerd is. Er is geen groen licht. Niets in ChillMate zal je ooit vertellen dat iets in orde is.</p>
       </div>
 
       <div class="walk-step reveal">
-        <p class="eyebrow">Privacyoverzicht</p>
+        <p class="eyebrow">Een kamer met het licht gedimd</p>
         <div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="../assets/shots/privacy.png" width="560" height="1217" alt="Een eerlijke kaart van je eigen gegevens" loading="lazy" decoding="async" />
+            <img src="../assets/shots/help.png" width="560" height="1217" alt="Voor als het al misgaat" loading="lazy" decoding="async" />
             <span class="phone-island"></span>
           </div>
         </div>
       </div>
-        <h3>Een eerlijke kaart van je eigen gegevens</h3>
-        <p>Wat op het toestel staat, wat er in een versleutelde back-up zou zitten, welke Gezondheid-categorieën je hebt toegestaan, en wat ChillMate nooit verstuurt. In de app, niet alleen in een beleidstekst.</p>
+        <h3>Voor als het al misgaat</h3>
+        <p>Weinig prikkels, één ding tegelijk. Start de ademhalingstimer, loop de groundingstappen door, en bel pas iemand als je dat zelf wilt.</p>
       </div>
 
       <div class="walk-step reveal">
-        <p class="eyebrow">Hulp</p>
+        <p class="eyebrow">Echte hulpverlening, offline</p>
         <div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="../assets/shots/support.png" width="560" height="1217" alt="Echte hulpverlening, offline" loading="lazy" decoding="async" />
+            <img src="../assets/shots/support.png" width="560" height="1217" alt="Hulp van mensen, niet van een app" loading="lazy" decoding="async" />
             <span class="phone-island"></span>
           </div>
         </div>
       </div>
-        <h3>Echte hulpverlening, offline</h3>
-        <p>Crisislijnen, seksuele gezondheid, drugs, LHBTIQ+ steun en praktische zorg voor het land dat je instelt. Het is een lijst op je telefoon, dus hij werkt zonder bereik.</p>
+        <h3>Hulp van mensen, niet van een app</h3>
+        <p>Crisislijnen, seksuele gezondheid, drugs, LHBTIQ+ steun en praktische zorg voor het land dat je instelt. Het is een lijst op je telefoon, dus hij werkt zonder bereik en zonder iets op te zoeken.</p>
       </div>
 
       <div class="walk-step reveal">
-        <p class="eyebrow">Meer</p>
+        <p class="eyebrow">Een eerlijke kaart van je gegevens</p>
         <div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="../assets/shots/more.png" width="560" height="1217" alt="Niets weggestopt" loading="lazy" decoding="async" />
+            <img src="../assets/shots/privacy.png" width="560" height="1217" alt="In de app, niet alleen in een beleidstekst" loading="lazy" decoding="async" />
             <span class="phone-island"></span>
           </div>
         </div>
       </div>
-        <h3>Niets weggestopt</h3>
-        <p>Profiel, instellingen, privacy, noodkaart en hulp, op één doorzoekbare plek in plaats van verspreid door menu&#x27;s.</p>
+        <h3>In de app, niet alleen in een beleidstekst</h3>
+        <p>Wat er op het toestel staat, wat er in een versleutelde back-up zou zitten, welke Gezondheid-categorieën je toestond, en wat ChillMate nooit verstuurt. Daar zou je geen beleidstekst voor hoeven lezen.</p>
       </div>
       </div>
     </div>
   </section>
 
   <section class="section reveal">
-    <p class="eyebrow">Wat het doet</p>
+    <p class="eyebrow">Hoe het past</p>
+    <h2 id="night">Eén nacht, in drie momenten.</h2>
+    <div class="beats">
+      <div class="beat">
+        <p class="eyebrow">Voor je gaat</p>
+        <h3>Beslis nu het makkelijk is</h3>
+        <p>Leg de combinatie langs de risicocheck, zet vast waar je wel en geen zin in hebt, en start een check-intimer. Vijf minuten nu, terwijl je helder bent en er nog niets gebeurd is.</p>
+      </div>
+      <div class="beat">
+        <p class="eyebrow">Als je op stap bent</p>
+        <h3>Eén tik, niets typen</h3>
+        <p>De timer vraagt of het goed gaat. Ik ben veilig is één tik. Hulp zoeken is de andere, en die kent je vertrouwenscontact en het juiste alarmnummer voor waar je bent al. Je horloge kan voor je antwoorden.</p>
+      </div>
+      <div class="beat">
+        <p class="eyebrow">De ochtend erna</p>
+        <h3>Onthoud het zoals het was</h3>
+        <p>Slaap, hoe je je voelt, wat echt hielp. Het kost een minuut en het is het deel waar je over drie maanden blij mee bent, als die patronen het enige eerlijke verslag zijn dat je hebt.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <p class="eyebrow">Wat erin zit</p>
     <div class="grid three">
       <div class="feature">
         <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></div>
@@ -1125,7 +1266,7 @@ footer .made { margin-left: auto; }
       <div class="feature">
         <div class="chip tint-mint"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></div>
         <h3>Jouw patronen</h3>
-        <p>Overzichten over dertig en negentig dagen van wat er echt voor je verandert, alleen voor jou.</p>
+        <p>Overzichten over 30 en 90 dagen van wat er echt verandert, en een dagscore die alleen jij ooit ziet.</p>
       </div>
       <div class="feature">
         <div class="chip tint-purple"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg></div>
@@ -1134,7 +1275,7 @@ footer .made { margin-left: auto; }
       </div>
       <div class="feature">
         <div class="chip tint-pink"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg></div>
-        <h3>Combinatiechecker</h3>
+        <h3>Risicocheck</h3>
         <p>Waarschuwingen in gewone taal over combinaties, inclusief de medicijnen die je al gebruikt.</p>
       </div>
       <div class="feature">
@@ -1150,13 +1291,28 @@ footer .made { margin-left: auto; }
     </div>
   </section>
 
+  <section class="section reveal">
+    <p class="eyebrow">Is dit iets voor jou</p>
+    <div class="card">
+      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-info"/></svg>Hieraan merk je het.</h2>
+      <ul class="scenarios">
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Je wilt gisternacht precies onthouden, niet vaag, en niet door iemand anders.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Je gebruikt PrEP en hebt liever niet dat de herinnering PrEP op je vergrendelscherm zet.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Je wilt een reden om bij iemand in te checken die geen heel gesprek is.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Je hebt je doordeweeks weleens afgevraagd of het vaker is dan vroeger.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Je wilt het alarmnummer van waar je bent, zonder een browser te ontgrendelen.</span></li>
+      </ul>
+      <p>Het is waarschijnlijk niets voor je als je iets zoekt dat de nacht voor je beoordeelt, je gedrag een cijfer geeft, of zegt dat een combinatie veilig is. Dat doet het alle drie met opzet niet.</p>
+    </div>
+  </section>
+
   <section class="section reveal" id="privacy">
     <p class="eyebrow">Privé van opzet</p>
     <div class="card">
-      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-lock"/></svg>Je telefoon, en nergens anders</h2>
-      <p>Privacy is hier geen instelling die je nog moet aanzetten. Zo is de app gebouwd.</p>
+      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-lock"/></svg>Je telefoon, en nergens anders</h2>
+      <p>Privacy is hier geen instelling die je aanzet. Het is de vorm van de app.</p>
       <ul class="checks">
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Geen account en geen aanmelding. Er is geen server met jouw logboek, want er is geen server.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Geen account en geen aanmelding. Geen server bewaart je logboek, want er is geen server.</span></li>
         <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Geen advertenties, geen analytics, geen trackers, en er wordt nooit iets verkocht of gedeeld.</span></li>
         <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Zet er Face ID of een pincode op, met alles versleuteld op het toestel.</span></li>
         <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Back-ups zijn optioneel en versleuteld, en gaan naar je eigen iCloud Drive.</span></li>
@@ -1184,7 +1340,7 @@ footer .made { margin-left: auto; }
   </g>
 
   <rect class="d-box" x="400" y="46" width="112" height="58" rx="14" opacity="0.45"/>
-  <text class="d-label" x="456" y="72" text-anchor="middle" opacity="0.6">Onze servers</text>
+  <text class="d-label" x="456" y="72" text-anchor="middle" opacity="0.6">Mijn servers</text>
   <text class="d-dim" x="456" y="90" text-anchor="middle" opacity="0.6">die zijn er niet</text>
 </svg>
 
@@ -1195,9 +1351,9 @@ footer .made { margin-left: auto; }
   <section class="section reveal">
     <p class="eyebrow">Controleer het zelf</p>
     <div class="card">
-      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-code"/></svg>Geloof ons niet op ons woord</h2>
-      <p>ChillMate is open source. Elke regel die je gegevens aanraakt staat openbaar, en de belofte hierboven is er een die je kunt controleren in plaats van vertrouwen.</p>
-      <p>In de code van de app staat geen enkele netwerkaanroep. Geen analytics-SDK, geen crashrapportage, nergens een <code>URLSession</code>. Het enige dat je telefoon verlaat, is wat jij zelf aantikt: een telefoongesprek, een link, een bericht dat je zelf schrijft.</p>
+      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-code"/></svg>Geloof me niet op mijn woord</h2>
+      <p>ChillMate is open source. Elke regel die je gegevens aanraakt staat openbaar, en dat maakt van de belofte hierboven iets dat je kunt controleren in plaats van iets waarop je mij moet vertrouwen.</p>
+      <p>In de code van de app staat geen enkele netwerkaanroep. Geen analytics-SDK, geen crashrapportage, nergens een <code>URLSession</code>. Het enige dat je telefoon verlaat, is wat jij aantikt: een gesprek, een link, een bericht dat jij schreef.</p>
       <div class="cta-row">
         <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>Lees de broncode</a>
         <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/ChillMateModelContainer.swift"><svg class="icon" aria-hidden="true"><use href="#i-doc"/></svg>Waar je gegevens staan</a>
@@ -1207,24 +1363,77 @@ footer .made { margin-left: auto; }
   </section>
 
   <section class="section reveal">
-    <div class="grid two">
-      <div class="feature">
-        <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-watch"/></svg></div>
-        <h3>Het werkt terwijl je telefoon in je zak zit</h3>
-        <p>Dosistimers, hydratatie, discrete check-ins, een ademhalingsoefening en met één tik bellen naar je vertrouwenscontact of de hulpdiensten, allemaal op Apple Watch, plus complicaties voor je wijzerplaat en de Smart Stack.</p>
+    <p class="eyebrow">Met opzet</p>
+    <div class="card">
+      <h2><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>Wat hij niet doet</h2>
+      <p>Het meeste werk zat in wat hij níét doet. Dat is lastiger vol te houden dan functies, want elk ervan is iets waar uiteindelijk iemand om vraagt.</p>
+      <ul class="refusals">
+        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Hij zegt niet dat iets veilig is.</b><span>Hij laat zien wat er over een combinatie gedocumenteerd is en geeft de beslissing aan jou terug, want hij kent jouw lichaam, jouw dosis en jouw nacht niet.</span></div></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Hij geeft jou als persoon geen cijfer.</b><span>Er is een getal voor de dag, dat blijft op je telefoon, en er wordt niets mee ontgrendeld of onthouden.</span></div></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Hij zeurt niet.</b><span>Elke herinnering staat uit tot jij hem aanzet, en kan zo geformuleerd worden dat een vergrendelscherm niets prijsgeeft.</span></div></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Hij wil geen account.</b><span>Daar zou een server bij horen, en een server is een kopie van jou op een plek waar jij niet bij kunt.</span></div></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Hij laat je niet betalen.</b><span>Alles gratis. De fooi ontgrendelt niets, want een veiligheidstool achter een betaalmuur is geen veiligheidstool.</span></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <div class="card">
+      <div class="hero" style="padding-top:0">
+        <div>
+          <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-watch"/></svg>Hij werkt terwijl je telefoon in je zak blijft</h2>
+          <p>Dosistimers, hydratatie, discrete check-ins, een ademhalingsoefening en met één tik je vertrouwenscontact of het lokale alarmnummer, allemaal op Apple Watch, plus complicaties voor je wijzerplaat en de Smart Stack.</p>
+          <blockquote class="quote">
+            <p>Als iets niet goed voelt, zoek hulp. Je bent niet in de problemen.</p>
+            <cite>Het hele Veiligheid-scherm op het horloge, inclusief die woorden.</cite>
+          </blockquote>
+        </div>
+        <div class="hero-phone-wrap">
+          <div class="watch">
+        <div class="watch-shell">
+          <div class="watch-screen">
+            <img src="../assets/shots/watch.png" width="416" height="496"
+                 alt="The watch app's Safety screen, offering an emergency call and a way to ping your phone."
+                 loading="lazy" decoding="async" />
+          </div>
+        </div>
       </div>
-      <div class="feature">
-        <div class="chip tint-mint"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></div>
-        <h3>Het spreekt jouw taal</h3>
-        <p>De app en deze site zijn er in het Engels, Nederlands, Duits, Frans en Spaans, en de hulpbronnen volgen het land dat je kiest, niet de taal die je leest.</p>
+        </div>
       </div>
+    </div>
+
+    <div class="card">
+      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-globe"/></svg>Hij werkt in jouw taal</h2>
+      <p>De app en deze site zijn er in het Engels, Nederlands, Duits, Frans en Spaans. De hulpbronnen volgen het land dat je instelt, niet de taal die je leest, want dat zijn twee verschillende vragen.</p>
+    </div>
+  </section>
+
+  <section class="section reveal">
+    <p class="eyebrow">Voor je het vraagt</p>
+    <h2 id="questions">De drie vragen die iedereen stelt.</h2>
+    <div class="card">
+      <div class="faq">
+        <details>
+          <summary>Zijn mijn gegevens privé?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Ja, en je hoeft me niet te geloven. ChillMate houdt alles op je iPhone, heeft geen account en geen server, en draait geen advertenties, analytics of trackers. De app is open source, dus je kunt precies nalezen wat er met je invoer gebeurt.</p></div>
+        </details>
+        <details>
+          <summary>Wat kost het?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Niets, en er is geen betaalde versie. Een optionele fooi loopt via Apple In-App Purchase en ontgrendelt helemaal niets. Elke functie is er voor iedereen, want een veiligheidstool achter een betaalmuur is geen veiligheidstool.</p></div>
+        </details>
+        <details>
+          <summary>Zegt hij of iets veilig is?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Nee, en dat zal hij nooit doen. De risicocheck laat zien wat er over een combinatie gedocumenteerd is, ook met medicijnen die je al gebruikt, en stopt daar. Er is geen groen licht. Voor alles wat ertoe doet is een arts of apotheker de juiste plek.</p></div>
+        </details>
+      </div>
+      <p style="margin-top:16px"><a href="./support/">De rest van de vragen, en echte hulpdiensten</a></p>
     </div>
   </section>
 
   <section class="section">
     <div class="callout">
       <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
-      <p>ChillMate ondersteunt reflectie, planning en je eigen welzijn. Het vervangt geen behandelaar en bepaalt niet of iets veilig is. Als iemand in direct gevaar kan zijn, bel dan je lokale alarmnummer.</p>
+      <p>ChillMate ondersteunt reflectie, planning en je eigen welzijn. Het vervangt geen behandelaar en bepaalt nooit of iets veilig is. Als iemand in direct gevaar kan zijn, bel dan je lokale alarmnummer.</p>
     </div>
   </section>
 
@@ -1240,7 +1449,7 @@ footer .made { margin-left: auto; }
     <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    <span class="made">ChillMate 4.2.1 · met zorg gemaakt in Nederland</span>
+    <span class="made">ChillMate 4.2.1 · gemaakt door één persoon in Nederland</span>
   </footer>
 
 </main>

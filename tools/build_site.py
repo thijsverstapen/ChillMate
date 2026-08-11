@@ -28,7 +28,9 @@ import re
 import shutil
 import zipfile
 from pathlib import Path
+from urllib.parse import quote
 
+import privacy_nl
 import site_content as C
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -199,9 +201,13 @@ SPRITE = f"""<svg width="0" height="0" style="position:absolute" aria-hidden="tr
 # page chrome
 # --------------------------------------------------------------------------
 
-# Runs before first paint so a reader who chose light does not get a dark
-# flash first. Kept inline and tiny for exactly that reason.
-THEME_BOOT = ("<script>try{var t=localStorage.getItem('cm-theme');"
+# Runs before first paint, for two reasons. The theme, so a reader who chose
+# light does not get a dark flash first. And the `js` class, which is what
+# lets the stylesheet hide anything at all: scroll-reveal starts at opacity 0,
+# and if this script never runs then neither does the one that reveals it, so
+# the CSS must not hide it in the first place.
+THEME_BOOT = ("<script>document.documentElement.classList.add('js');"
+              "try{var t=localStorage.getItem('cm-theme');"
               "if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>")
 
 
@@ -211,11 +217,19 @@ def page_urls(key: str) -> dict:
         return {lang: BASE_PATH + ("" if lang == "en" else lang + "/") for lang in C.LANGS}
     if key == "support":
         return {lang: BASE_PATH + ("support/" if lang == "en" else lang + "/support/") for lang in C.LANGS}
+    if key == "privacy":
+        # Only two, because only English and Dutch have a policy. hreflang is
+        # allowed to be a partial set; claiming a de/fr/es policy that is really
+        # the English one would be the wrong signal.
+        return {"en": BASE_PATH + "privacy/", "nl": BASE_PATH + "nl/privacy/"}
     return {}
 
 
 def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=""):
     a = rel(depth) + "assets/"
+    # A share card in a language the reader does not speak is the one part of
+    # the site most people ever see, so each language gets its own.
+    og = "og.png" if lang == "en" else f"og-{lang}.png"
     css = (ASSETS / "style.css").read_text(encoding="utf-8")
     urls = page_urls(key)
 
@@ -240,6 +254,7 @@ def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=
   <link rel="icon" href="{a}mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="{a}icon-180.png" />
   <link rel="manifest" href="{BASE_PATH}manifest.webmanifest" />
+  <link rel="alternate" type="application/atom+xml" title="ChillMate releases" href="{BASE_PATH}changelog/feed.xml" />
 
   <meta property="og:site_name" content="ChillMate" />
   <meta property="og:title" content="{e(title)}" />
@@ -247,14 +262,14 @@ def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=
   <meta property="og:type" content="website" />
   <meta property="og:url" content="{SITE_ORIGIN}{canonical}" />
   <meta property="og:locale" content="{C.LANG_TAGS[lang]}" />
-  <meta property="og:image" content="{BASE_URL}assets/og.png" />
+  <meta property="og:image" content="{BASE_URL}assets/{og}" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="ChillMate. A calm, private place to look after yourself." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="{e(title)}" />
   <meta name="twitter:description" content="{e(desc)}" />
-  <meta name="twitter:image" content="{BASE_URL}assets/og.png" />
+  <meta name="twitter:image" content="{BASE_URL}assets/{og}" />
 {THEME_BOOT}
   <style>{css}</style>{extra_head}
 </head>
@@ -270,7 +285,8 @@ def header(lang, depth, current, key=""):
     # Localised pages live under /<lang>/, so "home" from /nl/support/ is "../"
     # and from /nl/ is "./", never the docs root that `rel(depth)` gives.
     home = r if lang == "en" else ("../" * (depth - 1) if depth > 1 else "./")
-    privacy = r + "privacy/"
+    # Dutch has its own policy; the other languages point at the English one.
+    privacy = (("../" * (depth - 1) if depth > 1 else "./") + "privacy/") if lang == "nl" else r + "privacy/"
     support = (r + "support/") if lang == "en" else (("../" * (depth - 1) if depth > 1 else "./") + "support/")
     about = r + "about/"
 
@@ -284,12 +300,17 @@ def header(lang, depth, current, key=""):
     nav += item(about, s["nav_about"], "info", "about")
     nav += item(REPO, s["nav_github"], "github", "github")
 
+    # Not every page exists in every language: only English and Dutch have a
+    # privacy policy. A language with no counterpart goes to its own home page
+    # rather than vanishing from the switcher, which would leave a reader on a
+    # page they cannot read with no way out.
     urls = page_urls(key) or page_urls("home")
+    homes = page_urls("home")
     menu = ""
     for other in C.LANGS:
         cur = ' aria-current="true"' if other == lang else ""
         menu += (f'        <a lang="{C.LANG_TAGS[other]}" hreflang="{C.LANG_TAGS[other]}" '
-                 f'href="{urls[other]}"{cur}>{e(C.LANG_NAMES[other])}</a>\n')
+                 f'href="{urls.get(other, homes[other])}"{cur}>{e(C.LANG_NAMES[other])}</a>\n')
 
     return f"""<main class="wrap" id="main">
 
@@ -357,7 +378,20 @@ def phone(src, alt, depth, lazy=True, priority=False):
 # home
 # --------------------------------------------------------------------------
 
-SHOTS = ["home.png", "help.png", "privacy.png", "support.png", "more.png"]
+SHOTS = ["home.png", "risk.png", "help.png", "support.png", "privacy.png"]
+
+
+def watch(depth):
+    r = rel(depth)
+    return f"""<div class="watch">
+        <div class="watch-shell">
+          <div class="watch-screen">
+            <img src="{r}assets/shots/watch.png" width="416" height="496"
+                 alt="The watch app's Safety screen, offering an emergency call and a way to ping your phone."
+                 loading="lazy" decoding="async" />
+          </div>
+        </div>
+      </div>"""
 
 
 def diagram(lang):
@@ -387,18 +421,41 @@ def diagram(lang):
 </svg>"""
 
 
+def phone_video(depth):
+    """The real first-launch animation, inside the same frame as the stills.
+
+    Muted and inert: no controls, no sound, nothing to interrupt. Autoplay is
+    added by site.js only when the reader has not asked for reduced motion, so
+    by default this is a still poster and stays one.
+    """
+    r = rel(depth)
+    return f"""<div class="phone">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <video src="{r}assets/first-launch.mp4"
+                   poster="{r}assets/first-launch-poster.png"
+                   width="560" height="1217"
+                   muted loop playsinline preload="none" data-autoplay
+                   aria-label="ChillMate's first-launch animation: the mark draws itself."></video>
+            <span class="phone-island"></span>
+          </div>
+        </div>
+      </div>"""
+
+
 def build_home(lang):
     s = C.STRINGS[lang]
     depth = 0 if lang == "en" else 1
     r = rel(depth)
-    urls = page_urls("home")
-    canonical = urls[lang]
+    canonical = page_urls("home")[lang]
     support = (r + "support/") if lang == "en" else "./support/"
+    notify = (f"mailto:{EMAIL}"
+              f"?subject={quote(s['notify_subject'])}&body={quote(s['notify_body'])}")
 
     out = head(lang, s["home_title"], s["home_desc"], canonical, depth, "home")
     out += header(lang, depth, "home", "home")
 
-    # hero
+    # ---- hero
     out += f"""
   <section class="hero">
     <div>
@@ -406,8 +463,8 @@ def build_home(lang):
       <p class="lede">{e(s["lede"])}</p>
 
       <div class="cta-row">
-        <a class="btn btn-primary" href="{support}">{icon("life")}{e(s["cta_support"])}</a>
-        <a class="btn btn-ghost" href="#privacy">{icon("shield")}{e(s["cta_privacy"])}</a>
+        <a class="btn btn-primary" href="{notify}">{icon("mail")}{e(s["cta_notify"])}</a>
+        <a class="btn btn-ghost" href="#inside">{icon("phone")}{e(s["cta_see"])}</a>
       </div>
 
       <p class="status-note">{icon("info")}{e(s["status_note"])}</p>
@@ -419,7 +476,25 @@ def build_home(lang):
   </section>
 """
 
-    # the guided walk
+    # ---- who it is for
+    points = "".join(
+        f'        <li>{icon("check")}<span>{e(point)}</span></li>\n'
+        for point in s["audience_points"]
+    )
+    out += f"""
+  <section class="section reveal" id="who">
+    <p class="eyebrow">{e(s["audience_eyebrow"])}</p>
+    <div class="card">
+      <h2>{icon("hand", style="color:var(--pink)")}{e(no_orphan(s["audience_h2"]))}</h2>
+      <p>{e(s["audience_p"])}</p>
+      <ul class="checks">
+{points}      </ul>
+      <p>{s["audience_chill"]}</p>
+    </div>
+  </section>
+"""
+
+    # ---- the guided walk
     steps = ""
     frames = ""
     for i, (eyebrow, title, body) in enumerate(s["walk"]):
@@ -454,7 +529,25 @@ def build_home(lang):
   </section>
 """
 
-    # features
+    # ---- one night in three beats
+    beats = ""
+    for label, title, body in s["night"]:
+        beats += f"""      <div class="beat">
+        <p class="eyebrow">{e(label)}</p>
+        <h3>{e(no_orphan(title))}</h3>
+        <p>{e(body)}</p>
+      </div>
+"""
+    out += f"""
+  <section class="section reveal">
+    <p class="eyebrow">{e(s["night_eyebrow"])}</p>
+    <h2 id="night">{e(no_orphan(s["night_h2"]))}</h2>
+    <div class="beats">
+{beats}    </div>
+  </section>
+"""
+
+    # ---- features
     tiles = ""
     for ico, tint, title, body in s["features"]:
         tiles += f"""      <div class="feature">
@@ -471,7 +564,23 @@ def build_home(lang):
   </section>
 """
 
-    # privacy
+    # ---- is this for you
+    scenarios = "".join(
+        f'        <li>{icon("check")}<span>{e(line)}</span></li>\n' for line in s["foryou"]
+    )
+    out += f"""
+  <section class="section reveal">
+    <p class="eyebrow">{e(s["foryou_eyebrow"])}</p>
+    <div class="card">
+      <h2>{icon("info", style="color:var(--primary)")}{e(no_orphan(s["foryou_h2"]))}</h2>
+      <ul class="scenarios">
+{scenarios}      </ul>
+      <p>{e(s["foryou_not"])}</p>
+    </div>
+  </section>
+"""
+
+    # ---- privacy
     checks = "".join(
         f'        <li>{icon("check")}<span>{e(c)}</span></li>\n' for c in s["privacy_checks"]
     )
@@ -504,26 +613,75 @@ def build_home(lang):
       <p class="meta" style="margin-top:14px">{e(s["proof_caption"])}</p>
     </div>
   </section>
+"""
 
+    # ---- what it refuses to do
+    refusals = "".join(
+        f'        <li>{icon("hand")}<div><b>{e(title)}</b><span>{e(body)}</span></div></li>\n'
+        for title, body in s["refuse"]
+    )
+    out += f"""
   <section class="section reveal">
-    <div class="grid two">
-      <div class="feature">
-        <div class="chip tint-blue">{icon("watch")}</div>
-        <h3>{e(no_orphan(s["watch_h3"]))}</h3>
-        <p>{e(s["watch_p"])}</p>
+    <p class="eyebrow">{e(s["refuse_eyebrow"])}</p>
+    <div class="card">
+      <h2>{icon("alert", style="color:var(--danger)")}{e(no_orphan(s["refuse_h2"]))}</h2>
+      <p>{e(s["refuse_p"])}</p>
+      <ul class="refusals">
+{refusals}      </ul>
+    </div>
+  </section>
+"""
+
+    # ---- watch and languages
+    out += f"""
+  <section class="section reveal">
+    <div class="card">
+      <div class="hero" style="padding-top:0">
+        <div>
+          <h2>{icon("watch", style="color:var(--primary)")}{e(no_orphan(s["watch_h3"]))}</h2>
+          <p>{e(s["watch_p"])}</p>
+          <blockquote class="quote">
+            <p>{e(s["watch_quote"])}</p>
+            <cite>{e(s["watch_quote_note"])}</cite>
+          </blockquote>
+        </div>
+        <div class="hero-phone-wrap">
+          {watch(depth)}
+        </div>
       </div>
-      <div class="feature">
-        <div class="chip tint-mint">{icon("globe")}</div>
-        <h3>{e(no_orphan(s["langs_h3"]))}</h3>
-        <p>{e(s["langs_p"])}</p>
-      </div>
+    </div>
+
+    <div class="card">
+      <h2>{icon("globe", style="color:var(--mint)")}{e(no_orphan(s["langs_h3"]))}</h2>
+      <p>{e(s["langs_p"])}</p>
+    </div>
+  </section>
+"""
+
+    # ---- the three questions everyone asks
+    teaser = ""
+    for index in s["faq_teaser_indices"]:
+        question, answer = s["faq"][index]
+        teaser += f"""        <details>
+          <summary>{e(question)}<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>{e(answer)}</p></div>
+        </details>
+"""
+    out += f"""
+  <section class="section reveal">
+    <p class="eyebrow">{e(s["faq_teaser_eyebrow"])}</p>
+    <h2 id="questions">{e(no_orphan(s["faq_teaser_h2"]))}</h2>
+    <div class="card">
+      <div class="faq">
+{teaser}      </div>
+      <p style="margin-top:16px"><a href="{support}">{e(s["faq_teaser_link"])}</a></p>
     </div>
   </section>
 
   <section class="section">
     <div class="callout">
       {icon("alert")}
-      <p>{e(s["closing_callout"])}</p>
+      <p>{e(s["disclaimer"])}</p>
     </div>
   </section>
 """
@@ -663,6 +821,10 @@ def build_support(lang):
       {icon("shield")}
       <p>{e(s["policy_en_note"])} <a href="{r}privacy/">{e(s["privacy_link"])}</a></p>
     </div>
+    <div class="callout">
+      {icon("alert")}
+      <p>{e(s["disclaimer"])}</p>
+    </div>
   </section>
 """
     out += footer(lang, depth)
@@ -673,8 +835,40 @@ def build_support(lang):
 # English-only pages
 # --------------------------------------------------------------------------
 
+def policy_history():
+    """Every commit that has ever touched the privacy page, from git.
+
+    A privacy policy is a promise that can be quietly edited. Almost nobody can
+    show you the edits. This repository can, so it does: the list below is read
+    out of git at build time, not typed in, which means it cannot fall out of
+    step with what actually happened.
+    """
+    import subprocess
+    try:
+        raw = subprocess.run(
+            ["git", "log", "--format=%h\x1f%ad\x1f%s", "--date=short",
+             "--", "docs/privacy/index.html"],
+            cwd=ROOT, capture_output=True, text=True, timeout=20, check=True,
+        ).stdout.strip()
+    except Exception:
+        return []
+    rows = []
+    for line in raw.splitlines():
+        parts = line.split("\x1f")
+        if len(parts) == 3:
+            rows.append(tuple(parts))
+    return rows
+
+
 def build_privacy():
     lang, depth = "en", 1
+    HISTORY = policy_history()
+    history_rows = "".join(
+        f'          <tr><td>{e(when)}</td><td>{e(subject)}</td>'
+        f'<td><a href="{REPO}/commit/{sha}"><code>{e(sha)}</code></a></td></tr>\n'
+        for sha, when, subject in HISTORY
+    ) or '          <tr><td colspan="3">No history available in this build.</td></tr>\n'
+
     canonical = BASE_PATH + "privacy/"
     title = "ChillMate · Privacy Policy"
     desc = ("ChillMate's privacy policy, plus the honest detail: every network call the app "
@@ -778,6 +972,29 @@ def build_privacy():
   </div>
 
   <div class="card">
+    <h2 id="history">{icon("doc", style="color:var(--primary)")}Every change this page has ever&nbsp;had
+      <a class="anchor" href="#history" aria-label="Link to this section">#</a></h2>
+    <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
+    <div class="table-scroll">
+      <table>
+        <caption>{len(HISTORY)} change{"" if len(HISTORY) == 1 else "s"} since this page first existed.</caption>
+        <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
+        <tbody>
+{history_rows}        </tbody>
+      </table>
+    </div>
+    <p>Compare any two versions yourself in <a href="{REPO}/commits/main/docs/privacy/index.html">the file's history</a>.</p>
+  </div>
+
+  <div class="card">
+    <h2 id="ifitchanged">{icon("hand", style="color:var(--amber)")}What it would take to start collecting your&nbsp;data
+      <a class="anchor" href="#ifitchanged" aria-label="Link to this section">#</a></h2>
+    <p>Worth being concrete, because "we will never" is cheap and the honest version of the claim is structural rather than moral.</p>
+    <p>Collecting anything would mean writing a server, standing it up somewhere, adding accounts so records could be attributed to people, adding networking code to an app that currently has none, and shipping all of that through App Review with a privacy label that would have to change from nothing to something. It is not a setting somebody could flip, and it is not a line somebody could sneak in: it is a different app, built differently, and the commit that started it would be public on the day it was written.</p>
+    <p>That is the actual protection. Not a promise about intentions, but a shape that makes the other thing expensive and visible.</p>
+  </div>
+
+  <div class="card">
     <h2 id="saves">{icon("mail", style="color:var(--mint)")}What ChillMate can&nbsp;save</h2>
     <ul>
       <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
@@ -861,12 +1078,48 @@ def build_privacy():
   <div class="card">
     <h2 id="changes">{icon("doc", style="color:var(--primary)")}Changes to this&nbsp;policy</h2>
     <p>If this policy changes, the updated version will be posted on this page with a new "last updated" date. Material changes will also be noted in the app or in the <a href="../changelog/">changelog</a>.</p>
-    <p>This policy is published in English only, so that there is one authoritative text rather than five translations that can drift apart.</p>
+    <p>There is a <a href="../nl/privacy/" hreflang="nl" lang="nl">Nederlandse vertaling</a>, because most of the people this app is for read Dutch first. This English text governs: if the two ever disagree, the English one is what was meant and the Dutch one has a bug. Only these two exist, because a translation is a promise to keep it in step, and two is what I can honestly keep.</p>
   </div>
 
   <div class="card">
     <h2 id="contact">{icon("mail", style="color:var(--mint)")}Contact</h2>
     <p>Questions about privacy? Email <a href="mailto:{EMAIL}">{EMAIL}</a>. For anything security-related, see the <a href="../security/">security page</a>.</p>
+  </div>
+"""
+    out += footer(lang, depth)
+    return out, canonical
+
+
+def build_privacy_nl():
+    """The Dutch policy. Same ids as the English one, so anchors line up."""
+    lang, depth = "nl", 2
+    canonical = BASE_PATH + "nl/privacy/"
+    P = privacy_nl
+
+    out = head(lang, P.TITLE, P.DESC, canonical, depth, "privacy")
+    out += header(lang, depth, "privacy", "privacy")
+    out += f"""
+  <h1>{e(no_orphan(P.H1))}</h1>
+  <p class="lede">{e(P.LEDE)}</p>
+  <p class="meta">{e(P.META.format(updated=UPDATED))}</p>
+
+  <div class="callout calm" role="note">
+    {icon("info")}
+    <p><strong>{e(P.GOVERNS_TITLE)}.</strong> {P.GOVERNS_BODY}</p>
+  </div>
+"""
+    for anchor, ico, colour, heading, body in P.SECTIONS:
+        filled = body.format(version=VERSION, build=BUILD, repo=REPO, email=EMAIL)
+        out += f"""
+  <div class="card">
+    <h2 id="{anchor}">{icon(ico, style=f"color:{colour}")}{e(no_orphan(heading))}
+      <a class="anchor" href="#{anchor}" aria-label="Link naar dit onderdeel">#</a></h2>
+{filled}  </div>
+"""
+    out += f"""
+  <div class="callout">
+    {icon("alert")}
+    <p>{e(C.STRINGS["nl"]["disclaimer"])}</p>
   </div>
 """
     out += footer(lang, depth)
@@ -891,6 +1144,20 @@ def build_about():
     <p>Plenty of apps will happily hold the most sensitive things about you: how you slept, what you took, who you were with, what you are worried about. Almost all of them keep a copy on a server, and almost all of them are honest that they do, in a paragraph nobody reads.</p>
     <p>ChillMate is the version of that app where the copy does not exist. Not encrypted-at-rest on someone's cloud, not anonymised, not retained for ninety days. There is no server, so there is nothing to leak, subpoena, sell, or change its mind about later.</p>
     <p>That constraint decides most of the design. It is why there is no account, why sync means <em>your</em> iCloud rather than ours, and why the app has to be genuinely useful offline, in a taxi, at four in the morning.</p>
+  </div>
+
+  <div class="card">
+    <div class="hero" style="padding-top:0">
+      <div>
+        <h2 id="firstlaunch">{icon("phone", style="color:var(--purple)")}The first two&nbsp;seconds
+          <a class="anchor" href="#firstlaunch" aria-label="Link to this section">#</a></h2>
+        <p>This plays once, the very first time the app opens, and then never again. It is a small thing to have spent time on, and it is the whole argument in one gesture: nothing is asked of you, nothing is signed up for, the mark draws itself and gets out of the way.</p>
+        <p class="meta">Rendered with Remotion. If you have asked your system for reduced motion, this stays a still image.</p>
+      </div>
+      <div class="hero-phone-wrap">
+        {phone_video(depth)}
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -931,14 +1198,14 @@ def build_about():
 
 
 RELEASES = [
-    ("4.2.1", "422", "August 2026", "Fixes, and one that mattered", [
+    ("4.2.1", "422", "2026-08-11", "August 2026", "Fixes, and one that mattered", [
         "Fixed a crash on opening the app after upgrading from 4.2.0, caused by two schema versions sharing a checksum.",
         "Choosing a language inside the app no longer drops your region, so dates, numbers and 24-hour time stay right.",
         "Translated the last untranslated strings, including every combination-checker warning, in all five languages.",
         "Accessibility fixes: high contrast now reaches card surfaces, the one-handed layout toggle does something again, and reduced motion is honoured in more places.",
         "Continuous integration runs and passes for the first time.",
     ]),
-    ("4.1.0", "410", "July 2026", "A home that knows the moment", [
+    ("4.1.0", "410", "2026-07-14", "July 2026", "A home that knows the moment", [
         "Redesigned home: tools grouped into four moments, before you go, while you are out, aftercare and health, and your patterns.",
         "It arranges itself. When a dose timer is running, or it is the morning after, the tool you need rises to the top.",
         "Get help now is pinned to the top, so breathing, grounding and emergency calls are never something to hunt for.",
@@ -946,7 +1213,7 @@ RELEASES = [
         "Optional weekend night check-ins on Friday and Saturday, with one-tap I am safe or Get help.",
         "Choose exactly which reminders you want during setup.",
     ]),
-    ("4.0.0", "400", "June 2026", "The Apple Watch update", [
+    ("4.0.0", "400", "2026-06-24", "June 2026", "The Apple Watch update", [
         "All-new Apple Watch app: streak, live dose timers, hydration, discreet check-ins and a breathing exercise.",
         "Safety screen on the watch: call your trusted contact or emergency services in one tap.",
         "Watch face complications and Smart Stack support.",
@@ -972,7 +1239,7 @@ def build_changelog():
   <h1>What&nbsp;changed</h1>
   <p class="lede">Every release, in the order it shipped. The full release notes for each version, in all five languages, live in the repository.</p>
 """
-    for version, build, when, headline, items in RELEASES:
+    for version, build, iso, when, headline, items in RELEASES:
         bullets = "".join(f"        <li>{i}</li>\n" for i in items)
         out += f"""
   <div class="card">
@@ -987,10 +1254,43 @@ def build_changelog():
   <div class="card">
     <h2>{icon("github", style="color:var(--mint)")}Everything&nbsp;else</h2>
     <p>Earlier versions, and the per-language release notes, are in <a href="{REPO}/tree/main/Marketing">the Marketing folder</a> of the repository.</p>
+    <p>Prefer not to check back? <a href="feed.xml">Subscribe to the feed</a>. It is a plain Atom file, it asks for no address, and I never learn that you are reading it.</p>
   </div>
 """
     out += footer(lang, depth)
     return out, canonical
+
+
+def build_feed():
+    """An Atom feed for the changelog.
+
+    A free app with no account has no way to tell you it changed, and an email
+    list would mean holding addresses, which is the one thing this whole project
+    is arranged not to do. A feed costs nothing and asks for nothing.
+    """
+    entries = ""
+    for version, build, iso, when, headline, items in RELEASES:
+        summary = " ".join(re.sub(r"<[^>]+>", "", i) for i in items)
+        entries += f"""  <entry>
+    <title>ChillMate {version}: {e(headline)}</title>
+    <link href="{BASE_URL}changelog/#v{version.replace('.', '-')}" />
+    <id>tag:thijsverstapen.github.io,{iso}:chillmate-{version}</id>
+    <updated>{iso}T12:00:00Z</updated>
+    <summary>{e(summary)}</summary>
+  </entry>
+"""
+    latest = RELEASES[0][2]
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>ChillMate releases</title>
+  <subtitle>What changed in each release of ChillMate.</subtitle>
+  <link href="{BASE_URL}changelog/feed.xml" rel="self" />
+  <link href="{BASE_URL}changelog/" />
+  <id>{BASE_URL}changelog/</id>
+  <updated>{latest}T12:00:00Z</updated>
+  <author><name>Thijs Verstappen</name></author>
+{entries}</feed>
+"""
 
 
 def build_press():
@@ -1003,10 +1303,10 @@ def build_press():
     out += header(lang, depth, "")
     shots = "".join(
         f'      <a class="res" href="../assets/shots/{name}"><div class="t">{label}{icon("ext")}</div>'
-        f'<div class="d">PNG, 560 px wide</div></a>\n'
-        for name, label in [("home.png", "Home"), ("help.png", "Panic support"),
-                            ("privacy.png", "Privacy dashboard"), ("support.png", "Support"),
-                            ("more.png", "More")]
+        f'<div class="d">PNG</div></a>\n'
+        for name, label in [("home.png", "Home"), ("risk.png", "Risk checker"),
+                            ("help.png", "Panic support"), ("support.png", "Support"),
+                            ("privacy.png", "Privacy dashboard"), ("watch.png", "Apple Watch")]
     )
     out += f"""
   <h1>Press&nbsp;kit</h1>
@@ -1301,6 +1601,10 @@ def main():
         write(target, body)
         urls.append((canonical, "0.9"))
 
+    body, canonical = build_privacy_nl()
+    write(DOCS / "nl" / "privacy" / "index.html", body)
+    urls.append((canonical, "0.7"))
+
     for builder, folder in [(build_privacy, "privacy"), (build_about, "about"),
                             (build_changelog, "changelog"), (build_press, "press"),
                             (build_security, "security")]:
@@ -1308,6 +1612,7 @@ def main():
         write(DOCS / folder / "index.html", body)
         urls.append((canonical, "0.7"))
 
+    write(DOCS / "changelog" / "feed.xml", build_feed())
     write(DOCS / "404.html", build_404())
     write(DOCS / "robots.txt", ROBOTS)
     write(DOCS / "sw.js", SW)
@@ -1350,7 +1655,7 @@ def main():
         archive.writestr("README.txt", boiler)
         archive.write(ASSETS / "icon-512.png", "icon-512.png")
         archive.write(ASSETS / "og.png", "share-image-1200x630.png")
-        for name in SHOTS:
+        for name in SHOTS + ["watch.png"]:
             archive.write(ASSETS / "shots" / name, f"screenshots/{name}")
 
     print(f"Built {len(urls)} pages into {DOCS.relative_to(ROOT)}/")

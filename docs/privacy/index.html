@@ -11,6 +11,7 @@
   <link rel="icon" href="../assets/mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/icon-180.png" />
   <link rel="manifest" href="/ChillMate/manifest.webmanifest" />
+  <link rel="alternate" type="application/atom+xml" title="ChillMate releases" href="/ChillMate/changelog/feed.xml" />
 
   <meta property="og:site_name" content="ChillMate" />
   <meta property="og:title" content="ChillMate · Privacy Policy" />
@@ -26,7 +27,7 @@
   <meta name="twitter:title" content="ChillMate · Privacy Policy" />
   <meta name="twitter:description" content="ChillMate&#x27;s privacy policy, plus the honest detail: every network call the app makes, what a data breach could expose, and where to read the code." />
   <meta name="twitter:image" content="https://thijsverstapen.github.io/ChillMate/assets/og.png" />
-<script>try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <style>/* ChillMate site styles.
 
    The app is dark only. The site defaults to dark to match it, but honours a
@@ -487,6 +488,102 @@ h2:hover .anchor, h3:hover .anchor, .anchor:focus-visible { opacity: 1; }
 .hero .phone { max-width: 250px; }
 .hero-phone-wrap { display: grid; place-items: center; }
 
+/* ---------- the watch ---------- */
+
+.watch { width: 100%; max-width: 190px; margin-inline: auto; }
+.watch-shell {
+  position: relative;
+  border-radius: 27%;
+  padding: 8px;
+  background: linear-gradient(160deg, #3a4160 0%, #1e2439 45%, #12172b 100%);
+  box-shadow: var(--shadow-phone), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.watch-screen {
+  border-radius: 22%;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 416 / 496;
+}
+.watch-screen img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* The digital crown and side button, drawn rather than photographed so the
+   watch reads as hardware at any size. */
+.watch-shell::after,
+.watch-shell::before {
+  content: "";
+  position: absolute;
+  right: -3px;
+  background: linear-gradient(90deg, #4a5170, #262c44);
+  border-radius: 3px;
+}
+.watch-shell::before { top: 27%; width: 5px; height: 13%; }
+.watch-shell::after { top: 46%; width: 4px; height: 10%; opacity: 0.75; }
+
+.quote {
+  margin: 16px 0 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--mint);
+  background: color-mix(in srgb, var(--mint) 7%, transparent);
+  border-radius: 0 14px 14px 0;
+}
+.quote p { margin: 0; color: var(--text); font-size: 1.06rem; }
+.quote cite { display: block; margin-top: 7px; font-size: 0.86rem; color: var(--text-dim); font-style: normal; }
+
+/* ---------- three-beat night ---------- */
+
+.beats { display: grid; gap: 14px; counter-reset: beat; }
+@media (min-width: 780px) { .beats { grid-template-columns: repeat(3, 1fr); } }
+.beat {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 20px 22px;
+}
+.beat::before {
+  counter-increment: beat;
+  content: counter(beat);
+  display: grid;
+  place-items: center;
+  width: 30px; height: 30px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+.beat .eyebrow { margin: 0 0 3px; }
+.beat h3 { margin: 0 0 6px; font-size: 1.06rem; font-weight: 730; }
+.beat p { margin: 0; font-size: 0.95rem; color: var(--text-dim); }
+
+/* ---------- what it refuses to do ---------- */
+
+.refusals { list-style: none; padding: 0; margin: 8px 0 0; }
+.refusals li {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  max-width: none;
+}
+.refusals li:last-child { border-bottom: 0; padding-bottom: 0; }
+.refusals .icon { width: 20px; height: 20px; margin-top: 3px; color: var(--danger); }
+.refusals b { display: block; color: var(--text); font-weight: 700; }
+.refusals span { color: var(--text-dim); font-size: 0.95rem; }
+
+/* ---------- scenarios ---------- */
+
+.scenarios { list-style: none; padding: 0; margin: 6px 0 0; }
+.scenarios li {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  margin: 12px 0;
+  color: var(--text-soft);
+}
+.scenarios .icon { width: 18px; height: 18px; margin-top: 3px; color: var(--primary); }
+
 /* ---------- the guided walk ---------- */
 
 .walk { display: grid; gap: 34px; }
@@ -802,10 +899,17 @@ footer .made { margin-left: auto; }
 
 /* ---------- reveal on scroll ---------- */
 
-.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
-.reveal.is-in { opacity: 1; transform: none; }
+/* Gated on `.js`, which an inline script in <head> adds. Without that gate a
+   blocked, failed or slow site.js left nine sections of the home page at
+   opacity 0 with nothing to ever turn them back on: no animation is a fine
+   degradation, no content is not. */
+.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.js .reveal.is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; }
+  .js .reveal { opacity: 1; transform: none; }
+}
+@media print {
+  .js .reveal { opacity: 1 !important; transform: none !important; }
 }
 
 /* ---------- the mark draws itself ---------- */
@@ -1085,6 +1189,36 @@ footer .made { margin-left: auto; }
   </div>
 
   <div class="card">
+    <h2 id="history"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-doc"/></svg>Every change this page has ever&nbsp;had
+      <a class="anchor" href="#history" aria-label="Link to this section">#</a></h2>
+    <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
+    <div class="table-scroll">
+      <table>
+        <caption>7 changes since this page first existed.</caption>
+        <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
+        <tbody>
+          <tr><td>2026-08-11</td><td>Tag foreign service names, and answer the question the tables were dancing around</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/9b6ba66"><code>9b6ba66</code></a></td></tr>
+          <tr><td>2026-08-11</td><td>Show the actual app on the site, and let it speak five languages</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/1a0ef4f"><code>1a0ef4f</code></a></td></tr>
+          <tr><td>2026-08-11</td><td>Rebuild the GitHub Pages site around the real ChillMate mark</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/f69138e"><code>f69138e</code></a></td></tr>
+          <tr><td>2026-07-30</td><td>Make 4.2.1 shippable: fix the blockers the audit found, then the bugs the audit missed</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/76a709a"><code>76a709a</code></a></td></tr>
+          <tr><td>2026-07-28</td><td>Rate limit PIN entry, add a passcode fallback, cap backup growth</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/9ca50e2"><code>9ca50e2</code></a></td></tr>
+          <tr><td>2026-06-19</td><td>Neutralize store-facing docs and remove App Store description copy (Guideline 1.1)</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/aebb91e"><code>aebb91e</code></a></td></tr>
+          <tr><td>2026-06-11</td><td>v2.1.2 (230): single-stack More tab, setup wizard, privacy/support site</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/4a44e79"><code>4a44e79</code></a></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Compare any two versions yourself in <a href="https://github.com/thijsverstapen/ChillMate/commits/main/docs/privacy/index.html">the file's history</a>.</p>
+  </div>
+
+  <div class="card">
+    <h2 id="ifitchanged"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-hand"/></svg>What it would take to start collecting your&nbsp;data
+      <a class="anchor" href="#ifitchanged" aria-label="Link to this section">#</a></h2>
+    <p>Worth being concrete, because "we will never" is cheap and the honest version of the claim is structural rather than moral.</p>
+    <p>Collecting anything would mean writing a server, standing it up somewhere, adding accounts so records could be attributed to people, adding networking code to an app that currently has none, and shipping all of that through App Review with a privacy label that would have to change from nothing to something. It is not a setting somebody could flip, and it is not a line somebody could sneak in: it is a different app, built differently, and the commit that started it would be public on the day it was written.</p>
+    <p>That is the actual protection. Not a promise about intentions, but a shape that makes the other thing expensive and visible.</p>
+  </div>
+
+  <div class="card">
     <h2 id="saves"><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-mail"/></svg>What ChillMate can&nbsp;save</h2>
     <ul>
       <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
@@ -1168,7 +1302,7 @@ footer .made { margin-left: auto; }
   <div class="card">
     <h2 id="changes"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-doc"/></svg>Changes to this&nbsp;policy</h2>
     <p>If this policy changes, the updated version will be posted on this page with a new "last updated" date. Material changes will also be noted in the app or in the <a href="../changelog/">changelog</a>.</p>
-    <p>This policy is published in English only, so that there is one authoritative text rather than five translations that can drift apart.</p>
+    <p>There is a <a href="../nl/privacy/" hreflang="nl" lang="nl">Nederlandse vertaling</a>, because most of the people this app is for read Dutch first. This English text governs: if the two ever disagree, the English one is what was meant and the Dutch one has a bug. Only these two exist, because a translation is a promise to keep it in step, and two is what I can honestly keep.</p>
   </div>
 
   <div class="card">
@@ -1188,7 +1322,7 @@ footer .made { margin-left: auto; }
     <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    <span class="made">ChillMate 4.2.1 · made with care in the Netherlands</span>
+    <span class="made">ChillMate 4.2.1 · made by one person in the Netherlands</span>
   </footer>
 
 </main>

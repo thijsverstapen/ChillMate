@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChillMate · Hulp en ondersteuning</title>
-  <meta name="description" content="Contact, veelgestelde vragen en echte crisis- en zorgdiensten voor jouw land." />
+  <meta name="description" content="Crisislijnen en zorgdiensten voor jouw land, offline en printbaar, plus veelgestelde vragen en hoe je mij bereikt." />
   <meta name="theme-color" content="#0e1430" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
   <link rel="canonical" href="https://thijsverstapen.github.io/ChillMate/nl/support/" />
@@ -17,22 +17,23 @@
   <link rel="icon" href="../../assets/mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../../assets/icon-180.png" />
   <link rel="manifest" href="/ChillMate/manifest.webmanifest" />
+  <link rel="alternate" type="application/atom+xml" title="ChillMate releases" href="/ChillMate/changelog/feed.xml" />
 
   <meta property="og:site_name" content="ChillMate" />
   <meta property="og:title" content="ChillMate · Hulp en ondersteuning" />
-  <meta property="og:description" content="Contact, veelgestelde vragen en echte crisis- en zorgdiensten voor jouw land." />
+  <meta property="og:description" content="Crisislijnen en zorgdiensten voor jouw land, offline en printbaar, plus veelgestelde vragen en hoe je mij bereikt." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://thijsverstapen.github.io/ChillMate/nl/support/" />
   <meta property="og:locale" content="nl" />
-  <meta property="og:image" content="https://thijsverstapen.github.io/ChillMate/assets/og.png" />
+  <meta property="og:image" content="https://thijsverstapen.github.io/ChillMate/assets/og-nl.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="ChillMate. A calm, private place to look after yourself." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="ChillMate · Hulp en ondersteuning" />
-  <meta name="twitter:description" content="Contact, veelgestelde vragen en echte crisis- en zorgdiensten voor jouw land." />
-  <meta name="twitter:image" content="https://thijsverstapen.github.io/ChillMate/assets/og.png" />
-<script>try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+  <meta name="twitter:description" content="Crisislijnen en zorgdiensten voor jouw land, offline en printbaar, plus veelgestelde vragen en hoe je mij bereikt." />
+  <meta name="twitter:image" content="https://thijsverstapen.github.io/ChillMate/assets/og-nl.png" />
+<script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
   <style>/* ChillMate site styles.
 
    The app is dark only. The site defaults to dark to match it, but honours a
@@ -493,6 +494,102 @@ h2:hover .anchor, h3:hover .anchor, .anchor:focus-visible { opacity: 1; }
 .hero .phone { max-width: 250px; }
 .hero-phone-wrap { display: grid; place-items: center; }
 
+/* ---------- the watch ---------- */
+
+.watch { width: 100%; max-width: 190px; margin-inline: auto; }
+.watch-shell {
+  position: relative;
+  border-radius: 27%;
+  padding: 8px;
+  background: linear-gradient(160deg, #3a4160 0%, #1e2439 45%, #12172b 100%);
+  box-shadow: var(--shadow-phone), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.watch-screen {
+  border-radius: 22%;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 416 / 496;
+}
+.watch-screen img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* The digital crown and side button, drawn rather than photographed so the
+   watch reads as hardware at any size. */
+.watch-shell::after,
+.watch-shell::before {
+  content: "";
+  position: absolute;
+  right: -3px;
+  background: linear-gradient(90deg, #4a5170, #262c44);
+  border-radius: 3px;
+}
+.watch-shell::before { top: 27%; width: 5px; height: 13%; }
+.watch-shell::after { top: 46%; width: 4px; height: 10%; opacity: 0.75; }
+
+.quote {
+  margin: 16px 0 0;
+  padding: 14px 18px;
+  border-left: 3px solid var(--mint);
+  background: color-mix(in srgb, var(--mint) 7%, transparent);
+  border-radius: 0 14px 14px 0;
+}
+.quote p { margin: 0; color: var(--text); font-size: 1.06rem; }
+.quote cite { display: block; margin-top: 7px; font-size: 0.86rem; color: var(--text-dim); font-style: normal; }
+
+/* ---------- three-beat night ---------- */
+
+.beats { display: grid; gap: 14px; counter-reset: beat; }
+@media (min-width: 780px) { .beats { grid-template-columns: repeat(3, 1fr); } }
+.beat {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 20px 22px;
+}
+.beat::before {
+  counter-increment: beat;
+  content: counter(beat);
+  display: grid;
+  place-items: center;
+  width: 30px; height: 30px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+.beat .eyebrow { margin: 0 0 3px; }
+.beat h3 { margin: 0 0 6px; font-size: 1.06rem; font-weight: 730; }
+.beat p { margin: 0; font-size: 0.95rem; color: var(--text-dim); }
+
+/* ---------- what it refuses to do ---------- */
+
+.refusals { list-style: none; padding: 0; margin: 8px 0 0; }
+.refusals li {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  max-width: none;
+}
+.refusals li:last-child { border-bottom: 0; padding-bottom: 0; }
+.refusals .icon { width: 20px; height: 20px; margin-top: 3px; color: var(--danger); }
+.refusals b { display: block; color: var(--text); font-weight: 700; }
+.refusals span { color: var(--text-dim); font-size: 0.95rem; }
+
+/* ---------- scenarios ---------- */
+
+.scenarios { list-style: none; padding: 0; margin: 6px 0 0; }
+.scenarios li {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  margin: 12px 0;
+  color: var(--text-soft);
+}
+.scenarios .icon { width: 18px; height: 18px; margin-top: 3px; color: var(--primary); }
+
 /* ---------- the guided walk ---------- */
 
 .walk { display: grid; gap: 34px; }
@@ -808,10 +905,17 @@ footer .made { margin-left: auto; }
 
 /* ---------- reveal on scroll ---------- */
 
-.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
-.reveal.is-in { opacity: 1; transform: none; }
+/* Gated on `.js`, which an inline script in <head> adds. Without that gate a
+   blocked, failed or slow site.js left nine sections of the home page at
+   opacity 0 with nothing to ever turn them back on: no animation is a fine
+   degradation, no content is not. */
+.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.js .reveal.is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; }
+  .js .reveal { opacity: 1; transform: none; }
+}
+@media print {
+  .js .reveal { opacity: 1 !important; transform: none !important; }
 }
 
 /* ---------- the mark draws itself ---------- */
@@ -973,7 +1077,7 @@ footer .made { margin-left: auto; }
     <div class="head-right">
       <nav class="site-nav" aria-label="Home">
       <a href="../">Home</a>
-      <a href="../../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
+      <a href="../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
       <a href="../support/" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Hulp</a>
       <a href="../../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Over</a>
       <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
@@ -996,8 +1100,8 @@ footer .made { margin-left: auto; }
     </div>
   </header>
 
-  <h1>Hulp en ondersteuning</h1>
-  <p class="lede">Vragen, feedback of een bug melden? ChillMate wordt door één ontwikkelaar gemaakt, dus er leest een echt mens mee.</p>
+  <h1>Hulp, en hoe je mij bereikt</h1>
+  <p class="lede">Eerst echte hulpverlening, want daar is deze pagina het nuttigst voor. Vragen over de app staan verderop, en er leest één persoon elk bericht.</p>
 
   <div class="callout urgent" role="note">
     <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
@@ -1007,10 +1111,10 @@ footer .made { margin-left: auto; }
   <section class="section">
     <p class="eyebrow">Echte hulpverlening</p>
     <div class="card" data-countries>
-      <h2 id="services"><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-life"/></svg>Krijg hulp van mensen, niet van een app
-        <a class="anchor" href="#services" aria-label="Krijg hulp van mensen, niet van een app">#</a>
+      <h2 id="services"><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-life"/></svg>Hulp van mensen, niet van een app
+        <a class="anchor" href="#services" aria-label="Hulp van mensen, niet van een app">#</a>
       </h2>
-      <p>ChillMate is geen crisisdienst. Kies waar je bent, dan kunnen deze organisaties je direct helpen. Deze pagina is printbaar en werkt offline, zodat hij er nog is als het bereik dat niet is.</p>
+      <p>ChillMate is geen crisisdienst. Kies waar je bent, dan kunnen deze organisaties je direct helpen. Deze pagina is printbaar en werkt zonder bereik, want dat is precies wanneer deze nummers ertoe doen.</p>
 
       <div class="picker-row">
         <label for="country">Waar ben je?</label>
@@ -1178,35 +1282,35 @@ footer .made { margin-left: auto; }
       <div class="faq">
         <details>
           <summary>Zijn mijn gegevens privé?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Ja. ChillMate houdt je gegevens op je iPhone. Geen advertenties, geen trackers, en er wordt niets verkocht. De app is open source, dus je kunt precies nalezen wat er met je gegevens gebeurt.</p></div>
+          <div class="body"><p>Ja, en je hoeft me niet te geloven. ChillMate houdt alles op je iPhone, heeft geen account en geen server, en draait geen advertenties, analytics of trackers. De app is open source, dus je kunt precies nalezen wat er met je invoer gebeurt.</p></div>
+        </details>
+        <details>
+          <summary>Wat kost het?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Niets, en er is geen betaalde versie. Een optionele fooi loopt via Apple In-App Purchase en ontgrendelt helemaal niets. Elke functie is er voor iedereen, want een veiligheidstool achter een betaalmuur is geen veiligheidstool.</p></div>
+        </details>
+        <details>
+          <summary>Zegt hij of iets veilig is?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Nee, en dat zal hij nooit doen. De risicocheck laat zien wat er over een combinatie gedocumenteerd is, ook met medicijnen die je al gebruikt, en stopt daar. Er is geen groen licht. Voor alles wat ertoe doet is een arts of apotheker de juiste plek.</p></div>
         </details>
         <details>
           <summary>Hoe maak ik een back-up of stap ik over naar een nieuwe telefoon?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Zet iCloud-back-up aan in Instellingen om een versleutelde back-up in je eigen iCloud Drive te bewaren, of exporteer een versleuteld back-upbestand. Op een nieuw toestel herstel je vanuit iCloud of importeer je dat bestand tijdens het instellen.</p></div>
+          <div class="body"><p>Zet iCloud-back-up aan in Instellingen om een versleutelde back-up in je eigen iCloud Drive te bewaren, of exporteer zelf een versleuteld back-upbestand. Op een nieuw toestel herstel je vanuit iCloud of importeer je dat bestand tijdens het instellen.</p></div>
         </details>
         <details>
-          <summary>Hoe vergrendel ik de app?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Zet in Instellingen, onder Privacy en vergrendeling, Face ID aan of stel een pincode in. Je kunt ook discrete meldingen aanzetten zodat de tekst op je vergrendelscherm vaag blijft, en ChillMate verbergt zijn inhoud in de app-switcher en tijdens schermopname of spiegelen.</p></div>
-        </details>
-        <details>
-          <summary>Hoe werken fooien?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>De optionele fooi gaat via Apple In-App Purchase. Hij is volledig vrijwillig, ontgrendelt niets, en elke functie blijft voor iedereen gratis.</p></div>
+          <summary>Hoe vergrendel of verberg ik de app?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Zet in Instellingen, onder Privacy en vergrendeling, Face ID aan of stel een pincode in. Je kunt ook discrete meldingen aanzetten zodat je vergrendelscherm niets prijsgeeft, en ChillMate verbergt zijn inhoud in de app-switcher en tijdens schermopname of spiegelen. Eén tik maakt het scherm zwart met een maantje.</p></div>
         </details>
         <details>
           <summary>Hoe verwijder ik mijn gegevens?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Je kunt losse items of alles in één keer verwijderen binnen de app. De app verwijderen wist de lokale gegevens, en iCloud-gegevens haal je weg via de back-upinstellingen of via iCloud.</p></div>
-        </details>
-        <details>
-          <summary>Geeft ChillMate medisch advies?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Nee. ChillMate helpt je reflecteren, plannen en ordenen. Het stelt geen diagnose, schrijft niets voor en zegt niet of iets veilig is. Leg belangrijke dingen voor aan een deskundige.</p></div>
+          <div class="body"><p>Losse items of alles in één keer, binnen de app. De app verwijderen wist de lokale gegevens, en iCloud-gegevens haal je weg via de back-upinstellingen of via iCloud. Er is nergens anders een kopie waar je naar zou moeten vragen.</p></div>
         </details>
         <details>
           <summary>Welke landen worden ondersteund?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
           <div class="body"><p>ChillMate werkt overal. De hulpbronnen volgen het land dat je bij het instellen kiest, met ingebouwde diensten voor Nederland, België, Duitsland, het Verenigd Koninkrijk, Ierland, Frankrijk, Spanje, de Verenigde Staten en Australië, en internationale alternatieven daarbuiten.</p></div>
         </details>
         <details>
-          <summary>Welke talen spreekt de app?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Engels, Nederlands, Duits, Frans en Spaans, op de telefoon en op Apple Watch. Je stelt de taal in de app of in iOS-instellingen in, en de laatste die je wijzigde is degene die geldt.</p></div>
+          <summary>Welke talen spreekt hij?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Engels, Nederlands, Duits, Frans en Spaans, op de telefoon en op Apple Watch. Stel de taal in de app of in iOS-instellingen in; de laatste die je wijzigde is degene die geldt.</p></div>
         </details>
       </div>
     </div>
@@ -1221,7 +1325,7 @@ footer .made { margin-left: auto; }
                 hidden aria-label="Kopiëren"><svg class="icon" aria-hidden="true"><use href="#i-doc"/></svg></button><span class="copy-done"></span>
       </p>
       <div class="contact-row">
-        <a class="btn btn-primary" href="mailto:chillmate@icloud.com"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Mail de ondersteuning</a>
+        <a class="btn btn-primary" href="mailto:chillmate@icloud.com"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Mail mij</a>
         <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate/issues"><svg class="icon" aria-hidden="true"><use href="#i-bug"/></svg>Meld een probleem</a>
       </div>
     </div>
@@ -1230,7 +1334,11 @@ footer .made { margin-left: auto; }
   <section class="section">
     <div class="callout calm">
       <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>
-      <p>Het privacybeleid staat alleen in het Engels, zodat er één gezaghebbende tekst is in plaats van vijf die uit elkaar kunnen groeien. <a href="../../privacy/">Lees het volledige privacybeleid</a></p>
+      <p>Er is een Nederlandse vertaling van het privacybeleid. De Engelse tekst is de gezaghebbende versie: bij verschil geldt die. <a href="../../privacy/">Lees het volledige privacybeleid</a></p>
+    </div>
+    <div class="callout">
+      <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+      <p>ChillMate ondersteunt reflectie, planning en je eigen welzijn. Het vervangt geen behandelaar en bepaalt nooit of iets veilig is. Als iemand in direct gevaar kan zijn, bel dan je lokale alarmnummer.</p>
     </div>
   </section>
 
@@ -1246,7 +1354,7 @@ footer .made { margin-left: auto; }
     <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    <span class="made">ChillMate 4.2.1 · met zorg gemaakt in Nederland</span>
+    <span class="made">ChillMate 4.2.1 · gemaakt door één persoon in Nederland</span>
   </footer>
 
 </main>
