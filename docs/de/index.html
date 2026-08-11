@@ -1447,6 +1447,32 @@ sup.fn a { border: 0; font-weight: 700; }
   padding: 18px 20px 0;
 }
 .exhibition .hero-full { min-height: calc(100svh - 84px); }
+
+/* One line of a person, in the hero, where the rest of the page is product. */
+.human {
+  margin-top: 20px;
+  padding-left: 16px;
+  border-left: 2px solid color-mix(in srgb, var(--mint) 55%, transparent);
+  color: var(--text-soft);
+  font-size: clamp(0.98rem, 1.2vw, 1.06rem);
+  max-width: 42ch;
+}
+
+/* The demo took the room the feature grid gave up. */
+@media (min-width: 900px) {
+  .demo--wide { grid-template-columns: 0.85fr 1.15fr; gap: 52px; }
+}
+.demo--wide .demo-out { min-height: 280px; }
+.demo--wide .verdict p { font-size: 1.05rem; }
+
+/* A statement chapter that carries a sentence rather than three numbers. */
+.statement-line {
+  font-size: clamp(2.2rem, 6vw, 4.6rem) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.035em !important;
+  max-width: 20ch;
+  margin-inline: auto;
+}
 </style>
 </head>
 <body class="exhibition">
@@ -1564,6 +1590,7 @@ sup.fn a { border: 0; font-weight: 700; }
     <div class="head-right">
       <nav class="site-nav" aria-label="Start">
       <a href="./" aria-current="page">Start</a>
+      <a href="./how-it-works/"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>So funktioniert es</a>
       <a href="../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Datenschutz</a>
       <a href="./support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Hilfe</a>
       <a href="../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Über</a>
@@ -1604,11 +1631,12 @@ sup.fn a { border: 0; font-weight: 700; }
       <h1>Ein ruhiger, privater Ort, um auf dich zu achten.</h1>
       <div class="hero-cols">
         <div>
-          <p class="lede">ChillMate hält deine Nächte, Pläne, Erinnerungen und Sicherheitswerkzeuge in einer privaten Übersicht auf deinem iPhone. Es ist kostenlos, es ist Open Source, und es gibt keinen Server, also gibt es keinen anderen Ort, an dem etwas davon liegen könnte.</p>
+          <p class="lede">Deine Nächte, Pläne und Sicherheitswerkzeuge in einer privaten Übersicht auf deinem iPhone. Kostenlos, Open Source, und ohne Server.</p>
           <div class="cta-row">
             <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Sag%20mir%20Bescheid%2C%20wenn%20ChillMate%20da%20ist&body=Du%20musst%20nichts%20schreiben.%20Ich%20antworte%20einmal%2C%20am%20Tag%20des%20Starts%2C%20und%20l%C3%B6sche%20deine%20Adresse%20danach."><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Sag mir Bescheid, wenn es da ist</a>
             <a class="btn btn-ghost" href="#inside"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>So funktioniert es</a>
           </div>
+          <p class="human">Ich bin eine Person in den Niederlanden. Ich habe die App gebaut, die es geben sollte, und ich sehe nie etwas von dem, was du hineinschreibst.</p>
           <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Noch nicht im App Store. Schick eine leere Mail und du hörst genau einmal von mir, an dem Tag, an dem es so weit ist.</p>
           <a class="scroll-cue" href="#statement">Scrollen<svg class="icon" aria-hidden="true"><use href="#i-chev"/></svg></a>
         </div>
@@ -1641,7 +1669,7 @@ sup.fn a { border: 0; font-weight: 700; }
     <div class="inner">
       <p class="eyebrow">Für wen es ist</p>
       <h2>Gemacht für die Nächte, um die es hier wirklich geht</h2>
-      <p>Chems, Hookups, oder beides. ChillMate hat dazu keine Meinung und wird dich nie bitten, eine Nacht zu rechtfertigen. Was es tut: die praktischen Teile festhalten, die du um vier Uhr morgens lieber nicht klären möchtest.</p>
+      <p>Chems, Hookups, oder beides. ChillMate hat dazu keine Meinung und wird dich nie bitten, eine Nacht zu rechtfertigen.</p>
       <ul class="checks stagger">
           <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Ein Risikocheck, der weiß, was du ohnehin nimmst, dein eigenes Rezept eingeschlossen.</span></li>
           <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Ein Check-in-Timer, damit jemand weiß, dass du zu Hause bist, ohne dass du schreiben musst.</span></li>
@@ -1649,16 +1677,6 @@ sup.fn a { border: 0; font-weight: 700; }
           <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Test-Erinnerungen, die auf dem Sperrbildschirm nie sagen, worum es geht.</span></li>
       </ul>
       <p>Die App nennt eine Nacht einen <strong>Chill</strong>. Deinen, wie er auch war.</p>
-
-      <h3 style="margin-top:clamp(48px,6vw,86px)">Daran merkst du es.</h3>
-      <ul class="scenarios stagger">
-          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Du willst dich an letzte Nacht genau erinnern, nicht vage, und nicht über jemand anderen.</span></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Du nimmst PrEP und möchtest lieber nicht, dass die Erinnerung PrEP auf deinen Sperrbildschirm schreibt.</span></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Du willst einen Anlass, dich bei jemandem zu melden, der kein ganzes Gespräch ist.</span></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Du hast dich unter der Woche schon gefragt, ob es öfter ist als früher.</span></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Du willst die Notrufnummer für den Ort, an dem du bist, ohne einen Browser zu entsperren.</span></li>
-      </ul>
-      <p>Wahrscheinlich nichts für dich, wenn du etwas suchst, das die Nacht für dich bewertet, dein Verhalten benotet oder dir sagt, eine Kombination sei sicher. Alle drei lässt es absichtlich.</p>
     </div>
   </section>
 
@@ -1695,7 +1713,7 @@ sup.fn a { border: 0; font-weight: 700; }
         </div>
       </div>
             <h2>Was aus heute Nacht auch wurde</h2>
-            <p>Trag eine Nacht ein und der Startbildschirm ordnet sich darum herum. Hier hat er erkannt, dass ein PEP-Gespräch sinnvoll sein könnte, und den Countdown allein nach oben gestellt. Jetzt Hilfe holen bleibt immer über allem.</p>
+            <p>Trag eine Nacht ein und der Startbildschirm ordnet sich darum herum. Hier hat er erkannt, dass ein PEP-Gespräch sinnvoll sein könnte, und den Countdown allein nach oben gestellt.</p>
           </div>
 
           <div class="walk-step">
@@ -1709,7 +1727,7 @@ sup.fn a { border: 0; font-weight: 700; }
         </div>
       </div>
             <h2>Und weigert sich zu sagen, es sei sicher</h2>
-            <p>Wähl aus, was im Spiel ist, deine eigenen Medikamente eingeschlossen, und der Risikocheck zeigt dir, was zu dieser Kombination dokumentiert ist. Es gibt kein grünes Licht. Nichts in ChillMate wird dir je sagen, dass etwas in Ordnung ist.</p>
+            <p>Wähl aus, was im Spiel ist, deine Medikamente eingeschlossen, und es zeigt, was zu dieser Kombination dokumentiert ist. Es gibt kein grünes Licht.</p>
           </div>
 
           <div class="walk-step">
@@ -1723,7 +1741,7 @@ sup.fn a { border: 0; font-weight: 700; }
         </div>
       </div>
             <h2>Für den Moment, in dem es schon schiefgeht</h2>
-            <p>Wenig Reize, eins nach dem anderen. Starte den Atemtimer, geh die Grounding-Schritte durch, und ruf erst jemanden an, wenn du das willst.</p>
+            <p>Wenig Reize, eins nach dem anderen. Atme, geh die Grounding-Schritte durch, und ruf erst jemanden an, wenn du das willst.</p>
           </div>
 
           <div class="walk-step">
@@ -1737,7 +1755,7 @@ sup.fn a { border: 0; font-weight: 700; }
         </div>
       </div>
             <h2>Hilfe von Menschen, nicht von einer App</h2>
-            <p>Krisentelefone, sexuelle Gesundheit, Drogen, LGBTQ+ Unterstützung und praktische Hilfe für das Land, das du einstellst. Eine Liste auf deinem Handy, also auch ohne Empfang und ohne Nachschlagen.<sup class="fn"><a href="#fn-9" id="fnref-9" aria-label="Footnote 9">9</a></sup></p>
+            <p>Krisentelefone, sexuelle Gesundheit, Drogen und LGBTQ+ Unterstützung für das Land, das du einstellst. Eine Liste auf dem Handy, also auch ohne Empfang.<sup class="fn"><a href="#fn-2" id="fnref-2" aria-label="Footnote 2">2</a></sup></p>
           </div>
 
           <div class="walk-step">
@@ -1751,32 +1769,8 @@ sup.fn a { border: 0; font-weight: 700; }
         </div>
       </div>
             <h2>In der App, nicht nur in einer Erklärung</h2>
-            <p>Was auf dem Gerät liegt, was in einem verschlüsselten Backup wäre, welche Health-Kategorien du erlaubt hast, und was ChillMate nie sendet. Dafür solltest du keine Erklärung lesen müssen.</p>
+            <p>Was auf dem Gerät liegt, was in einem verschlüsselten Backup wäre, und was ChillMate nie sendet. Dafür solltest du keine Erklärung lesen müssen.</p>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="chapter" id="night">
-    <div class="inner">
-      <p class="eyebrow">Wie es passt</p>
-      <h2>Eine Nacht, in drei Momenten.</h2>
-      <div class="beats stagger">
-        <div class="beat">
-          <p class="eyebrow">Bevor du losgehst</p>
-          <h3>Entscheide, solange es leicht ist</h3>
-          <p>Lass die Kombination vom Risikocheck ansehen, halt fest, worauf du Lust hast und worauf nicht, und starte einen Check-in-Timer. Fünf Minuten jetzt, solange du klar bist und noch nichts passiert ist.</p>
-        </div>
-        <div class="beat">
-          <p class="eyebrow">Wenn du unterwegs bist</p>
-          <h3>Ein Tipp, nichts tippen</h3>
-          <p>Der Timer fragt, ob alles gut ist. Mir geht&#x27;s gut ist ein Tipp. Hilfe holen ist der andere, und der kennt deine Vertrauensperson und die richtige Notrufnummer für deinen Ort bereits. Deine Uhr kann für dich antworten.</p>
-        </div>
-        <div class="beat">
-          <p class="eyebrow">Der Morgen danach</p>
-          <h3>Erinnere dich richtig</h3>
-          <p>Schlaf, wie es dir geht, was tatsächlich geholfen hat. Es dauert eine Minute und es ist der Teil, über den du in drei Monaten froh bist, wenn die Muster die einzige ehrliche Aufzeichnung sind, die du hast.</p>
         </div>
       </div>
     </div>
@@ -1786,9 +1780,9 @@ sup.fn a { border: 0; font-weight: 700; }
     <div class="inner">
       <p class="eyebrow">Ausprobieren</p>
       <h2>Das ist der echte Risikocheck.</h2>
-      <p>Kein Screenshot davon. Dieselben 30 Kombinationen, derselbe Wortlaut, dieselbe Weigerung, etwas sicher zu nennen, hier in deinem Browser. Wähl zwei und schau.<sup class="fn"><a href="#fn-8" id="fnref-8" aria-label="Footnote 8">8</a></sup></p>
+      <p>Kein Screenshot davon. Dieselben 30 Kombinationen, derselbe Wortlaut, hier ausgeführt.<sup class="fn"><a href="#fn-3" id="fnref-3" aria-label="Footnote 3">3</a></sup></p>
 
-      <div class="demo panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
+      <div class="demo demo--wide panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
         <div>
           <p class="eyebrow">Wähl, was im Spiel ist</p>
           <div class="demo-picker">
@@ -1819,15 +1813,22 @@ sup.fn a { border: 0; font-weight: 700; }
     </div>
   </section>
 
+  <section class="chapter chapter--invert statement" id="never">
+    <div class="inner">
+      <div class="statement-grid stagger" style="grid-template-columns:1fr">
+        <div><b class="statement-line">Es sagt dir nie, dass etwas sicher ist.</b></div>
+      </div>
+      <p>Nicht der Risikocheck, nicht die Zusammenfassungen, nirgends. Es zeigt, was bekannt ist, und gibt dir die Entscheidung zurück.</p>
+    </div>
+  </section>
+
   <section class="chapter" id="privacy">
     <div class="inner">
       <p class="eyebrow">Privat gebaut</p>
       <h2>Dein Handy, und sonst nirgends</h2>
-      <p>Datenschutz ist hier keine Einstellung, die du aktivierst. Es ist die Form der App.</p>
+      <p>Datenschutz ist hier keine Einstellung. Es ist die Form der App.</p>
       <ul class="checks stagger">
-          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Kein Konto, keine Anmeldung. Kein Server hält dein Log, weil es keinen Server gibt.<sup class="fn"><a href="#fn-2" id="fnref-2" aria-label="Footnote 2">2</a></sup></span></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Keine Werbung, keine Analytics, keine Tracker, und nichts wird je verkauft oder geteilt.</span></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Sichere sie mit Face ID oder PIN, alles auf dem Gerät verschlüsselt.<sup class="fn"><a href="#fn-3" id="fnref-3" aria-label="Footnote 3">3</a></sup></span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Sichere sie mit Face ID oder PIN, alles auf dem Gerät verschlüsselt.<sup class="fn"><a href="#fn-4" id="fnref-4" aria-label="Footnote 4">4</a></sup></span></li>
           <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Backups sind optional und verschlüsselt und gehen in deine eigene iCloud Drive.<sup class="fn"><a href="#fn-5" id="fnref-5" aria-label="Footnote 5">5</a></sup></span></li>
           <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Mitteilungen können auf dem Sperrbildschirm bewusst vage bleiben.<sup class="fn"><a href="#fn-6" id="fnref-6" aria-label="Footnote 6">6</a></sup></span></li>
       </ul>
@@ -1858,116 +1859,13 @@ sup.fn a { border: 0; font-weight: 700; }
 </svg>
 
       <h3 style="margin-top:clamp(48px,6vw,86px)">Glaub mir nicht einfach so</h3>
-      <p>ChillMate ist Open Source. Jede Zeile, die deine Daten berührt, ist öffentlich, und das macht aus dem Versprechen oben etwas, das du prüfen kannst, statt etwas, wobei du mir vertrauen musst.</p>
-      <p>Im Code der App gibt es keinen einzigen Netzwerkaufruf. Kein Analytics-SDK, kein Crash-Reporter, nirgends eine <code>URLSession</code>. Dein Handy verlässt nur, was du antippst: ein Anruf, ein Link, eine Nachricht, die du geschrieben hast.<sup class="fn"><a href="#fn-1" id="fnref-1" aria-label="Footnote 1">1</a></sup></p>
+      <p>ChillMate ist Open Source. Jede Zeile, die deine Daten berührt, ist öffentlich, und das macht aus dem Versprechen oben etwas Prüfbares.</p>
+      <p>Im Code der App gibt es keinen einzigen Netzwerkaufruf. Kein Analytics-SDK, kein Crash-Reporter, nirgends eine <code>URLSession</code>. Dein Handy verlässt nur, was du antippst.<sup class="fn"><a href="#fn-1" id="fnref-1" aria-label="Footnote 1">1</a></sup></p>
       <div class="cta-row">
         <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>Quellcode lesen</a>
         <a class="btn btn-ghost" href="../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Vollständige Datenschutzerklärung lesen</a>
       </div>
       <p class="meta" style="margin-top:14px">Geprüft an ChillMate 4.2.1 (Build 422).</p>
-    </div>
-  </section>
-
-  <section class="chapter chapter--invert" id="refuse">
-    <div class="inner">
-      <p class="eyebrow">Mit Absicht</p>
-      <h2>Was es nicht tut</h2>
-      <p>Die meiste Arbeit steckt in dem, was es nicht tut. Das ist schwerer zu halten als Funktionen, denn jedes davon ist etwas, worum irgendwann jemand bittet.</p>
-      <ul class="refusals stagger">
-          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Es sagt nicht, dass etwas sicher ist.</b><span>Es zeigt, was zu einer Kombination dokumentiert ist, und gibt dir die Entscheidung zurück, denn es kennt deinen Körper, deine Dosis und deine Nacht nicht.</span></div></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Es benotet dich nicht als Person.</b><span>Es gibt eine Zahl für den Tag, sie bleibt auf deinem Handy, und nichts wird damit freigeschaltet oder vorenthalten.</span></div></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Es nervt nicht.</b><span>Jede Erinnerung ist aus, bis du sie einschaltest, und lässt sich so formulieren, dass ein Sperrbildschirm nichts verrät.</span></div></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Es will kein Konto.</b><span>Dazu gehörte ein Server, und ein Server ist eine Kopie von dir an einem Ort, an den du nicht kommst.</span></div></li>
-          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>Es lässt dich nicht zahlen.</b><span>Alles kostenlos. Das Trinkgeld schaltet nichts frei, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke ist keines.</span></div></li>
-      </ul>
-    </div>
-  </section>
-
-  <section class="chapter" id="watch">
-    <div class="inner">
-      <div class="hero-cols" style="margin-top:0">
-          <div>
-            <p class="eyebrow">Apple Watch</p>
-            <h2>Es funktioniert, während das Handy in der Tasche bleibt</h2>
-            <p>Dosis-Timer, Trinken, diskrete Check-ins, eine Atemübung und ein Tipp zu deiner Vertrauensperson oder der örtlichen Notrufnummer, alles auf der Apple Watch, dazu Komplikationen für Zifferblatt und Smart Stack.<sup class="fn"><a href="#fn-4" id="fnref-4" aria-label="Footnote 4">4</a></sup></p>
-            <blockquote class="quote">
-              <p>Wenn sich etwas falsch anfühlt, hol Hilfe. Du bist nicht in Schwierigkeiten.</p>
-              <cite>Der gesamte Sicherheits-Screen der Uhr, Wortlaut inklusive.</cite>
-            </blockquote>
-          </div>
-          <div><div class="watch">
-        <div class="watch-shell">
-          <div class="watch-screen">
-            <img src="../assets/shots/watch.png" width="416" height="496"
-                 alt="The watch app's Safety screen, offering an emergency call and a way to ping your phone."
-                 loading="lazy" decoding="async" />
-          </div>
-        </div>
-      </div></div>
-      </div>
-
-      <h3 style="margin-top:clamp(48px,6vw,86px)">Es funktioniert in deiner Sprache</h3>
-      <p>App und Website gibt es auf Englisch, Niederländisch, Deutsch, Französisch und Spanisch. Die Hilfsangebote richten sich nach dem Land, das du einstellst, nicht nach deiner Lesesprache, denn das sind zwei verschiedene Fragen.</p>
-    </div>
-  </section>
-
-  <section class="chapter chapter--invert" id="features">
-    <div class="inner">
-      <p class="eyebrow">Was drin ist</p>
-      <div class="grid three stagger">
-        <div class="feature">
-          <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></div>
-          <h3>Privates Log</h3>
-          <p>Halte eine Nacht so fest, wie du sie erinnern willst: Schlaf, wie es dir ging, und was danach geholfen hat.</p>
-        </div>
-        <div class="feature">
-          <div class="chip tint-mint"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></div>
-          <h3>Deine Muster</h3>
-          <p>Ansichten über 30 und 90 Tage, was sich wirklich ändert, und ein Tageswert, den nur du je siehst.</p>
-        </div>
-        <div class="feature">
-          <div class="chip tint-purple"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg></div>
-          <h3>Care-Werkzeuge</h3>
-          <p>Atmung, eine Pause bei Verlangen, ein Plan für eine sicherere Session, und ein Weg nach Hause, wenn du ihn willst.</p>
-        </div>
-        <div class="feature">
-          <div class="chip tint-pink"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg></div>
-          <h3>Risikocheck</h3>
-          <p>Hinweise in klarer Sprache zu Kombinationen, auch mit den Medikamenten, die du bereits nimmst.</p>
-        </div>
-        <div class="feature">
-          <div class="chip tint-amber"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg></div>
-          <h3>Erinnerungen, die passen</h3>
-          <p>Check-in-Timer, ein PEP-Fenster und Test-Erinnerungen, auf Wunsch diskret formuliert.</p>
-        </div>
-        <div class="feature">
-          <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-watch"/></svg></div>
-          <h3>An deinem Handgelenk</h3>
-          <p>Timer, Check-ins und eine Notrufnummer auf der Apple Watch, ohne zum Handy zu greifen.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="chapter" id="questions">
-    <div class="inner">
-      <p class="eyebrow">Bevor du fragst</p>
-      <h2>Die drei Fragen, die alle stellen.</h2>
-      <div class="faq">
-          <details>
-            <summary>Sind meine Daten privat?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-            <div class="body"><p>Ja, und du musst mir nicht glauben. ChillMate hält alles auf deinem iPhone, hat kein Konto und keinen Server und betreibt keine Werbung, Analytics oder Tracker. Die App ist Open Source, du kannst also genau nachlesen, was mit deinen Eingaben passiert.</p></div>
-          </details>
-          <details>
-            <summary>Was kostet es?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-            <div class="body"><p>Nichts, und es gibt keine bezahlte Version. Ein optionales Trinkgeld läuft über Apples In-App-Kauf und schaltet überhaupt nichts frei. Jede Funktion steht allen offen, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke ist keines.</p></div>
-          </details>
-          <details>
-            <summary>Sagt es mir, ob etwas sicher ist?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-            <div class="body"><p>Nein, und das wird es nie. Der Risikocheck zeigt, was zu einer Kombination dokumentiert ist, auch mit Medikamenten, die du nimmst, und hört da auf. Es gibt kein grünes Licht. Für alles Wichtige sind Ärztin oder Apotheke die richtige Stelle.</p></div>
-          </details>
-      </div>
-      <p style="margin-top:22px"><a href="./support/">Die übrigen Fragen, und echte Anlaufstellen</a></p>
     </div>
   </section>
 
@@ -1983,11 +1881,11 @@ sup.fn a { border: 0; font-weight: 700; }
         <tr><th scope="row">Konto</th><td>Keins. Es gibt nichts zu registrieren.</td></tr>
         <tr><th scope="row">Erhobene Daten</th><td>Keine<sup class="fn"><a href="#fn-1" id="fnref-1" aria-label="Footnote 1">1</a></sup></td></tr>
         <tr><th scope="row">Sprachen</th><td>English, Nederlands, Deutsch, Français, Español</td></tr>
-        <tr><th scope="row">Hilfsangebote</th><td>10 Regionen, auf dem Gerät, funktioniert offline<sup class="fn"><a href="#fn-9" id="fnref-9" aria-label="Footnote 9">9</a></sup></td></tr>
-        <tr><th scope="row">Geprüfte Kombinationen</th><td>30 dokumentierte Wechselwirkungen, auf dem Gerät<sup class="fn"><a href="#fn-8" id="fnref-8" aria-label="Footnote 8">8</a></sup></td></tr>
+        <tr><th scope="row">Hilfsangebote</th><td>10 Regionen, auf dem Gerät, funktioniert offline<sup class="fn"><a href="#fn-2" id="fnref-2" aria-label="Footnote 2">2</a></sup></td></tr>
+        <tr><th scope="row">Geprüfte Kombinationen</th><td>30 dokumentierte Wechselwirkungen, auf dem Gerät<sup class="fn"><a href="#fn-3" id="fnref-3" aria-label="Footnote 3">3</a></sup></td></tr>
         <tr><th scope="row">Geschriebene Zusammenfassungen</th><td>Auf dem Gerät, Apple Foundation Models<sup class="fn"><a href="#fn-7" id="fnref-7" aria-label="Footnote 7">7</a></sup></td></tr>
-        <tr><th scope="row">Sync und Backup</th><td>Optional, verschlüsselt, deine eigene iCloud<sup class="fn"><a href="#fn-2" id="fnref-2" aria-label="Footnote 2">2</a></sup></td></tr>
-        <tr><th scope="row">Sperre</th><td>Face ID, oder eine PIN mit 200.000 PBKDF2-Runden<sup class="fn"><a href="#fn-3" id="fnref-3" aria-label="Footnote 3">3</a></sup></td></tr>
+        <tr><th scope="row">Sync und Backup</th><td>Optional, verschlüsselt, deine eigene iCloud<sup class="fn"><a href="#fn-8" id="fnref-8" aria-label="Footnote 8">8</a></sup></td></tr>
+        <tr><th scope="row">Sperre</th><td>Face ID, oder eine PIN mit 200.000 PBKDF2-Runden<sup class="fn"><a href="#fn-4" id="fnref-4" aria-label="Footnote 4">4</a></sup></td></tr>
         <tr><th scope="row">Quellcode</th><td>Offen, MIT-Lizenz</td></tr>
         <tr><th scope="row">Version</th><td>4.2.1 (Build 422)</td></tr>
         </tbody>
@@ -2001,15 +1899,14 @@ sup.fn a { border: 0; font-weight: 700; }
       <p>Marketingseiten fußnoten ihre Behauptungen ins Kleingedruckte. Diese fußnotet sie in den Quellcode.</p>
       <div class="footnotes">
         <ol>
-          <li id="fn-1"><div>Nirgends in der App Netzwerkverkehr. Durchsuch die Repository selbst nach URLSession. <a href="https://github.com/thijsverstapen/ChillMate/search?q=URLSession&type=code"><code>search: URLSession</code></a> <a href="#fnref-1" aria-label="Back to text">&#8617;</a></div></li>
-          <li id="fn-2"><div>Sync geht in deine eigene private CloudKit-Datenbank, nie in eine geteilte. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/ChillMateModelContainer.swift#L81"><code>ChillMateModelContainer.swift:81</code></a> <a href="#fnref-2" aria-label="Back to text">&#8617;</a></div></li>
-          <li id="fn-3"><div>Die PIN wird mit 200.000 PBKDF2-Runden abgeleitet und im Schlüsselbund gehalten, nie wie getippt gespeichert. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/AppLockView.swift#L441"><code>AppLockView.swift:441</code></a> <a href="#fnref-3" aria-label="Back to text">&#8617;</a></div></li>
-          <li id="fn-4"><div>Inhalte werden im App-Umschalter und bei Bildschirmaufnahme oder Spiegelung verborgen. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/AppLockView.swift#L26"><code>AppLockView.swift:26</code></a> <a href="#fnref-4" aria-label="Back to text">&#8617;</a></div></li>
-          <li id="fn-5"><div>Backups werden mit AES-GCM versiegelt, bevor sie je eine Datei berühren. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/EncryptedBackupService.swift#L72"><code>EncryptedBackupService.swift:72</code></a> <a href="#fnref-5" aria-label="Back to text">&#8617;</a></div></li>
-          <li id="fn-6"><div>Der Wortlaut von Mitteilungen kann auf dem Sperrbildschirm bewusst vage bleiben. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SecurityHealthCheckView.swift#L18"><code>SecurityHealthCheckView.swift:18</code></a> <a href="#fnref-6" aria-label="Back to text">&#8617;</a></div></li>
-          <li id="fn-7"><div>Geschriebene Zusammenfassungen nutzen Apples Modell auf dem Gerät. Nichts verlässt das Telefon. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/OnDeviceAffirmationService.swift#L8"><code>OnDeviceAffirmationService.swift:8</code></a> <a href="#fnref-7" aria-label="Back to text">&#8617;</a></div></li>
-          <li id="fn-8"><div>Die 30 Kombinationen oben, genau wie die App sie führt. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SubstanceInteractions.swift#L59"><code>SubstanceInteractions.swift:59</code></a> <a href="#fnref-8" aria-label="Back to text">&#8617;</a></div></li>
-          <li id="fn-9"><div>Das Hilfeverzeichnis für alle 10 Regionen, auf dem Gerät gehalten. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SupportDirectoryViews.swift#L69"><code>SupportDirectoryViews.swift:69</code></a> <a href="#fnref-9" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-1"><div>Nirgends in der App Netzwerkverkehr. <a href="https://github.com/thijsverstapen/ChillMate/search?q=URLSession&type=code"><code>search: URLSession</code></a> <a href="#fnref-1" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-2"><div>Das Hilfeverzeichnis für 10 Regionen. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SupportDirectoryViews.swift#L69"><code>SupportDirectoryViews.swift:69</code></a> <a href="#fnref-2" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-3"><div>Die 30 Kombinationen oben. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SubstanceInteractions.swift#L59"><code>SubstanceInteractions.swift:59</code></a> <a href="#fnref-3" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-4"><div>Die PIN: 200.000 PBKDF2-Runden, im Schlüsselbund. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/AppLockView.swift#L441"><code>AppLockView.swift:441</code></a> <a href="#fnref-4" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-5"><div>Backups mit AES-GCM versiegelt. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/EncryptedBackupService.swift#L72"><code>EncryptedBackupService.swift:72</code></a> <a href="#fnref-5" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-6"><div>Mitteilungstexte, die nichts verraten. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SecurityHealthCheckView.swift#L18"><code>SecurityHealthCheckView.swift:18</code></a> <a href="#fnref-6" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-7"><div>Zusammenfassungen laufen auf Apples Modell im Gerät. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/OnDeviceAffirmationService.swift#L8"><code>OnDeviceAffirmationService.swift:8</code></a> <a href="#fnref-7" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-8"><div>Sync geht in deine eigene private Datenbank. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/ChillMateModelContainer.swift#L81"><code>ChillMateModelContainer.swift:81</code></a> <a href="#fnref-8" aria-label="Back to text">&#8617;</a></div></li>
         </ol>
       </div>
 

@@ -247,6 +247,9 @@ def page_urls(key: str) -> dict:
         return {lang: BASE_PATH + ("" if lang == "en" else lang + "/") for lang in C.LANGS}
     if key == "support":
         return {lang: BASE_PATH + ("support/" if lang == "en" else lang + "/support/") for lang in C.LANGS}
+    if key == "howto":
+        return {lang: BASE_PATH + ("how-it-works/" if lang == "en" else lang + "/how-it-works/")
+                for lang in C.LANGS}
     if key == "privacy":
         # Only two, because only English and Dutch have a policy. hreflang is
         # allowed to be a partial set; claiming a de/fr/es policy that is really
@@ -319,12 +322,15 @@ def header(lang, depth, current, key=""):
     privacy = (("../" * (depth - 1) if depth > 1 else "./") + "privacy/") if lang == "nl" else r + "privacy/"
     support = (r + "support/") if lang == "en" else (("../" * (depth - 1) if depth > 1 else "./") + "support/")
     about = r + "about/"
+    howto = (r + "how-it-works/") if lang == "en" else (
+        ("../" * (depth - 1) if depth > 1 else "./") + "how-it-works/")
 
     def item(href, label, ico, name):
         cur = ' aria-current="page"' if current == name else ""
         return f'      <a href="{href}"{cur}>{icon(ico) if ico else ""}{e(label)}</a>\n'
 
     nav = item(home, s["nav_home"], "", "home")
+    nav += item(howto, s["nav_howto"], "phone", "howto")
     nav += item(privacy, s["nav_privacy"], "shield", "privacy")
     nav += item(support, s["nav_support"], "life", "support")
     nav += item(about, s["nav_about"], "info", "about")
@@ -475,30 +481,56 @@ def phone_video(depth):
       </div>"""
 
 
-# Each footnote is a claim on the page and the place in the source that settles
-# it. Line numbers are the ones that matter, not the ones that happen to be
-# first: they point at the decision, not the import.
-FOOTNOTE_SOURCES = [
-    (REPO + "/search?q=URLSession&type=code", "search: URLSession"),
-    (REPO + "/blob/main/ChillMate/ChillMateModelContainer.swift#L81", "ChillMateModelContainer.swift:81"),
-    (REPO + "/blob/main/ChillMate/AppLockView.swift#L441", "AppLockView.swift:441"),
-    (REPO + "/blob/main/ChillMate/AppLockView.swift#L26", "AppLockView.swift:26"),
-    (REPO + "/blob/main/ChillMate/EncryptedBackupService.swift#L72", "EncryptedBackupService.swift:72"),
-    (REPO + "/blob/main/ChillMate/SecurityHealthCheckView.swift#L18", "SecurityHealthCheckView.swift:18"),
-    (REPO + "/blob/main/ChillMate/OnDeviceAffirmationService.swift#L8", "OnDeviceAffirmationService.swift:8"),
-    (REPO + "/blob/main/ChillMate/SubstanceInteractions.swift#L59", "SubstanceInteractions.swift:59"),
-    (REPO + "/blob/main/ChillMate/SupportDirectoryViews.swift#L69", "SupportDirectoryViews.swift:69"),
+# Each footnote is a claim and the place in the source that settles it. Keyed
+# rather than numbered, because the page has already been recut twice and a
+# positional index goes stale silently: the last cut left three footnotes
+# listed with nothing pointing at them and two markers aimed at rows that no
+# longer existed. Numbers are assigned at render time, in the order the page
+# actually uses them, and a note nobody cites is never printed.
+FOOTNOTES = [
+    ("network",  REPO + "/search?q=URLSession&type=code", "search: URLSession"),
+    ("cloudkit", REPO + "/blob/main/ChillMate/ChillMateModelContainer.swift#L81", "ChillMateModelContainer.swift:81"),
+    ("pin",      REPO + "/blob/main/ChillMate/AppLockView.swift#L441", "AppLockView.swift:441"),
+    ("switcher", REPO + "/blob/main/ChillMate/AppLockView.swift#L26", "AppLockView.swift:26"),
+    ("backup",   REPO + "/blob/main/ChillMate/EncryptedBackupService.swift#L72", "EncryptedBackupService.swift:72"),
+    ("discreet", REPO + "/blob/main/ChillMate/SecurityHealthCheckView.swift#L18", "SecurityHealthCheckView.swift:18"),
+    ("ondevice", REPO + "/blob/main/ChillMate/OnDeviceAffirmationService.swift#L8", "OnDeviceAffirmationService.swift:8"),
+    ("combos",   REPO + "/blob/main/ChillMate/SubstanceInteractions.swift#L59", "SubstanceInteractions.swift:59"),
+    ("helplines", REPO + "/blob/main/ChillMate/SupportDirectoryViews.swift#L69", "SupportDirectoryViews.swift:69"),
 ]
+FOOTNOTE_KEYS = [key for key, _, _ in FOOTNOTES]
 
-# Which footnote belongs to which spec row, by row index. Left blank where the
-# claim is self-evident from the page rather than from the code.
-SPEC_FOOTNOTES = {4: 1, 6: 9, 7: 8, 8: 7, 9: 2, 10: 3}
+# Which spec row cites which note.
+SPEC_FOOTNOTES = {4: "network", 6: "helplines", 7: "combos", 8: "ondevice",
+                  9: "cloudkit", 10: "pin"}
+# Which privacy check cites which note, by position in the (now three-item) list.
+CHECK_FOOTNOTES = {0: "pin", 1: "backup", 2: "discreet"}
 
 
-def fn(number):
-    """A superscript marker pointing into the footnote list."""
-    return (f'<sup class="fn"><a href="#fn-{number}" id="fnref-{number}" '
-            f'aria-label="Footnote {number}">{number}</a></sup>')
+class Footnotes:
+    """Numbers the notes a page cites, in the order it cites them."""
+
+    def __init__(self):
+        self.used = []
+
+    def cite(self, key):
+        if key not in FOOTNOTE_KEYS:
+            raise KeyError(f"unknown footnote {key!r}")
+        if key not in self.used:
+            self.used.append(key)
+        number = self.used.index(key) + 1
+        return (f'<sup class="fn"><a href="#fn-{number}" id="fnref-{number}" '
+                f'aria-label="Footnote {number}">{number}</a></sup>')
+
+    def render(self, strings):
+        rows = ""
+        for number, key in enumerate(self.used, start=1):
+            index = FOOTNOTE_KEYS.index(key)
+            _, url, label = FOOTNOTES[index]
+            rows += (f'          <li id="fn-{number}"><div>{e(strings["footnotes"][index])} '
+                     f'<a href="{url}"><code>{e(label)}</code></a> '
+                     f'<a href="#fnref-{number}" aria-label="Back to text">&#8617;</a></div></li>\n')
+        return rows
 
 
 def chapter(body, ident="", invert=False, extra="", inner="inner"):
@@ -526,6 +558,8 @@ def demo_payload(lang):
 
 def build_home(lang):
     s = C.STRINGS[lang]
+    notes = Footnotes()
+    fn = notes.cite
     depth = 0 if lang == "en" else 1
     r = rel(depth)
     canonical = page_urls("home")[lang]
@@ -559,6 +593,7 @@ def build_home(lang):
             <a class="btn btn-primary" href="{notify}">{icon("mail")}{e(s["cta_notify"])}</a>
             <a class="btn btn-ghost" href="#inside">{icon("phone")}{e(s["cta_see"])}</a>
           </div>
+          <p class="human">{e(s["human"])}</p>
           <p class="status-note">{icon("info")}{e(s["status_note"])}</p>
           <a class="scroll-cue" href="#statement">{e(s["scroll_cue"])}{icon("chev")}</a>
         </div>
@@ -575,7 +610,7 @@ def build_home(lang):
     )
     out += chapter(f"""      <div class="statement-grid stagger">
 {tiles}      </div>
-      <p>{e(s["statement_note"])}{fn(1)}</p>
+      <p>{e(s["statement_note"])}{fn("network")}</p>
 """, ident="statement", invert=True, extra="statement")
 
     # ---- 3. who it is for
@@ -583,27 +618,19 @@ def build_home(lang):
         f'          <li>{icon("check")}<span>{e(point)}</span></li>\n'
         for point in s["audience_points"]
     )
-    scenarios = "".join(
-        f'          <li>{icon("check")}<span>{e(line)}</span></li>\n' for line in s["foryou"]
-    )
     out += chapter(f"""      <p class="eyebrow">{e(s["audience_eyebrow"])}</p>
       <h2>{e(no_orphan(s["audience_h2"]))}</h2>
       <p>{e(s["audience_p"])}</p>
       <ul class="checks stagger">
 {points}      </ul>
       <p>{s["audience_chill"]}</p>
-
-      <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["foryou_h2"]))}</h3>
-      <ul class="scenarios stagger">
-{scenarios}      </ul>
-      <p>{e(s["foryou_not"])}</p>
 """, ident="who")
 
     # ---- 4. the scroll-driven walk
     steps = ""
     frames = ""
     for i, (eyebrow, title, body) in enumerate(s["walk"]):
-        marker = fn(9) if i == 3 else ""
+        marker = fn("helplines") if i == 3 else ""
         steps += f"""
           <div class="walk-step">
             <p class="eyebrow">{e(eyebrow)}</p>
@@ -634,22 +661,7 @@ def build_home(lang):
       </div>
 """, ident="inside", invert=True, extra="walk-scroll")
 
-    # ---- 5. one night in three beats
-    beats = ""
-    for label, title, body in s["night"]:
-        beats += f"""        <div class="beat">
-          <p class="eyebrow">{e(label)}</p>
-          <h3>{e(no_orphan(title))}</h3>
-          <p>{e(body)}</p>
-        </div>
-"""
-    out += chapter(f"""      <p class="eyebrow">{e(s["night_eyebrow"])}</p>
-      <h2>{e(no_orphan(s["night_h2"]))}</h2>
-      <div class="beats stagger">
-{beats}      </div>
-""", ident="night")
-
-    # ---- 6. the playable risk checker
+    # ---- 5. the playable risk checker
     payload, substances = demo_payload(lang)
     chips = "".join(
         f'            <button type="button" class="demo-chip" data-substance="{e(name)}" '
@@ -658,9 +670,9 @@ def build_home(lang):
     )
     out += chapter(f"""      <p class="eyebrow">{e(s["demo_eyebrow"])}</p>
       <h2>{e(no_orphan(s["demo_h2"]))}</h2>
-      <p>{e(s["demo_p"])}{fn(8)}</p>
+      <p>{e(s["demo_p"])}{fn("combos")}</p>
 
-      <div class="demo panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
+      <div class="demo demo--wide panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
         <div>
           <p class="eyebrow">{e(s["demo_pick"])}</p>
           <div class="demo-picker">
@@ -678,11 +690,20 @@ def build_home(lang):
       <script type="application/json" id="cm-interactions">{json.dumps(payload, ensure_ascii=False)}</script>
 """, ident="try", invert=True)
 
+    # ---- 6. the second statement, carrying the strongest refusal
+    #
+    # The refusals moved to their own page, but this one is the spine of the
+    # product and belongs where everybody sees it.
+    out += chapter(f"""      <div class="statement-grid stagger" style="grid-template-columns:1fr">
+        <div><b class="statement-line">{e(s["statement2_big"])}</b></div>
+      </div>
+      <p>{e(s["statement2_note"])}</p>
+""", ident="never", invert=True, extra="statement")
+
     # ---- 7. privacy, the diagram, and the proof
-    check_notes = {0: 2, 2: 3, 3: 5, 4: 6}
     checks = "".join(
         f'          <li>{icon("check")}<span>{e(c)}'
-        f'{fn(check_notes[i]) if i in check_notes else ""}</span></li>\n'
+        f'{fn(CHECK_FOOTNOTES[i]) if i in CHECK_FOOTNOTES else ""}</span></li>\n'
         for i, c in enumerate(s["privacy_checks"])
     )
     out += chapter(f"""      <p class="eyebrow">{e(s["privacy_eyebrow"])}</p>
@@ -696,7 +717,7 @@ def build_home(lang):
 
       <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["proof_h2"]))}</h3>
       <p>{e(s["proof_p"])}</p>
-      <p>{s["proof_fact"]}{fn(1)}</p>
+      <p>{s["proof_fact"]}{fn("network")}</p>
       <div class="cta-row">
         <a class="btn btn-ghost" href="{REPO}">{icon("github")}{e(s["proof_cta_repo"])}</a>
         <a class="btn btn-ghost" href="{r}privacy/">{icon("shield")}{e(s["privacy_link"])}</a>
@@ -704,67 +725,7 @@ def build_home(lang):
       <p class="meta" style="margin-top:14px">{e(s["proof_caption"])}</p>
 """, ident="privacy")
 
-    # ---- 8. what it refuses to do
-    refusals = "".join(
-        f'          <li>{icon("hand")}<div><b>{e(title)}</b><span>{e(body)}</span></div></li>\n'
-        for title, body in s["refuse"]
-    )
-    out += chapter(f"""      <p class="eyebrow">{e(s["refuse_eyebrow"])}</p>
-      <h2>{e(no_orphan(s["refuse_h2"]))}</h2>
-      <p>{e(s["refuse_p"])}</p>
-      <ul class="refusals stagger">
-{refusals}      </ul>
-""", ident="refuse", invert=True)
-
-    # ---- 9. the watch, and the languages
-    out += chapter(f"""      <div class="hero-cols" style="margin-top:0">
-          <div>
-            <p class="eyebrow">Apple Watch</p>
-            <h2>{e(no_orphan(s["watch_h3"]))}</h2>
-            <p>{e(s["watch_p"])}{fn(4)}</p>
-            <blockquote class="quote">
-              <p>{e(s["watch_quote"])}</p>
-              <cite>{e(s["watch_quote_note"])}</cite>
-            </blockquote>
-          </div>
-          <div>{watch(depth)}</div>
-      </div>
-
-      <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["langs_h3"]))}</h3>
-      <p>{e(s["langs_p"])}</p>
-""", ident="watch")
-
-    # ---- 10. what is in it
-    tiles = ""
-    for ico, tint, title, body in s["features"]:
-        tiles += f"""        <div class="feature">
-          <div class="chip {tint}">{icon(ico)}</div>
-          <h3>{e(no_orphan(title))}</h3>
-          <p>{e(body)}</p>
-        </div>
-"""
-    out += chapter(f"""      <p class="eyebrow">{e(s["features_eyebrow"])}</p>
-      <div class="grid three stagger">
-{tiles}      </div>
-""", ident="features", invert=True)
-
-    # ---- 11. the questions
-    teaser = ""
-    for index in s["faq_teaser_indices"]:
-        question, answer = s["faq"][index]
-        teaser += f"""          <details>
-            <summary>{e(question)}<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-            <div class="body"><p>{e(answer)}</p></div>
-          </details>
-"""
-    out += chapter(f"""      <p class="eyebrow">{e(s["faq_teaser_eyebrow"])}</p>
-      <h2>{e(no_orphan(s["faq_teaser_h2"]))}</h2>
-      <div class="faq">
-{teaser}      </div>
-      <p style="margin-top:22px"><a href="{support}">{e(s["faq_teaser_link"])}</a></p>
-""", ident="questions")
-
-    # ---- 12. specifications
+    # ---- 8. specifications
     rows = ""
     for i, (label, value) in enumerate(s["specs"]):
         marker = fn(SPEC_FOOTNOTES[i]) if i in SPEC_FOOTNOTES else ""
@@ -777,18 +738,13 @@ def build_home(lang):
       </table>
 """, ident="specs", invert=True, inner="inner narrow")
 
-    # ---- 13. the footnotes, and the one disclaimer
-    notes = ""
-    for i, text in enumerate(s["footnotes"], start=1):
-        url, label = FOOTNOTE_SOURCES[i - 1]
-        notes += (f'          <li id="fn-{i}"><div>{e(text)} '
-                  f'<a href="{url}"><code>{e(label)}</code></a> '
-                  f'<a href="#fnref-{i}" aria-label="Back to text">&#8617;</a></div></li>\n')
+    # ---- 9. the footnotes, and the one disclaimer
+    rendered = notes.render(s)
     out += chapter(f"""      <p class="eyebrow">{e(s["footnotes_title"])}</p>
       <p>{e(s["footnotes_intro"])}</p>
       <div class="footnotes">
         <ol>
-{notes}        </ol>
+{rendered}        </ol>
       </div>
 
       <div class="callout" style="margin-top:clamp(40px,5vw,72px)">
@@ -1198,6 +1154,104 @@ def build_privacy():
     <p>Questions about privacy? Email <a href="mailto:{EMAIL}">{EMAIL}</a>. For anything security-related, see the <a href="../security/">security page</a>.</p>
   </div>
 """
+    out += footer(lang, depth)
+    return out, canonical
+
+
+def build_howto(lang):
+    """The chapters the front page could not carry without repeating itself.
+
+    Everything here was on the home page and earned its place, but the home
+    page was saying the same four things in seven different chapters. This is
+    the depth, given a page where it is the point rather than the padding.
+    """
+    s = C.STRINGS[lang]
+    depth = 1 if lang == "en" else 2
+    r = rel(depth)
+    canonical = page_urls("howto")[lang]
+    home = r if lang == "en" else ("../" * (depth - 1) if depth > 1 else "./")
+
+    out = head(lang, s["howto_title"], s["howto_desc"], canonical, depth, "howto",
+               body_class="exhibition")
+    out += header(lang, depth, "howto", "howto")
+
+    # ---- the shape of a night
+    beats = ""
+    for label, title, body in s["night"]:
+        beats += f"""        <div class="beat">
+          <p class="eyebrow">{e(label)}</p>
+          <h3>{e(no_orphan(title))}</h3>
+          <p>{e(body)}</p>
+        </div>
+"""
+    out += chapter(f"""      <h1>{e(no_orphan(s["howto_h1"]))}</h1>
+      <p class="lede">{e(s["howto_lede"])}</p>
+
+      <p class="eyebrow" style="margin-top:clamp(44px,6vw,84px)">{e(s["night_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["night_h2"]))}</h2>
+      <div class="beats stagger">
+{beats}      </div>
+""", ident="night")
+
+    # ---- what it refuses to do
+    refusals = "".join(
+        f'          <li>{icon("hand")}<div><b>{e(title)}</b><span>{e(body)}</span></div></li>\n'
+        for title, body in s["refuse"]
+    )
+    out += chapter(f"""      <p class="eyebrow">{e(s["refuse_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["refuse_h2"]))}</h2>
+      <p>{e(s["refuse_p"])}</p>
+      <ul class="refusals stagger">
+{refusals}      </ul>
+""", ident="refuse", invert=True)
+
+    # ---- is this for you
+    scenarios = "".join(
+        f'          <li>{icon("check")}<span>{e(line)}</span></li>\n' for line in s["foryou"]
+    )
+    out += chapter(f"""      <p class="eyebrow">{e(s["foryou_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["foryou_h2"]))}</h2>
+      <ul class="scenarios stagger">
+{scenarios}      </ul>
+      <p>{e(s["foryou_not"])}</p>
+""", ident="foryou")
+
+    # ---- everything that is in it
+    tiles = ""
+    for ico, tint, title, body in s["features"]:
+        tiles += f"""        <div class="feature">
+          <div class="chip {tint}">{icon(ico)}</div>
+          <h3>{e(no_orphan(title))}</h3>
+          <p>{e(body)}</p>
+        </div>
+"""
+    out += chapter(f"""      <p class="eyebrow">{e(s["features_eyebrow"])}</p>
+      <div class="grid three stagger">
+{tiles}      </div>
+""", ident="features", invert=True)
+
+    # ---- the watch, and the languages
+    out += chapter(f"""      <div class="hero-cols" style="margin-top:0">
+          <div>
+            <p class="eyebrow">Apple Watch</p>
+            <h2>{e(no_orphan(s["watch_h3"]))}</h2>
+            <p>{e(s["watch_p"])}</p>
+            <blockquote class="quote">
+              <p>{e(s["watch_quote"])}</p>
+              <cite>{e(s["watch_quote_note"])}</cite>
+            </blockquote>
+          </div>
+          <div>{watch(depth)}</div>
+      </div>
+
+      <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["langs_h3"]))}</h3>
+      <p>{e(s["langs_p"])}</p>
+
+      <div class="cta-row" style="margin-top:clamp(40px,5vw,72px)">
+        <a class="btn btn-ghost" href="{home}">{icon("chev")}{e(s["howto_back"])}</a>
+      </div>
+""", ident="watch")
+
     out += footer(lang, depth)
     return out, canonical
 
@@ -1707,6 +1761,12 @@ def main():
         target = DOCS / "index.html" if lang == "en" else DOCS / lang / "index.html"
         write(target, body)
         urls.append((canonical, "1.0"))
+
+        body, canonical = build_howto(lang)
+        target = (DOCS / "how-it-works" / "index.html" if lang == "en"
+                  else DOCS / lang / "how-it-works" / "index.html")
+        write(target, body)
+        urls.append((canonical, "0.8"))
 
         body, canonical = build_support(lang)
         target = DOCS / "support" / "index.html" if lang == "en" else DOCS / lang / "support" / "index.html"

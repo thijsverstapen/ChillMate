@@ -1441,6 +1441,32 @@ sup.fn a { border: 0; font-weight: 700; }
   padding: 18px 20px 0;
 }
 .exhibition .hero-full { min-height: calc(100svh - 84px); }
+
+/* One line of a person, in the hero, where the rest of the page is product. */
+.human {
+  margin-top: 20px;
+  padding-left: 16px;
+  border-left: 2px solid color-mix(in srgb, var(--mint) 55%, transparent);
+  color: var(--text-soft);
+  font-size: clamp(0.98rem, 1.2vw, 1.06rem);
+  max-width: 42ch;
+}
+
+/* The demo took the room the feature grid gave up. */
+@media (min-width: 900px) {
+  .demo--wide { grid-template-columns: 0.85fr 1.15fr; gap: 52px; }
+}
+.demo--wide .demo-out { min-height: 280px; }
+.demo--wide .verdict p { font-size: 1.05rem; }
+
+/* A statement chapter that carries a sentence rather than three numbers. */
+.statement-line {
+  font-size: clamp(2.2rem, 6vw, 4.6rem) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.035em !important;
+  max-width: 20ch;
+  margin-inline: auto;
+}
 </style>
 </head>
 <body>
@@ -1558,6 +1584,7 @@ sup.fn a { border: 0; font-weight: 700; }
     <div class="head-right">
       <nav class="site-nav" aria-label="Home">
       <a href="../">Home</a>
+      <a href="../how-it-works/"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>How it works</a>
       <a href="../privacy/" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
       <a href="../support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support</a>
       <a href="../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>About</a>
@@ -1681,9 +1708,10 @@ sup.fn a { border: 0; font-weight: 700; }
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>8 changes since this page first existed.</caption>
+        <caption>9 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-08-12</td><td>Rebuild the home page as an exhibition, and make the risk checker playable</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/dd77914"><code>dd77914</code></a></td></tr>
           <tr><td>2026-08-11</td><td>Say who the app is for, and stop hiding nine sections when JavaScript fails</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/0f8f20b"><code>0f8f20b</code></a></td></tr>
           <tr><td>2026-08-11</td><td>Tag foreign service names, and answer the question the tables were dancing around</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/9b6ba66"><code>9b6ba66</code></a></td></tr>
           <tr><td>2026-08-11</td><td>Show the actual app on the site, and let it speak five languages</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/1a0ef4f"><code>1a0ef4f</code></a></td></tr>

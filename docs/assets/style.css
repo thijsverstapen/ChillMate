@@ -1411,3 +1411,29 @@ sup.fn a { border: 0; font-weight: 700; }
   padding: 18px 20px 0;
 }
 .exhibition .hero-full { min-height: calc(100svh - 84px); }
+
+/* One line of a person, in the hero, where the rest of the page is product. */
+.human {
+  margin-top: 20px;
+  padding-left: 16px;
+  border-left: 2px solid color-mix(in srgb, var(--mint) 55%, transparent);
+  color: var(--text-soft);
+  font-size: clamp(0.98rem, 1.2vw, 1.06rem);
+  max-width: 42ch;
+}
+
+/* The demo took the room the feature grid gave up. */
+@media (min-width: 900px) {
+  .demo--wide { grid-template-columns: 0.85fr 1.15fr; gap: 52px; }
+}
+.demo--wide .demo-out { min-height: 280px; }
+.demo--wide .verdict p { font-size: 1.05rem; }
+
+/* A statement chapter that carries a sentence rather than three numbers. */
+.statement-line {
+  font-size: clamp(2.2rem, 6vw, 4.6rem) !important;
+  line-height: 1.04 !important;
+  letter-spacing: -0.035em !important;
+  max-width: 20ch;
+  margin-inline: auto;
+}

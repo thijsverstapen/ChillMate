@@ -64,7 +64,7 @@ S = {
     # Short enough to survive a 1200x630 share card.
     "og_sub": "No account. No servers. Everything stays on your iPhone.",
     "og_foot": "Open source · iPhone and Apple Watch",
-    "lede": "ChillMate keeps your nights, plans, reminders and safety tools in one private overview on your iPhone. It is free, it is open source, and there is no server, so there is nowhere else for any of it to be.",
+    "lede": 'Your nights, plans and safety tools in one private overview on your iPhone. Free, open source, and there is no server.',
     "cta_notify": "Tell me when it is out",
     "cta_see": "See how it works",
     "status_note": "Not on the App Store yet. Send an empty email and you will hear from me once, on the day it is.",
@@ -74,7 +74,7 @@ S = {
     # ---------- home: who it is for ----------
     "audience_eyebrow": "Who it is for",
     "audience_h2": "Made for the nights this is actually about",
-    "audience_p": "Chems, hookups, or both. ChillMate has no opinion about that, and it will never ask you to justify a night to it. What it does is hold the practical parts you would rather not be working out at four in the morning.",
+    "audience_p": 'Chems, hookups, or both. ChillMate has no opinion about that, and it will never ask you to justify a night.',
     "audience_points": [
         "A risk checker that knows what you already take, including your own prescription.",
         "A check-in timer, so somebody knows you got home without you having to text them.",
@@ -87,28 +87,20 @@ S = {
     "walk_eyebrow": "A look inside",
     "walk_h2": "Five screens, and what each one is for.",
     "walk": [
-        ("It arranges itself", "Whatever tonight turned into",
-         "Log a night and the home screen rearranges around it. Here it has worked out that a PEP conversation might be worth having, and put the countdown at the top by itself. Get help now stays pinned above everything, always."),
-        ("It says what is known", "And refuses to say it is safe",
-         "Pick what is in play, including your own medication, and the risk checker tells you what is documented about that combination. It has no green light. Nothing in ChillMate will ever tell you something is fine."),
-        ("A room with the lights turned down", "For when it is already going wrong",
-         "Low stimulation, one thing at a time. Start the breathing timer, work through the grounding steps, and call someone only if you decide you want to."),
-        ("Real services, offline", "Help from people, not an app",
-         "Crisis lines, sexual health, drugs, LGBTQ+ support and practical care for the country you set. It is a list held on your phone, so it still works with no signal and nothing to look up."),
-        ("A plain map of your own data", "In the app, not just in a policy",
-         "What is on the device, what an encrypted backup would contain, which Health categories you allowed, and what ChillMate never sends. You should not have to read a policy to find that out."),
+        ('It arranges itself', 'Whatever tonight turned into', 'Log a night and the home screen rearranges around it. Here it has worked out that a PEP conversation might be worth having, and put the countdown at the top by itself.'),
+        ('It says what is known', 'And refuses to say it is safe', 'Pick what is in play, your own medication included, and it tells you what is documented about that combination. There is no green light.'),
+        ('A room with the lights turned down', 'For when it is already going wrong', 'Low stimulation, one thing at a time. Breathe, work through the grounding steps, and call someone only if you decide you want to.'),
+        ('Real services, offline', 'Help from people, not an app', 'Crisis lines, sexual health, drugs and LGBTQ+ support for the country you set. A list held on your phone, so it works with no signal.'),
+        ('A plain map of your own data', 'In the app, not just in a policy', 'What is on the device, what an encrypted backup would contain, and what ChillMate never sends. You should not have to read a policy to find that out.'),
     ],
 
     # ---------- home: one night ----------
     "night_eyebrow": "How it fits",
     "night_h2": "One night, in three beats.",
     "night": [
-        ("Before you go", "Decide while it is easy",
-         "Run the combination past the risk checker, set what you are and are not up for, and start a check-in timer. Five minutes now, while you are clear-headed and nothing has happened yet."),
-        ("While you are out", "One tap, nothing typed",
-         "The timer asks if you are alright. I'm safe is one tap. Get help is the other, and it already knows your trusted contact and the right emergency number for where you are. Your watch can answer for you."),
-        ("The morning after", "Remember it accurately",
-         "Sleep, how you feel, what actually helped. It takes a minute and it is the part you will be glad of in three months, when the patterns are the only honest record you have."),
+        ('Before you go', 'Decide while it is easy', 'Run the combination past the risk checker, set what you are and are not up for, and start a check-in timer. Five minutes while you are still clear-headed.'),
+        ('While you are out', 'One tap, nothing typed', 'The timer asks if you are alright. Get help already knows your trusted contact and the right emergency number for where you are. Your watch can answer for you.'),
+        ('The morning after', 'Remember it accurately', 'Sleep, how you feel, what actually helped. A minute now is the part you will be glad of in three months.'),
     ],
 
     # ---------- home: features ----------
@@ -143,21 +135,19 @@ S = {
     # ---------- home: privacy ----------
     "privacy_eyebrow": "Private by design",
     "privacy_h2": "Your phone, and nowhere else",
-    "privacy_intro": "Privacy here is not a setting to switch on. It is the shape of the app.",
+    "privacy_intro": 'Privacy here is not a setting. It is the shape of the app.',
     "privacy_checks": [
-        "No account and no sign-up. No server holds your log, because there is no server.",
-        "No ads, no analytics, no trackers, and nothing is ever sold or shared.",
-        "Lock it behind Face ID or a PIN, with everything encrypted on the device.",
-        "Backups are optional and encrypted, and they go to your own iCloud Drive.",
-        "Notifications can stay deliberately vague on the lock screen.",
+        'Lock it behind Face ID or a PIN, with everything encrypted on the device.',
+        'Backups are optional and encrypted, and they go to your own iCloud Drive.',
+        'Notifications can stay deliberately vague on the lock screen.',
     ],
     "privacy_link": "Read the full privacy policy",
 
     # ---------- home: proof ----------
     "proof_eyebrow": "Verify it yourself",
     "proof_h2": "Do not take my word for it",
-    "proof_p": "ChillMate is open source. Every line that touches your data is in public, which turns the claim above into something you can check instead of something you have to trust me about.",
-    "proof_fact": "There is not a single network call in the app's own code. No analytics SDK, no crash reporter, no <code>URLSession</code> anywhere. The only things that leave your phone are the ones you tap: a call, a link, a message you wrote.",
+    "proof_p": 'ChillMate is open source. Every line that touches your data is public, which turns the claim above into something you can check.',
+    "proof_fact": "There is not a single network call in the app's own code. No analytics SDK, no crash reporter, no <code>URLSession</code> anywhere. The only things that leave your phone are the ones you tap.",
     "proof_cta_repo": "Read the source",
     "proof_cta_store": "Where your data lives",
     "proof_caption": "Verified against ChillMate 4.2.1 (build 422).",
@@ -234,6 +224,26 @@ S = {
          "English, Dutch, German, French and Spanish, on the phone and on Apple Watch. Set the language inside the app or in iOS Settings, and whichever you changed last is the one that applies."),
     ],
     # Which of the above to lift onto the home page.
+    "human": 'I am one person in the Netherlands. I made the app I wanted to exist, and I never see a single thing you put into it.',
+    "footnotes": [
+        'No networking anywhere in the app.',
+        'Sync goes to your own private database.',
+        'The PIN: 200,000 PBKDF2 rounds, held in the Keychain.',
+        'Hidden in the App Switcher and during screen capture.',
+        'Backups sealed with AES-GCM.',
+        'Lock-screen wording that gives nothing away.',
+        "Summaries run on Apple's on-device model.",
+        'The 30 combinations above.',
+        'The help directory for 10 regions.',
+    ],
+    "statement2_big": 'It will never tell you something is safe.',
+    "statement2_note": 'Not the risk checker, not the summaries, not anywhere. It shows what is known and hands the decision back to you.',
+    "nav_howto": 'How it works',
+    "howto_title": 'ChillMate · How it works',
+    "howto_desc": 'One night in three beats, what the app refuses to do, everything that is in it, and the Apple Watch.',
+    "howto_h1": 'How it works',
+    "howto_lede": 'The parts that did not fit on the front page: the shape of a night, the things it will not do, and what is actually in it.',
+    "howto_back": 'Back to the front page',
     "faq_teaser_indices": [0, 1, 2],
 
     # ---------- chapter navigation ----------
@@ -248,7 +258,7 @@ S = {
     # ---------- the playable risk checker ----------
     "demo_eyebrow": "Try it",
     "demo_h2": "This is the real risk checker.",
-    "demo_p": "Not a screenshot of it. The same 30 combinations, the same wording, the same refusal to call anything safe, running here in your browser. Pick two and see.",
+    "demo_p": 'Not a screenshot of it. The same 30 combinations, the same wording, running here.',
     "demo_pick": "Pick what is in play",
     "demo_none_title": "Nothing documented for this combination",
     "demo_none_body": "That is not the same as safe. It means this table has nothing on file, and this table is not the last word on anything.",
@@ -279,15 +289,4 @@ S = {
     # ---------- footnotes ----------
     "footnotes_title": "Every claim on this page, and where to check it",
     "footnotes_intro": "Marketing pages footnote their claims to the small print. This one footnotes them to the source code.",
-    "footnotes": [
-        "No networking anywhere in the app. Search the repository yourself for URLSession.",
-        "Sync goes to your own private CloudKit database, never to a shared one.",
-        "The PIN is derived with 200,000 PBKDF2 rounds and held in the Keychain, never stored as typed.",
-        "Contents are hidden in the App Switcher and while the screen is captured or mirrored.",
-        "Backups are sealed with AES-GCM before they ever reach a file.",
-        "Notification wording can be made deliberately vague on the lock screen.",
-        "Written summaries use Apple's on-device model. Nothing leaves the phone.",
-        "The 30 combinations shown above, exactly as the app carries them.",
-        "The help directory for all 10 regions, held on the device.",
-    ],
 }
