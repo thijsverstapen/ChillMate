@@ -557,7 +557,13 @@ def country_panel(lang, code):
         if not name and not url:
             detail = detail + " " + s["cat_generic_local"]
         label = action_label(lang, url)
-        head_html = f'<div class="t">{e(title)}'
+        # A service keeps the name it actually has. Tagging it with its own
+        # language is what stops a screen reader reading "Zelfmoordpreventie"
+        # with English phonetics on the English page.
+        name_lang = C.COUNTRY_LANG[code]
+        tag = f'<span lang="{name_lang}">{e(title)}</span>' if (
+            name and name_lang != lang) else e(title)
+        head_html = f'<div class="t">{tag}'
         if url and not url.startswith("tel:"):
             head_html += icon("ext")
         head_html += "</div>"
@@ -743,6 +749,27 @@ def build_privacy():
   </div>
 
   <div class="card">
+    <h2 id="compare">{icon("hand", style="color:var(--pink)")}What a wellbeing app usually&nbsp;knows
+      <a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
+    <p>Not an accusation against anyone in particular. This is simply what the ordinary, above-board version of an app like this holds, because holding it is how the ordinary version works.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Question</th><th scope="col">The usual answer</th><th scope="col">ChillMate</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Who can read your entries?</th><td>You, and whoever holds the database</td><td><span class="yes">Only you</span></td></tr>
+          <tr><th scope="row">What does a breach expose?</th><td>Everything on the server</td><td><span class="yes">Nothing. There is no server.</span></td></tr>
+          <tr><th scope="row">What can be handed over on request?</th><td>Your account and its contents</td><td><span class="yes">Nothing is held to hand over</span></td></tr>
+          <tr><th scope="row">What happens if it is acquired?</th><td>The new owner inherits the data</td><td><span class="yes">There is no data to inherit</span></td></tr>
+          <tr><th scope="row">What does an email address unlock?</th><td>Your account</td><td><span class="yes">There is no account</span></td></tr>
+          <tr><th scope="row">Who sees which screens you open?</th><td>An analytics provider</td><td><span class="yes">Nobody. There is no analytics.</span></td></tr>
+          <tr><th scope="row">Can the policy change later?</th><td>Yes, and the data is already collected</td><td><span class="yes">It can change, but there is still nothing collected</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The honest cost of the right-hand column: if you lose the phone with no backup, nobody can recover it for you. That is the same property, seen from the other side.</p>
+  </div>
+
+  <div class="card">
     <h2 id="threat">{icon("hand", style="color:var(--amber)")}What we actually designed&nbsp;against
       <a class="anchor" href="#threat" aria-label="Link to this section">#</a></h2>
     <p>Most privacy pages talk about breaches and hackers. For an app like this, the realistic risk is closer to home: <strong>someone picking up your unlocked phone.</strong> A partner, a housemate, a family member, a colleague glancing at a notification.</p>
@@ -884,6 +911,7 @@ def build_about():
       <a class="anchor" href="#built" aria-label="Link to this section">#</a></h2>
     <p>Swift and SwiftUI, SwiftData for storage, HealthKit, WidgetKit, App Intents and a native watchOS app. Everything on-device, including the written summaries, which use Apple's on-device Foundation Models rather than a hosted one.</p>
     <p>Version {VERSION} (build {BUILD}). It runs on iOS 26 and later, with an Apple Watch app, Home Screen and Lock Screen widgets, complications, Siri shortcuts and Spotlight.</p>
+    <p>Every push builds and runs the test suite on GitHub Actions. You can see the runs, passing or not, on the <a href="{REPO}/actions/workflows/ci.yml">CI workflow</a>. There is deliberately no build badge on this page: a badge is an image fetched from someone else's server, which would hand your IP address to a third party on a site whose entire argument is that it does not do that.</p>
     <p>See the <a href="../changelog/">changelog</a> for what has landed, or the <a href="{REPO}">repository</a> for everything else.</p>
   </div>
 

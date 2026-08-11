@@ -170,6 +170,14 @@ COUNTRIES = {
 # and always sits last.
 COUNTRY_ORDER = ["NL", "BE", "DE", "GB", "IE", "FR", "ES", "US", "AU", "XX"]
 
+# The language each country's service names are actually written in. Used to tag
+# them with `lang` when they appear on a page in a different language, so a
+# screen reader pronounces "Zelfmoordpreventie" as Dutch rather than sounding it
+# out in English. Belgium is listed as Dutch because the services carried here
+# are the Flemish ones.
+COUNTRY_LANG = {"NL": "nl", "BE": "nl", "DE": "de", "GB": "en", "IE": "en",
+                "FR": "fr", "ES": "es", "US": "en", "AU": "en", "XX": "en"}
+
 
 COUNTRY_NAMES = {
     "en": {"NL": "Netherlands", "BE": "Belgium", "DE": "Germany", "GB": "United Kingdom",
