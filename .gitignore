@@ -42,3 +42,7 @@ __pycache__/
 
 # xcresult bundles written by the CI test steps into the workspace
 TestResults/
+
+# Python bytecode from tools/
+__pycache__/
+*.pyc

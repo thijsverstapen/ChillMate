@@ -1,0 +1,5 @@
+Contact: mailto:chillmate@icloud.com
+Expires: 2027-08-11T00:00:00.000Z
+Preferred-Languages: en, nl
+Canonical: https://thijsverstapen.github.io/ChillMate/.well-known/security.txt
+Policy: https://thijsverstapen.github.io/ChillMate/security/

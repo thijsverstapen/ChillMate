@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://thijsverstapen.github.io/ChillMate/sitemap.xml

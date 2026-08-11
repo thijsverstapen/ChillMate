@@ -1,21 +1,864 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-sw-scope="/ChillMate/">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChillMate · Support and help</title>
-  <meta name="description" content="Help and support for ChillMate, answers to common questions, and trusted crisis and health services." />
-  <meta name="theme-color" content="#0e1430" />
+  <meta name="description" content="Contact, common questions, and real crisis and health services for your country." />
+  <meta name="theme-color" content="#0e1430" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <link rel="canonical" href="https://thijsverstapen.github.io/ChillMate/support/" />
+  <link rel="alternate" hreflang="en" href="https://thijsverstapen.github.io/ChillMate/support/" />
+  <link rel="alternate" hreflang="nl" href="https://thijsverstapen.github.io/ChillMate/nl/support/" />
+  <link rel="alternate" hreflang="de" href="https://thijsverstapen.github.io/ChillMate/de/support/" />
+  <link rel="alternate" hreflang="fr" href="https://thijsverstapen.github.io/ChillMate/fr/support/" />
+  <link rel="alternate" hreflang="es" href="https://thijsverstapen.github.io/ChillMate/es/support/" />
+  <link rel="alternate" hreflang="x-default" href="https://thijsverstapen.github.io/ChillMate/support/" />
   <link rel="icon" href="../assets/mark.svg" type="image/svg+xml" />
-  <link rel="apple-touch-icon" href="../assets/app-icon.png" />
-  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="apple-touch-icon" href="../assets/icon-180.png" />
+  <link rel="manifest" href="/ChillMate/manifest.webmanifest" />
+
+  <meta property="og:site_name" content="ChillMate" />
+  <meta property="og:title" content="ChillMate · Support and help" />
+  <meta property="og:description" content="Contact, common questions, and real crisis and health services for your country." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://thijsverstapen.github.io/ChillMate/support/" />
+  <meta property="og:locale" content="en" />
+  <meta property="og:image" content="https://thijsverstapen.github.io/ChillMate/assets/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="ChillMate. A calm, private place to look after yourself." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ChillMate · Support and help" />
+  <meta name="twitter:description" content="Contact, common questions, and real crisis and health services for your country." />
+  <meta name="twitter:image" content="https://thijsverstapen.github.io/ChillMate/assets/og.png" />
+<script>try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+  <style>/* ChillMate site styles.
+
+   The app is dark only. The site defaults to dark to match it, but honours a
+   light system preference and a manual toggle, because a website is read in
+   daylight far more often than the app is. Screenshots stay dark either way:
+   they are photographs of the product, not part of the page theme. */
+
+:root {
+  color-scheme: dark;
+
+  --bg-0: #0b1022;
+  --bg-1: #0e1430;
+  --bg-2: #131a2e;
+  --glow-a: rgba(124, 140, 255, 0.20);
+  --glow-b: rgba(111, 227, 180, 0.13);
+
+  --surface: rgba(255, 255, 255, 0.045);
+  --surface-hi: rgba(255, 255, 255, 0.075);
+  --line: rgba(255, 255, 255, 0.10);
+  --line-hi: rgba(255, 255, 255, 0.18);
+
+  --text: #eef1f8;
+  --text-soft: #bcc5dc;
+  --text-dim: #8a93ad;
+
+  --primary: #7c8cff;
+  --primary-deep: #4e6bf5;
+  --on-primary: #ffffff;
+  /* The filled button carries white text, so both ends of its gradient have to
+     clear 4.5:1 on their own. --primary is a fine link colour and a poor button
+     fill: white on it measures 2.98:1. These two measure 4.68 and 6.72. */
+  --btn-a: #5a68e0;
+  --btn-b: #3f4fc4;
+  --mint: #6fe3b4;
+  --purple: #b08bff;
+  --pink: #ff8bbf;
+  --amber: #ffc266;
+  --danger: #ff6b6b;
+
+  --shadow-lift: 0 24px 60px -18px rgba(78, 107, 245, 0.55);
+  --shadow-phone: 0 34px 80px -26px rgba(4, 8, 22, 0.95);
+
+  --radius: 20px;
+  --radius-lg: 26px;
+  --maxw: 940px;
+  --measure: 62ch;
+}
+
+/* Light, when the reader's system asks for it and they have not overridden. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+
+    --bg-0: #eef1f8;
+    --bg-1: #ffffff;
+    --bg-2: #f5f7fc;
+    --glow-a: rgba(78, 107, 245, 0.10);
+    --glow-b: rgba(15, 143, 99, 0.07);
+
+    --surface: rgba(16, 22, 46, 0.035);
+    --surface-hi: rgba(16, 22, 46, 0.065);
+    --line: rgba(16, 22, 46, 0.13);
+    --line-hi: rgba(16, 22, 46, 0.26);
+
+    --text: #10162e;
+    --text-soft: #3b4463;
+    --text-dim: #5a6382;
+
+    --primary: #3a4fd0;
+    --primary-deep: #2a3cb0;
+    --btn-a: #3a4fd0;
+    --btn-b: #2a3cb0;
+    --mint: #0d7a55;
+    --purple: #6b3fc4;
+    --pink: #b8336a;
+    --amber: #8a5c00;
+    --danger: #c02929;
+
+    --shadow-lift: 0 18px 44px -20px rgba(42, 60, 176, 0.4);
+    --shadow-phone: 0 30px 70px -26px rgba(16, 22, 46, 0.45);
+  }
+}
+
+/* The explicit toggle wins over the system in both directions. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-0: #eef1f8;
+  --bg-1: #ffffff;
+  --bg-2: #f5f7fc;
+  --glow-a: rgba(78, 107, 245, 0.10);
+  --glow-b: rgba(15, 143, 99, 0.07);
+
+  --surface: rgba(16, 22, 46, 0.035);
+  --surface-hi: rgba(16, 22, 46, 0.065);
+  --line: rgba(16, 22, 46, 0.13);
+  --line-hi: rgba(16, 22, 46, 0.26);
+
+  --text: #10162e;
+  --text-soft: #3b4463;
+  --text-dim: #5a6382;
+
+  --primary: #3a4fd0;
+  --primary-deep: #2a3cb0;
+  --btn-a: #3a4fd0;
+  --btn-b: #2a3cb0;
+  --mint: #0d7a55;
+  --purple: #6b3fc4;
+  --pink: #b8336a;
+  --amber: #8a5c00;
+  --danger: #c02929;
+
+  --shadow-lift: 0 18px 44px -20px rgba(42, 60, 176, 0.4);
+  --shadow-phone: 0 30px 70px -26px rgba(16, 22, 46, 0.45);
+}
+
+/* Readers who ask their OS for more contrast get firmer lines and brighter
+   secondary text, mirroring the app's own high-contrast mode. */
+@media (prefers-contrast: more) {
+  :root {
+    --text-soft: #dfe4f2;
+    --text-dim: #b9c1d6;
+    --line: rgba(255, 255, 255, 0.26);
+    --line-hi: rgba(255, 255, 255, 0.42);
+    --surface: rgba(255, 255, 255, 0.08);
+  }
+  :root[data-theme="light"] {
+    --text-soft: #1d2440;
+    --text-dim: #2b3350;
+    --line: rgba(16, 22, 46, 0.32);
+    --line-hi: rgba(16, 22, 46, 0.5);
+  }
+}
+
+* { box-sizing: border-box; }
+
+/* An inline SVG with no intrinsic size fills its container, so every icon needs
+   a default even where a more specific rule usually wins. Without this one an
+   icon dropped into new markup renders at the width of the card. */
+.icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1100px 620px at 82% -12%, var(--glow-a), transparent 62%),
+    radial-gradient(820px 520px at -8% 6%, var(--glow-b), transparent 58%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 55%, var(--bg-0) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 24px 20px 80px;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--primary-deep);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 0 0 12px 0;
+  z-index: 20;
+}
+.skip:focus { left: 0; }
+
+:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ---------- header ---------- */
+
+.site-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0 28px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  text-decoration: none;
+  border: 0;
+  color: var(--text);
+}
+.brand .mark { width: 36px; height: 36px; flex: none; }
+.brand .name { font-weight: 800; font-size: 1.12rem; letter-spacing: -0.2px; }
+.brand .name em { font-style: normal; color: var(--mint); }
+
+.head-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.site-nav { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.site-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  color: var(--text-soft);
+  font-weight: 600;
+  font-size: 0.94rem;
+  text-decoration: none;
+  transition: background 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+.site-nav a:hover { background: var(--surface-hi); color: var(--text); border-color: var(--line); }
+.site-nav a[aria-current="page"] { background: var(--surface-hi); color: var(--text); border-color: var(--line-hi); }
+.site-nav .icon { width: 17px; height: 17px; }
+
+/* Language switcher and theme toggle live together at the end of the header. */
+.chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+.chip-btn:hover { background: var(--surface-hi); border-color: var(--line-hi); color: var(--text); }
+.chip-btn .icon { width: 16px; height: 16px; }
+
+.lang { position: relative; }
+.lang > summary {
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+.lang > summary::-webkit-details-marker { display: none; }
+.lang > summary:hover { background: var(--surface-hi); color: var(--text); }
+.lang .icon { width: 16px; height: 16px; }
+.lang-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 30;
+  min-width: 170px;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid var(--line-hi);
+  background: var(--bg-1);
+  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+}
+.lang-menu a {
+  display: block;
+  padding: 8px 11px;
+  border-radius: 9px;
+  border: 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+.lang-menu a:hover { background: var(--surface-hi); color: var(--text); }
+.lang-menu a[aria-current="true"] { color: var(--text); font-weight: 700; }
+
+/* ---------- type ---------- */
+
+h1 {
+  font-size: clamp(2rem, 5.4vw, 3rem);
+  line-height: 1.08;
+  margin: 6px 0 12px;
+  letter-spacing: -1px;
+  font-weight: 800;
+  max-width: 20ch;
+}
+
+.lede {
+  color: var(--text-soft);
+  font-size: clamp(1.05rem, 2.1vw, 1.18rem);
+  margin: 0;
+  max-width: var(--measure);
+}
+
+h2 {
+  font-size: 1.28rem;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  letter-spacing: -0.3px;
+  scroll-margin-top: 90px;
+}
+h2 .icon { width: 20px; height: 20px; flex: none; margin-top: 0.2em; }
+
+h3 { font-size: 1.02rem; margin: 20px 0 4px; color: var(--text); letter-spacing: -0.1px; }
+
+p { margin: 9px 0; color: var(--text-soft); max-width: var(--measure); }
+strong { color: var(--text); font-weight: 660; }
+.meta { color: var(--text-dim); font-size: 0.9rem; }
+
+ul { margin: 8px 0; padding-left: 20px; }
+li { margin: 6px 0; color: var(--text-soft); max-width: var(--measure); }
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  transition: border-color 0.16s ease, color 0.16s ease;
+}
+a:hover { border-bottom-color: var(--primary); color: var(--primary-deep); }
+
+code, .mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+/* A heading you can link to. The anchor stays invisible until the heading is
+   hovered or the link itself is focused, so it never competes with the text. */
+.anchor {
+  margin-left: 8px;
+  border: 0;
+  color: var(--text-dim);
+  opacity: 0;
+  font-weight: 400;
+  transition: opacity 0.15s ease;
+}
+h2:hover .anchor, h3:hover .anchor, .anchor:focus-visible { opacity: 1; }
+
+/* ---------- hero ---------- */
+
+.hero {
+  display: grid;
+  gap: 30px;
+  align-items: center;
+  padding: 10px 0 6px;
+}
+@media (min-width: 780px) {
+  .hero { grid-template-columns: 1.15fr 0.85fr; gap: 44px; }
+}
+
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 680;
+  font-size: 0.97rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.14s ease, background 0.16s ease, border-color 0.16s ease;
+}
+.btn .icon { width: 18px; height: 18px; }
+.btn:hover { transform: translateY(-1px); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--btn-a), var(--btn-b));
+  color: var(--on-primary);
+  border-color: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 26px -10px rgba(78, 107, 245, 0.8);
+}
+.btn-primary:hover { color: var(--on-primary); }
+.btn-ghost {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--line);
+}
+.btn-ghost:hover { background: var(--surface-hi); border-color: var(--line-hi); color: var(--text); }
+
+.status-note {
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.status-note .icon { width: 15px; height: 15px; flex: none; margin-top: 0.28em; }
+
+/* ---------- the phone ---------- */
+
+.phone { width: 100%; max-width: 268px; margin-inline: auto; }
+.phone-shell {
+  position: relative;
+  border-radius: 46px;
+  padding: 9px;
+  background: linear-gradient(160deg, #333a5e 0%, #1c2238 42%, #12172b 100%);
+  box-shadow: var(--shadow-phone), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+.phone-screen {
+  position: relative;
+  border-radius: 38px;
+  overflow: hidden;
+  background: #0b1022;
+  aspect-ratio: 1206 / 2622;
+}
+.phone-screen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Drawn rather than captured: the simulator renders the island in some
+   screenshots and not others, so covering that strip is what makes a row of
+   them look like one set of photos instead of five. */
+.phone-island {
+  position: absolute;
+  left: 34.5%;
+  width: 31%;
+  top: 2%;
+  height: 3.4%;
+  border-radius: 999px;
+  background: #000;
+}
+
+.hero .phone { max-width: 250px; }
+.hero-phone-wrap { display: grid; place-items: center; }
+
+/* ---------- the guided walk ---------- */
+
+.walk { display: grid; gap: 34px; }
+.walk-stage { display: none; }
+.walk-step .phone { margin-bottom: 16px; }
+.walk-step h3 { margin: 0 0 4px; font-size: 1.14rem; font-weight: 750; }
+.walk-step p { margin: 0; }
+.walk-step .eyebrow { margin: 0 0 6px; }
+
+@media (min-width: 900px) {
+  .walk.is-sticky {
+    grid-template-columns: 300px 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .walk.is-sticky .walk-stage {
+    display: block;
+    position: sticky;
+    top: 14vh;
+  }
+  .walk.is-sticky .walk-step .phone { display: none; }
+  .walk.is-sticky .walk-step {
+    min-height: 62vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.42;
+    transition: opacity 0.35s ease;
+  }
+  .walk.is-sticky .walk-step.is-active { opacity: 1; }
+  .walk.is-sticky .walk-steps { display: block; }
+}
+
+.walk-stage .phone-screen img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.walk-stage .phone-screen img.is-shown { opacity: 1; }
+
+/* ---------- sections & cards ---------- */
+
+.section { margin: 52px 0 0; }
+.eyebrow {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 0 0 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  margin: 16px 0;
+}
+
+.grid { display: grid; gap: 12px; }
+@media (min-width: 560px) { .grid.two { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 760px) { .grid.three { grid-template-columns: repeat(3, 1fr); } }
+
+.feature {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px 18px 20px;
+  transition: border-color 0.16s ease, background 0.16s ease;
+}
+.feature:hover { border-color: var(--line-hi); background: var(--surface-hi); }
+.feature .chip {
+  width: 38px; height: 38px;
+  border-radius: 12px;
+  display: grid; place-items: center;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+}
+.feature .chip .icon { width: 19px; height: 19px; }
+.feature h3 { margin: 0 0 4px; font-size: 1rem; font-weight: 700; }
+.feature p { margin: 0; font-size: 0.93rem; color: var(--text-dim); }
+
+.tint-blue   { background: color-mix(in srgb, var(--primary) 14%, transparent); color: var(--primary); }
+.tint-mint   { background: color-mix(in srgb, var(--mint) 14%, transparent); color: var(--mint); }
+.tint-purple { background: color-mix(in srgb, var(--purple) 14%, transparent); color: var(--purple); }
+.tint-pink   { background: color-mix(in srgb, var(--pink) 14%, transparent); color: var(--pink); }
+.tint-amber  { background: color-mix(in srgb, var(--amber) 16%, transparent); color: var(--amber); }
+.tint-danger { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+
+.checks { list-style: none; padding: 0; margin: 6px 0 0; }
+.checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 11px 0;
+  color: var(--text-soft);
+  max-width: var(--measure);
+}
+.checks .icon { width: 19px; height: 19px; flex: none; margin-top: 2px; color: var(--mint); }
+
+.res {
+  display: block;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 16px;
+  text-decoration: none;
+  transition: border-color 0.16s ease, background 0.16s ease, transform 0.14s ease;
+}
+.res:hover { border-color: var(--line-hi); background: var(--surface-hi); transform: translateY(-1px); }
+.res .t { font-weight: 680; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.res .t .icon { width: 15px; height: 15px; color: var(--text-dim); flex: none; }
+.res .d { font-size: 0.9rem; color: var(--text-dim); margin-top: 3px; }
+
+/* ---------- tables ---------- */
+
+.table-scroll { overflow-x: auto; margin: 14px 0 4px; }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 460px;
+  font-size: 0.94rem;
+}
+caption {
+  text-align: left;
+  color: var(--text-dim);
+  font-size: 0.86rem;
+  padding-bottom: 10px;
+}
+th, td {
+  text-align: left;
+  padding: 11px 14px 11px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  color: var(--text-soft);
+}
+th { color: var(--text); font-weight: 700; }
+tbody tr:last-child td { border-bottom: 0; }
+td .yes { color: var(--mint); font-weight: 700; }
+td .no { color: var(--text-dim); }
+
+/* ---------- the no-server diagram ---------- */
+
+.diagram {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  margin: 6px auto 0;
+  height: auto;
+}
+.diagram .d-label { fill: var(--text-soft); font-size: 11px; font-weight: 650; }
+.diagram .d-dim { fill: var(--text-dim); font-size: 10px; }
+.diagram .d-box { fill: var(--surface); stroke: var(--line-hi); }
+.diagram .d-stop { stroke: var(--danger); }
+.diagram .d-flow { stroke: var(--mint); }
+
+/* ---------- callouts ---------- */
+
+.callout {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  border: 1px solid color-mix(in srgb, var(--amber) 32%, transparent);
+  background: color-mix(in srgb, var(--amber) 8%, transparent);
+  border-radius: 16px;
+  padding: 15px 17px;
+  margin: 18px 0;
+  color: var(--text-soft);
+}
+.callout .icon { width: 20px; height: 20px; flex: none; color: var(--amber); margin-top: 2px; }
+.callout p { margin: 0; max-width: none; }
+.callout.urgent {
+  border-color: color-mix(in srgb, var(--danger) 36%, transparent);
+  background: color-mix(in srgb, var(--danger) 9%, transparent);
+}
+.callout.urgent .icon { color: var(--danger); }
+.callout.calm {
+  border-color: color-mix(in srgb, var(--mint) 30%, transparent);
+  background: color-mix(in srgb, var(--mint) 8%, transparent);
+}
+.callout.calm .icon { color: var(--mint); }
+
+/* ---------- country picker ---------- */
+
+.picker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.picker-row label { color: var(--text-soft); font-weight: 650; font-size: 0.95rem; }
+select {
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 9px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--line-hi);
+  background: var(--surface-hi);
+  color: var(--text);
+  cursor: pointer;
+}
+.country-panel[hidden] { display: none; }
+.emergency-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 16px;
+  font-size: 0.98rem;
+  color: var(--text-soft);
+  max-width: none;
+}
+.emergency-line .icon { width: 20px; height: 20px; }
+.emergency-line b { color: var(--danger); font-size: 1.14rem; letter-spacing: 0.3px; }
+
+/* ---------- footer ---------- */
+
+footer {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  color: var(--text-dim);
+  font-size: 0.88rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+footer a { color: var(--text-soft); border-bottom-color: color-mix(in srgb, var(--text-soft) 28%, transparent); }
+footer a:hover { color: var(--text); }
+footer .sep { color: var(--line-hi); }
+footer .made { margin-left: auto; }
+
+@media (max-width: 620px) {
+  footer .made { margin-left: 0; width: 100%; }
+}
+
+/* ---------- FAQ disclosures ---------- */
+
+.faq { border-top: 1px solid var(--line); }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 2px;
+  cursor: pointer;
+  font-weight: 660;
+  color: var(--text);
+  list-style: none;
+  transition: color 0.16s ease;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary:hover { color: var(--primary); }
+.faq summary .chev {
+  width: 18px; height: 18px;
+  margin-left: auto;
+  flex: none;
+  color: var(--text-dim);
+  transition: transform 0.2s ease;
+}
+.faq details[open] summary .chev { transform: rotate(180deg); }
+.faq .body { padding: 0 2px 16px; }
+.faq .body p { margin: 0 0 8px; }
+.faq .body p:last-child { margin-bottom: 0; }
+
+/* ---------- contact row ---------- */
+
+.contact-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+/* ---------- copy button ---------- */
+
+.copy {
+  border: 0;
+  background: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  vertical-align: middle;
+  font: inherit;
+}
+.copy:hover { color: var(--text); background: var(--surface-hi); }
+.copy .icon { width: 15px; height: 15px; display: block; }
+.copy-done { color: var(--mint); font-size: 0.85rem; margin-left: 6px; }
+
+/* ---------- back to top ---------- */
+
+.to-top {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 15;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--line-hi);
+  background: var(--bg-1);
+  color: var(--text-soft);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.6);
+}
+.to-top.is-shown { opacity: 1; pointer-events: auto; transform: none; }
+.to-top .icon { width: 19px; height: 19px; }
+
+/* ---------- reveal on scroll ---------- */
+
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+}
+
+/* ---------- the mark draws itself ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .draw path {
+    stroke-dasharray: var(--len, 200);
+    stroke-dashoffset: var(--len, 200);
+    animation: draw 1.15s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  .draw path:nth-child(2) { animation-delay: 0.5s; }
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+/* ---------- narrow screens ---------- */
+
+@media (max-width: 620px) {
+  .site-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding-bottom: 22px;
+  }
+  .site-nav { justify-content: flex-start; margin-left: -13px; }
+  .head-right { justify-content: flex-start; }
+  .lang-menu { left: 0; right: auto; }
+}
+
+/* ---------- print: the crisis numbers have to survive a printer ---------- */
+
+@media print {
+  :root {
+    --text: #000; --text-soft: #1a1a1a; --text-dim: #444;
+    --line: #bbb; --line-hi: #888; --surface: transparent; --surface-hi: transparent;
+  }
+  body { background: #fff; color: #000; }
+  .site-nav, .head-right, .to-top, .cta-row, .contact-row, .phone, .walk-stage { display: none !important; }
+  .card { border: 1px solid #bbb; break-inside: avoid; }
+  .faq details { break-inside: avoid; }
+  .faq details > .body { display: block !important; }
+  a { color: #000; border: 0; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #444; }
+  .country-panel[hidden] { display: block !important; }
+}
+</style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-
-<!-- Inlined rather than linked: an external sprite referenced with
-     <use href="file.svg#id"> is blocked over file://, so the page could not be
-     checked locally before publishing. Three pages is a fair price for that. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="g-c" x1="14" y1="10" x2="50" y2="54" gradientUnits="userSpaceOnUse">
@@ -25,51 +868,132 @@
       <stop offset="0" stop-color="#6FE3B4"/><stop offset="1" stop-color="#8CEBC4"/>
     </linearGradient>
   </defs>
+
   <symbol id="i-mark" viewBox="0 0 64 64">
     <path d="M43.5 15.6 A20 20 0 1 0 43.5 48.4" fill="none" stroke="url(#g-c)" stroke-width="9.5" stroke-linecap="round"/>
     <path d="M24.5 32.6 L31.4 39.6 L45.2 22.4" fill="none" stroke="url(#g-k)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
+
   <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6z"/><path d="M9 12l2.2 2.2L15.5 10"/>
+  </symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M5 4.5A1.5 1.5 0 016.5 3H18a1 1 0 011 1v14.5"/><path d="M6.5 16H19v4.5H6.5A1.5 1.5 0 015 19V6"/><path d="M9 7.5h6M9 11h4"/>
+  </symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16v-4M12.5 16V8M17 16v-6"/>
   </symbol>
   <symbol id="i-life" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/>
     <path d="M6.8 6.8l2 2M17.2 6.8l-2 2M6.8 17.2l2-2M17.2 17.2l-2-2"/>
   </symbol>
-  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l7.4 5.4a2 2 0 002.2 0L20.5 7"/>
+  <symbol id="i-flask" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 3v6.2L5.4 17a2 2 0 001.7 3h9.8a2 2 0 001.7-3L14 9.2V3"/><path d="M9 3h6"/><path d="M7.4 14h9.2"/>
   </symbol>
-  <symbol id="i-bug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="7.5" y="7.5" width="9" height="12" rx="4.5"/><path d="M9.2 8.2A2.8 2.8 0 0112 5.4a2.8 2.8 0 012.8 2.8"/>
-    <path d="M7.5 11.5H4.5M19.5 11.5h-3M7.5 15.5H4.5M19.5 15.5h-3M8.6 19.4l-1.8 2M15.4 19.4l1.8 2"/>
+  <symbol id="i-watch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7" y="6" width="10" height="12" rx="3"/><path d="M9.5 6l.4-2.4A1 1 0 0110.9 3h2.2a1 1 0 011 .6l.4 2.4M9.5 18l.4 2.4a1 1 0 001 .6h2.2a1 1 0 001-.6l.4-2.4"/><path d="M12 9.8V12l1.6 1"/>
+  </symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 8.5a6 6 0 10-12 0c0 5-2 6.5-2 6.5h16s-2-1.5-2-6.5z"/><path d="M13.7 19a2 2 0 01-3.4 0"/>
+  </symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/>
   </symbol>
   <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 4.5l8.5 15h-17z"/><path d="M12 10v4"/><path d="M12 17.2v.1"/>
   </symbol>
-  <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M6.5 9.5l5.5 5.5 5.5-5.5"/>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8.5"/><path d="M12 11.2v5"/><path d="M12 8.3v.1"/>
+  </symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8.5"/><path d="M8.6 12.2l2.4 2.4 4.4-5"/>
+  </symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l7.4 5.4a2 2 0 002.2 0L20.5 7"/>
+  </symbol>
+  <symbol id="i-bug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7.5" y="7.5" width="9" height="12" rx="4.5"/><path d="M9.4 7a2.6 2.6 0 015.2 0"/>
+    <path d="M4.5 11h3M16.5 11h3M4.5 16h3M16.5 16h3M12 8v11"/>
   </symbol>
   <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 5h5v5"/><path d="M19 5l-7.5 7.5"/><path d="M18 14.5V18a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h3.5"/>
+    <path d="M14 4.5h5.5V10"/><path d="M19.5 4.5L11 13"/><path d="M18 14.5v4a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 014 18.5v-11A1.5 1.5 0 015.5 6h4"/>
+  </symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6.5 9.5L12 15l5.5-5.5"/>
+  </symbol>
+  <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 19V5.5"/><path d="M6 11.5L12 5.5l6 6"/>
+  </symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8.5"/><path d="M3.6 12h16.8"/>
+    <path d="M12 3.5c2.3 2.4 3.5 5.4 3.5 8.5S14.3 18.1 12 20.5c-2.3-2.4-3.5-5.4-3.5-8.5S9.7 5.9 12 3.5z"/>
+  </symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4"/>
+    <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"/>
+  </symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 13.5A8 8 0 1110.5 4a6.5 6.5 0 009.5 9.5z"/>
+  </symbol>
+  <symbol id="i-code" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8.5 8L4.5 12l4 4"/><path d="M15.5 8l4 4-4 4"/><path d="M13.4 5.5l-2.8 13"/>
+  </symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 5.4h3"/>
+  </symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 18a4 4 0 01-.4-8A5.5 5.5 0 0117.4 10 3.9 3.9 0 0117 18z"/>
+  </symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 11V5.5a1.5 1.5 0 013 0V11"/><path d="M12 11V4.6a1.5 1.5 0 013 0V11"/>
+    <path d="M15 11.5V7.6a1.5 1.5 0 013 0V15a6 6 0 01-6 6h-.7a5 5 0 01-3.7-1.7L5 15.6a1.6 1.6 0 012.3-2.2L9 15V8.6a1.5 1.5 0 00-3 0"/>
+  </symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13.5 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8.5z"/><path d="M13.5 3v5.5H19"/>
+  </symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 3.5H4.5v6.6a2 2 0 00.6 1.4l7.6 7.6a2 2 0 002.8 0l5-5a2 2 0 000-2.8l-7.6-7.6a2 2 0 00-1.4-.6z"/>
+    <path d="M8 8v.1"/>
+  </symbol>
+  <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 9V3.5h10V9"/><rect x="3.5" y="9" width="17" height="7.5" rx="2"/><path d="M7 14h10v6.5H7z"/>
   </symbol>
   <symbol id="i-github" viewBox="0 0 24 24">
-    <path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.5 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.570 2.34 1.12 2.91.86.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 015 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.8-4.58 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.07 10.07 0 0022 12.25C22 6.58 17.52 2 12 2z"/>
+    <path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.5 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.86.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 015 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.8-4.58 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.07 10.07 0 0022 12.25C22 6.58 17.52 2 12 2z"/>
   </symbol>
 </svg>
-
+<a class="skip" href="#main">Skip to content</a>
 <main class="wrap" id="main">
 
   <header class="site-head">
-    <a class="brand" href="../" aria-label="ChillMate home">
-      <svg class="mark" aria-hidden="true"><use href="#i-mark"/></svg>
+    <a class="brand" href="../" aria-label="ChillMate">
+      <svg class="mark draw" aria-hidden="true"><use href="#i-mark"/></svg>
       <span class="name">Chill<em>Mate</em></span>
     </a>
-    <nav class="site-nav" aria-label="Primary">
+    <div class="head-right">
+      <nav class="site-nav" aria-label="Home">
       <a href="../">Home</a>
       <a href="../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
-      <a href="./" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support</a>
+      <a href="../support/" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support</a>
+      <a href="../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>About</a>
       <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
-    </nav>
+      </nav>
+      <details class="lang">
+        <summary><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg><span>English</span></summary>
+        <div class="lang-menu" role="group" aria-label="Language">
+        <a lang="en" hreflang="en" href="/ChillMate/support/" aria-current="true">English</a>
+        <a lang="nl" hreflang="nl" href="/ChillMate/nl/support/">Nederlands</a>
+        <a lang="de" hreflang="de" href="/ChillMate/de/support/">Deutsch</a>
+        <a lang="fr" hreflang="fr" href="/ChillMate/fr/support/">Français</a>
+        <a lang="es" hreflang="es" href="/ChillMate/es/support/">Español</a>
+        </div>
+      </details>
+      <button type="button" class="chip-btn" data-theme-toggle hidden
+              aria-pressed="false" title="Switch colour theme">
+        <svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg>
+        <span data-theme-label>Light</span>
+      </button>
+    </div>
   </header>
 
   <h1>Support and help</h1>
@@ -77,21 +1001,173 @@
 
   <div class="callout urgent" role="note">
     <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
-    <p><strong>In an emergency, do not wait for the app.</strong> If you or someone else may be in immediate danger, call your local emergency number now: 112 in the Netherlands and most of Europe, 911 in the US, 999 in the UK.</p>
+    <p><strong>In an emergency, do not wait for the app.</strong> If you or someone else may be in immediate danger, call your local emergency number now.</p>
   </div>
 
   <section class="section">
-    <p class="eyebrow">Get in touch</p>
-    <div class="card">
-      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-mail"/></svg> Contact</h2>
-      <p>Email <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>. Replies usually take a few days. Including your iOS version and what you were doing when something went wrong helps a lot.</p>
-      <div class="contact-row">
-        <a class="btn btn-primary" href="mailto:chillmate@icloud.com">
-          <svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Email support
-        </a>
-        <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate/issues">
-          <svg class="icon" aria-hidden="true"><use href="#i-bug"/></svg>Report an issue
-        </a>
+    <p class="eyebrow">Real services</p>
+    <div class="card" data-countries>
+      <h2 id="services"><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-life"/></svg>Get help from people, not an app
+        <a class="anchor" href="#services" aria-label="Get help from people, not an app">#</a>
+      </h2>
+      <p>ChillMate is not a crisis service. Pick where you are and these organisations can help directly. This page prints and works offline, so it is still here when the signal is not.</p>
+
+      <div class="picker-row">
+        <label for="country">Where are you?</label>
+        <select id="country">
+          <option value="NL">Netherlands</option>
+          <option value="BE">Belgium</option>
+          <option value="DE">Germany</option>
+          <option value="GB">United Kingdom</option>
+          <option value="IE">Ireland</option>
+          <option value="FR">France</option>
+          <option value="ES">Spain</option>
+          <option value="US">United States</option>
+          <option value="AU">Australia</option>
+          <option value="XX">Somewhere else</option>
+        </select>
+        <button type="button" class="chip-btn" onclick="window.print()"><svg class="icon" aria-hidden="true"><use href="#i-print"/></svg>Print this page</button>
+      </div>
+
+      <div class="country-panel" data-country="NL">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>112</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:112"><div class="t">112</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 112</strong></div></a>
+        <a class="res" href="https://www.113.nl"><div class="t">113 Zelfmoordpreventie<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Open 113.nl</strong></div></a>
+        <a class="res" href="https://www.ggd.nl"><div class="t">GGD<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open ggd.nl</strong></div></a>
+        <div class="res"><div class="t">Huisarts</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://www.drugsinfo.nl"><div class="t">Drugs Infolijn<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open drugsinfo.nl</strong></div></a>
+        <a class="res" href="https://centrumseksueelgeweld.nl"><div class="t">Centrum Seksueel Geweld<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Open centrumseksueelgeweld.nl</strong></div></a>
+        <a class="res" href="https://switchboard.nl"><div class="t">Switchboard LGBT+<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open switchboard.nl</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="BE">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>112</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:112"><div class="t">112</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 112</strong></div></a>
+        <a class="res" href="tel:1813"><div class="t">Zelfmoordlijn 1813</div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Call 1813</strong></div></a>
+        <a class="res" href="https://www.sensoa.be"><div class="t">Sensoa<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open sensoa.be</strong></div></a>
+        <div class="res"><div class="t">Huisarts</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://www.druglijn.be"><div class="t">De DrugLijn<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open druglijn.be</strong></div></a>
+        <a class="res" href="https://www.seksueelgeweld.be"><div class="t">Zorgcentra na Seksueel Geweld<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Open seksueelgeweld.be</strong></div></a>
+        <a class="res" href="https://lumi.be"><div class="t">Lumi<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open lumi.be</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="DE">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>112</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:112"><div class="t">112</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 112</strong></div></a>
+        <a class="res" href="tel:08001110111"><div class="t">TelefonSeelsorge</div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Call 08001110111</strong></div></a>
+        <a class="res" href="https://www.aidshilfe.de"><div class="t">Deutsche Aidshilfe<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open aidshilfe.de</strong></div></a>
+        <div class="res"><div class="t">Hausarzt</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://www.drugcom.de"><div class="t">drugcom.de<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open drugcom.de</strong></div></a>
+        <a class="res" href="tel:116016"><div class="t">Hilfetelefon</div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Call 116016</strong></div></a>
+        <a class="res" href="https://www.lsvd.de"><div class="t">LSVD+<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open lsvd.de</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="GB">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>999</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:999"><div class="t">999</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 999</strong></div></a>
+        <a class="res" href="tel:116123"><div class="t">Samaritans</div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Call 116123</strong></div></a>
+        <a class="res" href="https://www.nhs.uk/live-well/sexual-health/"><div class="t">NHS sexual health<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open nhs.uk</strong></div></a>
+        <div class="res"><div class="t">GP</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://www.talktofrank.com"><div class="t">FRANK<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open talktofrank.com</strong></div></a>
+        <a class="res" href="https://rapecrisis.org.uk"><div class="t">Rape Crisis<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Open rapecrisis.org.uk</strong></div></a>
+        <a class="res" href="https://switchboard.lgbt"><div class="t">Switchboard LGBTQ+<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open switchboard.lgbt</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="IE">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>112</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:112"><div class="t">112</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 112</strong></div></a>
+        <a class="res" href="tel:116123"><div class="t">Samaritans</div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Call 116123</strong></div></a>
+        <a class="res" href="https://www.sexualwellbeing.ie"><div class="t">Sexual Wellbeing (HSE)<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open sexualwellbeing.ie</strong></div></a>
+        <div class="res"><div class="t">GP</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://www.drugs.ie"><div class="t">Drugs.ie<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open drugs.ie</strong></div></a>
+        <a class="res" href="https://www.drcc.ie"><div class="t">Dublin Rape Crisis Centre<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Open drcc.ie</strong></div></a>
+        <a class="res" href="https://lgbt.ie"><div class="t">LGBT Ireland<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open lgbt.ie</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="FR">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>112</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:112"><div class="t">112</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 112</strong></div></a>
+        <a class="res" href="tel:3114"><div class="t">3114</div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Call 3114</strong></div></a>
+        <a class="res" href="https://www.sida-info-service.org"><div class="t">Sida Info Service<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open sida-info-service.org</strong></div></a>
+        <div class="res"><div class="t">Médecin traitant</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://www.drogues-info-service.fr"><div class="t">Drogues Info Service<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open drogues-info-service.fr</strong></div></a>
+        <a class="res" href="tel:0800059595"><div class="t">Viols Femmes Informations</div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Call 0800059595</strong></div></a>
+        <a class="res" href="https://www.sos-homophobie.org"><div class="t">SOS homophobie<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open sos-homophobie.org</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="ES">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>112</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:112"><div class="t">112</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 112</strong></div></a>
+        <a class="res" href="tel:024"><div class="t">024</div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Call 024</strong></div></a>
+        <a class="res" href="https://www.sanidad.gob.es"><div class="t">Sanidad<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open sanidad.gob.es</strong></div></a>
+        <div class="res"><div class="t">Médico de cabecera</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://energycontrol.org"><div class="t">Energy Control<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open energycontrol.org</strong></div></a>
+        <a class="res" href="tel:016"><div class="t">016</div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Call 016</strong></div></a>
+        <a class="res" href="https://felgtbi.org"><div class="t">FELGTBI+<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open felgtbi.org</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="US">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>911</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:911"><div class="t">911</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 911</strong></div></a>
+        <a class="res" href="tel:988"><div class="t">988 Suicide &amp; Crisis Lifeline</div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Call 988</strong></div></a>
+        <a class="res" href="https://gettested.cdc.gov"><div class="t">CDC GetTested<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open gettested.cdc.gov</strong></div></a>
+        <div class="res"><div class="t">Primary care doctor</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://dancesafe.org"><div class="t">DanceSafe<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open dancesafe.org</strong></div></a>
+        <a class="res" href="https://www.rainn.org"><div class="t">RAINN<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Open rainn.org</strong></div></a>
+        <a class="res" href="https://www.thetrevorproject.org"><div class="t">The Trevor Project<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open thetrevorproject.org</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="AU">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>000</b></span>
+        </p>
+        <div class="grid two">
+        <a class="res" href="tel:000"><div class="t">000</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. <strong>Call 000</strong></div></a>
+        <a class="res" href="tel:131114"><div class="t">Lifeline</div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Call 131114</strong></div></a>
+        <a class="res" href="https://www.healthdirect.gov.au/sexual-health"><div class="t">Healthdirect<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. <strong>Open healthdirect.gov.au</strong></div></a>
+        <div class="res"><div class="t">GP</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals.</div></div>
+        <a class="res" href="https://adf.org.au"><div class="t">Alcohol and Drug Foundation<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open adf.org.au</strong></div></a>
+        <a class="res" href="tel:1800737732"><div class="t">1800RESPECT</div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. <strong>Call 1800737732</strong></div></a>
+        <a class="res" href="https://qlife.org.au"><div class="t">QLife<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ support · A listening ear, information, and referral. <strong>Open qlife.org.au</strong></div></a>
+        </div>
+      </div>
+      <div class="country-panel" data-country="XX">
+        <p class="emergency-line"><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>
+          <span>Emergency number here: <b>your local emergency number</b></span>
+        </p>
+        <div class="grid two">
+        <div class="res"><div class="t">Emergency services</div><div class="d">Emergency services · Immediate danger, unconsciousness, or someone who cannot be woken. Ask your local health service.</div></div>
+        <a class="res" href="https://findahelpline.com"><div class="t">Find a Helpline<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Crisis and suicide support · Free and confidential, if you might hurt yourself or cannot stay safe. <strong>Open findahelpline.com</strong></div></a>
+        <div class="res"><div class="t">Sexual health and STI testing</div><div class="d">Sexual health and STI testing · STI testing, PrEP, PEP questions, vaccination, and sexual health support. Ask your local health service.</div></div>
+        <div class="res"><div class="t">Your doctor</div><div class="d">Your doctor · Medication interactions, sleep, mental health, substance use, and referrals. Ask your local health service.</div></div>
+        <a class="res" href="https://tripsit.me"><div class="t">TripSit<svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Drug information and harm reduction · Trusted, non-judgemental drug information and harm reduction. <strong>Open tripsit.me</strong></div></a>
+        <div class="res"><div class="t">After sexual assault</div><div class="d">After sexual assault · Support after assault, coercion, or a consent concern. Ask your local health service.</div></div>
+        <div class="res"><div class="t">LGBTQ+ support</div><div class="d">LGBTQ+ support · A listening ear, information, and referral. Ask your local health service.</div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -102,7 +1178,7 @@
       <div class="faq">
         <details>
           <summary>Is my data private?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Yes. ChillMate keeps your information on your iPhone. There are no ads, no trackers, and nothing is sold. See the <a href="../privacy/">privacy policy</a> for the detail.</p></div>
+          <div class="body"><p>Yes. ChillMate keeps your information on your iPhone. There are no ads, no trackers, and nothing is sold. The app is open source, so you can read exactly what it does with your data.</p></div>
         </details>
         <details>
           <summary>How do I back up, or move to a new phone?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
@@ -110,11 +1186,11 @@
         </details>
         <details>
           <summary>How do I lock the app?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>In Settings, under Privacy and lock, turn on Face ID or set a PIN. You can also enable discreet notifications so lock-screen wording stays vague.</p></div>
+          <div class="body"><p>In Settings, under Privacy and lock, turn on Face ID or set a PIN. You can also enable discreet notifications so lock-screen wording stays vague, and ChillMate hides its contents in the App Switcher and while your screen is recorded or mirrored.</p></div>
         </details>
         <details>
           <summary>How do tips work?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>The optional "Support the developer" tip uses Apple In-App Purchase. It is entirely optional, it unlocks nothing, and every feature stays free for everyone.</p></div>
+          <div class="body"><p>The optional tip uses Apple In-App Purchase. It is entirely optional, it unlocks nothing, and every feature stays free for everyone.</p></div>
         </details>
         <details>
           <summary>How do I delete my data?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
@@ -126,28 +1202,35 @@
         </details>
         <details>
           <summary>Which countries does it support?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>ChillMate works anywhere. Help resources follow the country you pick in setup, with Dutch services built in and international fallbacks for everyone else.</p></div>
+          <div class="body"><p>ChillMate works anywhere. Help resources follow the country you pick in setup, with services built in for the Netherlands, Belgium, Germany, the UK, Ireland, France, Spain, the United States and Australia, and international fallbacks everywhere else.</p></div>
+        </details>
+        <details>
+          <summary>Which languages does it speak?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>English, Dutch, German, French and Spanish, on the phone and on Apple Watch. You can set the language inside the app or in iOS Settings, and the one you changed last is the one that applies.</p></div>
         </details>
       </div>
     </div>
   </section>
 
   <section class="section">
-    <p class="eyebrow">Real services</p>
+    <p class="eyebrow">Get in touch</p>
     <div class="card">
-      <h2><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-life"/></svg> Get help from people, not an app</h2>
-      <p>ChillMate is not a crisis service. These organisations can help directly.</p>
-      <div class="grid two" style="margin-top:14px">
-        <a class="res" href="https://www.113.nl"><div class="t">113 Zelfmoordpreventie <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Crisis and suicide support in the Netherlands. Call 113 or 0800 0113.</div></a>
-        <a class="res" href="https://findahelpline.com"><div class="t">Find a Helpline <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Free, confidential crisis lines worldwide.</div></a>
-        <a class="res" href="https://www.ggd.nl"><div class="t">GGD <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Public health services, testing and vaccination.</div></a>
-        <a class="res" href="https://www.soaaids.nl"><div class="t">Soa Aids Nederland <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health information and guidance.</div></a>
-        <a class="res" href="https://www.trimbos.nl"><div class="t">Trimbos <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Substance information and a support line.</div></a>
-        <a class="res" href="https://tripsit.me"><div class="t">TripSit <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Confidential information and support, worldwide.</div></a>
-        <a class="res" href="https://www.jellinek.nl"><div class="t">Jellinek <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Addiction support and information line.</div></a>
-        <a class="res" href="https://centrumseksueelgeweld.nl"><div class="t">Centrum Seksueel Geweld <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Support after assault, coercion, or a consent concern.</div></a>
-        <a class="res" href="https://switchboard.nl"><div class="t">Switchboard LGBT+ <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ listening ear, information and referral.</div></a>
+      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-mail"/></svg>Contact</h2>
+      <p>Email <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>. Replies usually take a few days. Including your iOS version and what you were doing when something went wrong helps a lot.
+        <button type="button" class="copy" data-copy="chillmate@icloud.com" data-copied-label="Copied"
+                hidden aria-label="Copy"><svg class="icon" aria-hidden="true"><use href="#i-doc"/></svg></button><span class="copy-done"></span>
+      </p>
+      <div class="contact-row">
+        <a class="btn btn-primary" href="mailto:chillmate@icloud.com"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Email support</a>
+        <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate/issues"><svg class="icon" aria-hidden="true"><use href="#i-bug"/></svg>Report an issue</a>
       </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="callout calm">
+      <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>
+      <p>The privacy policy is kept in English only, so there is one authoritative text rather than five that can drift apart. <a href="../privacy/">Read the full privacy policy</a></p>
     </div>
   </section>
 
@@ -156,6 +1239,10 @@
     <span class="sep" aria-hidden="true">·</span>
     <a href="../privacy/">Privacy</a>
     <span class="sep" aria-hidden="true">·</span>
+    <a href="../support/">Support</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="../changelog/">Changelog</a>
+    <span class="sep" aria-hidden="true">·</span>
     <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
@@ -163,5 +1250,9 @@
   </footer>
 
 </main>
+<button type="button" class="to-top" data-to-top hidden aria-label="Back to top">
+  <svg class="icon" aria-hidden="true"><use href="#i-up"/></svg>
+</button>
+<script src="../assets/site.js" defer></script>
 </body>
 </html>
