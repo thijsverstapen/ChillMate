@@ -34,7 +34,36 @@
   <meta name="twitter:description" content="A private overview of your own nights, plans, reminders and safety tools, kept entirely on your iPhone. Free, open source, no account and no server." />
   <meta name="twitter:image" content="https://thijsverstapen.github.io/ChillMate/assets/og.png" />
 <script>document.documentElement.classList.add('js');try{var t=localStorage.getItem('cm-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
-  <style>/* ChillMate site styles.
+  <style>/* Inter, self-hosted, as the fallback for everyone who is not on an Apple
+   device. Apple devices resolve -apple-system to SF Pro first, so these files
+   are never requested there: the download only happens on the platforms where
+   the alternative was Segoe UI or Roboto, which is where the page stopped
+   looking designed. Self-hosted rather than from a font CDN, because a webfont
+   request would hand every reader's IP address to a third party, on the one
+   site whose argument is that it does not do that. SIL OFL 1.1, see
+   fonts/LICENSE.txt. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("fonts/inter-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+                 U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+                 U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("fonts/inter-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+                 U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF,
+                 U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ChillMate site styles.
 
    The app is dark only. The site defaults to dark to match it, but honours a
    light system preference and a manual toggle, because a website is read in
@@ -195,7 +224,7 @@ html {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--text);
   background:
     radial-gradient(1100px 620px at 82% -12%, var(--glow-a), transparent 62%),
@@ -590,46 +619,15 @@ h2:hover .anchor, h3:hover .anchor, .anchor:focus-visible { opacity: 1; }
 }
 .scenarios .icon { width: 18px; height: 18px; margin-top: 3px; color: var(--primary); }
 
-/* ---------- the guided walk ---------- */
+/* ---------- the walk, narrow fallback ---------- */
 
-.walk { display: grid; gap: 34px; }
-.walk-stage { display: none; }
-.walk-step .phone { margin-bottom: 16px; }
-.walk-step h3 { margin: 0 0 4px; font-size: 1.14rem; font-weight: 750; }
-.walk-step p { margin: 0; }
+/* Below 940px there is no sticky stage: each step carries its own phone and
+   the chapter reads as a plain sequence. The scroll-driven version lives in
+   the exhibition layer further down. */
+
+.walk-step .phone { margin-bottom: 18px; }
 .walk-step .eyebrow { margin: 0 0 6px; }
-
-@media (min-width: 900px) {
-  .walk.is-sticky {
-    grid-template-columns: 300px 1fr;
-    gap: 60px;
-    align-items: start;
-  }
-  .walk.is-sticky .walk-stage {
-    display: block;
-    position: sticky;
-    top: 14vh;
-  }
-  .walk.is-sticky .walk-step .phone { display: none; }
-  .walk.is-sticky .walk-step {
-    min-height: 62vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    opacity: 0.42;
-    transition: opacity 0.35s ease;
-  }
-  .walk.is-sticky .walk-step.is-active { opacity: 1; }
-  .walk.is-sticky .walk-steps { display: block; }
-}
-
-.walk-stage .phone-screen img {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  transition: opacity 0.45s ease;
-}
-.walk-stage .phone-screen img.is-shown { opacity: 1; }
+.walk-step p { margin: 0; }
 
 /* ---------- sections & cards ---------- */
 
@@ -952,19 +950,508 @@ footer .made { margin-left: auto; }
     --line: #bbb; --line-hi: #888; --surface: transparent; --surface-hi: transparent;
   }
   body { background: #fff; color: #000; }
-  .site-nav, .head-right, .to-top, .cta-row, .contact-row, .phone, .walk-stage { display: none !important; }
+  .site-nav, .head-right, .to-top, .cta-row, .contact-row,
+  .phone, .watch, .stage, .subnav, .scroll-cue, .demo-picker,
+  .demo-actions { display: none !important; }
   .card { border: 1px solid #bbb; break-inside: avoid; }
   .faq details { break-inside: avoid; }
   .faq details > .body { display: block !important; }
   a { color: #000; border: 0; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #444; }
   .country-panel[hidden] { display: block !important; }
+  .chapter { padding: 18px 0 !important; min-height: 0 !important; }
+  .hero-full { min-height: 0 !important; }
+  .exhibition .chapter h1 { font-size: 26pt !important; }
+  .exhibition .chapter h2 { font-size: 17pt !important; }
+  .statement-grid b { font-size: 34pt !important; color: #000 !important; -webkit-text-fill-color: #000 !important; }
 }
+
+/* ==========================================================================
+   The exhibition layout
+
+   Only the home page uses this. Privacy, support, about, changelog, press and
+   security stay documents, because that is what they are: a legal text set as
+   a full-bleed chapter sequence would be theatre in the wrong place.
+
+   The rules of the layout are Apple's, and they are mostly about restraint
+   with space rather than decoration: break the column, make the type large
+   enough to be an image, put a chapter's worth of air between chapters, draw
+   almost no borders, and let the product be the biggest thing on screen.
+   ========================================================================== */
+
+.exhibition { --chapter-pad: clamp(84px, 11vw, 168px); }
+
+/* The whole page is chapters now, so the old centred column only applies
+   inside one. */
+.exhibition > .wrap { max-width: none; padding: 0; }
+
+.chapter {
+  position: relative;
+  padding: var(--chapter-pad) 20px;
+  background: var(--bg-1);
+  color: var(--text);
+  overflow: clip;
+}
+.chapter > .inner {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+.chapter > .inner.narrow { max-width: 820px; }
+
+/* Chapters alternate tone. An inverted chapter is light on a dark page and
+   dark on a light one, so the rhythm survives the theme toggle instead of
+   fighting it. The token lists are duplicated rather than shared because CSS
+   has no way to name a set of custom properties and apply it conditionally,
+   and four honest copies beat one clever indirection. */
+.exhibition .chapter--invert,
+:root[data-theme="dark"] .exhibition .chapter--invert {
+  color-scheme: light;
+  --bg-0: #eef1f8; --bg-1: #ffffff; --bg-2: #f5f7fc;
+  --surface: rgba(16, 22, 46, 0.04); --surface-hi: rgba(16, 22, 46, 0.07);
+  --line: rgba(16, 22, 46, 0.13); --line-hi: rgba(16, 22, 46, 0.26);
+  --text: #10162e; --text-soft: #3b4463; --text-dim: #5a6382;
+  --primary: #3a4fd0; --primary-deep: #2a3cb0;
+  --btn-a: #3a4fd0; --btn-b: #2a3cb0;
+  --mint: #0d7a55; --purple: #6b3fc4; --pink: #b8336a;
+  --amber: #8a5c00; --danger: #c02929;
+  --shadow-phone: 0 34px 80px -26px rgba(16, 22, 46, 0.42);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .exhibition .chapter--invert {
+    color-scheme: dark;
+    --bg-0: #0b1022; --bg-1: #0e1430; --bg-2: #131a2e;
+    --surface: rgba(255, 255, 255, 0.05); --surface-hi: rgba(255, 255, 255, 0.08);
+    --line: rgba(255, 255, 255, 0.11); --line-hi: rgba(255, 255, 255, 0.2);
+    --text: #eef1f8; --text-soft: #bcc5dc; --text-dim: #8a93ad;
+    --primary: #7c8cff; --primary-deep: #4e6bf5;
+    --btn-a: #5a68e0; --btn-b: #3f4fc4;
+    --mint: #6fe3b4; --purple: #b08bff; --pink: #ff8bbf;
+    --amber: #ffc266; --danger: #ff6b6b;
+    --shadow-phone: 0 34px 80px -26px rgba(4, 8, 22, 0.95);
+  }
+}
+:root[data-theme="light"] .exhibition .chapter--invert {
+  color-scheme: dark;
+  --bg-0: #0b1022; --bg-1: #0e1430; --bg-2: #131a2e;
+  --surface: rgba(255, 255, 255, 0.05); --surface-hi: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.11); --line-hi: rgba(255, 255, 255, 0.2);
+  --text: #eef1f8; --text-soft: #bcc5dc; --text-dim: #8a93ad;
+  --primary: #7c8cff; --primary-deep: #4e6bf5;
+  --btn-a: #5a68e0; --btn-b: #3f4fc4;
+  --mint: #6fe3b4; --purple: #b08bff; --pink: #ff8bbf;
+  --amber: #ffc266; --danger: #ff6b6b;
+  --shadow-phone: 0 34px 80px -26px rgba(4, 8, 22, 0.95);
+}
+
+/* ---------- exhibition typography ---------- */
+
+.exhibition .chapter h1 {
+  font-size: clamp(2.7rem, 6.6vw, 5.4rem);
+  line-height: 1.0;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  max-width: 19ch;
+  margin: 0;
+  text-wrap: balance;
+}
+.exhibition .chapter h2 {
+  display: block;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+  font-weight: 800;
+  max-width: 18ch;
+  margin: 0 0 20px;
+}
+.exhibition .chapter h3 {
+  font-size: clamp(1.15rem, 1.7vw, 1.45rem);
+  letter-spacing: -0.015em;
+  font-weight: 730;
+}
+.exhibition .chapter .lede {
+  font-size: clamp(1.15rem, 1.9vw, 1.5rem);
+  line-height: 1.45;
+  max-width: 34ch;
+  color: var(--text-soft);
+}
+.exhibition .chapter > .inner > p { font-size: clamp(1.02rem, 1.3vw, 1.15rem); max-width: 48ch; }
+.exhibition .chapter .eyebrow { font-size: 0.8rem; letter-spacing: 1.8px; margin-bottom: 16px; }
+
+/* Almost no borders. A card in here is a shape made of space, not of lines. */
+.exhibition .chapter .card {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+/* Except where the content genuinely is a panel: the demo and the tables. */
+.exhibition .chapter .panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: clamp(22px, 3vw, 40px);
+}
+
+/* ---------- hero ---------- */
+
+.hero-full {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
+  padding-top: clamp(80px, 12vh, 150px);
+  padding-bottom: clamp(60px, 9vh, 110px);
+}
+/* The headline spans the full column and the split happens beneath it. At
+   display size a 500px column fits about five characters per line, which turns
+   a sentence into a ransom note. Full width buys twice that. */
+.hero-cols {
+  display: grid;
+  gap: clamp(30px, 5vw, 64px);
+  align-items: center;
+  margin-top: clamp(22px, 3vh, 40px);
+}
+@media (min-width: 900px) {
+  .hero-cols { grid-template-columns: 1fr 0.82fr; }
+}
+
+/* The light source. A single soft key behind the phone, so the device has
+   something to catch rather than sitting on a flat gradient. */
+.hero-full::before {
+  content: "";
+  position: absolute;
+  right: 6%;
+  top: 58%;
+  width: min(760px, 78vw);
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  background: radial-gradient(circle at center,
+              color-mix(in srgb, var(--primary) 34%, transparent) 0%,
+              color-mix(in srgb, var(--primary) 12%, transparent) 38%,
+              transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+.hero-full .inner { position: relative; z-index: 1; }
+
+.hero-phone-big { width: 100%; max-width: min(360px, 74vw); margin-inline: auto; }
+@media (min-width: 900px) {
+  .hero-phone-big { max-width: 400px; }
+}
+.hero-phone-big .phone { max-width: none; }
+.hero-phone-big .phone-shell {
+  box-shadow:
+    0 60px 120px -40px rgba(4, 8, 22, 0.9),
+    0 0 90px -20px color-mix(in srgb, var(--primary) 45%, transparent),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.scroll-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: clamp(26px, 5vh, 54px);
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  font-weight: 700;
+  border: 0;
+}
+.scroll-cue .icon { width: 15px; height: 15px; }
+@media (prefers-reduced-motion: no-preference) {
+  .scroll-cue .icon { animation: nudge 2.2s ease-in-out infinite; }
+}
+@keyframes nudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* ---------- sticky sub-nav ---------- */
+
+.subnav {
+  position: sticky;
+  top: 0;
+  z-index: 18;
+  background: color-mix(in srgb, var(--bg-1) 82%, transparent);
+  border-bottom: 1px solid var(--line);
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+}
+.subnav.is-shown { transform: none; opacity: 1; pointer-events: auto; }
+@supports (backdrop-filter: blur(1px)) {
+  .subnav { backdrop-filter: saturate(160%) blur(18px); }
+}
+.subnav .inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 11px 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.subnav .inner::-webkit-scrollbar { display: none; }
+.subnav .title { font-weight: 750; margin-right: 12px; white-space: nowrap; }
+.subnav a {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 0;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  font-weight: 620;
+  white-space: nowrap;
+}
+.subnav a:hover { color: var(--text); background: var(--surface-hi); }
+.subnav a.is-current { color: var(--text); background: var(--surface-hi); }
+.subnav .btn { margin-left: auto; padding: 8px 16px; font-size: 0.9rem; }
+
+/* ---------- the statement ---------- */
+
+.statement { text-align: center; }
+.statement .inner { max-width: 1000px; }
+.statement-grid {
+  display: grid;
+  gap: clamp(28px, 5vw, 60px);
+  margin-bottom: clamp(30px, 5vh, 56px);
+}
+@media (min-width: 720px) { .statement-grid { grid-template-columns: repeat(3, 1fr); } }
+.statement-grid b {
+  display: block;
+  font-size: clamp(4.5rem, 13vw, 10rem);
+  line-height: 0.86;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  background: linear-gradient(160deg, var(--text) 30%, color-mix(in srgb, var(--text) 45%, transparent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.statement-grid span {
+  display: block;
+  margin-top: 6px;
+  font-size: clamp(1rem, 1.6vw, 1.3rem);
+  color: var(--text-soft);
+  letter-spacing: -0.01em;
+}
+.statement > .inner > p { margin-inline: auto; max-width: 46ch; color: var(--text-dim); }
+
+/* ---------- the scroll-driven walk ---------- */
+
+.walk-scroll { position: relative; }
+.walk-scroll .inner { max-width: 1140px; }
+.walk-scroll .track { display: grid; gap: 0; }
+@media (min-width: 940px) {
+  .walk-scroll .track { grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  .walk-scroll .stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: grid;
+    place-items: center;
+  }
+  .walk-scroll .beats-col { padding: 8vh 0; }
+  .walk-scroll .walk-step {
+    min-height: 84svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.3;
+    transition: opacity 0.4s ease;
+  }
+  .walk-scroll .walk-step.is-active { opacity: 1; }
+  .walk-scroll .walk-step .phone { display: none; }
+}
+.walk-scroll .stage { display: none; }
+@media (min-width: 940px) { .walk-scroll .stage { display: grid; } }
+
+.stage-phone {
+  width: 340px;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform:
+    perspective(1600px)
+    rotateY(var(--ry, 0deg))
+    rotateX(var(--rx, 0deg))
+    translate3d(0, var(--ty, 0px), 0)
+    scale(var(--sc, 1));
+}
+.stage-phone .phone { max-width: none; }
+.stage-phone .phone-screen img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.stage-phone .phone-screen img.is-shown { opacity: 1; }
+
+/* ---------- the playable risk checker ---------- */
+
+.demo { display: grid; gap: 24px; }
+@media (min-width: 900px) { .demo { grid-template-columns: 1fr 1fr; gap: 44px; align-items: start; } }
+
+.demo-picker { display: flex; flex-wrap: wrap; gap: 9px; }
+.demo-chip {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 650;
+  padding: 10px 17px;
+  border-radius: 999px;
+  border: 1px solid var(--line-hi);
+  background: var(--surface);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+.demo-chip:hover { background: var(--surface-hi); color: var(--text); }
+.demo-chip[aria-pressed="true"] {
+  background: linear-gradient(135deg, var(--btn-a), var(--btn-b));
+  border-color: transparent;
+  color: var(--on-primary);
+  transform: translateY(-1px);
+}
+.demo-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; align-items: center; }
+
+.demo-out { min-height: 210px; }
+.verdict {
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 20px 22px;
+  margin-bottom: 12px;
+}
+.verdict + .verdict { margin-top: 0; }
+.verdict .tag {
+  display: inline-block;
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.2px;
+  margin-bottom: 11px;
+  color: #fff;
+}
+.verdict p { margin: 0; max-width: none; color: var(--text-soft); font-size: 1rem; }
+.verdict--critical { border-color: color-mix(in srgb, var(--danger) 45%, transparent); background: color-mix(in srgb, var(--danger) 9%, transparent); }
+.verdict--critical .tag { background: var(--danger); }
+.verdict--serious  { border-color: color-mix(in srgb, var(--amber) 45%, transparent); background: color-mix(in srgb, var(--amber) 9%, transparent); }
+.verdict--serious .tag { background: var(--amber); color: #2a1c00; }
+.verdict--caution  { border-color: color-mix(in srgb, var(--primary) 38%, transparent); background: color-mix(in srgb, var(--primary) 8%, transparent); }
+.verdict--caution .tag { background: var(--primary); color: #0b1022; }
+.verdict--none .tag { background: var(--surface-hi); color: var(--text-soft); }
+.verdict--empty { border-style: dashed; color: var(--text-dim); }
+.verdict--empty p { color: var(--text-dim); }
+
+/* ---------- specs ---------- */
+
+.specs { width: 100%; border-collapse: collapse; min-width: 0; }
+.specs tr { border-bottom: 1px solid var(--line); }
+.specs tr:last-child { border-bottom: 0; }
+.specs th {
+  text-align: left;
+  padding: 17px 24px 17px 0;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.95rem;
+  width: 38%;
+  vertical-align: top;
+}
+.specs td {
+  padding: 17px 0;
+  color: var(--text);
+  font-weight: 600;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+  border-bottom: 0;
+}
+@media (max-width: 600px) {
+  .specs th, .specs td { display: block; width: auto; padding: 0; }
+  .specs th { padding-top: 16px; }
+  .specs td { padding-bottom: 16px; }
+}
+
+/* ---------- footnotes ---------- */
+
+sup.fn { font-size: 0.62em; vertical-align: super; line-height: 0; margin-left: 2px; }
+sup.fn a { border: 0; font-weight: 700; }
+.footnotes { counter-reset: fn; }
+.footnotes ol { list-style: none; padding: 0; margin: 10px 0 0; }
+.footnotes li {
+  counter-increment: fn;
+  display: flex;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: var(--text-soft);
+  max-width: none;
+  scroll-margin-top: 90px;
+}
+.footnotes li:last-child { border-bottom: 0; }
+.footnotes li::before {
+  content: counter(fn);
+  flex: none;
+  width: 25px; height: 25px;
+  display: grid; place-items: center;
+  border-radius: 999px;
+  background: var(--surface-hi);
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+.footnotes code { color: var(--text-dim); }
+.footnotes li:target::before { background: var(--primary); color: var(--on-primary); }
+
+/* ---------- staggered choreography ---------- */
+
+.js .stagger > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.js .stagger.is-in > * { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .js .stagger > * { opacity: 1; transform: none; }
+}
+@media print {
+  .js .stagger > * { opacity: 1 !important; transform: none !important; }
+}
+
+/* ---------- exhibition tweaks to shared components ---------- */
+
+.exhibition .beats { gap: clamp(16px, 2vw, 26px); }
+.exhibition .beat { background: var(--surface); border-color: var(--line); border-radius: 24px; padding: clamp(22px, 2.6vw, 32px); }
+.exhibition .feature { background: var(--surface); border-radius: 24px; padding: clamp(20px, 2.4vw, 28px); }
+.exhibition .grid.three { gap: clamp(12px, 1.6vw, 20px); }
+.exhibition .checks li,
+.exhibition .scenarios li { font-size: clamp(1rem, 1.25vw, 1.1rem); max-width: 52ch; }
+.exhibition .refusals li { padding: 18px 0; }
+.exhibition .faq summary { padding: 20px 2px; font-size: 1.05rem; }
+.exhibition footer { max-width: 1080px; margin-inline: auto; padding-inline: 20px; }
+.exhibition .callout { max-width: 1080px; margin-inline: auto; }
+
+@media (max-width: 620px) {
+  .exhibition .chapter { padding-left: 18px; padding-right: 18px; }
+  .subnav .title { display: none; }
+}
+
+/* The global header stays in flow above the hero, aligned to the chapter
+   column rather than the old 940px one. */
+.exhibition .site-head {
+  max-width: 1080px;
+  margin-inline: auto;
+  padding: 18px 20px 0;
+}
+.exhibition .hero-full { min-height: calc(100svh - 84px); }
 </style>
 
   <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ChillMate", "applicationCategory": "HealthApplication", "operatingSystem": "iOS 26, watchOS", "softwareVersion": "4.2.1", "url": "https://thijsverstapen.github.io/ChillMate/", "description": "A private overview of your own nights, plans, reminders and safety tools, kept entirely on your iPhone. Free, open source, no account and no server.", "inLanguage": ["en", "nl", "de", "fr", "es"], "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "author": {"@type": "Person", "name": "Thijs Verstappen"}, "image": "https://thijsverstapen.github.io/ChillMate/assets/og.png", "privacyPolicy": "https://thijsverstapen.github.io/ChillMate/privacy/"}</script>
 </head>
-<body>
+<body class="exhibition">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="g-c" x1="14" y1="10" x2="50" y2="54" gradientUnits="userSpaceOnUse">
@@ -1102,226 +1589,252 @@ footer .made { margin-left: auto; }
     </div>
   </header>
 
-  <section class="hero">
-    <div>
-      <h1>A calm, private place to look after yourself.</h1>
-      <p class="lede">ChillMate keeps your nights, plans, reminders and safety tools in one private overview on your iPhone. It is free, it is open source, and there is no server, so there is nowhere else for any of it to be.</p>
-
-      <div class="cta-row">
-        <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Tell%20me%20when%20ChillMate%20is%20out&body=Nothing%20to%20write.%20I%20will%20reply%20once%2C%20on%20the%20day%20it%20launches%2C%20and%20then%20delete%20your%20address."><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Tell me when it is out</a>
-        <a class="btn btn-ghost" href="#inside"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>See how it works</a>
-      </div>
-
-      <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Not on the App Store yet. Send an empty email and you will hear from me once, on the day it is.</p>
+  <nav class="subnav" data-subnav aria-label="A look inside">
+    <div class="inner">
+      <span class="title">ChillMate</span>
+        <a href="#who">Who it is for</a>
+        <a href="#inside">A look inside</a>
+        <a href="#try">Try it</a>
+        <a href="#privacy">Privacy</a>
+        <a href="#specs">Specs</a>
+      <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Tell%20me%20when%20ChillMate%20is%20out&body=Nothing%20to%20write.%20I%20will%20reply%20once%2C%20on%20the%20day%20it%20launches%2C%20and%20then%20delete%20your%20address.">Tell me when it is out</a>
     </div>
+  </nav>
 
-    <div class="hero-phone-wrap">
-      <div class="phone">
+  <section class="chapter hero-full">
+    <div class="inner">
+      <h1>A calm, private place to look after yourself.</h1>
+      <div class="hero-cols">
+        <div>
+          <p class="lede">ChillMate keeps your nights, plans, reminders and safety tools in one private overview on your iPhone. It is free, it is open source, and there is no server, so there is nowhere else for any of it to be.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Tell%20me%20when%20ChillMate%20is%20out&body=Nothing%20to%20write.%20I%20will%20reply%20once%2C%20on%20the%20day%20it%20launches%2C%20and%20then%20delete%20your%20address."><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Tell me when it is out</a>
+            <a class="btn btn-ghost" href="#inside"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>See how it works</a>
+          </div>
+          <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Not on the App Store yet. Send an empty email and you will hear from me once, on the day it is.</p>
+          <a class="scroll-cue" href="#statement">Scroll<svg class="icon" aria-hidden="true"><use href="#i-chev"/></svg></a>
+        </div>
+        <div class="hero-phone-big">
+          <div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="assets/shots/home.png" width="560" height="1217" alt="Whatever tonight turned into" decoding="async" fetchpriority="high" />
+            <img src="assets/shots/home.jpg" width="640" height="1391" alt="Whatever tonight turned into" decoding="async" fetchpriority="high" />
             <span class="phone-island"></span>
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section reveal" id="who">
-    <p class="eyebrow">Who it is for</p>
-    <div class="card">
-      <h2><svg class="icon" style="color:var(--pink)" aria-hidden="true"><use href="#i-hand"/></svg>Made for the nights this is actually about</h2>
+  <section class="chapter chapter--invert statement" id="statement">
+    <div class="inner">
+      <div class="statement-grid stagger">
+        <div><b>0</b><span>servers</span></div>
+        <div><b>0</b><span>accounts</span></div>
+        <div><b>0</b><span>trackers</span></div>
+      </div>
+      <p>Not a policy. An architecture. Everything below explains how, and links to the line of code that proves it.<sup class="fn"><a href="#fn-1" id="fnref-1" aria-label="Footnote 1">1</a></sup></p>
+    </div>
+  </section>
+
+  <section class="chapter" id="who">
+    <div class="inner">
+      <p class="eyebrow">Who it is for</p>
+      <h2>Made for the nights this is actually about</h2>
       <p>Chems, hookups, or both. ChillMate has no opinion about that, and it will never ask you to justify a night to it. What it does is hold the practical parts you would rather not be working out at four in the morning.</p>
-      <ul class="checks">
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>A risk checker that knows what you already take, including your own prescription.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>A check-in timer, so somebody knows you got home without you having to text them.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>A PEP window that starts counting the moment it might matter.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Testing reminders that never say why on your lock screen.</span></li>
+      <ul class="checks stagger">
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>A risk checker that knows what you already take, including your own prescription.</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>A check-in timer, so somebody knows you got home without you having to text them.</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>A PEP window that starts counting the moment it might matter.</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Testing reminders that never say why on your lock screen.</span></li>
       </ul>
       <p>The app calls a night a <strong>Chill</strong>. Yours, whatever it was.</p>
-    </div>
-  </section>
 
-  <section class="section">
-    <p class="eyebrow">A look inside</p>
-    <h2 id="inside">Five screens, and what each one is for.</h2>
-
-    <div class="walk" data-walk>
-      <div class="walk-stage" aria-hidden="true">
-        <div class="phone">
-          <div class="phone-shell">
-            <div class="phone-screen">
-          <img src="assets/shots/home.png" width="560" height="1217" alt="Whatever tonight turned into" loading="lazy" decoding="async" />
-          <img src="assets/shots/risk.png" width="560" height="1217" alt="And refuses to say it is safe" loading="lazy" decoding="async" />
-          <img src="assets/shots/help.png" width="560" height="1217" alt="For when it is already going wrong" loading="lazy" decoding="async" />
-          <img src="assets/shots/support.png" width="560" height="1217" alt="Help from people, not an app" loading="lazy" decoding="async" />
-          <img src="assets/shots/privacy.png" width="560" height="1217" alt="In the app, not just in a policy" loading="lazy" decoding="async" />
-              <span class="phone-island"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="walk-steps">
-      <div class="walk-step reveal">
-        <p class="eyebrow">It arranges itself</p>
-        <div class="phone">
-        <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="assets/shots/home.png" width="560" height="1217" alt="Whatever tonight turned into" loading="lazy" decoding="async" />
-            <span class="phone-island"></span>
-          </div>
-        </div>
-      </div>
-        <h3>Whatever tonight turned into</h3>
-        <p>Log a night and the home screen rearranges around it. Here it has worked out that a PEP conversation might be worth having, and put the countdown at the top by itself. Get help now stays pinned above everything, always.</p>
-      </div>
-
-      <div class="walk-step reveal">
-        <p class="eyebrow">It says what is known</p>
-        <div class="phone">
-        <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="assets/shots/risk.png" width="560" height="1217" alt="And refuses to say it is safe" loading="lazy" decoding="async" />
-            <span class="phone-island"></span>
-          </div>
-        </div>
-      </div>
-        <h3>And refuses to say it is safe</h3>
-        <p>Pick what is in play, including your own medication, and the risk checker tells you what is documented about that combination. It has no green light. Nothing in ChillMate will ever tell you something is fine.</p>
-      </div>
-
-      <div class="walk-step reveal">
-        <p class="eyebrow">A room with the lights turned down</p>
-        <div class="phone">
-        <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="assets/shots/help.png" width="560" height="1217" alt="For when it is already going wrong" loading="lazy" decoding="async" />
-            <span class="phone-island"></span>
-          </div>
-        </div>
-      </div>
-        <h3>For when it is already going wrong</h3>
-        <p>Low stimulation, one thing at a time. Start the breathing timer, work through the grounding steps, and call someone only if you decide you want to.</p>
-      </div>
-
-      <div class="walk-step reveal">
-        <p class="eyebrow">Real services, offline</p>
-        <div class="phone">
-        <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="assets/shots/support.png" width="560" height="1217" alt="Help from people, not an app" loading="lazy" decoding="async" />
-            <span class="phone-island"></span>
-          </div>
-        </div>
-      </div>
-        <h3>Help from people, not an app</h3>
-        <p>Crisis lines, sexual health, drugs, LGBTQ+ support and practical care for the country you set. It is a list held on your phone, so it still works with no signal and nothing to look up.</p>
-      </div>
-
-      <div class="walk-step reveal">
-        <p class="eyebrow">A plain map of your own data</p>
-        <div class="phone">
-        <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="assets/shots/privacy.png" width="560" height="1217" alt="In the app, not just in a policy" loading="lazy" decoding="async" />
-            <span class="phone-island"></span>
-          </div>
-        </div>
-      </div>
-        <h3>In the app, not just in a policy</h3>
-        <p>What is on the device, what an encrypted backup would contain, which Health categories you allowed, and what ChillMate never sends. You should not have to read a policy to find that out.</p>
-      </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section reveal">
-    <p class="eyebrow">How it fits</p>
-    <h2 id="night">One night, in three beats.</h2>
-    <div class="beats">
-      <div class="beat">
-        <p class="eyebrow">Before you go</p>
-        <h3>Decide while it is easy</h3>
-        <p>Run the combination past the risk checker, set what you are and are not up for, and start a check-in timer. Five minutes now, while you are clear-headed and nothing has happened yet.</p>
-      </div>
-      <div class="beat">
-        <p class="eyebrow">While you are out</p>
-        <h3>One tap, nothing typed</h3>
-        <p>The timer asks if you are alright. I&#x27;m safe is one tap. Get help is the other, and it already knows your trusted contact and the right emergency number for where you are. Your watch can answer for you.</p>
-      </div>
-      <div class="beat">
-        <p class="eyebrow">The morning after</p>
-        <h3>Remember it accurately</h3>
-        <p>Sleep, how you feel, what actually helped. It takes a minute and it is the part you will be glad of in three months, when the patterns are the only honest record you have.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section reveal">
-    <p class="eyebrow">What is in it</p>
-    <div class="grid three">
-      <div class="feature">
-        <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></div>
-        <h3>Private log</h3>
-        <p>Record a night the way you want to remember it: sleep, how you felt, and what helped afterwards.</p>
-      </div>
-      <div class="feature">
-        <div class="chip tint-mint"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></div>
-        <h3>Your patterns</h3>
-        <p>30 and 90 day views of what actually changes for you, and a score for the day that only you ever see.</p>
-      </div>
-      <div class="feature">
-        <div class="chip tint-purple"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg></div>
-        <h3>Care tools</h3>
-        <p>Breathing, a craving pause, a safer-session plan, and a route home when you want one.</p>
-      </div>
-      <div class="feature">
-        <div class="chip tint-pink"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg></div>
-        <h3>Risk checker</h3>
-        <p>Plain-language cautions for combinations, including the medication you already take.</p>
-      </div>
-      <div class="feature">
-        <div class="chip tint-amber"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg></div>
-        <h3>Reminders that fit</h3>
-        <p>Check-in timers, a PEP window, and testing reminders, worded discreetly if you prefer.</p>
-      </div>
-      <div class="feature">
-        <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-watch"/></svg></div>
-        <h3>On your wrist</h3>
-        <p>Timers, check-ins and an emergency number on Apple Watch, without reaching for your phone.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section reveal">
-    <p class="eyebrow">Is this for you</p>
-    <div class="card">
-      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-info"/></svg>You will know from these.</h2>
-      <ul class="scenarios">
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You want last night remembered accurately, not vaguely, and not by anyone else.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You are on PrEP and would rather the reminder did not say PrEP on your lock screen.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You want a reason to check in with someone that is not a whole conversation.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You have wondered, mid-week, whether it is more often than it used to be.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You want the emergency number for wherever you are, without unlocking a browser.</span></li>
+      <h3 style="margin-top:clamp(48px,6vw,86px)">You will know from these.</h3>
+      <ul class="scenarios stagger">
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You want last night remembered accurately, not vaguely, and not by anyone else.</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You are on PrEP and would rather the reminder did not say PrEP on your lock screen.</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You want a reason to check in with someone that is not a whole conversation.</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You have wondered, mid-week, whether it is more often than it used to be.</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>You want the emergency number for wherever you are, without unlocking a browser.</span></li>
       </ul>
       <p>It is probably not for you if you want something that will judge the night for you, score your behaviour, or tell you a combination is safe. It does none of those on purpose.</p>
     </div>
   </section>
 
-  <section class="section reveal" id="privacy">
-    <p class="eyebrow">Private by design</p>
-    <div class="card">
-      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-lock"/></svg>Your phone, and nowhere else</h2>
+  <section class="chapter chapter--invert walk-scroll" id="inside">
+    <div class="inner">
+      <p class="eyebrow">A look inside</p>
+      <h2>Five screens, and what each one is for.</h2>
+      <div class="track" data-walk>
+        <div class="stage" aria-hidden="true">
+          <div class="stage-phone">
+            <div class="phone">
+              <div class="phone-shell">
+                <div class="phone-screen">
+              <img src="assets/shots/home.jpg" width="640" height="1391" alt="Whatever tonight turned into" loading="lazy" decoding="async" />
+              <img src="assets/shots/risk.jpg" width="640" height="1391" alt="And refuses to say it is safe" loading="lazy" decoding="async" />
+              <img src="assets/shots/help.jpg" width="640" height="1391" alt="For when it is already going wrong" loading="lazy" decoding="async" />
+              <img src="assets/shots/support.jpg" width="640" height="1391" alt="Help from people, not an app" loading="lazy" decoding="async" />
+              <img src="assets/shots/privacy.jpg" width="640" height="1391" alt="In the app, not just in a policy" loading="lazy" decoding="async" />
+                  <span class="phone-island"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="beats-col">
+          <div class="walk-step">
+            <p class="eyebrow">It arranges itself</p>
+            <div class="phone">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <img src="assets/shots/home.jpg" width="640" height="1391" alt="Whatever tonight turned into" loading="lazy" decoding="async" />
+            <span class="phone-island"></span>
+          </div>
+        </div>
+      </div>
+            <h2>Whatever tonight turned into</h2>
+            <p>Log a night and the home screen rearranges around it. Here it has worked out that a PEP conversation might be worth having, and put the countdown at the top by itself. Get help now stays pinned above everything, always.</p>
+          </div>
+
+          <div class="walk-step">
+            <p class="eyebrow">It says what is known</p>
+            <div class="phone">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <img src="assets/shots/risk.jpg" width="640" height="1391" alt="And refuses to say it is safe" loading="lazy" decoding="async" />
+            <span class="phone-island"></span>
+          </div>
+        </div>
+      </div>
+            <h2>And refuses to say it is safe</h2>
+            <p>Pick what is in play, including your own medication, and the risk checker tells you what is documented about that combination. It has no green light. Nothing in ChillMate will ever tell you something is fine.</p>
+          </div>
+
+          <div class="walk-step">
+            <p class="eyebrow">A room with the lights turned down</p>
+            <div class="phone">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <img src="assets/shots/help.jpg" width="640" height="1391" alt="For when it is already going wrong" loading="lazy" decoding="async" />
+            <span class="phone-island"></span>
+          </div>
+        </div>
+      </div>
+            <h2>For when it is already going wrong</h2>
+            <p>Low stimulation, one thing at a time. Start the breathing timer, work through the grounding steps, and call someone only if you decide you want to.</p>
+          </div>
+
+          <div class="walk-step">
+            <p class="eyebrow">Real services, offline</p>
+            <div class="phone">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <img src="assets/shots/support.jpg" width="640" height="1391" alt="Help from people, not an app" loading="lazy" decoding="async" />
+            <span class="phone-island"></span>
+          </div>
+        </div>
+      </div>
+            <h2>Help from people, not an app</h2>
+            <p>Crisis lines, sexual health, drugs, LGBTQ+ support and practical care for the country you set. It is a list held on your phone, so it still works with no signal and nothing to look up.<sup class="fn"><a href="#fn-9" id="fnref-9" aria-label="Footnote 9">9</a></sup></p>
+          </div>
+
+          <div class="walk-step">
+            <p class="eyebrow">A plain map of your own data</p>
+            <div class="phone">
+        <div class="phone-shell">
+          <div class="phone-screen">
+            <img src="assets/shots/privacy.jpg" width="640" height="1391" alt="In the app, not just in a policy" loading="lazy" decoding="async" />
+            <span class="phone-island"></span>
+          </div>
+        </div>
+      </div>
+            <h2>In the app, not just in a policy</h2>
+            <p>What is on the device, what an encrypted backup would contain, which Health categories you allowed, and what ChillMate never sends. You should not have to read a policy to find that out.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="night">
+    <div class="inner">
+      <p class="eyebrow">How it fits</p>
+      <h2>One night, in three beats.</h2>
+      <div class="beats stagger">
+        <div class="beat">
+          <p class="eyebrow">Before you go</p>
+          <h3>Decide while it is easy</h3>
+          <p>Run the combination past the risk checker, set what you are and are not up for, and start a check-in timer. Five minutes now, while you are clear-headed and nothing has happened yet.</p>
+        </div>
+        <div class="beat">
+          <p class="eyebrow">While you are out</p>
+          <h3>One tap, nothing typed</h3>
+          <p>The timer asks if you are alright. I&#x27;m safe is one tap. Get help is the other, and it already knows your trusted contact and the right emergency number for where you are. Your watch can answer for you.</p>
+        </div>
+        <div class="beat">
+          <p class="eyebrow">The morning after</p>
+          <h3>Remember it accurately</h3>
+          <p>Sleep, how you feel, what actually helped. It takes a minute and it is the part you will be glad of in three months, when the patterns are the only honest record you have.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter chapter--invert" id="try">
+    <div class="inner">
+      <p class="eyebrow">Try it</p>
+      <h2>This is the real risk checker.</h2>
+      <p>Not a screenshot of it. The same 30 combinations, the same wording, the same refusal to call anything safe, running here in your browser. Pick two and see.<sup class="fn"><a href="#fn-8" id="fnref-8" aria-label="Footnote 8">8</a></sup></p>
+
+      <div class="demo panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
+        <div>
+          <p class="eyebrow">Pick what is in play</p>
+          <div class="demo-picker">
+            <button type="button" class="demo-chip" data-substance="Cannabis" aria-pressed="false">Cannabis</button>
+            <button type="button" class="demo-chip" data-substance="Alcohol" aria-pressed="false">Alcohol</button>
+            <button type="button" class="demo-chip" data-substance="MDMA" aria-pressed="false">MDMA</button>
+            <button type="button" class="demo-chip" data-substance="3MMC" aria-pressed="false">3MMC</button>
+            <button type="button" class="demo-chip" data-substance="Ketamine" aria-pressed="false">Ketamine</button>
+            <button type="button" class="demo-chip" data-substance="GHB" aria-pressed="false">GHB</button>
+            <button type="button" class="demo-chip" data-substance="GBL" aria-pressed="false">GBL</button>
+            <button type="button" class="demo-chip" data-substance="Cocaine" aria-pressed="false">Cocaine</button>
+            <button type="button" class="demo-chip" data-substance="Poppers" aria-pressed="false">Poppers</button>
+            <button type="button" class="demo-chip" data-substance="Kamagra" aria-pressed="false">Kamagra</button>
+            <button type="button" class="demo-chip" data-substance="Viagra" aria-pressed="false">Viagra</button>
+            <button type="button" class="demo-chip" data-substance="Psychedelics" aria-pressed="false">Psychedelics</button>
+          </div>
+          <div class="demo-actions">
+            <button type="button" class="btn btn-ghost" data-demo-try><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg>Try GHB and alcohol</button>
+            <button type="button" class="chip-btn" data-demo-reset>Clear</button>
+          </div>
+        </div>
+        <div>
+          <div class="demo-out" data-demo-out></div>
+          <p class="meta">Runs entirely in this page. Nothing you tap here is sent anywhere, for the same reason nothing in the app is.</p>
+        </div>
+      </div>
+      <script type="application/json" id="cm-interactions">{"levels": {"caution": "Worth noting", "serious": "Significant risk", "critical": "High-risk combination"}, "copy": {"empty": "Pick at least two to see what the app would say.", "noneTitle": "Nothing documented for this combination", "noneBody": "That is not the same as safe. It means this table has nothing on file, and this table is not the last word on anything."}, "rules": [{"substances": ["Alcohol", "GHB"], "level": "critical", "warning": "GHB and alcohol together strongly increase the risk of unconsciousness and breathing problems. This combination has caused deaths. Seek immediate help if someone cannot be woken."}, {"substances": ["Alcohol", "GBL"], "level": "critical", "warning": "GBL converts to GHB in the body. Combined with alcohol, the risk of losing consciousness or stopping breathing rises sharply. This is a life-threatening combination."}, {"substances": ["GBL", "GHB"], "level": "critical", "warning": "GHB and GBL are effectively the same substance. Combining them stacks the dose unpredictably and can cause sudden unconsciousness."}, {"substances": ["Kamagra", "Poppers"], "level": "critical", "warning": "Poppers and Kamagra together can cause a sudden, dangerous drop in blood pressure. This can lead to fainting, stroke, or cardiac arrest. Do not combine these."}, {"substances": ["Poppers", "Viagra"], "level": "critical", "warning": "Poppers and Viagra together can cause a dangerous blood pressure drop. This is a high-risk combination. Avoid it."}, {"substances": ["GHB", "Ketamine"], "level": "serious", "warning": "GHB and ketamine combine depressant and dissociative effects. This increases the risk of losing the ability to respond to problems around you."}, {"substances": ["GBL", "Ketamine"], "level": "serious", "warning": "GBL and ketamine together carry a higher risk of losing control and difficulty getting help."}, {"substances": ["Alcohol", "Ketamine"], "level": "serious", "warning": "Alcohol and ketamine together combine depressant effects and can cause deeper disorientation and breathing problems."}, {"substances": ["Cocaine", "MDMA"], "level": "serious", "warning": "Cocaine and MDMA both strain the heart. Combined, the risk of irregular heartbeat and overheating is significantly higher."}, {"substances": ["3MMC", "Cocaine"], "level": "serious", "warning": "Cocaine and 3-MMC together stack stimulant effects on the heart and raise the risk of cardiac problems and anxiety."}, {"substances": ["3MMC", "MDMA"], "level": "serious", "warning": "MDMA and 3-MMC together increase stimulant and serotonergic load. The combination raises heart rate, temperature, and the chance of a difficult crash."}, {"substances": ["Cocaine", "GHB"], "level": "caution", "warning": "Stimulants can mask GHB effects, making it harder to notice when a dose is too high. This increases the risk of accidental overdose."}, {"substances": ["Cocaine", "GBL"], "level": "caution", "warning": "Stimulants can mask GBL effects, making it harder to notice when a dose is too high."}, {"substances": ["Alcohol", "Cocaine"], "level": "serious", "warning": "Cocaine and alcohol together form cocaethylene in the liver. It puts more strain on the heart than cocaine alone and stays in the body longer, raising the risk of chest pain and irregular heartbeat. Alcohol also masks how much cocaine you have taken."}, {"substances": ["Alcohol", "MDMA"], "level": "serious", "warning": "Alcohol dehydrates you while MDMA raises your body temperature, and each masks how strongly the other is hitting. Together they increase the risk of overheating, dehydration, and a much harder comedown."}, {"substances": ["3MMC", "Alcohol"], "level": "serious", "warning": "3-MMC masks how drunk you are, which makes it easy to keep drinking past your limit. The combination also raises heart rate and blood pressure and makes redosing harder to judge."}, {"substances": ["Alcohol", "Cannabis"], "level": "caution", "warning": "Cannabis suppresses the urge to vomit, which is one of the body's defences against alcohol poisoning. Combined, impairment and dizziness also increase sharply. If someone cannot be woken, place them on their side and call emergency services."}, {"substances": ["GHB", "Poppers"], "level": "serious", "warning": "GHB and poppers both lower blood pressure. Together they can cause fainting, a fall, or losing consciousness at a moment when you cannot protect yourself."}, {"substances": ["GBL", "Poppers"], "level": "serious", "warning": "GBL and poppers both lower blood pressure. The drop can be sudden and cause fainting or a fall."}, {"substances": ["Ketamine", "MDMA"], "level": "caution", "warning": "MDMA and ketamine together deepen disorientation and make it harder to judge your surroundings, your limits, and whether the people around you still feel safe. Consent gets harder to give and to read."}, {"substances": ["MDMA", "Psychedelics"], "level": "serious", "warning": "Psychedelics and MDMA stack serotonergic and cardiac load, and the psychological effects become much less predictable. Overheating and a heavy, long comedown are both more likely."}, {"substances": ["Cocaine", "Psychedelics"], "level": "caution", "warning": "Adding a stimulant to a psychedelic raises heart rate and commonly turns a manageable experience into anxiety or panic. It also makes it harder to sit still and let a difficult moment pass."}, {"substances": ["3MMC", "Psychedelics"], "level": "caution", "warning": "Adding 3-MMC to a psychedelic raises heart rate and anxiety and makes the experience harder to steer. Panic is a common outcome."}, {"substances": ["Kamagra", "Viagra"], "level": "serious", "warning": "Kamagra is sildenafil, the same active ingredient as Viagra. Taking both stacks one dose on top of another and raises the risk of a blood pressure drop, headache, vision changes, and an erection that will not go down. An erection lasting more than four hours needs urgent medical care."}, {"substances": ["Cocaine", "Viagra"], "level": "serious", "warning": "Viagra and cocaine pull your circulation in opposite directions while both put the heart under load. This raises the risk of chest pain and irregular heartbeat, especially alongside a long session."}, {"substances": ["Cocaine", "Kamagra"], "level": "serious", "warning": "Kamagra and cocaine both put the heart under load while pulling your circulation in opposite directions, raising the risk of chest pain and irregular heartbeat."}, {"substances": ["MDMA", "Viagra"], "level": "caution", "warning": "Viagra and MDMA together add cardiac strain and can lower blood pressure more than expected. Take breaks, keep cool, and stop if your chest feels tight."}, {"substances": ["Kamagra", "MDMA"], "level": "caution", "warning": "Kamagra and MDMA together add cardiac strain and can lower blood pressure more than expected. Take breaks and stop if your chest feels tight."}, {"substances": ["3MMC", "Viagra"], "level": "caution", "warning": "Viagra and 3-MMC together add cardiac strain during a session that is often already long. Watch for chest tightness and a racing heart that does not settle."}, {"substances": ["3MMC", "Kamagra"], "level": "caution", "warning": "Kamagra and 3-MMC together add cardiac strain during a session that is often already long. Watch for chest tightness and a racing heart that does not settle."}]}</script>
+    </div>
+  </section>
+
+  <section class="chapter" id="privacy">
+    <div class="inner">
+      <p class="eyebrow">Private by design</p>
+      <h2>Your phone, and nowhere else</h2>
       <p>Privacy here is not a setting to switch on. It is the shape of the app.</p>
-      <ul class="checks">
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>No account and no sign-up. No server holds your log, because there is no server.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>No ads, no analytics, no trackers, and nothing is ever sold or shared.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Lock it behind Face ID or a PIN, with everything encrypted on the device.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Backups are optional and encrypted, and they go to your own iCloud Drive.</span></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Notifications can stay deliberately vague on the lock screen.</span></li>
+      <ul class="checks stagger">
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>No account and no sign-up. No server holds your log, because there is no server.<sup class="fn"><a href="#fn-2" id="fnref-2" aria-label="Footnote 2">2</a></sup></span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>No ads, no analytics, no trackers, and nothing is ever sold or shared.</span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Lock it behind Face ID or a PIN, with everything encrypted on the device.<sup class="fn"><a href="#fn-3" id="fnref-3" aria-label="Footnote 3">3</a></sup></span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Backups are optional and encrypted, and they go to your own iCloud Drive.<sup class="fn"><a href="#fn-5" id="fnref-5" aria-label="Footnote 5">5</a></sup></span></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Notifications can stay deliberately vague on the lock screen.<sup class="fn"><a href="#fn-6" id="fnref-6" aria-label="Footnote 6">6</a></sup></span></li>
       </ul>
 
-      <p class="eyebrow" style="margin-top:22px">Where your data goes</p>
+      <p class="eyebrow" style="margin-top:clamp(40px,5vw,72px)">Where your data goes</p>
       <svg class="diagram" viewBox="0 0 520 150" role="img"
      aria-label="Where your data goes">
   <rect class="d-box" x="8" y="46" width="104" height="58" rx="14"/>
@@ -1346,52 +1859,45 @@ footer .made { margin-left: auto; }
   <text class="d-dim" x="456" y="90" text-anchor="middle" opacity="0.6">there are none</text>
 </svg>
 
-      <p style="margin-top:18px"><a href="privacy/">Read the full privacy policy</a></p>
-    </div>
-  </section>
-
-  <section class="section reveal">
-    <p class="eyebrow">Verify it yourself</p>
-    <div class="card">
-      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-code"/></svg>Do not take my word for it</h2>
+      <h3 style="margin-top:clamp(48px,6vw,86px)">Do not take my word for it</h3>
       <p>ChillMate is open source. Every line that touches your data is in public, which turns the claim above into something you can check instead of something you have to trust me about.</p>
-      <p>There is not a single network call in the app's own code. No analytics SDK, no crash reporter, no <code>URLSession</code> anywhere. The only things that leave your phone are the ones you tap: a call, a link, a message you wrote.</p>
+      <p>There is not a single network call in the app's own code. No analytics SDK, no crash reporter, no <code>URLSession</code> anywhere. The only things that leave your phone are the ones you tap: a call, a link, a message you wrote.<sup class="fn"><a href="#fn-1" id="fnref-1" aria-label="Footnote 1">1</a></sup></p>
       <div class="cta-row">
         <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>Read the source</a>
-        <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/ChillMateModelContainer.swift"><svg class="icon" aria-hidden="true"><use href="#i-doc"/></svg>Where your data lives</a>
+        <a class="btn btn-ghost" href="privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Read the full privacy policy</a>
       </div>
       <p class="meta" style="margin-top:14px">Verified against ChillMate 4.2.1 (build 422).</p>
     </div>
   </section>
 
-  <section class="section reveal">
-    <p class="eyebrow">By design</p>
-    <div class="card">
-      <h2><svg class="icon" style="color:var(--danger)" aria-hidden="true"><use href="#i-alert"/></svg>What it will not do</h2>
+  <section class="chapter chapter--invert" id="refuse">
+    <div class="inner">
+      <p class="eyebrow">By design</p>
+      <h2>What it will not do</h2>
       <p>Most of the work went into the things it does not do. They are harder to keep than features, because every one of them is a thing somebody will eventually ask for.</p>
-      <ul class="refusals">
-        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not tell you something is safe.</b><span>It shows what is documented about a combination and hands the decision back to you, because it does not know your body, your dose, or your night.</span></div></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not score you as a person.</b><span>There is a number for the day, and it stays on your phone, and nothing is unlocked or withheld by it.</span></div></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not nag.</b><span>Every reminder is off until you turn it on, and can be worded so a lock screen gives nothing away.</span></div></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not want an account.</b><span>Adding one would mean adding a server, and a server is a copy of you that exists somewhere you cannot reach.</span></div></li>
-        <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not charge you.</b><span>Free, all of it. The tip unlocks nothing, because a safety tool with a paywall is not a safety tool.</span></div></li>
+      <ul class="refusals stagger">
+          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not tell you something is safe.</b><span>It shows what is documented about a combination and hands the decision back to you, because it does not know your body, your dose, or your night.</span></div></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not score you as a person.</b><span>There is a number for the day, and it stays on your phone, and nothing is unlocked or withheld by it.</span></div></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not nag.</b><span>Every reminder is off until you turn it on, and can be worded so a lock screen gives nothing away.</span></div></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not want an account.</b><span>Adding one would mean adding a server, and a server is a copy of you that exists somewhere you cannot reach.</span></div></li>
+          <li><svg class="icon" aria-hidden="true"><use href="#i-hand"/></svg><div><b>It will not charge you.</b><span>Free, all of it. The tip unlocks nothing, because a safety tool with a paywall is not a safety tool.</span></div></li>
       </ul>
     </div>
   </section>
 
-  <section class="section reveal">
-    <div class="card">
-      <div class="hero" style="padding-top:0">
-        <div>
-          <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-watch"/></svg>It works while the phone stays in a pocket</h2>
-          <p>Dose timers, hydration, discreet check-ins, a breathing exercise, and one tap to your trusted contact or your local emergency number, all on Apple Watch, plus complications for the watch face and the Smart Stack.</p>
-          <blockquote class="quote">
-            <p>If something feels wrong, get help. You are not in trouble.</p>
-            <cite>The whole of the watch&#x27;s Safety screen, wording included.</cite>
-          </blockquote>
-        </div>
-        <div class="hero-phone-wrap">
-          <div class="watch">
+  <section class="chapter" id="watch">
+    <div class="inner">
+      <div class="hero-cols" style="margin-top:0">
+          <div>
+            <p class="eyebrow">Apple Watch</p>
+            <h2>It works while the phone stays in a pocket</h2>
+            <p>Dose timers, hydration, discreet check-ins, a breathing exercise, and one tap to your trusted contact or your local emergency number, all on Apple Watch, plus complications for the watch face and the Smart Stack.<sup class="fn"><a href="#fn-4" id="fnref-4" aria-label="Footnote 4">4</a></sup></p>
+            <blockquote class="quote">
+              <p>If something feels wrong, get help. You are not in trouble.</p>
+              <cite>The whole of the watch&#x27;s Safety screen, wording included.</cite>
+            </blockquote>
+          </div>
+          <div><div class="watch">
         <div class="watch-shell">
           <div class="watch-screen">
             <img src="assets/shots/watch.png" width="416" height="496"
@@ -1399,43 +1905,120 @@ footer .made { margin-left: auto; }
                  loading="lazy" decoding="async" />
           </div>
         </div>
+      </div></div>
       </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="card">
-      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-globe"/></svg>It works in your language</h2>
+      <h3 style="margin-top:clamp(48px,6vw,86px)">It works in your language</h3>
       <p>The app and this site are in English, Dutch, German, French and Spanish. Help resources follow the country you set, not the language you read, because those are two different questions.</p>
     </div>
   </section>
 
-  <section class="section reveal">
-    <p class="eyebrow">Before you ask</p>
-    <h2 id="questions">The three questions everyone asks.</h2>
-    <div class="card">
-      <div class="faq">
-        <details>
-          <summary>Is my data private?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Yes, and you do not have to believe me. ChillMate keeps everything on your iPhone, has no account and no server, and runs no ads, analytics or trackers. The app is open source, so you can read exactly what it does with what you type in.</p></div>
-        </details>
-        <details>
-          <summary>What does it cost?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>Nothing, and there is no paid tier. An optional tip goes through Apple&#x27;s In-App Purchase and unlocks nothing at all. Every feature is available to everyone, because a safety tool behind a paywall is not a safety tool.</p></div>
-        </details>
-        <details>
-          <summary>Does it tell me whether something is safe?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>No, and it never will. The risk checker shows what is documented about a combination, including with medication you already take, and stops there. It has no green light. For anything that matters, a clinician or pharmacist is the right place.</p></div>
-        </details>
+  <section class="chapter chapter--invert" id="features">
+    <div class="inner">
+      <p class="eyebrow">What is in it</p>
+      <div class="grid three stagger">
+        <div class="feature">
+          <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></div>
+          <h3>Private log</h3>
+          <p>Record a night the way you want to remember it: sleep, how you felt, and what helped afterwards.</p>
+        </div>
+        <div class="feature">
+          <div class="chip tint-mint"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></div>
+          <h3>Your patterns</h3>
+          <p>30 and 90 day views of what actually changes for you, and a score for the day that only you ever see.</p>
+        </div>
+        <div class="feature">
+          <div class="chip tint-purple"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg></div>
+          <h3>Care tools</h3>
+          <p>Breathing, a craving pause, a safer-session plan, and a route home when you want one.</p>
+        </div>
+        <div class="feature">
+          <div class="chip tint-pink"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg></div>
+          <h3>Risk checker</h3>
+          <p>Plain-language cautions for combinations, including the medication you already take.</p>
+        </div>
+        <div class="feature">
+          <div class="chip tint-amber"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg></div>
+          <h3>Reminders that fit</h3>
+          <p>Check-in timers, a PEP window, and testing reminders, worded discreetly if you prefer.</p>
+        </div>
+        <div class="feature">
+          <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-watch"/></svg></div>
+          <h3>On your wrist</h3>
+          <p>Timers, check-ins and an emergency number on Apple Watch, without reaching for your phone.</p>
+        </div>
       </div>
-      <p style="margin-top:16px"><a href="support/">The rest of the questions, and real help services</a></p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="callout">
-      <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
-      <p>ChillMate supports reflection, planning and your own wellbeing. It does not replace a clinician and it never decides whether anything is safe. If someone may be in immediate danger, call your local emergency number.</p>
+  <section class="chapter" id="questions">
+    <div class="inner">
+      <p class="eyebrow">Before you ask</p>
+      <h2>The three questions everyone asks.</h2>
+      <div class="faq">
+          <details>
+            <summary>Is my data private?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+            <div class="body"><p>Yes, and you do not have to believe me. ChillMate keeps everything on your iPhone, has no account and no server, and runs no ads, analytics or trackers. The app is open source, so you can read exactly what it does with what you type in.</p></div>
+          </details>
+          <details>
+            <summary>What does it cost?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+            <div class="body"><p>Nothing, and there is no paid tier. An optional tip goes through Apple&#x27;s In-App Purchase and unlocks nothing at all. Every feature is available to everyone, because a safety tool behind a paywall is not a safety tool.</p></div>
+          </details>
+          <details>
+            <summary>Does it tell me whether something is safe?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+            <div class="body"><p>No, and it never will. The risk checker shows what is documented about a combination, including with medication you already take, and stops there. It has no green light. For anything that matters, a clinician or pharmacist is the right place.</p></div>
+          </details>
+      </div>
+      <p style="margin-top:22px"><a href="support/">The rest of the questions, and real help services</a></p>
+    </div>
+  </section>
+
+  <section class="chapter chapter--invert" id="specs">
+    <div class="inner narrow">
+      <p class="eyebrow">The details</p>
+      <h2>Specifications</h2>
+      <table class="specs">
+        <tbody>
+        <tr><th scope="row">Requires</th><td>iPhone with iOS 26 or later</td></tr>
+        <tr><th scope="row">Apple Watch</th><td>Native app, watchOS 26 or later</td></tr>
+        <tr><th scope="row">Price</th><td>Free. No paid tier, no subscription, no ads.</td></tr>
+        <tr><th scope="row">Account</th><td>None. There is nothing to sign up for.</td></tr>
+        <tr><th scope="row">Data collected</th><td>None<sup class="fn"><a href="#fn-1" id="fnref-1" aria-label="Footnote 1">1</a></sup></td></tr>
+        <tr><th scope="row">Languages</th><td>English, Nederlands, Deutsch, Français, Español</td></tr>
+        <tr><th scope="row">Help services</th><td>10 regions, held on the device, works offline<sup class="fn"><a href="#fn-9" id="fnref-9" aria-label="Footnote 9">9</a></sup></td></tr>
+        <tr><th scope="row">Combinations checked</th><td>30 documented interactions, on-device<sup class="fn"><a href="#fn-8" id="fnref-8" aria-label="Footnote 8">8</a></sup></td></tr>
+        <tr><th scope="row">Written summaries</th><td>On-device, Apple Foundation Models<sup class="fn"><a href="#fn-7" id="fnref-7" aria-label="Footnote 7">7</a></sup></td></tr>
+        <tr><th scope="row">Sync and backup</th><td>Optional, encrypted, your own iCloud<sup class="fn"><a href="#fn-2" id="fnref-2" aria-label="Footnote 2">2</a></sup></td></tr>
+        <tr><th scope="row">Lock</th><td>Face ID, or a PIN derived with 200,000 PBKDF2 rounds<sup class="fn"><a href="#fn-3" id="fnref-3" aria-label="Footnote 3">3</a></sup></td></tr>
+        <tr><th scope="row">Source</th><td>Open, MIT licensed</td></tr>
+        <tr><th scope="row">Version</th><td>4.2.1 (build 422)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="chapter" id="footnotes">
+    <div class="inner">
+      <p class="eyebrow">Every claim on this page, and where to check it</p>
+      <p>Marketing pages footnote their claims to the small print. This one footnotes them to the source code.</p>
+      <div class="footnotes">
+        <ol>
+          <li id="fn-1"><div>No networking anywhere in the app. Search the repository yourself for URLSession. <a href="https://github.com/thijsverstapen/ChillMate/search?q=URLSession&type=code"><code>search: URLSession</code></a> <a href="#fnref-1" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-2"><div>Sync goes to your own private CloudKit database, never to a shared one. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/ChillMateModelContainer.swift#L81"><code>ChillMateModelContainer.swift:81</code></a> <a href="#fnref-2" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-3"><div>The PIN is derived with 200,000 PBKDF2 rounds and held in the Keychain, never stored as typed. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/AppLockView.swift#L441"><code>AppLockView.swift:441</code></a> <a href="#fnref-3" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-4"><div>Contents are hidden in the App Switcher and while the screen is captured or mirrored. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/AppLockView.swift#L26"><code>AppLockView.swift:26</code></a> <a href="#fnref-4" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-5"><div>Backups are sealed with AES-GCM before they ever reach a file. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/EncryptedBackupService.swift#L72"><code>EncryptedBackupService.swift:72</code></a> <a href="#fnref-5" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-6"><div>Notification wording can be made deliberately vague on the lock screen. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SecurityHealthCheckView.swift#L18"><code>SecurityHealthCheckView.swift:18</code></a> <a href="#fnref-6" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-7"><div>Written summaries use Apple&#x27;s on-device model. Nothing leaves the phone. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/OnDeviceAffirmationService.swift#L8"><code>OnDeviceAffirmationService.swift:8</code></a> <a href="#fnref-7" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-8"><div>The 30 combinations shown above, exactly as the app carries them. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SubstanceInteractions.swift#L59"><code>SubstanceInteractions.swift:59</code></a> <a href="#fnref-8" aria-label="Back to text">&#8617;</a></div></li>
+          <li id="fn-9"><div>The help directory for all 10 regions, held on the device. <a href="https://github.com/thijsverstapen/ChillMate/blob/main/ChillMate/SupportDirectoryViews.swift#L69"><code>SupportDirectoryViews.swift:69</code></a> <a href="#fnref-9" aria-label="Back to text">&#8617;</a></div></li>
+        </ol>
+      </div>
+
+      <div class="callout" style="margin-top:clamp(40px,5vw,72px)">
+        <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+        <p>ChillMate supports reflection, planning and your own wellbeing. It does not replace a clinician and it never decides whether anything is safe. If someone may be in immediate danger, call your local emergency number.</p>
+      </div>
     </div>
   </section>
 

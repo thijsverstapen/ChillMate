@@ -26,6 +26,7 @@ import json
 import os
 import re
 import shutil
+import struct
 import zipfile
 from pathlib import Path
 from urllib.parse import quote
@@ -78,6 +79,35 @@ def icon(name: str, cls: str = "icon", style: str = "") -> str:
     attrs = f' class="{cls}"' if cls else ""
     attrs += f' style="{style}"' if style else ""
     return f'<svg{attrs} aria-hidden="true"><use href="#i-{name}"/></svg>'
+
+
+def image_size(path: Path):
+    """Real pixel size of a PNG or JPEG, read from the file.
+
+    Hardcoded width/height attributes went wrong once already: `sips -Z` scales
+    by the longest edge, so a portrait screenshot asked to be 560 came out 257
+    wide while the markup kept claiming 560. Reading the file removes the class
+    of bug rather than the instance.
+    """
+    data = path.read_bytes()
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return struct.unpack(">II", data[16:24])
+    if data[:2] == b"\xff\xd8":
+        i = 2
+        while i < len(data) - 9:
+            if data[i] != 0xFF:
+                i += 1
+                continue
+            marker = data[i + 1]
+            if marker in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+                          0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+                height, width = struct.unpack(">HH", data[i + 5:i + 9])
+                return width, height
+            if marker in (0xD8, 0x01) or 0xD0 <= marker <= 0xD7:
+                i += 2
+                continue
+            i += 2 + struct.unpack(">H", data[i + 2:i + 4])[0]
+    raise ValueError(f"cannot read dimensions of {path}")
 
 
 def rel(depth: int) -> str:
@@ -361,13 +391,14 @@ def footer(lang, depth):
 
 def phone(src, alt, depth, lazy=True, priority=False):
     r = rel(depth)
+    w, h = image_size(ASSETS / "shots" / src)
     loading = ' loading="lazy" decoding="async"' if lazy and not priority else ' decoding="async"'
     if priority:
         loading += ' fetchpriority="high"'
     return f"""<div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="{r}assets/shots/{src}" width="560" height="1217" alt="{e(alt)}"{loading} />
+            <img src="{r}assets/shots/{src}" width="{w}" height="{h}" alt="{e(alt)}"{loading} />
             <span class="phone-island"></span>
           </div>
         </div>
@@ -378,15 +409,16 @@ def phone(src, alt, depth, lazy=True, priority=False):
 # home
 # --------------------------------------------------------------------------
 
-SHOTS = ["home.png", "risk.png", "help.png", "support.png", "privacy.png"]
+SHOTS = ["home.jpg", "risk.jpg", "help.jpg", "support.jpg", "privacy.jpg"]
 
 
 def watch(depth):
     r = rel(depth)
+    w, h = image_size(ASSETS / "shots" / "watch.png")
     return f"""<div class="watch">
         <div class="watch-shell">
           <div class="watch-screen">
-            <img src="{r}assets/shots/watch.png" width="416" height="496"
+            <img src="{r}assets/shots/watch.png" width="{w}" height="{h}"
                  alt="The watch app's Safety screen, offering an emergency call and a way to ping your phone."
                  loading="lazy" decoding="async" />
           </div>
@@ -443,6 +475,55 @@ def phone_video(depth):
       </div>"""
 
 
+# Each footnote is a claim on the page and the place in the source that settles
+# it. Line numbers are the ones that matter, not the ones that happen to be
+# first: they point at the decision, not the import.
+FOOTNOTE_SOURCES = [
+    (REPO + "/search?q=URLSession&type=code", "search: URLSession"),
+    (REPO + "/blob/main/ChillMate/ChillMateModelContainer.swift#L81", "ChillMateModelContainer.swift:81"),
+    (REPO + "/blob/main/ChillMate/AppLockView.swift#L441", "AppLockView.swift:441"),
+    (REPO + "/blob/main/ChillMate/AppLockView.swift#L26", "AppLockView.swift:26"),
+    (REPO + "/blob/main/ChillMate/EncryptedBackupService.swift#L72", "EncryptedBackupService.swift:72"),
+    (REPO + "/blob/main/ChillMate/SecurityHealthCheckView.swift#L18", "SecurityHealthCheckView.swift:18"),
+    (REPO + "/blob/main/ChillMate/OnDeviceAffirmationService.swift#L8", "OnDeviceAffirmationService.swift:8"),
+    (REPO + "/blob/main/ChillMate/SubstanceInteractions.swift#L59", "SubstanceInteractions.swift:59"),
+    (REPO + "/blob/main/ChillMate/SupportDirectoryViews.swift#L69", "SupportDirectoryViews.swift:69"),
+]
+
+# Which footnote belongs to which spec row, by row index. Left blank where the
+# claim is self-evident from the page rather than from the code.
+SPEC_FOOTNOTES = {4: 1, 6: 9, 7: 8, 8: 7, 9: 2, 10: 3}
+
+
+def fn(number):
+    """A superscript marker pointing into the footnote list."""
+    return (f'<sup class="fn"><a href="#fn-{number}" id="fnref-{number}" '
+            f'aria-label="Footnote {number}">{number}</a></sup>')
+
+
+def chapter(body, ident="", invert=False, extra="", inner="inner"):
+    classes = "chapter" + (" chapter--invert" if invert else "") + (f" {extra}" if extra else "")
+    ident = f' id="{ident}"' if ident else ""
+    return f'\n  <section class="{classes}"{ident}>\n    <div class="{inner}">\n{body}    </div>\n  </section>\n'
+
+
+def demo_payload(lang):
+    """The app's own interaction table, in this language, for the live demo."""
+    raw = json.loads((Path(__file__).resolve().parent / "interactions.json")
+                     .read_text(encoding="utf-8"))
+    s = C.STRINGS[lang]
+    return {
+        "levels": {key: value[lang] for key, value in raw["levels"].items()},
+        "copy": {
+            "empty": s["demo_empty"],
+            "noneTitle": s["demo_none_title"],
+            "noneBody": s["demo_none_body"],
+        },
+        "rules": [{"substances": r["substances"], "level": r["level"],
+                   "warning": r["warning"][lang]} for r in raw["rules"]],
+    }, raw["substances"]
+
+
 def build_home(lang):
     s = C.STRINGS[lang]
     depth = 0 if lang == "en" else 1
@@ -452,239 +533,270 @@ def build_home(lang):
     notify = (f"mailto:{EMAIL}"
               f"?subject={quote(s['notify_subject'])}&body={quote(s['notify_body'])}")
 
-    out = head(lang, s["home_title"], s["home_desc"], canonical, depth, "home")
+    out = head(lang, s["home_title"], s["home_desc"], canonical, depth, "home",
+               body_class="exhibition")
     out += header(lang, depth, "home", "home")
 
-    # ---- hero
-    out += f"""
-  <section class="hero">
-    <div>
-      <h1>{e(no_orphan(s["h1"]))}</h1>
-      <p class="lede">{e(s["lede"])}</p>
-
-      <div class="cta-row">
-        <a class="btn btn-primary" href="{notify}">{icon("mail")}{e(s["cta_notify"])}</a>
-        <a class="btn btn-ghost" href="#inside">{icon("phone")}{e(s["cta_see"])}</a>
-      </div>
-
-      <p class="status-note">{icon("info")}{e(s["status_note"])}</p>
-    </div>
-
-    <div class="hero-phone-wrap">
-      {phone(SHOTS[0], s["walk"][0][1], depth, lazy=False, priority=True)}
-    </div>
-  </section>
-"""
-
-    # ---- who it is for
-    points = "".join(
-        f'        <li>{icon("check")}<span>{e(point)}</span></li>\n'
-        for point in s["audience_points"]
+    # ---- sticky sub-nav, revealed once the hero is behind you
+    chapters = "".join(
+        f'        <a href="#{ident}">{e(label)}</a>\n' for ident, label in s["nav_chapters"]
     )
     out += f"""
-  <section class="section reveal" id="who">
-    <p class="eyebrow">{e(s["audience_eyebrow"])}</p>
-    <div class="card">
-      <h2>{icon("hand", style="color:var(--pink)")}{e(no_orphan(s["audience_h2"]))}</h2>
-      <p>{e(s["audience_p"])}</p>
-      <ul class="checks">
-{points}      </ul>
-      <p>{s["audience_chill"]}</p>
+  <nav class="subnav" data-subnav aria-label="{e(s["walk_eyebrow"])}">
+    <div class="inner">
+      <span class="title">ChillMate</span>
+{chapters}      <a class="btn btn-primary" href="{notify}">{e(s["cta_notify"])}</a>
     </div>
-  </section>
+  </nav>
 """
 
-    # ---- the guided walk
+    # ---- 1. hero
+    out += chapter(f"""      <h1>{e(no_orphan(s["h1"]))}</h1>
+      <div class="hero-cols">
+        <div>
+          <p class="lede">{e(s["lede"])}</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="{notify}">{icon("mail")}{e(s["cta_notify"])}</a>
+            <a class="btn btn-ghost" href="#inside">{icon("phone")}{e(s["cta_see"])}</a>
+          </div>
+          <p class="status-note">{icon("info")}{e(s["status_note"])}</p>
+          <a class="scroll-cue" href="#statement">{e(s["scroll_cue"])}{icon("chev")}</a>
+        </div>
+        <div class="hero-phone-big">
+          {phone(SHOTS[0], s["walk"][0][1], depth, lazy=False, priority=True)}
+        </div>
+      </div>
+""", extra="hero-full")
+
+    # ---- 2. the statement
+    tiles = "".join(
+        f'        <div><b>{e(number)}</b><span>{e(label)}</span></div>\n'
+        for number, label in s["statement"]
+    )
+    out += chapter(f"""      <div class="statement-grid stagger">
+{tiles}      </div>
+      <p>{e(s["statement_note"])}{fn(1)}</p>
+""", ident="statement", invert=True, extra="statement")
+
+    # ---- 3. who it is for
+    points = "".join(
+        f'          <li>{icon("check")}<span>{e(point)}</span></li>\n'
+        for point in s["audience_points"]
+    )
+    scenarios = "".join(
+        f'          <li>{icon("check")}<span>{e(line)}</span></li>\n' for line in s["foryou"]
+    )
+    out += chapter(f"""      <p class="eyebrow">{e(s["audience_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["audience_h2"]))}</h2>
+      <p>{e(s["audience_p"])}</p>
+      <ul class="checks stagger">
+{points}      </ul>
+      <p>{s["audience_chill"]}</p>
+
+      <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["foryou_h2"]))}</h3>
+      <ul class="scenarios stagger">
+{scenarios}      </ul>
+      <p>{e(s["foryou_not"])}</p>
+""", ident="who")
+
+    # ---- 4. the scroll-driven walk
     steps = ""
     frames = ""
     for i, (eyebrow, title, body) in enumerate(s["walk"]):
+        marker = fn(9) if i == 3 else ""
         steps += f"""
-      <div class="walk-step reveal">
-        <p class="eyebrow">{e(eyebrow)}</p>
-        {phone(SHOTS[i], title, depth)}
-        <h3>{e(no_orphan(title))}</h3>
-        <p>{e(body)}</p>
-      </div>
+          <div class="walk-step">
+            <p class="eyebrow">{e(eyebrow)}</p>
+            {phone(SHOTS[i], title, depth)}
+            <h2>{e(no_orphan(title))}</h2>
+            <p>{e(body)}{marker}</p>
+          </div>
 """
-        frames += (f'          <img src="{r}assets/shots/{SHOTS[i]}" width="560" height="1217" '
+        fw, fh = image_size(ASSETS / "shots" / SHOTS[i])
+        frames += (f'              <img src="{r}assets/shots/{SHOTS[i]}" width="{fw}" height="{fh}" '
                    f'alt="{e(title)}" loading="lazy" decoding="async" />\n')
 
-    out += f"""
-  <section class="section">
-    <p class="eyebrow">{e(s["walk_eyebrow"])}</p>
-    <h2 id="inside">{e(no_orphan(s["walk_h2"]))}</h2>
-
-    <div class="walk" data-walk>
-      <div class="walk-stage" aria-hidden="true">
-        <div class="phone">
-          <div class="phone-shell">
-            <div class="phone-screen">
-{frames}              <span class="phone-island"></span>
+    out += chapter(f"""      <p class="eyebrow">{e(s["walk_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["walk_h2"]))}</h2>
+      <div class="track" data-walk>
+        <div class="stage" aria-hidden="true">
+          <div class="stage-phone">
+            <div class="phone">
+              <div class="phone-shell">
+                <div class="phone-screen">
+{frames}                  <span class="phone-island"></span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <div class="beats-col">{steps}        </div>
       </div>
-      <div class="walk-steps">{steps}      </div>
-    </div>
-  </section>
-"""
+""", ident="inside", invert=True, extra="walk-scroll")
 
-    # ---- one night in three beats
+    # ---- 5. one night in three beats
     beats = ""
     for label, title, body in s["night"]:
-        beats += f"""      <div class="beat">
-        <p class="eyebrow">{e(label)}</p>
-        <h3>{e(no_orphan(title))}</h3>
-        <p>{e(body)}</p>
-      </div>
+        beats += f"""        <div class="beat">
+          <p class="eyebrow">{e(label)}</p>
+          <h3>{e(no_orphan(title))}</h3>
+          <p>{e(body)}</p>
+        </div>
 """
-    out += f"""
-  <section class="section reveal">
-    <p class="eyebrow">{e(s["night_eyebrow"])}</p>
-    <h2 id="night">{e(no_orphan(s["night_h2"]))}</h2>
-    <div class="beats">
-{beats}    </div>
-  </section>
-"""
+    out += chapter(f"""      <p class="eyebrow">{e(s["night_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["night_h2"]))}</h2>
+      <div class="beats stagger">
+{beats}      </div>
+""", ident="night")
 
-    # ---- features
-    tiles = ""
-    for ico, tint, title, body in s["features"]:
-        tiles += f"""      <div class="feature">
-        <div class="chip {tint}">{icon(ico)}</div>
-        <h3>{e(no_orphan(title))}</h3>
-        <p>{e(body)}</p>
-      </div>
-"""
-    out += f"""
-  <section class="section reveal">
-    <p class="eyebrow">{e(s["features_eyebrow"])}</p>
-    <div class="grid three">
-{tiles}    </div>
-  </section>
-"""
-
-    # ---- is this for you
-    scenarios = "".join(
-        f'        <li>{icon("check")}<span>{e(line)}</span></li>\n' for line in s["foryou"]
+    # ---- 6. the playable risk checker
+    payload, substances = demo_payload(lang)
+    chips = "".join(
+        f'            <button type="button" class="demo-chip" data-substance="{e(name)}" '
+        f'aria-pressed="false">{e(name)}</button>\n'
+        for name in substances
     )
-    out += f"""
-  <section class="section reveal">
-    <p class="eyebrow">{e(s["foryou_eyebrow"])}</p>
-    <div class="card">
-      <h2>{icon("info", style="color:var(--primary)")}{e(no_orphan(s["foryou_h2"]))}</h2>
-      <ul class="scenarios">
-{scenarios}      </ul>
-      <p>{e(s["foryou_not"])}</p>
-    </div>
-  </section>
-"""
+    out += chapter(f"""      <p class="eyebrow">{e(s["demo_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["demo_h2"]))}</h2>
+      <p>{e(s["demo_p"])}{fn(8)}</p>
 
-    # ---- privacy
+      <div class="demo panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
+        <div>
+          <p class="eyebrow">{e(s["demo_pick"])}</p>
+          <div class="demo-picker">
+{chips}          </div>
+          <div class="demo-actions">
+            <button type="button" class="btn btn-ghost" data-demo-try>{icon("flask")}{e(s["demo_try"])}</button>
+            <button type="button" class="chip-btn" data-demo-reset>{e(s["demo_reset"])}</button>
+          </div>
+        </div>
+        <div>
+          <div class="demo-out" data-demo-out></div>
+          <p class="meta">{e(s["demo_note"])}</p>
+        </div>
+      </div>
+      <script type="application/json" id="cm-interactions">{json.dumps(payload, ensure_ascii=False)}</script>
+""", ident="try", invert=True)
+
+    # ---- 7. privacy, the diagram, and the proof
+    check_notes = {0: 2, 2: 3, 3: 5, 4: 6}
     checks = "".join(
-        f'        <li>{icon("check")}<span>{e(c)}</span></li>\n' for c in s["privacy_checks"]
+        f'          <li>{icon("check")}<span>{e(c)}'
+        f'{fn(check_notes[i]) if i in check_notes else ""}</span></li>\n'
+        for i, c in enumerate(s["privacy_checks"])
     )
-    out += f"""
-  <section class="section reveal" id="privacy">
-    <p class="eyebrow">{e(s["privacy_eyebrow"])}</p>
-    <div class="card">
-      <h2>{icon("lock", style="color:var(--mint)")}{e(no_orphan(s["privacy_h2"]))}</h2>
+    out += chapter(f"""      <p class="eyebrow">{e(s["privacy_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["privacy_h2"]))}</h2>
       <p>{e(s["privacy_intro"])}</p>
-      <ul class="checks">
+      <ul class="checks stagger">
 {checks}      </ul>
 
-      <p class="eyebrow" style="margin-top:22px">{e(s["diagram_title"])}</p>
+      <p class="eyebrow" style="margin-top:clamp(40px,5vw,72px)">{e(s["diagram_title"])}</p>
       {diagram(lang)}
 
-      <p style="margin-top:18px"><a href="{r}privacy/">{e(s["privacy_link"])}</a></p>
-    </div>
-  </section>
-
-  <section class="section reveal">
-    <p class="eyebrow">{e(s["proof_eyebrow"])}</p>
-    <div class="card">
-      <h2>{icon("code", style="color:var(--primary)")}{e(no_orphan(s["proof_h2"]))}</h2>
+      <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["proof_h2"]))}</h3>
       <p>{e(s["proof_p"])}</p>
-      <p>{s["proof_fact"]}</p>
+      <p>{s["proof_fact"]}{fn(1)}</p>
       <div class="cta-row">
         <a class="btn btn-ghost" href="{REPO}">{icon("github")}{e(s["proof_cta_repo"])}</a>
-        <a class="btn btn-ghost" href="{REPO}/blob/main/ChillMate/ChillMateModelContainer.swift">{icon("doc")}{e(s["proof_cta_store"])}</a>
+        <a class="btn btn-ghost" href="{r}privacy/">{icon("shield")}{e(s["privacy_link"])}</a>
       </div>
       <p class="meta" style="margin-top:14px">{e(s["proof_caption"])}</p>
-    </div>
-  </section>
-"""
+""", ident="privacy")
 
-    # ---- what it refuses to do
+    # ---- 8. what it refuses to do
     refusals = "".join(
-        f'        <li>{icon("hand")}<div><b>{e(title)}</b><span>{e(body)}</span></div></li>\n'
+        f'          <li>{icon("hand")}<div><b>{e(title)}</b><span>{e(body)}</span></div></li>\n'
         for title, body in s["refuse"]
     )
-    out += f"""
-  <section class="section reveal">
-    <p class="eyebrow">{e(s["refuse_eyebrow"])}</p>
-    <div class="card">
-      <h2>{icon("alert", style="color:var(--danger)")}{e(no_orphan(s["refuse_h2"]))}</h2>
+    out += chapter(f"""      <p class="eyebrow">{e(s["refuse_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["refuse_h2"]))}</h2>
       <p>{e(s["refuse_p"])}</p>
-      <ul class="refusals">
+      <ul class="refusals stagger">
 {refusals}      </ul>
-    </div>
-  </section>
-"""
+""", ident="refuse", invert=True)
 
-    # ---- watch and languages
-    out += f"""
-  <section class="section reveal">
-    <div class="card">
-      <div class="hero" style="padding-top:0">
-        <div>
-          <h2>{icon("watch", style="color:var(--primary)")}{e(no_orphan(s["watch_h3"]))}</h2>
-          <p>{e(s["watch_p"])}</p>
-          <blockquote class="quote">
-            <p>{e(s["watch_quote"])}</p>
-            <cite>{e(s["watch_quote_note"])}</cite>
-          </blockquote>
-        </div>
-        <div class="hero-phone-wrap">
-          {watch(depth)}
-        </div>
+    # ---- 9. the watch, and the languages
+    out += chapter(f"""      <div class="hero-cols" style="margin-top:0">
+          <div>
+            <p class="eyebrow">Apple Watch</p>
+            <h2>{e(no_orphan(s["watch_h3"]))}</h2>
+            <p>{e(s["watch_p"])}{fn(4)}</p>
+            <blockquote class="quote">
+              <p>{e(s["watch_quote"])}</p>
+              <cite>{e(s["watch_quote_note"])}</cite>
+            </blockquote>
+          </div>
+          <div>{watch(depth)}</div>
       </div>
-    </div>
 
-    <div class="card">
-      <h2>{icon("globe", style="color:var(--mint)")}{e(no_orphan(s["langs_h3"]))}</h2>
+      <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["langs_h3"]))}</h3>
       <p>{e(s["langs_p"])}</p>
-    </div>
-  </section>
-"""
+""", ident="watch")
 
-    # ---- the three questions everyone asks
+    # ---- 10. what is in it
+    tiles = ""
+    for ico, tint, title, body in s["features"]:
+        tiles += f"""        <div class="feature">
+          <div class="chip {tint}">{icon(ico)}</div>
+          <h3>{e(no_orphan(title))}</h3>
+          <p>{e(body)}</p>
+        </div>
+"""
+    out += chapter(f"""      <p class="eyebrow">{e(s["features_eyebrow"])}</p>
+      <div class="grid three stagger">
+{tiles}      </div>
+""", ident="features", invert=True)
+
+    # ---- 11. the questions
     teaser = ""
     for index in s["faq_teaser_indices"]:
         question, answer = s["faq"][index]
-        teaser += f"""        <details>
-          <summary>{e(question)}<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
-          <div class="body"><p>{e(answer)}</p></div>
-        </details>
+        teaser += f"""          <details>
+            <summary>{e(question)}<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+            <div class="body"><p>{e(answer)}</p></div>
+          </details>
 """
-    out += f"""
-  <section class="section reveal">
-    <p class="eyebrow">{e(s["faq_teaser_eyebrow"])}</p>
-    <h2 id="questions">{e(no_orphan(s["faq_teaser_h2"]))}</h2>
-    <div class="card">
+    out += chapter(f"""      <p class="eyebrow">{e(s["faq_teaser_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["faq_teaser_h2"]))}</h2>
       <div class="faq">
 {teaser}      </div>
-      <p style="margin-top:16px"><a href="{support}">{e(s["faq_teaser_link"])}</a></p>
-    </div>
-  </section>
+      <p style="margin-top:22px"><a href="{support}">{e(s["faq_teaser_link"])}</a></p>
+""", ident="questions")
 
-  <section class="section">
-    <div class="callout">
-      {icon("alert")}
-      <p>{e(s["disclaimer"])}</p>
-    </div>
-  </section>
-"""
+    # ---- 12. specifications
+    rows = ""
+    for i, (label, value) in enumerate(s["specs"]):
+        marker = fn(SPEC_FOOTNOTES[i]) if i in SPEC_FOOTNOTES else ""
+        rows += f"        <tr><th scope=\"row\">{e(label)}</th><td>{e(value)}{marker}</td></tr>\n"
+    out += chapter(f"""      <p class="eyebrow">{e(s["specs_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["specs_h2"]))}</h2>
+      <table class="specs">
+        <tbody>
+{rows}        </tbody>
+      </table>
+""", ident="specs", invert=True, inner="inner narrow")
+
+    # ---- 13. the footnotes, and the one disclaimer
+    notes = ""
+    for i, text in enumerate(s["footnotes"], start=1):
+        url, label = FOOTNOTE_SOURCES[i - 1]
+        notes += (f'          <li id="fn-{i}"><div>{e(text)} '
+                  f'<a href="{url}"><code>{e(label)}</code></a> '
+                  f'<a href="#fnref-{i}" aria-label="Back to text">&#8617;</a></div></li>\n')
+    out += chapter(f"""      <p class="eyebrow">{e(s["footnotes_title"])}</p>
+      <p>{e(s["footnotes_intro"])}</p>
+      <div class="footnotes">
+        <ol>
+{notes}        </ol>
+      </div>
+
+      <div class="callout" style="margin-top:clamp(40px,5vw,72px)">
+        {icon("alert")}
+        <p>{e(s["disclaimer"])}</p>
+      </div>
+""", ident="footnotes")
+
     out += footer(lang, depth)
     return out, canonical
 
@@ -1304,9 +1416,9 @@ def build_press():
     shots = "".join(
         f'      <a class="res" href="../assets/shots/{name}"><div class="t">{label}{icon("ext")}</div>'
         f'<div class="d">PNG</div></a>\n'
-        for name, label in [("home.png", "Home"), ("risk.png", "Risk checker"),
-                            ("help.png", "Panic support"), ("support.png", "Support"),
-                            ("privacy.png", "Privacy dashboard"), ("watch.png", "Apple Watch")]
+        for name, label in [("home.jpg", "Home"), ("risk.jpg", "Risk checker"),
+                            ("help.jpg", "Panic support"), ("support.jpg", "Support"),
+                            ("privacy.jpg", "Privacy dashboard"), ("watch.png", "Apple Watch")]
     )
     out += f"""
   <h1>Press&nbsp;kit</h1>

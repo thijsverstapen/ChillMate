@@ -235,4 +235,59 @@ S = {
     ],
     # Which of the above to lift onto the home page.
     "faq_teaser_indices": [0, 1, 2],
+
+    # ---------- chapter navigation ----------
+    "nav_chapters": [("who", "Who it is for"), ("inside", "A look inside"),
+                     ("try", "Try it"), ("privacy", "Privacy"), ("specs", "Specs")],
+    "scroll_cue": "Scroll",
+
+    # ---------- the statement ----------
+    "statement": [("0", "servers"), ("0", "accounts"), ("0", "trackers")],
+    "statement_note": "Not a policy. An architecture. Everything below explains how, and links to the line of code that proves it.",
+
+    # ---------- the playable risk checker ----------
+    "demo_eyebrow": "Try it",
+    "demo_h2": "This is the real risk checker.",
+    "demo_p": "Not a screenshot of it. The same 30 combinations, the same wording, the same refusal to call anything safe, running here in your browser. Pick two and see.",
+    "demo_pick": "Pick what is in play",
+    "demo_none_title": "Nothing documented for this combination",
+    "demo_none_body": "That is not the same as safe. It means this table has nothing on file, and this table is not the last word on anything.",
+    "demo_empty": "Pick at least two to see what the app would say.",
+    "demo_reset": "Clear",
+    "demo_note": "Runs entirely in this page. Nothing you tap here is sent anywhere, for the same reason nothing in the app is.",
+    "demo_try": "Try GHB and alcohol",
+
+    # ---------- tech specs ----------
+    "specs_eyebrow": "The details",
+    "specs_h2": "Specifications",
+    "specs": [
+        ("Requires", "iPhone with iOS 26 or later"),
+        ("Apple Watch", "Native app, watchOS 26 or later"),
+        ("Price", "Free. No paid tier, no subscription, no ads."),
+        ("Account", "None. There is nothing to sign up for."),
+        ("Data collected", "None"),
+        ("Languages", "English, Nederlands, Deutsch, Français, Español"),
+        ("Help services", "10 regions, held on the device, works offline"),
+        ("Combinations checked", "30 documented interactions, on-device"),
+        ("Written summaries", "On-device, Apple Foundation Models"),
+        ("Sync and backup", "Optional, encrypted, your own iCloud"),
+        ("Lock", "Face ID, or a PIN derived with 200,000 PBKDF2 rounds"),
+        ("Source", "Open, MIT licensed"),
+        ("Version", "4.2.1 (build 422)"),
+    ],
+
+    # ---------- footnotes ----------
+    "footnotes_title": "Every claim on this page, and where to check it",
+    "footnotes_intro": "Marketing pages footnote their claims to the small print. This one footnotes them to the source code.",
+    "footnotes": [
+        "No networking anywhere in the app. Search the repository yourself for URLSession.",
+        "Sync goes to your own private CloudKit database, never to a shared one.",
+        "The PIN is derived with 200,000 PBKDF2 rounds and held in the Keychain, never stored as typed.",
+        "Contents are hidden in the App Switcher and while the screen is captured or mirrored.",
+        "Backups are sealed with AES-GCM before they ever reach a file.",
+        "Notification wording can be made deliberately vague on the lock screen.",
+        "Written summaries use Apple's on-device model. Nothing leaves the phone.",
+        "The 30 combinations shown above, exactly as the app carries them.",
+        "The help directory for all 10 regions, held on the device.",
+    ],
 }

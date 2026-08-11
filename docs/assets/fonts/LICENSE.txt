@@ -1,0 +1,13 @@
+Inter is licensed under the SIL Open Font License 1.1.
+
+Copyright (c) 2016 The Inter Project Authors (https://github.com/rsms/inter)
+
+Full licence text: https://openfontlicense.org
+
+These two files are the latin and latin-ext subsets of the Inter variable font,
+as served by Google Fonts, saved here so the site fetches them from its own
+origin. Nothing on this site is loaded from a third party, and a webfont
+request would otherwise hand every reader's IP address to whoever served it.
+
+They are only ever downloaded by browsers that cannot resolve -apple-system,
+which is to say: not by anyone on an Apple device, who already has SF Pro.

@@ -63,48 +63,253 @@
     items.forEach(function (el) { io.observe(el); });
   }
 
-  /* ---------- the guided walk ---------- */
+  /* ---------- the scroll-driven walk ---------- */
 
   function initWalk() {
     var walk = document.querySelector('[data-walk]');
-    if (!walk || !('IntersectionObserver' in window)) return;
+    if (!walk) return;
 
-    var wide = window.matchMedia('(min-width: 900px)');
+    var wide = window.matchMedia('(min-width: 940px)');
     var steps = Array.prototype.slice.call(walk.querySelectorAll('.walk-step'));
-    var frames = Array.prototype.slice.call(walk.querySelectorAll('.walk-stage img'));
-    if (steps.length !== frames.length || !frames.length) return;
+    var frames = Array.prototype.slice.call(walk.querySelectorAll('.stage-phone img'));
+    var device = walk.querySelector('.stage-phone');
+    // data-walk is on the track element itself, so do not go looking
+    // for a descendant that will never be there.
+    var track = walk.classList.contains('track') ? walk : walk.querySelector('.track');
+    if (!device || !track || steps.length !== frames.length || !frames.length) return;
 
-    var io = null;
+    var ticking = false;
+    var shown = -1;
 
     function show(index) {
+      if (index === shown) return;
+      shown = index;
       frames.forEach(function (img, i) { img.classList.toggle('is-shown', i === index); });
       steps.forEach(function (step, i) { step.classList.toggle('is-active', i === index); });
     }
 
+    // Progress of the track through the viewport, 0 to 1. Everything the stage
+    // does is a function of this one number, which is what makes the rotation
+    // and the screen changes feel like one movement rather than two effects.
+    function progress() {
+      var box = track.getBoundingClientRect();
+      var travel = box.height - window.innerHeight;
+      if (travel <= 0) return 0;
+      return Math.min(1, Math.max(0, -box.top / travel));
+    }
+
+    function frame() {
+      ticking = false;
+      var p = progress();
+
+      show(Math.min(steps.length - 1, Math.floor(p * steps.length + 0.0001)));
+
+      if (reduceMotion) return;
+      // A slow turn across the whole chapter, plus a shallow tilt and a breath
+      // of scale. Small numbers on purpose: past about 16 degrees the screen
+      // starts to read as a photograph of a phone rather than a phone.
+      var swing = (p - 0.5) * 2;
+      device.style.setProperty('--ry', (swing * 13).toFixed(2) + 'deg');
+      device.style.setProperty('--rx', (Math.cos(p * Math.PI) * 3.5).toFixed(2) + 'deg');
+      device.style.setProperty('--ty', (Math.sin(p * Math.PI) * -14).toFixed(2) + 'px');
+      device.style.setProperty('--sc', (1 + Math.sin(p * Math.PI) * 0.03).toFixed(4));
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(frame);
+    }
+
     function enable() {
-      if (io) return;
       walk.classList.add('is-sticky');
-      show(0);
-      io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) show(steps.indexOf(entry.target));
-        });
-      }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
-      steps.forEach(function (step) { io.observe(step); });
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
+      frame();
     }
 
     function disable() {
-      if (!io) return;
-      io.disconnect();
-      io = null;
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
       walk.classList.remove('is-sticky');
       steps.forEach(function (step) { step.classList.remove('is-active'); });
+      shown = -1;
     }
 
     function sync() { wide.matches ? enable() : disable(); }
 
     sync();
     wide.addEventListener('change', sync);
+  }
+
+  /* ---------- sticky sub-nav ---------- */
+
+  function initSubnav() {
+    var nav = document.querySelector('[data-subnav]');
+    if (!nav) return;
+    var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+    var targets = links
+      .map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); })
+      .filter(Boolean);
+
+    var hero = document.querySelector('.hero-full');
+    var ticking = false;
+
+    function frame() {
+      ticking = false;
+      var past = hero ? window.scrollY > hero.offsetHeight * 0.7 : window.scrollY > 400;
+      nav.classList.toggle('is-shown', past);
+
+      // Whichever chapter owns the middle of the screen.
+      var middle = window.innerHeight * 0.45;
+      var current = -1;
+      targets.forEach(function (el, i) {
+        if (el.getBoundingClientRect().top <= middle) current = i;
+      });
+      links.forEach(function (a, i) { a.classList.toggle('is-current', i === current); });
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(frame);
+    }, { passive: true });
+    frame();
+  }
+
+  /* ---------- staggered entrances ---------- */
+
+  function initStagger() {
+    var groups = document.querySelectorAll('.stagger');
+    if (!groups.length) return;
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      groups.forEach(function (g) { g.classList.add('is-in'); });
+      return;
+    }
+    groups.forEach(function (group) {
+      Array.prototype.slice.call(group.children).forEach(function (child, i) {
+        child.style.setProperty('--i', i);
+      });
+    });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-in');
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.05 });
+    groups.forEach(function (g) { io.observe(g); });
+  }
+
+  /* ---------- the playable risk checker ---------- */
+
+  function initDemo() {
+    var root = document.querySelector('[data-demo]');
+    if (!root) return;
+    var source = document.getElementById('cm-interactions');
+    if (!source) return;
+
+    var data;
+    try { data = JSON.parse(source.textContent); } catch (e) { return; }
+
+    var out = root.querySelector('[data-demo-out]');
+    var chips = Array.prototype.slice.call(root.querySelectorAll('.demo-chip'));
+    var reset = root.querySelector('[data-demo-reset]');
+    var shortcut = root.querySelector('[data-demo-try]');
+    var picked = new Set();
+
+    var ORDER = { critical: 3, serious: 2, caution: 1 };
+
+    // Mirrors SubstanceInteractionChecker.warnings(for:): a rule fires when
+    // every substance it names is selected, then severity descending, then by
+    // the rule's own identity so equal severities never swap around.
+    function matches() {
+      return data.rules
+        .filter(function (rule) {
+          return rule.substances.every(function (s) { return picked.has(s); });
+        })
+        .sort(function (a, b) {
+          if (ORDER[a.level] !== ORDER[b.level]) return ORDER[b.level] - ORDER[a.level];
+          return a.substances.join('+') < b.substances.join('+') ? -1 : 1;
+        });
+    }
+
+    function card(cls, tag, body) {
+      var el = document.createElement('div');
+      el.className = 'verdict verdict--' + cls;
+      if (tag) {
+        var t = document.createElement('span');
+        t.className = 'tag';
+        t.textContent = tag;
+        el.appendChild(t);
+      }
+      var p = document.createElement('p');
+      p.textContent = body;
+      el.appendChild(p);
+      return el;
+    }
+
+    function render() {
+      out.textContent = '';
+      if (picked.size < 2) {
+        out.appendChild(card('empty', '', data.copy.empty));
+        return;
+      }
+      var found = matches();
+      if (!found.length) {
+        out.appendChild(card('none', data.copy.noneTitle, data.copy.noneBody));
+        return;
+      }
+      found.forEach(function (rule) {
+        out.appendChild(card(rule.level, data.levels[rule.level], rule.warning));
+      });
+    }
+
+    function setChip(chip, on) {
+      chip.setAttribute('aria-pressed', String(on));
+      if (on) picked.add(chip.dataset.substance);
+      else picked.delete(chip.dataset.substance);
+    }
+
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        setChip(chip, chip.getAttribute('aria-pressed') !== 'true');
+        render();
+      });
+    });
+
+    if (reset) {
+      reset.addEventListener('click', function () {
+        chips.forEach(function (chip) { setChip(chip, false); });
+        render();
+      });
+    }
+
+    if (shortcut) {
+      shortcut.addEventListener('click', function () {
+        chips.forEach(function (chip) {
+          setChip(chip, chip.dataset.substance === 'GHB' || chip.dataset.substance === 'Alcohol');
+        });
+        render();
+        out.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
+      });
+    }
+
+    render();
+  }
+
+  /* ---------- inert video, played only if motion is welcome ---------- */
+
+  function initVideo() {
+    document.querySelectorAll('video[data-autoplay]').forEach(function (video) {
+      video.preload = 'metadata';
+      if (reduceMotion) {
+        video.controls = true;
+        return;
+      }
+      video.autoplay = true;
+      video.play().catch(function () { video.controls = true; });
+    });
   }
 
   /* ---------- copy to clipboard ---------- */
@@ -238,7 +443,11 @@
   function boot() {
     initTheme();
     initReveal();
+    initStagger();
     initWalk();
+    initSubnav();
+    initDemo();
+    initVideo();
     initCopy();
     initToTop();
     initDraw();
