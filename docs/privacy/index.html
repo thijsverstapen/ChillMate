@@ -5,26 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChillMate · Privacy Policy</title>
   <meta name="description" content="ChillMate's privacy policy. Your data stays on your iPhone. No ads, no tracking, nothing sold." />
+  <meta name="theme-color" content="#0e1430" />
+  <link rel="icon" href="../assets/mark.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../assets/app-icon.png" />
   <link rel="stylesheet" href="../assets/style.css" />
 </head>
 <body>
-  <main class="wrap">
-    <header class="brand">
-      <div class="logo">🜂</div>
-      <div class="name">Chill<span>Mate</span></div>
-    </header>
+<a class="skip" href="#main">Skip to content</a>
 
-    <div class="nav">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="g-c" x1="14" y1="10" x2="50" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7C8CFF"/><stop offset="1" stop-color="#4E6BF5"/>
+    </linearGradient>
+    <linearGradient id="g-k" x1="24" y1="40" x2="48" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6FE3B4"/><stop offset="1" stop-color="#8CEBC4"/>
+    </linearGradient>
+  </defs>
+  <symbol id="i-mark" viewBox="0 0 64 64">
+    <path d="M43.5 15.6 A20 20 0 1 0 43.5 48.4" fill="none" stroke="url(#g-c)" stroke-width="9.5" stroke-linecap="round"/>
+    <path d="M24.5 32.6 L31.4 39.6 L45.2 22.4" fill="none" stroke="url(#g-k)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6z"/><path d="M9 12l2.2 2.2L15.5 10"/>
+  </symbol>
+  <symbol id="i-life" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/>
+    <path d="M6.8 6.8l2 2M17.2 6.8l-2 2M6.8 17.2l2-2M17.2 17.2l-2-2"/>
+  </symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/>
+  </symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l7.4 5.4a2 2 0 002.2 0L20.5 7"/>
+  </symbol>
+  <symbol id="i-github" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.5 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.570 2.34 1.12 2.91.86.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 015 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.8-4.58 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.07 10.07 0 0022 12.25C22 6.58 17.52 2 12 2z"/>
+  </symbol>
+</svg>
+
+  <main class="wrap" id="main">
+  <header class="site-head">
+    <a class="brand" href="../" aria-label="ChillMate home">
+      <svg class="mark" aria-hidden="true"><use href="#i-mark"/></svg>
+      <span class="name">Chill<em>Mate</em></span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
       <a href="../">Home</a>
-      <a href="../support/">Support</a>
-    </div>
+      <a href="./" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
+      <a href="../support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support</a>
+      <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
+    </nav>
+  </header>
 
     <h1>Privacy Policy</h1>
     <p class="lede">ChillMate is built privacy-first. Your information lives on your iPhone, under your control. We do not run servers that collect your data, we do not use advertising or analytics trackers, and we never sell or share your personal information.</p>
     <p class="meta">Last updated: 28 July 2026 · Applies to the ChillMate iOS app and this website.</p>
 
     <div class="card">
-      <h2><span class="dot p"></span> The short version</h2>
+      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-shield"/></svg> The short version</h2>
       <ul>
         <li><strong>On your device.</strong> Your profile, logs, plans, and notes are stored locally on your iPhone.</li>
         <li><strong>No trackers.</strong> No third-party advertising, analytics, or tracking SDKs.</li>
@@ -34,7 +73,7 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot m"></span> What ChillMate can save</h2>
+      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-mail"/></svg> What ChillMate can save</h2>
       <ul>
         <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
         <li>Private logs, sleep notes, health-related entries and test reminders, plans, journal entries, check-ins, and emergency-card details.</li>
@@ -44,7 +83,7 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot u"></span> How your information is used</h2>
+      <h2><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-lock"/></svg> How your information is used</h2>
       <ul>
         <li>To show your private overview, reminders, follow-ups, emergency shortcuts, and wellbeing reflections.</li>
         <li>To sync with Apple Health only for the categories you approve in iOS settings.</li>
@@ -54,7 +93,7 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot k"></span> What ChillMate does not do</h2>
+      <h2><svg class="icon" style="color:var(--pink)" aria-hidden="true"><use href="#i-lock"/></svg> What ChillMate does not do</h2>
       <ul>
         <li>No ads, no selling personal information, and no sharing of your health details for marketing.</li>
         <li>No medical diagnosis, treatment decisions, or advice on whether anything is safe.</li>
@@ -63,14 +102,14 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot a"></span> Where your data is stored</h2>
+      <h2><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-lock"/></svg> Where your data is stored</h2>
       <p><strong>On your iPhone.</strong> Data is kept in the app's private storage, protected by iOS file protection and, if you enable it, an extra app lock (Face ID or PIN).</p>
       <p><strong>Optional iCloud.</strong> If you turn on iCloud backup or sync, ChillMate stores your data in <em>your own</em> private iCloud account through Apple's CloudKit and iCloud Drive. It is protected by Apple's encryption and is accessible only to you. The developer has no access to it.</p>
       <p><strong>No developer servers.</strong> ChillMate has no backend that receives or stores your personal information.</p>
     </div>
 
     <div class="card">
-      <h2><span class="dot m"></span> Apple Watch</h2>
+      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-mail"/></svg> Apple Watch</h2>
       <p>If you pair an Apple Watch, ChillMate mirrors part of your data to the watch app so it still works when your phone is out of reach: your recovery streak and daily score, any running dose timers, your watch settings, your emergency number, and the <strong>name and phone number of your trusted contact</strong>, so the watch can reach them without your phone.</p>
       <p>This goes directly between your phone and your watch over Apple&rsquo;s Watch Connectivity, on your own devices. It does not pass through our servers, because there are none.</p>
       <p>Two things worth knowing. The trusted contact&rsquo;s details belong to another person and end up on a second device, so add someone only if they would be comfortable with that. And ChillMate&rsquo;s app lock protects the <em>phone</em> app. The watch app is protected by your watch&rsquo;s own passcode and wrist detection instead.</p>
@@ -78,7 +117,7 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot p"></span> Device permissions</h2>
+      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-shield"/></svg> Device permissions</h2>
       <p>Each permission is optional and only used for the purpose you grant it:</p>
       <ul>
         <li><strong>Apple Health.</strong> Read and write only the categories you allow (such as sleep, heart rate, HRV, and workouts).</li>
@@ -90,12 +129,12 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot m"></span> Payments &amp; tips</h2>
+      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-mail"/></svg> Payments &amp; tips</h2>
       <p>ChillMate is free. An optional tip ("Support the developer") is handled entirely by Apple's In-App Purchase system. Apple processes the payment; the developer never receives your card or account details. Tips do not unlock features and do not change what data is collected.</p>
     </div>
 
     <div class="card">
-      <h2><span class="dot u"></span> Your control &amp; deletion</h2>
+      <h2><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-lock"/></svg> Your control &amp; deletion</h2>
       <ul>
         <li>You can delete logs, plans, reminders, timers, journal entries, and your whole account from inside the app.</li>
         <li>Deleting the app removes its local data from your iPhone. iCloud data can be removed from iCloud settings or from within the app's backup controls.</li>
@@ -105,7 +144,7 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot k"></span> Children</h2>
+      <h2><svg class="icon" style="color:var(--pink)" aria-hidden="true"><use href="#i-lock"/></svg> Children</h2>
       <p>ChillMate is intended for adults only. You must be 18 or older to create a profile and use the app.</p>
     </div>
 
@@ -114,18 +153,24 @@
     </div>
 
     <div class="card">
-      <h2><span class="dot p"></span> Changes to this policy</h2>
+      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-shield"/></svg> Changes to this policy</h2>
       <p>If this policy changes, the updated version will be posted on this page with a new "last updated" date. Material changes will also be noted in the app or its release notes.</p>
     </div>
 
     <div class="card">
-      <h2><span class="dot m"></span> Contact</h2>
+      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-mail"/></svg> Contact</h2>
       <p>Questions about privacy? Email <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>.</p>
     </div>
 
     <footer>
-      ChillMate · <a href="../">Home</a> · <a href="../support/">Support</a> ·
+      <a href="../">Home</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="../support/">Support</a>
+      <span class="sep" aria-hidden="true">·</span>
       <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
+      <span class="sep" aria-hidden="true">·</span>
+      <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
+      <span class="made">ChillMate 4.2.1 · made with care in the Netherlands</span>
     </footer>
   </main>
 </body>

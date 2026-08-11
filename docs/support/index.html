@@ -3,84 +3,165 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ChillMate · Support</title>
-  <meta name="description" content="Help and support for ChillMate, plus crisis and health resources." />
+  <title>ChillMate · Support and help</title>
+  <meta name="description" content="Help and support for ChillMate, answers to common questions, and trusted crisis and health services." />
+  <meta name="theme-color" content="#0e1430" />
+  <link rel="icon" href="../assets/mark.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../assets/app-icon.png" />
   <link rel="stylesheet" href="../assets/style.css" />
 </head>
 <body>
-  <main class="wrap">
-    <header class="brand">
-      <div class="logo">🜂</div>
-      <div class="name">Chill<span>Mate</span></div>
-    </header>
+<a class="skip" href="#main">Skip to content</a>
 
-    <div class="nav">
+<!-- Inlined rather than linked: an external sprite referenced with
+     <use href="file.svg#id"> is blocked over file://, so the page could not be
+     checked locally before publishing. Three pages is a fair price for that. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="g-c" x1="14" y1="10" x2="50" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7C8CFF"/><stop offset="1" stop-color="#4E6BF5"/>
+    </linearGradient>
+    <linearGradient id="g-k" x1="24" y1="40" x2="48" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6FE3B4"/><stop offset="1" stop-color="#8CEBC4"/>
+    </linearGradient>
+  </defs>
+  <symbol id="i-mark" viewBox="0 0 64 64">
+    <path d="M43.5 15.6 A20 20 0 1 0 43.5 48.4" fill="none" stroke="url(#g-c)" stroke-width="9.5" stroke-linecap="round"/>
+    <path d="M24.5 32.6 L31.4 39.6 L45.2 22.4" fill="none" stroke="url(#g-k)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6z"/><path d="M9 12l2.2 2.2L15.5 10"/>
+  </symbol>
+  <symbol id="i-life" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/>
+    <path d="M6.8 6.8l2 2M17.2 6.8l-2 2M6.8 17.2l2-2M17.2 17.2l-2-2"/>
+  </symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l7.4 5.4a2 2 0 002.2 0L20.5 7"/>
+  </symbol>
+  <symbol id="i-bug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="7.5" y="7.5" width="9" height="12" rx="4.5"/><path d="M9.2 8.2A2.8 2.8 0 0112 5.4a2.8 2.8 0 012.8 2.8"/>
+    <path d="M7.5 11.5H4.5M19.5 11.5h-3M7.5 15.5H4.5M19.5 15.5h-3M8.6 19.4l-1.8 2M15.4 19.4l1.8 2"/>
+  </symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4.5l8.5 15h-17z"/><path d="M12 10v4"/><path d="M12 17.2v.1"/>
+  </symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6.5 9.5l5.5 5.5 5.5-5.5"/>
+  </symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 5h5v5"/><path d="M19 5l-7.5 7.5"/><path d="M18 14.5V18a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h3.5"/>
+  </symbol>
+  <symbol id="i-github" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.5 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.570 2.34 1.12 2.91.86.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 015 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.8-4.58 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.07 10.07 0 0022 12.25C22 6.58 17.52 2 12 2z"/>
+  </symbol>
+</svg>
+
+<main class="wrap" id="main">
+
+  <header class="site-head">
+    <a class="brand" href="../" aria-label="ChillMate home">
+      <svg class="mark" aria-hidden="true"><use href="#i-mark"/></svg>
+      <span class="name">Chill<em>Mate</em></span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
       <a href="../">Home</a>
-      <a href="../privacy/">Privacy</a>
-    </div>
+      <a href="../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
+      <a href="./" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support</a>
+      <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
+    </nav>
+  </header>
 
-    <h1>Support &amp; Help</h1>
-    <p class="lede">Questions, feedback, or a bug to report? Get in touch and we'll help. ChillMate is made by one developer, so a real person reads every message.</p>
+  <h1>Support and help</h1>
+  <p class="lede">Questions, feedback, or a bug to report? ChillMate is made by one developer, so a real person reads every message.</p>
 
+  <div class="callout urgent" role="note">
+    <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+    <p><strong>In an emergency, do not wait for the app.</strong> If you or someone else may be in immediate danger, call your local emergency number now: 112 in the Netherlands and most of Europe, 911 in the US, 999 in the UK.</p>
+  </div>
+
+  <section class="section">
+    <p class="eyebrow">Get in touch</p>
     <div class="card">
-      <h2><span class="dot p"></span> Contact us</h2>
-      <p>Email <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>. We usually reply within a few days. Please include your iOS version and what you were doing when something went wrong. It helps a lot.</p>
-      <p>
-        <a class="pill" href="mailto:chillmate@icloud.com">✉︎ Email support</a>
-        <a class="pill" href="https://github.com/thijsverstapen/ChillMate/issues">⌥ Report on GitHub</a>
-      </p>
-    </div>
-
-    <div class="card">
-      <h2><span class="dot m"></span> Frequently asked questions</h2>
-
-      <h3>Is my data private?</h3>
-      <p>Yes. ChillMate stores your information on your iPhone. There are no ads, no trackers, and nothing is sold. See the <a href="../privacy/">Privacy Policy</a> for details.</p>
-
-      <h3>How do I back up or move to a new phone?</h3>
-      <p>Turn on iCloud backup in Settings to save an encrypted backup to your own iCloud Drive, or export an encrypted backup file. On a new device, restore from iCloud or import the backup file during setup.</p>
-
-      <h3>How do I lock the app?</h3>
-      <p>In Settings → Privacy &amp; lock, turn on Face ID or set a PIN. You can also enable discreet notifications so lock-screen wording stays vague.</p>
-
-      <h3>How do tips work?</h3>
-      <p>The optional "Support the developer" tip uses Apple In-App Purchase. It is entirely optional, unlocks nothing, and keeps every feature free for everyone.</p>
-
-      <h3>How do I delete my data?</h3>
-      <p>You can delete individual entries or your whole account inside the app. Deleting the app removes its local data, and iCloud data can be removed from the backup controls or iCloud settings.</p>
-
-      <h3>Does ChillMate give medical advice?</h3>
-      <p>No. ChillMate helps you reflect, plan, and organise. It does not diagnose, prescribe, or tell you whether anything is safe. Always confirm anything important with a qualified professional.</p>
-
-      <h3>Which countries does it support?</h3>
-      <p>ChillMate works anywhere. Help resources are tailored to the country you pick in setup, with Dutch services built in and international fallbacks for everyone else.</p>
-    </div>
-
-    <div class="callout">
-      <strong>In an emergency, do not wait for the app.</strong> If you or someone else may be in immediate danger, call your local emergency number now (112 in the Netherlands and most of Europe, 911 in the US, 999 in the UK).
-    </div>
-
-    <div class="card">
-      <h2><span class="dot u"></span> Get help from real services</h2>
-      <p>ChillMate is not a crisis service. These trusted organisations can help directly:</p>
-      <div class="grid two">
-        <div class="res"><div class="t"><a href="https://www.113.nl">113 Zelfmoordpreventie</a></div><div class="d">Crisis &amp; suicide support in the Netherlands. Call 113 or 0800-0113.</div></div>
-        <div class="res"><div class="t"><a href="https://findahelpline.com">Find a Helpline</a></div><div class="d">Free, confidential crisis support lines worldwide.</div></div>
-        <div class="res"><div class="t"><a href="https://www.ggd.nl">GGD</a></div><div class="d">Public health services, testing, and vaccination.</div></div>
-        <div class="res"><div class="t"><a href="https://www.soaaids.nl">Soa Aids Nederland</a></div><div class="d">Health information and guidance.</div></div>
-        <div class="res"><div class="t"><a href="https://www.trimbos.nl">Trimbos</a></div><div class="d">Information and support line.</div></div>
-        <div class="res"><div class="t"><a href="https://tripsit.me">TripSit</a></div><div class="d">Confidential information and support, worldwide.</div></div>
-        <div class="res"><div class="t"><a href="https://www.jellinek.nl">Jellinek</a></div><div class="d">Support and information line.</div></div>
-        <div class="res"><div class="t"><a href="https://centrumseksueelgeweld.nl">Centrum Seksueel Geweld</a></div><div class="d">Support after assault, coercion, or a consent concern.</div></div>
-        <div class="res"><div class="t"><a href="https://switchboard.nl">Switchboard LGBT+</a></div><div class="d">LGBTQ+ listening ear, information, and referral.</div></div>
+      <h2><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-mail"/></svg> Contact</h2>
+      <p>Email <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>. Replies usually take a few days. Including your iOS version and what you were doing when something went wrong helps a lot.</p>
+      <div class="contact-row">
+        <a class="btn btn-primary" href="mailto:chillmate@icloud.com">
+          <svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Email support
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/thijsverstapen/ChillMate/issues">
+          <svg class="icon" aria-hidden="true"><use href="#i-bug"/></svg>Report an issue
+        </a>
       </div>
     </div>
+  </section>
 
-    <footer>
-      ChillMate 4.2.1 · <a href="../">Home</a> · <a href="../privacy/">Privacy</a> ·
-      <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a> ·
-      <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    </footer>
-  </main>
+  <section class="section">
+    <p class="eyebrow">Common questions</p>
+    <div class="card">
+      <div class="faq">
+        <details>
+          <summary>Is my data private?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Yes. ChillMate keeps your information on your iPhone. There are no ads, no trackers, and nothing is sold. See the <a href="../privacy/">privacy policy</a> for the detail.</p></div>
+        </details>
+        <details>
+          <summary>How do I back up, or move to a new phone?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>Turn on iCloud backup in Settings to save an encrypted backup to your own iCloud Drive, or export an encrypted backup file. On a new device, restore from iCloud or import that file during setup.</p></div>
+        </details>
+        <details>
+          <summary>How do I lock the app?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>In Settings, under Privacy and lock, turn on Face ID or set a PIN. You can also enable discreet notifications so lock-screen wording stays vague.</p></div>
+        </details>
+        <details>
+          <summary>How do tips work?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>The optional "Support the developer" tip uses Apple In-App Purchase. It is entirely optional, it unlocks nothing, and every feature stays free for everyone.</p></div>
+        </details>
+        <details>
+          <summary>How do I delete my data?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>You can delete individual entries or everything at once inside the app. Deleting the app removes its local data, and iCloud data can be removed from the backup controls or from iCloud settings.</p></div>
+        </details>
+        <details>
+          <summary>Does ChillMate give medical advice?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>No. ChillMate helps you reflect, plan and organise. It does not diagnose, prescribe, or tell you whether anything is safe. Confirm anything important with a qualified professional.</p></div>
+        </details>
+        <details>
+          <summary>Which countries does it support?<svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg></summary>
+          <div class="body"><p>ChillMate works anywhere. Help resources follow the country you pick in setup, with Dutch services built in and international fallbacks for everyone else.</p></div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <p class="eyebrow">Real services</p>
+    <div class="card">
+      <h2><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-life"/></svg> Get help from people, not an app</h2>
+      <p>ChillMate is not a crisis service. These organisations can help directly.</p>
+      <div class="grid two" style="margin-top:14px">
+        <a class="res" href="https://www.113.nl"><div class="t">113 Zelfmoordpreventie <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Crisis and suicide support in the Netherlands. Call 113 or 0800 0113.</div></a>
+        <a class="res" href="https://findahelpline.com"><div class="t">Find a Helpline <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Free, confidential crisis lines worldwide.</div></a>
+        <a class="res" href="https://www.ggd.nl"><div class="t">GGD <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Public health services, testing and vaccination.</div></a>
+        <a class="res" href="https://www.soaaids.nl"><div class="t">Soa Aids Nederland <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Sexual health information and guidance.</div></a>
+        <a class="res" href="https://www.trimbos.nl"><div class="t">Trimbos <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Substance information and a support line.</div></a>
+        <a class="res" href="https://tripsit.me"><div class="t">TripSit <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Confidential information and support, worldwide.</div></a>
+        <a class="res" href="https://www.jellinek.nl"><div class="t">Jellinek <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Addiction support and information line.</div></a>
+        <a class="res" href="https://centrumseksueelgeweld.nl"><div class="t">Centrum Seksueel Geweld <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">Support after assault, coercion, or a consent concern.</div></a>
+        <a class="res" href="https://switchboard.nl"><div class="t">Switchboard LGBT+ <svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg></div><div class="d">LGBTQ+ listening ear, information and referral.</div></a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <a href="../">Home</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="../privacy/">Privacy</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
+    <span class="made">ChillMate 4.2.1 · made with care in the Netherlands</span>
+  </footer>
+
+</main>
 </body>
 </html>

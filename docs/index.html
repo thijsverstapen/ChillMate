@@ -3,34 +3,188 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ChillMate</title>
-  <meta name="description" content="ChillMate is a private, on-device wellbeing companion. No ads, no tracking, nothing sold." />
+  <title>ChillMate · A calm, private place to look after yourself</title>
+  <meta name="description" content="ChillMate keeps your logs, plans, reminders and personal-safety tools in one private overview. Everything stays on your iPhone. No account, no ads, no tracking." />
+  <meta name="theme-color" content="#0e1430" />
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/app-icon.png" />
   <link rel="stylesheet" href="assets/style.css" />
+
+  <meta property="og:title" content="ChillMate" />
+  <meta property="og:description" content="A calm, private place to look after yourself. Everything stays on your iPhone." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/app-icon.png" />
 </head>
 <body>
-  <main class="wrap">
-    <header class="brand">
-      <div class="logo">🜂</div>
-      <div class="name">Chill<span>Mate</span></div>
-    </header>
+<a class="skip" href="#main">Skip to content</a>
 
-    <h1>A calm, private place to look after yourself.</h1>
-    <p class="lede">ChillMate keeps your reflections, plans, reminders, journaling, and personal-safety tools in one private overview. Everything stays on your iPhone. No ads, no tracking, nothing sold.</p>
+<!-- One icon set for the whole page. Stroke icons share a 24x24 box and a 1.8
+     stroke so they read as one family; the GitHub mark is filled because that is
+     how the brand is drawn. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="g-c" x1="14" y1="10" x2="50" y2="54" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7C8CFF"/><stop offset="1" stop-color="#4E6BF5"/>
+    </linearGradient>
+    <linearGradient id="g-k" x1="24" y1="40" x2="48" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6FE3B4"/><stop offset="1" stop-color="#8CEBC4"/>
+    </linearGradient>
+  </defs>
 
+  <symbol id="i-mark" viewBox="0 0 64 64">
+    <path d="M43.5 15.6 A20 20 0 1 0 43.5 48.4" fill="none" stroke="url(#g-c)" stroke-width="9.5" stroke-linecap="round"/>
+    <path d="M24.5 32.6 L31.4 39.6 L45.2 22.4" fill="none" stroke="url(#g-k)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+    <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3l7 3v5.5c0 4.3-2.9 7.9-7 9.5-4.1-1.6-7-5.2-7-9.5V6z"/><path d="M9 12l2.2 2.2L15.5 10"/>
+    </symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 4.5A1.5 1.5 0 016.5 3H18a1 1 0 011 1v14.5"/><path d="M6.5 16H19v4.5H6.5A1.5 1.5 0 015 19V6"/><path d="M9 7.5h6M9 11h4"/>
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16v-4M12.5 16V8M17 16v-6"/>
+    </symbol>
+    <symbol id="i-life" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.6"/>
+      <path d="M6.8 6.8l2 2M17.2 6.8l-2 2M6.8 17.2l2-2M17.2 17.2l-2-2"/>
+    </symbol>
+    <symbol id="i-flask" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 3v6.2L5.4 17a2 2 0 001.7 3h9.8a2 2 0 001.7-3L14 9.2V3"/><path d="M9 3h6"/><path d="M7.4 14h9.2"/>
+    </symbol>
+    <symbol id="i-watch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="7" y="6" width="10" height="12" rx="3"/><path d="M9.5 6l.4-2.4A1 1 0 0110.9 3h2.2a1 1 0 011 .6l.4 2.4M9.5 18l.4 2.4a1 1 0 001 .6h2.2a1 1 0 001-.6l.4-2.4"/><path d="M12 9.8V12l1.6 1"/>
+    </symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8.5a6 6 0 10-12 0c0 5-2 6.5-2 6.5h16s-2-1.5-2-6.5z"/><path d="M13.7 19a2 2 0 01-3.4 0"/>
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 018 0v3"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 4.5l8.5 15h-17z"/><path d="M12 10v4"/><path d="M12 17.2v.1"/>
+    </symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="8.5"/><path d="M12 11.2v5"/><path d="M12 8.3v.1"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="8.5"/><path d="M8.6 12.2l2.4 2.4 4.4-5"/>
+    </symbol>
+  <symbol id="i-github" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.09.68-.22.68-.5 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.570 2.34 1.12 2.91.86.09-.66.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 015 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.8-4.58 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.07 10.07 0 0022 12.25C22 6.58 17.52 2 12 2z"/>
+  </symbol>
+</svg>
+
+<main class="wrap" id="main">
+
+  <header class="site-head">
+    <a class="brand" href="./" aria-label="ChillMate home">
+      <svg class="mark" aria-hidden="true"><use href="#i-mark"/></svg>
+      <span class="name">Chill<em>Mate</em></span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="./" aria-current="page">Home</a>
+      <a href="privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
+      <a href="support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support</a>
+      <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>A calm, private place to look after yourself.</h1>
+      <p class="lede">ChillMate keeps your logs, reflections, plans, reminders and personal-safety tools in one private overview. Everything stays on your iPhone. No account, no ads, no trackers, nothing sold.</p>
+
+      <div class="cta-row">
+        <a class="btn btn-primary" href="support/">
+          <svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support and help
+        </a>
+        <a class="btn btn-ghost" href="privacy/">
+          <svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy policy
+        </a>
+      </div>
+
+      <p class="status-note">
+        <svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>
+        Not on the App Store yet. This page will link to it once it is.
+      </p>
+    </div>
+
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 64 64"><use href="#i-mark"/></svg>
+    </div>
+  </section>
+
+  <section class="section">
+    <p class="eyebrow">What it does</p>
+    <div class="grid three">
+      <div class="feature">
+        <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></div>
+        <h3>Private log</h3>
+        <p>Record a night the way you want to remember it: sleep, how you felt, and what helped afterwards.</p>
+      </div>
+      <div class="feature">
+        <div class="chip tint-mint"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></div>
+        <h3>Your patterns</h3>
+        <p>Thirty and ninety day views of what actually changes for you, kept to yourself.</p>
+      </div>
+      <div class="feature">
+        <div class="chip tint-purple"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg></div>
+        <h3>Care tools</h3>
+        <p>Breathing, a craving pause, a safer-session plan, and a route home when you want one.</p>
+      </div>
+      <div class="feature">
+        <div class="chip tint-pink"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg></div>
+        <h3>Combination checker</h3>
+        <p>Plain-language cautions for combinations, including the medication you already take.</p>
+      </div>
+      <div class="feature">
+        <div class="chip tint-amber"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg></div>
+        <h3>Reminders that fit</h3>
+        <p>Check-in timers, a PEP window, and testing reminders, worded discreetly if you prefer.</p>
+      </div>
+      <div class="feature">
+        <div class="chip tint-blue"><svg class="icon" aria-hidden="true"><use href="#i-watch"/></svg></div>
+        <h3>On your wrist</h3>
+        <p>Timers, check-ins and an emergency number on Apple Watch, without reaching for your phone.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <p class="eyebrow">Private by design</p>
     <div class="card">
-      <h2><span class="dot p"></span> Pages</h2>
-      <p><a href="privacy/">Privacy Policy</a> &nbsp;·&nbsp; <a href="support/">Support &amp; Help</a></p>
+      <h2><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-lock"/></svg> Your phone, and nowhere else</h2>
+      <p>Privacy here is not a setting you go and switch on. It is how the app is built.</p>
+      <ul class="checks">
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>No account and no sign-up. There is no server holding your logs, because there is no server.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>No ads, no analytics, no trackers, and nothing is ever sold or shared.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Lock it behind Face ID or a PIN, with everything encrypted on the device.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Backups are optional and encrypted, and they go to your own iCloud Drive.</span></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Notifications can stay deliberately vague on the lock screen.</span></li>
+      </ul>
+      <p><a href="privacy/">Read the full privacy policy</a></p>
     </div>
+  </section>
 
+  <section class="section">
     <div class="callout">
-      ChillMate supports reflection, planning, and personal wellbeing. It does not replace a clinician and does not decide whether anything is safe. If someone may be in immediate danger, call your local emergency number.
+      <svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>
+      <p>ChillMate supports reflection, planning and personal wellbeing. It does not replace a clinician and it does not decide whether anything is safe. If someone may be in immediate danger, call your local emergency number.</p>
     </div>
+  </section>
 
-    <footer>
-      ChillMate · made with care in the Netherlands ·
-      <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a> ·
-      <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    </footer>
-  </main>
+  <footer>
+    <a href="privacy/">Privacy</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="support/">Support</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
+    <span class="sep" aria-hidden="true">·</span>
+    <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
+    <span class="made">ChillMate 4.2.1 · made with care in the Netherlands</span>
+  </footer>
+
+</main>
 </body>
 </html>
