@@ -1,48 +1,13 @@
 /* ChillMate site behaviour.
 
    Everything here is an enhancement. The pages are complete and readable with
-   this file blocked: the walk falls back to one phone per step, the helpline
-   list falls back to every country rendered in the markup, and the theme falls
-   back to the reader's system preference. */
+   this file blocked: the walk falls back to one phone per step, and the
+   helpline list falls back to every country rendered in the markup. */
 
 (function () {
   'use strict';
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- theme toggle ---------- */
-
-  function initTheme() {
-    var btn = document.querySelector('[data-theme-toggle]');
-    if (!btn) return;
-
-    function systemIsDark() {
-      return !window.matchMedia('(prefers-color-scheme: light)').matches;
-    }
-    function currentIsDark() {
-      var set = document.documentElement.getAttribute('data-theme');
-      if (set === 'dark') return true;
-      if (set === 'light') return false;
-      return systemIsDark();
-    }
-    function paint() {
-      var dark = currentIsDark();
-      btn.setAttribute('aria-pressed', String(!dark));
-      btn.querySelector('[data-theme-label]').textContent = dark ? 'Light' : 'Dark';
-      var use = btn.querySelector('use');
-      if (use) use.setAttribute('href', dark ? '#i-sun' : '#i-moon');
-    }
-
-    btn.hidden = false;
-    paint();
-
-    btn.addEventListener('click', function () {
-      var next = currentIsDark() ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      try { localStorage.setItem('cm-theme', next); } catch (e) { /* private mode */ }
-      paint();
-    });
-  }
 
   /* ---------- reveal on scroll ---------- */
 
@@ -213,17 +178,75 @@
     try { data = JSON.parse(source.textContent); } catch (e) { return; }
 
     var out = root.querySelector('[data-demo-out]');
-    var chips = Array.prototype.slice.call(root.querySelectorAll('.demo-chip'));
+    // Scoped to the substance chips: the timing control reuses the same class
+    // for its look, and picking those up put `undefined` in the selection and
+    // threw the moment a deep link tried to lowercase it.
+    var chips = Array.prototype.slice.call(root.querySelectorAll('.demo-chip[data-substance]'));
+    var meds = root.querySelector('[data-demo-meds]');
+    var medsOut = root.querySelector('[data-demo-meds-out]');
+    var timingButtons = Array.prototype.slice.call(root.querySelectorAll('[data-timing]'));
     var reset = root.querySelector('[data-demo-reset]');
     var shortcut = root.querySelector('[data-demo-try]');
+    var share = root.querySelector('[data-demo-share]');
+
     var picked = new Set();
+    var timing = 'sameSession';
 
     var ORDER = { critical: 3, serious: 2, caution: 1 };
+    var RANK = { lower: 0, caution: 1, high: 2 };
+    var SEROTONERGIC = ['MDMA', '3MMC', 'Cocaine', 'Psychedelics'];
+    var STIMULANTS = ['MDMA', '3MMC', 'Cocaine'];
 
-    // Mirrors SubstanceInteractionChecker.warnings(for:): a rule fires when
-    // every substance it names is selected, then severity descending, then by
-    // the rule's own identity so equal severities never swap around.
-    function matches() {
+    function countIn(list) {
+      return list.filter(function (s) { return picked.has(s); }).length;
+    }
+
+    // The same normalisation the app uses: diacritics folded, lowercased, then
+    // a plain substring test against every alias in the group.
+    function normalise(value) {
+      return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    }
+
+    function medicationMatches() {
+      var typed = normalise(meds ? meds.value : '').trim();
+      if (!typed) return [];
+      return data.medication.filter(function (group) {
+        return group.aliases.some(function (alias) {
+          return typed.indexOf(normalise(alias)) !== -1;
+        });
+      });
+    }
+
+    function hasGroup(matched, key) {
+      return matched.some(function (g) { return g.key === key; });
+    }
+
+    // Mirrors CombinationAssessment in CombinationRiskCheckerView.swift.
+    function assess(matched) {
+      var sero = countIn(SEROTONERGIC);
+      var stim = countIn(STIMULANTS);
+
+      var serotonin;
+      if (hasGroup(matched, 'maoi') && sero > 0) serotonin = 'high';
+      else if (hasGroup(matched, 'serotonergic') && sero >= 2) serotonin = 'high';
+      else if (hasGroup(matched, 'serotonergic') && sero > 0) serotonin = 'caution';
+      else serotonin = sero >= 2 ? 'high' : (sero > 0 ? 'caution' : 'lower');
+
+      var byStimulant = stim === 0 ? 'lower' : (timing === 'withinDay' ? 'caution' : 'high');
+      var byAlcohol = picked.has('Alcohol') ? 'caution' : 'lower';
+      var byBoth = picked.has('Alcohol') && stim > 0 ? 'high' : 'lower';
+      var dehydration = [byStimulant, byAlcohol, byBoth].reduce(function (a, b) {
+        return RANK[a] >= RANK[b] ? a : b;
+      });
+
+      var total = stim + (hasGroup(matched, 'stimulantMedication') ? 1 : 0);
+      var stimulant = total >= 2 ? 'high'
+        : (total === 1 ? (timing === 'sameSession' ? 'caution' : 'lower') : 'lower');
+
+      return { serotonin: serotonin, dehydration: dehydration, stimulant: stimulant };
+    }
+
+    function warnings() {
       return data.rules
         .filter(function (rule) {
           return rule.substances.every(function (s) { return picked.has(s); });
@@ -249,20 +272,79 @@
       return el;
     }
 
+    function renderAssessments(levels) {
+      var wrap = document.createElement('div');
+      wrap.className = 'assessments';
+      Object.keys(data.assessments).forEach(function (key) {
+        var spec = data.assessments[key];
+        var level = levels[key];
+        // Built node by node rather than innerHTML plus queries. An earlier
+        // version used row.querySelector('div span'), which matches any span
+        // with any div ancestor, including ancestors outside the row: it
+        // re-selected the tag and overwrote the label with the detail text.
+        var row = document.createElement('div');
+        row.className = 'assess assess--' + level;
+
+        var tag = document.createElement('span');
+        tag.className = 'assess-tag';
+        tag.textContent = data.riskLabels[level];
+
+        var title = document.createElement('b');
+        title.textContent = spec.title;
+
+        var detail = document.createElement('span');
+        detail.textContent = spec.levels[level];
+
+        var body = document.createElement('div');
+        body.appendChild(title);
+        body.appendChild(detail);
+
+        row.appendChild(tag);
+        row.appendChild(body);
+        wrap.appendChild(row);
+      });
+      return wrap;
+    }
+
     function render() {
+      var matched = medicationMatches();
+
+      if (medsOut) {
+        medsOut.textContent = '';
+        if (meds && meds.value.trim()) {
+          medsOut.textContent = matched.length
+            ? data.copy.medsHit + ': ' + matched.map(function (g) { return g.label; }).join(', ')
+            : data.copy.medsNone;
+          medsOut.className = 'meds-out' + (matched.length ? ' is-hit' : '');
+        }
+      }
+
       out.textContent = '';
-      if (picked.size < 2) {
+      // One substance is enough, the same as the app: the standing checks have
+      // something to say about a single stimulant, and a typed medication has
+      // something to say on its own.
+      if (!picked.size && !matched.length) {
         out.appendChild(card('empty', '', data.copy.empty));
         return;
       }
-      var found = matches();
-      if (!found.length) {
+
+      var found = warnings();
+      if (found.length) {
+        found.forEach(function (rule) {
+          out.appendChild(card(rule.level, data.levels[rule.level], rule.warning));
+        });
+      } else if (picked.size >= 2) {
         out.appendChild(card('none', data.copy.noneTitle, data.copy.noneBody));
-        return;
       }
-      found.forEach(function (rule) {
-        out.appendChild(card(rule.level, data.levels[rule.level], rule.warning));
-      });
+      out.appendChild(renderAssessments(assess(matched)));
+    }
+
+    function syncHash() {
+      var parts = chips
+        .filter(function (c) { return picked.has(c.dataset.substance); })
+        .map(function (c) { return c.dataset.substance.toLowerCase(); });
+      var next = parts.length ? '#try=' + parts.join('+') : ' ';
+      if (history.replaceState) history.replaceState(null, '', next);
     }
 
     function setChip(chip, on) {
@@ -271,17 +353,32 @@
       else picked.delete(chip.dataset.substance);
     }
 
+    function update() { render(); syncHash(); }
+
     chips.forEach(function (chip) {
       chip.addEventListener('click', function () {
         setChip(chip, chip.getAttribute('aria-pressed') !== 'true');
+        update();
+      });
+    });
+
+    timingButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        timing = button.dataset.timing;
+        timingButtons.forEach(function (b) {
+          b.setAttribute('aria-pressed', String(b === button));
+        });
         render();
       });
     });
 
+    if (meds) meds.addEventListener('input', render);
+
     if (reset) {
       reset.addEventListener('click', function () {
         chips.forEach(function (chip) { setChip(chip, false); });
-        render();
+        if (meds) meds.value = '';
+        update();
       });
     }
 
@@ -290,12 +387,41 @@
         chips.forEach(function (chip) {
           setChip(chip, chip.dataset.substance === 'GHB' || chip.dataset.substance === 'Alcohol');
         });
-        render();
+        update();
         out.scrollIntoView({ block: 'nearest', behavior: reduceMotion ? 'auto' : 'smooth' });
       });
     }
 
-    render();
+    // A specific warning you can send to someone is worth more than a page
+    // about warnings, so the selection lives in the URL.
+    if (share && navigator.clipboard) {
+      share.hidden = false;
+      share.addEventListener('click', function () {
+        navigator.clipboard.writeText(location.href).then(function () {
+          var note = root.querySelector('.copy-done');
+          if (!note) return;
+          note.textContent = share.dataset.copiedLabel || '';
+          setTimeout(function () { note.textContent = ''; }, 2200);
+        });
+      });
+    }
+
+    function fromHash() {
+      var match = /(?:^|[#&])try=([a-z0-9+%]+)/i.exec(location.hash);
+      if (!match) return false;
+      var wanted = decodeURIComponent(match[1]).toLowerCase().split('+');
+      chips.forEach(function (chip) {
+        setChip(chip, wanted.indexOf(chip.dataset.substance.toLowerCase()) !== -1);
+      });
+      return picked.size > 0;
+    }
+
+    if (fromHash()) {
+      render();
+      root.scrollIntoView({ block: 'start' });
+    } else {
+      render();
+    }
   }
 
   /* ---------- inert video, played only if motion is welcome ---------- */
@@ -441,7 +567,6 @@
   }
 
   function boot() {
-    initTheme();
     initReveal();
     initStagger();
     initWalk();

@@ -23,6 +23,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SWIFT = ROOT / "ChillMate" / "SubstanceInteractions.swift"
+MEDS = ROOT / "ChillMate" / "MedicationRiskData.swift"
+CHECKER = ROOT / "ChillMate" / "CombinationRiskCheckerView.swift"
 SUBSTANCE = ROOT / "ChillMate" / "Substance.swift"
 CATALOG = ROOT / "ChillMate" / "Localizable.xcstrings"
 OUT = Path(__file__).resolve().parent / "interactions.json"
@@ -99,6 +101,54 @@ def parse_rules(names: dict) -> list:
     return rules
 
 
+def medication_categories(catalog: dict) -> list:
+    """Every medication group the checker recognises, with its search terms.
+
+    Small enough to carry whole (eight groups, about sixty aliases), which is
+    what lets the website match a typed prescription the same way the app does
+    rather than approximating it.
+    """
+    text = MEDS.read_text(encoding="utf-8")
+
+    labels = {}
+    block = text[text.index("var label: String"):text.index("var aliases")]
+    for case, value in re.findall(r'case \.(\w+):\s*\n\s*String\(localized: "([^"]+)"\)', block):
+        labels[case] = value
+
+    aliases = {}
+    block = text[text.index("var aliases"):text.index("enum MedicationRiskDatabase")]
+    for case, body in re.findall(r'case \.(\w+):\s*\n\s*\[(.*?)\]', block, re.S):
+        aliases[case] = re.findall(r'"([^"]+)"', body)
+
+    return [{"key": key, "label": translations(catalog, labels[key]), "aliases": aliases.get(key, [])}
+            for key in labels if aliases.get(key)]
+
+
+def assessment_details(catalog: dict) -> dict:
+    """The three standing checks, and what the app says at each level."""
+    text = CHECKER.read_text(encoding="utf-8")
+    out = {}
+    for key, prop in [("serotonin", "serotoninDetail"),
+                      ("dehydration", "dehydrationDetail"),
+                      ("stimulant", "stimulantDetail")]:
+        block = text[text.index(f"var {prop}: String"):]
+        block = block[:block.index("\n    }")]
+        levels = {}
+        for level, value in re.findall(r'case \.(\w+):\s*\n\s*String\(localized: "((?:[^"\\]|\\.)*)"\)', block):
+            levels[level] = translations(catalog, value.encode().decode("unicode_escape"))
+        out[key] = levels
+    return out
+
+
+ASSESSMENT_TITLES = {
+    "serotonin": "Serotonin syndrome",
+    "dehydration": "Dehydration",
+    "stimulant": "Stimulant overload",
+}
+RISK_LABELS = {"lower": "No known", "caution": "Caution", "high": "Higher risk"}
+TIMINGS = [("sameSession", "Same session"), ("withinSixHours", "6 h"), ("withinDay", "24 h")]
+
+
 def main():
     for path in (SWIFT, SUBSTANCE, CATALOG):
         if not path.exists():
@@ -116,6 +166,13 @@ def main():
         "substances": PICKABLE,
         "levels": {key: translations(catalog, label)
                    for key, label in LEVEL_LABELS.items()},
+        "medication": medication_categories(catalog),
+        "assessments": {
+            key: {"title": translations(catalog, ASSESSMENT_TITLES[key]), "levels": levels}
+            for key, levels in assessment_details(catalog).items()
+        },
+        "riskLabels": {k: translations(catalog, v) for k, v in RISK_LABELS.items()},
+        "timings": [{"key": k, "label": translations(catalog, v)} for k, v in TIMINGS],
         "rules": [{"substances": r["substances"],
                    "level": r["level"],
                    "warning": translations(catalog, r["english"])}
@@ -132,6 +189,9 @@ def main():
         if all(r["warning"][l] != r["warning"]["en"] for l in ("nl", "de", "fr", "es"))
     )
     print(f"{len(payload['rules'])} rules  {by_level}")
+    print(f"{len(payload['medication'])} medication groups, "
+          f"{sum(len(m['aliases']) for m in payload['medication'])} search terms")
+    print(f"{len(payload['assessments'])} standing assessments")
     print(f"{translated} fully translated into all four other languages")
     print(f"wrote {OUT.relative_to(ROOT)}")
 

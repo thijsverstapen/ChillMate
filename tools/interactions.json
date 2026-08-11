@@ -37,6 +37,329 @@
    "es": "Combinación de alto riesgo"
   }
  },
+ "medication": [
+  {
+   "key": "serotonergic",
+   "label": {
+    "en": "Affects serotonin",
+    "nl": "Beïnvloedt serotonine",
+    "de": "Beeinflusst Serotonin",
+    "fr": "Affecte la sérotonine",
+    "es": "Afecta a la serotonina"
+   },
+   "aliases": [
+    "ssri",
+    "snri",
+    "tramadol",
+    "lithium",
+    "linezolid",
+    "mirtazapine",
+    "venlafaxine",
+    "fluoxetine",
+    "sertraline",
+    "citalopram",
+    "escitalopram",
+    "paroxetine",
+    "duloxetine",
+    "vortioxetine",
+    "dextromethorphan",
+    "sumatriptan",
+    "triptan",
+    "st johns wort"
+   ]
+  },
+  {
+   "key": "maoi",
+   "label": {
+    "en": "MAOI",
+    "nl": "MAOI",
+    "de": "MAO-Hemmer",
+    "fr": "IMAO",
+    "es": "IMAO"
+   },
+   "aliases": [
+    "maoi",
+    "phenelzine",
+    "tranylcypromine",
+    "moclobemide",
+    "selegiline"
+   ]
+  },
+  {
+   "key": "sedative",
+   "label": {
+    "en": "Sedative",
+    "nl": "Kalmerend middel",
+    "de": "Beruhigungsmittel",
+    "fr": "Sédatif",
+    "es": "Sedante"
+   },
+   "aliases": [
+    "benzodiazepine",
+    "benzo",
+    "diazepam",
+    "alprazolam",
+    "lorazepam",
+    "oxazepam",
+    "temazepam",
+    "zolpidem",
+    "zopiclone",
+    "pregabalin",
+    "gabapentin",
+    "baclofen",
+    "quetiapine"
+   ]
+  },
+  {
+   "key": "opioid",
+   "label": {
+    "en": "Opioid",
+    "nl": "Opioïde",
+    "de": "Opioid",
+    "fr": "Opioïde",
+    "es": "Opioide"
+   },
+   "aliases": [
+    "opioid",
+    "opiate",
+    "oxycodone",
+    "morphine",
+    "fentanyl",
+    "codeine",
+    "methadone",
+    "buprenorphine",
+    "tramadol"
+   ]
+  },
+  {
+   "key": "nitrateLike",
+   "label": {
+    "en": "Nitrate-like",
+    "nl": "Nitraatachtig",
+    "de": "Nitrat-artig",
+    "fr": "Type nitrate",
+    "es": "Tipo nitrato"
+   },
+   "aliases": [
+    "nitrate",
+    "nitroglycerin",
+    "glyceryl trinitrate",
+    "isosorbide",
+    "mononitrate",
+    "dinitrate",
+    "nicorandil",
+    "riociguat"
+   ]
+  },
+  {
+   "key": "alphaBlocker",
+   "label": {
+    "en": "Alpha blocker",
+    "nl": "Alfablokker",
+    "de": "Alphablocker",
+    "fr": "Alphabloquant",
+    "es": "Alfabloqueante"
+   },
+   "aliases": [
+    "alpha blocker",
+    "tamsulosin",
+    "doxazosin",
+    "alfuzosin",
+    "prazosin",
+    "terazosin"
+   ]
+  },
+  {
+   "key": "stimulantMedication",
+   "label": {
+    "en": "Stimulant medication",
+    "nl": "Stimulantmedicatie",
+    "de": "Stimulanzien-Medikament",
+    "fr": "Médicament stimulant",
+    "es": "Medicación estimulante"
+   },
+   "aliases": [
+    "methylphenidate",
+    "ritalin",
+    "concerta",
+    "dexamfetamine",
+    "dexamphetamine",
+    "lisdexamfetamine",
+    "vyvanse",
+    "elvanse",
+    "adderall",
+    "modafinil",
+    "bupropion"
+   ]
+  },
+  {
+   "key": "ritonavirBooster",
+   "label": {
+    "en": "Ritonavir/cobicistat",
+    "nl": "Ritonavir/cobicistat",
+    "de": "Ritonavir/Cobicistat",
+    "fr": "Ritonavir/cobicistat",
+    "es": "Ritonavir/cobicistat"
+   },
+   "aliases": [
+    "ritonavir",
+    "cobicistat"
+   ]
+  }
+ ],
+ "assessments": {
+  "serotonin": {
+   "title": {
+    "en": "Serotonin syndrome",
+    "nl": "Serotoninesyndroom",
+    "de": "Serotoninsyndrom",
+    "fr": "Syndrome sérotoninergique",
+    "es": "Síndrome serotoninérgico"
+   },
+   "levels": {
+    "high": {
+     "en": "You've selected a medication or substance mix that can affect serotonin, a brain chemical involved in mood and body function. Signs to watch for: confusion, fever, agitation, shaking, sweating, or diarrhea. Get help if these appear.",
+     "nl": "Je hebt een medicatie- of middelencombinatie geselecteerd die serotonine kan beïnvloeden, een stof in de hersenen die betrokken is bij stemming en lichaamsfunctie. Let op: verwardheid, koorts, onrust, trillen, zweten of diarree. Zoek hulp als deze optreden.",
+     "de": "Du hast eine Medikamenten- oder Substanzmischung gewählt, die Serotonin beeinflussen kann, einen Botenstoff im Gehirn, der an Stimmung und Körperfunktion beteiligt ist. Anzeichen, auf die du achten solltest: Verwirrtheit, Fieber, Unruhe, Zittern, Schwitzen oder Durchfall. Hol Hilfe, wenn diese auftreten.",
+     "fr": "Tu as sélectionné un mélange de médicaments ou de substances qui peut affecter la sérotonine, une substance chimique du cerveau impliquée dans l'humeur et le fonctionnement du corps. Signes à surveiller : confusion, fièvre, agitation, tremblements, transpiration ou diarrhée. Demande de l'aide si ces signes apparaissent.",
+     "es": "Has seleccionado una mezcla de medicación o sustancias que puede afectar a la serotonina, una sustancia química del cerebro implicada en el estado de ánimo y el funcionamiento del cuerpo. Señales a vigilar: confusión, fiebre, agitación, temblores, sudoración o diarrea. Busca ayuda si aparecen."
+    },
+    "caution": {
+     "en": "One of your selections can affect serotonin levels. Risk can increase with repeated use, heat, dehydration, or other medication.",
+     "nl": "Een van je keuzes kan de serotoninespiegel beïnvloeden. Het risico kan toenemen bij herhaald gebruik, hitte, uitdroging of andere medicatie.",
+     "de": "Eine deiner Auswahlen kann den Serotoninspiegel beeinflussen. Das Risiko kann bei wiederholtem Konsum, Hitze, Dehydrierung oder anderen Medikamenten steigen.",
+     "fr": "L'une de tes sélections peut affecter les niveaux de sérotonine. Le risque peut augmenter avec un usage répété, la chaleur, la déshydratation ou d'autres médicaments.",
+     "es": "Una de tus selecciones puede afectar a los niveles de serotonina. El riesgo puede aumentar con el uso repetido, el calor, la deshidratación u otra medicación."
+    },
+    "lower": {
+     "en": "No known serotonin-related combination is selected.",
+     "nl": "Er is geen bekende serotonine-gerelateerde combinatie geselecteerd.",
+     "de": "Es ist keine bekannte serotoninbezogene Kombination ausgewählt.",
+     "fr": "Aucune combinaison connue liée à la sérotonine n'est sélectionnée.",
+     "es": "No hay seleccionada ninguna combinación conocida relacionada con la serotonina."
+    }
+   }
+  },
+  "dehydration": {
+   "title": {
+    "en": "Dehydration",
+    "nl": "Uitdroging",
+    "de": "Dehydrierung",
+    "fr": "Déshydratation",
+    "es": "Deshidratación"
+   },
+   "levels": {
+    "high": {
+     "en": "Stimulants, alcohol, heat, dancing, and long sessions can push dehydration and overheating risk up.",
+     "nl": "Stimulanten, alcohol, hitte, dansen en lange sessies kunnen het risico op uitdroging en oververhitting verhogen.",
+     "de": "Stimulanzien, Alkohol, Hitze, Tanzen und lange Sessions können das Risiko für Dehydrierung und Überhitzung erhöhen.",
+     "fr": "Les stimulants, l'alcool, la chaleur, la danse et les longues sessions peuvent augmenter le risque de déshydratation et de surchauffe.",
+     "es": "Los estimulantes, el alcohol, el calor, bailar y las sesiones largas pueden aumentar el riesgo de deshidratación y sobrecalentamiento."
+    },
+    "caution": {
+     "en": "Hydration and cooling matter, especially if sleep, food, or breaks have been limited.",
+     "nl": "Hydratatie en afkoeling zijn belangrijk, zeker als slaap, eten of pauzes beperkt waren.",
+     "de": "Flüssigkeit und Abkühlen sind wichtig, besonders wenn Schlaf, Essen oder Pausen knapp waren.",
+     "fr": "L'hydratation et le rafraîchissement comptent, surtout si le sommeil, la nourriture ou les pauses ont été limités.",
+     "es": "La hidratación y refrescarse importan, especialmente si el sueño, la comida o los descansos han sido limitados."
+    },
+    "lower": {
+     "en": "No strong dehydration pattern is selected, but check water, food, temperature, and rest.",
+     "nl": "Er is geen sterk uitdrogingspatroon geselecteerd, maar let op water, eten, temperatuur en rust.",
+     "de": "Es ist kein starkes Dehydrierungsmuster ausgewählt, aber achte auf Wasser, Essen, Temperatur und Ruhe.",
+     "fr": "Aucun schéma marqué de déshydratation n'est sélectionné, mais vérifie l'eau, la nourriture, la température et le repos.",
+     "es": "No hay seleccionado un patrón claro de deshidratación, pero revisa agua, comida, temperatura y descanso."
+    }
+   }
+  },
+  "stimulant": {
+   "title": {
+    "en": "Stimulant overload",
+    "nl": "Stimulant-overbelasting",
+    "de": "Stimulanzien-Überlastung",
+    "fr": "Surcharge de stimulants",
+    "es": "Sobrecarga de estimulantes"
+   },
+   "levels": {
+    "high": {
+     "en": "More than one stimulant pattern is selected, including possible prescribed stimulant medication. Heart rate, anxiety, jaw tension, overheating, and pressure to continue can stack.",
+     "nl": "Er is meer dan één stimulantpatroon geselecteerd, mogelijk inclusief voorgeschreven stimulantmedicatie. Hartslag, angst, kaakspanning, oververhitting en druk om door te gaan kunnen zich opstapelen.",
+     "de": "Es ist mehr als ein Stimulanzienmuster ausgewählt, möglicherweise einschließlich verschriebener Stimulanzien. Herzschlag, Angst, Kieferanspannung, Überhitzung und Druck weiterzumachen können sich summieren.",
+     "fr": "Plus d'un schéma stimulant est sélectionné, y compris un possible médicament stimulant prescrit. La fréquence cardiaque, l'anxiété, la tension de la mâchoire, la surchauffe et la pression pour continuer peuvent se cumuler.",
+     "es": "Hay seleccionado más de un patrón estimulante, incluida posible medicación estimulante recetada. La frecuencia cardíaca, la ansiedad, la tensión mandibular, el sobrecalentamiento y la presión para continuar pueden acumularse."
+    },
+    "caution": {
+     "en": "A stimulant is selected in the current timing window. Pause, rest, and give your body time.",
+     "nl": "Er is een stimulant geselecteerd in het huidige tijdvenster. Pauzeer, rust en geef je lichaam tijd.",
+     "de": "Im aktuellen Zeitfenster ist ein Stimulans ausgewählt. Pausiere, ruh dich aus und gib deinem Körper Zeit.",
+     "fr": "Un stimulant est sélectionné dans la fenêtre de temps actuelle. Fais une pause, repose-toi et laisse du temps à ton corps.",
+     "es": "Hay un estimulante seleccionado en la ventana de tiempo actual. Haz una pausa, descansa y dale tiempo a tu cuerpo."
+    },
+    "lower": {
+     "en": "No obvious stimulant stacking is selected.",
+     "nl": "Er is geen duidelijke stimulantstapeling geselecteerd.",
+     "de": "Es ist kein offensichtliches Stapeln von Stimulanzien ausgewählt.",
+     "fr": "Aucun cumul évident de stimulants n'est sélectionné.",
+     "es": "No hay seleccionada una acumulación evidente de estimulantes."
+    }
+   }
+  }
+ },
+ "riskLabels": {
+  "lower": {
+   "en": "No known",
+   "nl": "Niet bekend",
+   "de": "Keine bekannt",
+   "fr": "Aucune connue",
+   "es": "Ninguna conocida"
+  },
+  "caution": {
+   "en": "Caution",
+   "nl": "Let op",
+   "de": "Vorsicht",
+   "fr": "Prudence",
+   "es": "Precaución"
+  },
+  "high": {
+   "en": "Higher risk",
+   "nl": "Higher risk",
+   "de": "Higher risk",
+   "fr": "Higher risk",
+   "es": "Higher risk"
+  }
+ },
+ "timings": [
+  {
+   "key": "sameSession",
+   "label": {
+    "en": "Same session",
+    "nl": "Zelfde sessie",
+    "de": "Gleiche Session",
+    "fr": "Même session",
+    "es": "Misma sesión"
+   }
+  },
+  {
+   "key": "withinSixHours",
+   "label": {
+    "en": "6 h",
+    "nl": "6 u",
+    "de": "6 h",
+    "fr": "6 h",
+    "es": "6 h"
+   }
+  },
+  {
+   "key": "withinDay",
+   "label": {
+    "en": "24 h",
+    "nl": "24 u",
+    "de": "24 h",
+    "fr": "24 h",
+    "es": "24 h"
+   }
+  }
+ ],
  "rules": [
   {
    "substances": [

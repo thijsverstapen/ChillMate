@@ -191,13 +191,6 @@ SPRITE = f"""<svg width="0" height="0" style="position:absolute" aria-hidden="tr
     <circle cx="12" cy="12" r="8.5"/><path d="M3.6 12h16.8"/>
     <path d="M12 3.5c2.3 2.4 3.5 5.4 3.5 8.5S14.3 18.1 12 20.5c-2.3-2.4-3.5-5.4-3.5-8.5S9.7 5.9 12 3.5z"/>
   </symbol>
-  <symbol id="i-sun" viewBox="0 0 24 24" {_STROKE}>
-    <circle cx="12" cy="12" r="4"/>
-    <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"/>
-  </symbol>
-  <symbol id="i-moon" viewBox="0 0 24 24" {_STROKE}>
-    <path d="M20 13.5A8 8 0 1110.5 4a6.5 6.5 0 009.5 9.5z"/>
-  </symbol>
   <symbol id="i-code" viewBox="0 0 24 24" {_STROKE}>
     <path d="M8.5 8L4.5 12l4 4"/><path d="M15.5 8l4 4-4 4"/><path d="M13.4 5.5l-2.8 13"/>
   </symbol>
@@ -231,14 +224,11 @@ SPRITE = f"""<svg width="0" height="0" style="position:absolute" aria-hidden="tr
 # page chrome
 # --------------------------------------------------------------------------
 
-# Runs before first paint, for two reasons. The theme, so a reader who chose
-# light does not get a dark flash first. And the `js` class, which is what
+# Runs before first paint. It exists only to add the `js` class, which is what
 # lets the stylesheet hide anything at all: scroll-reveal starts at opacity 0,
 # and if this script never runs then neither does the one that reveals it, so
 # the CSS must not hide it in the first place.
-THEME_BOOT = ("<script>document.documentElement.classList.add('js');"
-              "try{var t=localStorage.getItem('cm-theme');"
-              "if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>")
+JS_BOOT = "<script>document.documentElement.classList.add('js')</script>"
 
 
 def page_urls(key: str) -> dict:
@@ -258,12 +248,30 @@ def page_urls(key: str) -> dict:
     return {}
 
 
+CRITICAL_CSS = """
+:root{--bg-0:#0b1022;--bg-1:#0e1430;--bg-2:#131a2e;--text:#eef1f8;
+--text-soft:#bcc5dc;--text-dim:#8a93ad;--primary:#7c8cff;--mint:#6fe3b4;
+--glow-a:rgba(124,140,255,.2);--glow-b:rgba(111,227,180,.13)}
+*{box-sizing:border-box}
+body{margin:0;color:var(--text);background:linear-gradient(180deg,#0e1430,#131a2e 55%,#0b1022);
+font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,sans-serif;
+line-height:1.62;-webkit-font-smoothing:antialiased;overflow-x:hidden;min-height:100vh}
+.site-head{display:flex;align-items:center;justify-content:space-between;gap:16px;
+flex-wrap:wrap;max-width:1080px;margin-inline:auto;padding:18px 20px 0}
+.chapter{padding:clamp(84px,11vw,168px) 20px}
+.chapter>.inner{max-width:1080px;margin:0 auto}
+h1{font-size:clamp(2.7rem,6.6vw,5.4rem);line-height:1;letter-spacing:-.035em;
+font-weight:800;max-width:19ch;margin:0}
+"""
+
+
 def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=""):
     a = rel(depth) + "assets/"
     # A share card in a language the reader does not speak is the one part of
     # the site most people ever see, so each language gets its own.
     og = "og.png" if lang == "en" else f"og-{lang}.png"
-    css = (ASSETS / "style.css").read_text(encoding="utf-8")
+    preload = (f'  <link rel="preload" as="image" href="{a}shots/home.jpg" fetchpriority="high" />'
+               if key == "home" else "")
     urls = page_urls(key)
 
     alts = ""
@@ -281,11 +289,12 @@ def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{e(title)}</title>
   <meta name="description" content="{e(desc)}" />
-  <meta name="theme-color" content="#0e1430" media="(prefers-color-scheme: dark)" />
-  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e1430" />
+  <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="{SITE_ORIGIN}{canonical}" />{alts}
   <link rel="icon" href="{a}mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="{a}icon-180.png" />
+{preload}
   <link rel="manifest" href="{BASE_PATH}manifest.webmanifest" />
   <link rel="alternate" type="application/atom+xml" title="ChillMate releases" href="{BASE_PATH}changelog/feed.xml" />
 
@@ -303,8 +312,9 @@ def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=
   <meta name="twitter:title" content="{e(title)}" />
   <meta name="twitter:description" content="{e(desc)}" />
   <meta name="twitter:image" content="{BASE_URL}assets/{og}" />
-{THEME_BOOT}
-  <style>{css}</style>{extra_head}
+{JS_BOOT}
+  <style>{CRITICAL_CSS}</style>
+  <link rel="stylesheet" href="{a}style.css" />{extra_head}
 </head>
 <body{f' class="{body_class}"' if body_class else ""}>
 {SPRITE}
@@ -363,11 +373,6 @@ def header(lang, depth, current, key=""):
         <div class="lang-menu" role="group" aria-label="{e(s["lang_label"])}">
 {menu}        </div>
       </details>
-      <button type="button" class="chip-btn" data-theme-toggle hidden
-              aria-pressed="false" title="{e(s["theme_hint"])}">
-        <svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg>
-        <span data-theme-label>{e(s["theme_light"])}</span>
-      </button>
     </div>
   </header>
 """
@@ -395,6 +400,16 @@ def footer(lang, depth):
 """
 
 
+def sources(src, depth):
+    """srcset for a screenshot, using the half-width variant where one exists."""
+    r = rel(depth)
+    half = ASSETS / "shots" / src.replace(".", "@half.")
+    if not half.exists():
+        return ""
+    return (f' srcset="{r}assets/shots/{half.name} 320w, {r}assets/shots/{src} 640w"'
+            f' sizes="(max-width: 620px) 78vw, 400px"')
+
+
 def phone(src, alt, depth, lazy=True, priority=False):
     r = rel(depth)
     w, h = image_size(ASSETS / "shots" / src)
@@ -404,7 +419,7 @@ def phone(src, alt, depth, lazy=True, priority=False):
     return f"""<div class="phone">
         <div class="phone-shell">
           <div class="phone-screen">
-            <img src="{r}assets/shots/{src}" width="{w}" height="{h}" alt="{e(alt)}"{loading} />
+            <img src="{r}assets/shots/{src}"{sources(src, depth)} width="{w}" height="{h}" alt="{e(alt)}"{loading} />
             <span class="phone-island"></span>
           </div>
         </div>
@@ -424,7 +439,9 @@ def watch(depth):
     return f"""<div class="watch">
         <div class="watch-shell">
           <div class="watch-screen">
-            <img src="{r}assets/shots/watch.png" width="{w}" height="{h}"
+            <img src="{r}assets/shots/watch.png"
+                 srcset="{r}assets/shots/watch@half.png 208w, {r}assets/shots/watch.png 416w"
+                 sizes="(max-width: 620px) 46vw, 190px" width="{w}" height="{h}"
                  alt="The watch app's Safety screen, offering an emergency call and a way to ping your phone."
                  loading="lazy" decoding="async" />
           </div>
@@ -546,14 +563,22 @@ def demo_payload(lang):
     s = C.STRINGS[lang]
     return {
         "levels": {key: value[lang] for key, value in raw["levels"].items()},
+        "riskLabels": {key: value[lang] for key, value in raw["riskLabels"].items()},
+        "medication": [{"key": m["key"], "label": m["label"][lang], "aliases": m["aliases"]}
+                       for m in raw["medication"]],
+        "assessments": {key: {"title": spec["title"][lang],
+                              "levels": {lv: text[lang] for lv, text in spec["levels"].items()}}
+                        for key, spec in raw["assessments"].items()},
         "copy": {
             "empty": s["demo_empty"],
             "noneTitle": s["demo_none_title"],
             "noneBody": s["demo_none_body"],
+            "medsHit": s["demo_meds_hit"],
+            "medsNone": s["demo_meds_none"],
         },
         "rules": [{"substances": r["substances"], "level": r["level"],
                    "warning": r["warning"][lang]} for r in raw["rules"]],
-    }, raw["substances"]
+    }, raw["substances"], raw["timings"]
 
 
 def build_home(lang):
@@ -640,7 +665,7 @@ def build_home(lang):
           </div>
 """
         fw, fh = image_size(ASSETS / "shots" / SHOTS[i])
-        frames += (f'              <img src="{r}assets/shots/{SHOTS[i]}" width="{fw}" height="{fh}" '
+        frames += (f'              <img src="{r}assets/shots/{SHOTS[i]}"{sources(SHOTS[i], depth)} width="{fw}" height="{fh}" '
                    f'alt="{e(title)}" loading="lazy" decoding="async" />\n')
 
     out += chapter(f"""      <p class="eyebrow">{e(s["walk_eyebrow"])}</p>
@@ -662,11 +687,16 @@ def build_home(lang):
 """, ident="inside", invert=True, extra="walk-scroll")
 
     # ---- 5. the playable risk checker
-    payload, substances = demo_payload(lang)
+    payload, substances, timings = demo_payload(lang)
     chips = "".join(
         f'            <button type="button" class="demo-chip" data-substance="{e(name)}" '
         f'aria-pressed="false">{e(name)}</button>\n'
         for name in substances
+    )
+    timing_buttons = "".join(
+        f'            <button type="button" class="demo-chip" data-timing="{t["key"]}" '
+        f'aria-pressed="{"true" if i == 0 else "false"}">{e(t["label"][lang])}</button>\n'
+        for i, t in enumerate(timings)
     )
     out += chapter(f"""      <p class="eyebrow">{e(s["demo_eyebrow"])}</p>
       <h2>{e(no_orphan(s["demo_h2"]))}</h2>
@@ -677,9 +707,24 @@ def build_home(lang):
           <p class="eyebrow">{e(s["demo_pick"])}</p>
           <div class="demo-picker">
 {chips}          </div>
+
+          <p class="eyebrow" style="margin-top:26px">{e(s["demo_meds_label"])}</p>
+          <input class="demo-input" type="text" data-demo-meds autocomplete="off"
+                 spellcheck="false" placeholder="{e(s["demo_meds_ph"])}"
+                 aria-label="{e(s["demo_meds_label"])}" />
+          <p class="meds-out" data-demo-meds-out></p>
+
+          <p class="eyebrow" style="margin-top:22px">{e(s["demo_timing_label"])}</p>
+          <div class="demo-picker" role="group" aria-label="{e(s["demo_timing_label"])}">
+{timing_buttons}          </div>
+
           <div class="demo-actions">
             <button type="button" class="btn btn-ghost" data-demo-try>{icon("flask")}{e(s["demo_try"])}</button>
-            <button type="button" class="chip-btn" data-demo-reset>{e(s["demo_reset"])}</button>
+            <button type="button" class="chip-btn" data-demo-reset aria-label="{e(s["demo_reset"])}">{e(s["demo_reset"])}</button>
+            <button type="button" class="chip-btn" data-demo-share hidden
+                    data-copied-label="{e(s["demo_shared"])}">{icon("doc")}{e(s["demo_share"])}</button>
+            <button type="button" class="chip-btn" onclick="window.print()" aria-label="{e(s["demo_print"])}">{icon("print")}{e(s["demo_print"])}</button>
+            <span class="copy-done"></span>
           </div>
         </div>
         <div>
@@ -855,7 +900,7 @@ def build_support(lang):
         <label for="country">{e(s["support_country_label"])}</label>
         <select id="country">
 {options}        </select>
-        <button type="button" class="chip-btn" onclick="window.print()">{icon("print")}{e(s["support_print"])}</button>
+        <button type="button" class="chip-btn" onclick="window.print()" aria-label="{e(s["support_print"])}">{icon("print")}{e(s["support_print"])}</button>
       </div>
 
 {panels}    </div>
@@ -1166,14 +1211,31 @@ def build_howto(lang):
     the depth, given a page where it is the point rather than the padding.
     """
     s = C.STRINGS[lang]
+    notes = Footnotes()
+    fn = notes.cite
     depth = 1 if lang == "en" else 2
     r = rel(depth)
     canonical = page_urls("howto")[lang]
     home = r if lang == "en" else ("../" * (depth - 1) if depth > 1 else "./")
 
     out = head(lang, s["howto_title"], s["howto_desc"], canonical, depth, "howto",
-               body_class="exhibition")
+               body_class="exhibition no-hero")
     out += header(lang, depth, "howto", "howto")
+
+    links = "".join(
+        f'        <a href="#{ident}">{e(label)}</a>\n'
+        for ident, label in [("night", s["night_eyebrow"]), ("refuse", s["refuse_eyebrow"]),
+                             ("foryou", s["foryou_eyebrow"]), ("features", s["features_eyebrow"]),
+                             ("watch", "Apple Watch")]
+    )
+    out += f"""
+  <nav class="subnav" data-subnav aria-label="{e(s["howto_h1"])}">
+    <div class="inner">
+      <span class="title">{e(s["howto_h1"])}</span>
+{links}      <a class="btn btn-primary" href="{home}">{e(s["howto_back"])}</a>
+    </div>
+  </nav>
+"""
 
     # ---- the shape of a night
     beats = ""
@@ -1203,6 +1265,7 @@ def build_howto(lang):
       <p>{e(s["refuse_p"])}</p>
       <ul class="refusals stagger">
 {refusals}      </ul>
+      <p class="meta">{e(s["footnotes_intro"])}{fn("network")}{fn("cloudkit")}</p>
 """, ident="refuse", invert=True)
 
     # ---- is this for you
@@ -1235,7 +1298,7 @@ def build_howto(lang):
           <div>
             <p class="eyebrow">Apple Watch</p>
             <h2>{e(no_orphan(s["watch_h3"]))}</h2>
-            <p>{e(s["watch_p"])}</p>
+            <p>{e(s["watch_p"])}{fn("switcher")}</p>
             <blockquote class="quote">
               <p>{e(s["watch_quote"])}</p>
               <cite>{e(s["watch_quote_note"])}</cite>
@@ -1249,6 +1312,12 @@ def build_howto(lang):
 
       <div class="cta-row" style="margin-top:clamp(40px,5vw,72px)">
         <a class="btn btn-ghost" href="{home}">{icon("chev")}{e(s["howto_back"])}</a>
+      </div>
+
+      <div class="footnotes" style="margin-top:clamp(40px,5vw,72px)">
+        <p class="eyebrow">{e(s["footnotes_title"])}</p>
+        <ol>
+{notes.render(s)}        </ol>
       </div>
 """, ident="watch")
 
@@ -1298,7 +1367,7 @@ def build_about():
     title = "ChillMate · About"
     desc = "Why ChillMate exists, who makes it, and the rules it is built to."
 
-    out = head(lang, title, desc, canonical, depth)
+    out = head(lang, title, desc, canonical, depth, body_class="exhibition")
     out += header(lang, depth, "about")
     out += f"""
   <h1>Why this&nbsp;exists</h1>
@@ -1564,6 +1633,35 @@ def build_security():
   </div>
 
   <div class="card">
+    <h2 id="compelled">{icon("hand", style="color:var(--amber)")}If I were compelled to hand something&nbsp;over
+      <a class="anchor" href="#compelled" aria-label="Link to this section">#</a></h2>
+    <p>Almost nobody puts this in writing, so here it is. If a court, a police force or any other authority ordered me to produce a user's data, <strong>I would have nothing to produce.</strong> Not because I would refuse, but because there is no copy: no server, no account, no database, no logs tying a person to anything.</p>
+    <p>What I could be compelled to do is change the app so that future versions collect something. That would be a public commit in a public repository, it would go through App Review with a privacy label that changed from nothing to something, and it could not be done retroactively to data that was never taken. If you ever see that commit and no explanation next to it, something has gone wrong and you should stop trusting this page.</p>
+    <p>I have received no such order. If that sentence ever disappears from this page, draw your own conclusion.</p>
+  </div>
+
+  <div class="card">
+    <h2 id="audit">{icon("check", style="color:var(--mint)")}An open invitation to audit&nbsp;it
+      <a class="anchor" href="#audit" aria-label="Link to this section">#</a></h2>
+    <p>I would rather be told I am wrong than be believed by default. If you work in security, harm reduction, or digital rights and want to look properly, the scope that would be most useful:</p>
+    <ul>
+      <li>Whether the app really makes no network calls, on device, under instrumentation rather than by reading the source.</li>
+      <li>The PIN derivation and Keychain handling, and whether the legacy migration path leaks anything.</li>
+      <li>The encrypted backup format, and whether a backup file discloses anything without the key.</li>
+      <li>What the widgets, complications and Live Activity expose on a locked screen.</li>
+      <li>Whether discreet notification wording ever leaks a category it should not.</li>
+    </ul>
+    <p>Email <a href="mailto:{EMAIL}">{EMAIL}</a>. I cannot pay, I can give you a build, answer questions quickly, and publish what you find whether or not it is flattering.</p>
+  </div>
+
+  <div class="card">
+    <h2 id="analytics">{icon("chart", style="color:var(--primary)")}How I know whether this site&nbsp;works
+      <a class="anchor" href="#analytics" aria-label="Link to this section">#</a></h2>
+    <p>I do not, mostly, and that is a deliberate trade. This site runs no analytics, sets no cookies, and loads nothing from a third party, so there is no dashboard telling me which chapter people stop reading.</p>
+    <p>What exists is whatever GitHub records when it serves the files, which I do not control and do not process. It is a real cost: I am designing partly in the dark. It is still the right trade for a site whose readers may not want a record of having visited a page about chemsex safety.</p>
+  </div>
+
+  <div class="card">
     <h2 id="scope">{icon("info", style="color:var(--purple)")}Out of&nbsp;scope</h2>
     <ul>
       <li>Issues in iOS, iCloud, or Apple's frameworks. Report those to Apple.</li>
@@ -1580,7 +1678,6 @@ def build_security():
 def build_404():
     lang = "en"
     a = BASE_PATH + "assets/"
-    css = (ASSETS / "style.css").read_text(encoding="utf-8")
     return f"""<!DOCTYPE html>
 <html lang="en" data-sw-scope="{BASE_PATH}">
 <head>
@@ -1589,12 +1686,12 @@ def build_404():
   <title>ChillMate · Page not found</title>
   <meta name="description" content="That page is not here. The things people usually want are." />
   <meta name="robots" content="noindex" />
-  <meta name="theme-color" content="#0e1430" media="(prefers-color-scheme: dark)" />
-  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0e1430" />
   <link rel="icon" href="{a}mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="{a}icon-180.png" />
-{THEME_BOOT}
-  <style>{css}</style>
+{JS_BOOT}
+  <style>{CRITICAL_CSS}</style>
+  <link rel="stylesheet" href="{a}style.css" />
 </head>
 <body>
 {SPRITE}
