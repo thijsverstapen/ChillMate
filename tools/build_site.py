@@ -70,6 +70,18 @@ def no_orphan(text: str) -> str:
     return parts[0] + " " + parts[1]
 
 
+def t(text: str) -> str:
+    """Escaped body text, with the last two words bound together.
+
+    The same rule as `no_orphan`, applied to running prose rather than only to
+    headings. A paragraph whose final line carries one word is the same
+    typographic fault as a heading that does; it is simply harder to notice,
+    which is how "I never see a single thing you put into\u00a0it." sat on the
+    front page through four rewrites with "it." alone on the last line.
+    """
+    return e(no_orphan(text))
+
+
 def slug(text: str) -> str:
     value = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
     return value or "section"
@@ -529,6 +541,7 @@ class Footnotes:
 
     def __init__(self):
         self.used = []
+        self.counts = {}
 
     def cite(self, key):
         if key not in FOOTNOTE_KEYS:
@@ -536,7 +549,14 @@ class Footnotes:
         if key not in self.used:
             self.used.append(key)
         number = self.used.index(key) + 1
-        return (f'<sup class="fn"><a href="#fn-{number}" id="fnref-{number}" '
+        # A claim can be cited from more than one chapter, and four of them are:
+        # "no networking" is footnoted from the statement, the proof and the
+        # spec table. Each marker therefore needs an id of its own. Emitting
+        # `fnref-1` three times is invalid HTML, and it silently breaks the
+        # return arrow, which lands on whichever copy the browser met first
+        # rather than the one the reader actually left.
+        seen = self.counts[key] = self.counts.get(key, 0) + 1
+        return (f'<sup class="fn"><a href="#fn-{number}" id="fnref-{number}-{seen}" '
                 f'aria-label="Footnote {number}">{number}</a></sup>')
 
     def render(self, strings):
@@ -544,9 +564,19 @@ class Footnotes:
         for number, key in enumerate(self.used, start=1):
             index = FOOTNOTE_KEYS.index(key)
             _, url, label = FOOTNOTES[index]
+            total = self.counts.get(key, 1)
+            # One arrow per place the note is cited, numbered when there is more
+            # than one, so a reader who followed the third marker can get back
+            # to the third marker.
+            back = " ".join(
+                f'<a href="#fnref-{number}-{seen}" '
+                f'aria-label="Back to text{f" {seen}" if total > 1 else ""}">'
+                f'&#8617;{seen if total > 1 else ""}</a>'
+                for seen in range(1, total + 1)
+            )
             rows += (f'          <li id="fn-{number}"><div>{e(strings["footnotes"][index])} '
                      f'<a href="{url}"><code>{e(label)}</code></a> '
-                     f'<a href="#fnref-{number}" aria-label="Back to text">&#8617;</a></div></li>\n')
+                     f'{back}</div></li>\n')
         return rows
 
 
@@ -583,8 +613,6 @@ def demo_payload(lang):
 
 def build_home(lang):
     s = C.STRINGS[lang]
-    notes = Footnotes()
-    fn = notes.cite
     depth = 0 if lang == "en" else 1
     r = rel(depth)
     canonical = page_urls("home")[lang]
@@ -613,14 +641,13 @@ def build_home(lang):
     out += chapter(f"""      <h1>{e(no_orphan(s["h1"]))}</h1>
       <div class="hero-cols">
         <div>
-          <p class="lede">{e(s["lede"])}</p>
+          <p class="lede">{t(s["lede"])}</p>
           <div class="cta-row">
             <a class="btn btn-primary" href="{notify}">{icon("mail")}{e(s["cta_notify"])}</a>
             <a class="btn btn-ghost" href="#inside">{icon("phone")}{e(s["cta_see"])}</a>
           </div>
-          <p class="human">{e(s["human"])}</p>
-          <p class="status-note">{icon("info")}{e(s["status_note"])}</p>
-          <a class="scroll-cue" href="#statement">{e(s["scroll_cue"])}{icon("chev")}</a>
+          <p class="status-note">{icon("info")}{t(s["status_note"])}</p>
+          <a class="scroll-cue" href="#who">{e(s["scroll_cue"])}{icon("chev")}</a>
         </div>
         <div class="hero-phone-big">
           {phone(SHOTS[0], s["walk"][0][1], depth, lazy=False, priority=True)}
@@ -628,40 +655,44 @@ def build_home(lang):
       </div>
 """, extra="hero-full")
 
-    # ---- 2. the statement
-    tiles = "".join(
-        f'        <div><b>{e(number)}</b><span>{e(label)}</span></div>\n'
-        for number, label in s["statement"]
-    )
-    out += chapter(f"""      <div class="statement-grid stagger">
-{tiles}      </div>
-      <p>{e(s["statement_note"])}{fn("network")}</p>
-""", ident="statement", invert=True, extra="statement")
+    # The second chapter used to be three enormous zeros: 0 servers, 0 accounts,
+    # 0 trackers. It was the first thing after the hero, and it sold the wrong
+    # thing to the wrong person. A reader deciding whether this app is for them
+    # does not open with a question about server architecture, and three noughts
+    # answer a question they have not asked yet. The same facts still appear, in
+    # the privacy chapter, where the reader has arrived wanting them and where
+    # they read as reassurance rather than as a boast.
 
-    # ---- 3. who it is for
+    # ---- 2. who it is for
     points = "".join(
-        f'          <li>{icon("check")}<span>{e(point)}</span></li>\n'
+        f'            <li>{icon("check")}<span>{t(point)}</span></li>\n'
         for point in s["audience_points"]
     )
-    out += chapter(f"""      <p class="eyebrow">{e(s["audience_eyebrow"])}</p>
-      <h2>{e(no_orphan(s["audience_h2"]))}</h2>
-      <p>{e(s["audience_p"])}</p>
-      <ul class="checks stagger">
-{points}      </ul>
-      <p>{s["audience_chill"]}</p>
+    out += chapter(f"""      <div class="split">
+        <div>
+          <p class="eyebrow">{e(s["audience_eyebrow"])}</p>
+          <h2>{e(no_orphan(s["audience_h2"]))}</h2>
+          <p>{t(s["audience_p"])}</p>
+          <p>{s["audience_chill"]}</p>
+        </div>
+        <div class="split-panel">
+          <ul class="checks stagger">
+{points}          </ul>
+        </div>
+      </div>
 """, ident="who")
 
-    # ---- 4. the scroll-driven walk
+    # ---- 3. the scroll-driven walk
     steps = ""
     frames = ""
     for i, (eyebrow, title, body) in enumerate(s["walk"]):
-        marker = fn("helplines") if i == 3 else ""
+        marker = ""
         steps += f"""
           <div class="walk-step">
             <p class="eyebrow">{e(eyebrow)}</p>
             {phone(SHOTS[i], title, depth)}
             <h2>{e(no_orphan(title))}</h2>
-            <p>{e(body)}{marker}</p>
+            <p>{t(body)}{marker}</p>
           </div>
 """
         fw, fh = image_size(ASSETS / "shots" / SHOTS[i])
@@ -686,7 +717,7 @@ def build_home(lang):
       </div>
 """, ident="inside", invert=True, extra="walk-scroll")
 
-    # ---- 5. the playable risk checker
+    # ---- 4. the playable risk checker
     payload, substances, timings = demo_payload(lang)
     chips = "".join(
         f'            <button type="button" class="demo-chip" data-substance="{e(name)}" '
@@ -700,7 +731,7 @@ def build_home(lang):
     )
     out += chapter(f"""      <p class="eyebrow">{e(s["demo_eyebrow"])}</p>
       <h2>{e(no_orphan(s["demo_h2"]))}</h2>
-      <p>{e(s["demo_p"])}{fn("combos")}</p>
+      <p>{t(s["demo_p"])}</p>
 
       <div class="demo demo--wide panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
         <div>
@@ -735,45 +766,43 @@ def build_home(lang):
       <script type="application/json" id="cm-interactions">{json.dumps(payload, ensure_ascii=False)}</script>
 """, ident="try", invert=True)
 
-    # ---- 6. the second statement, carrying the strongest refusal
+    # ---- 5. the second statement, carrying the strongest refusal
     #
     # The refusals moved to their own page, but this one is the spine of the
     # product and belongs where everybody sees it.
     out += chapter(f"""      <div class="statement-grid stagger" style="grid-template-columns:1fr">
         <div><b class="statement-line">{e(s["statement2_big"])}</b></div>
       </div>
-      <p>{e(s["statement2_note"])}</p>
+      <p>{t(s["statement2_note"])}</p>
 """, ident="never", invert=True, extra="statement")
 
-    # ---- 7. privacy, the diagram, and the proof
+    # ---- 6. privacy, the diagram, and the proof
     checks = "".join(
-        f'          <li>{icon("check")}<span>{e(c)}'
-        f'{fn(CHECK_FOOTNOTES[i]) if i in CHECK_FOOTNOTES else ""}</span></li>\n'
-        for i, c in enumerate(s["privacy_checks"])
+        f'            <li>{icon("check")}<span>{t(c)}</span></li>\n'
+        for c in s["privacy_checks"]
     )
-    out += chapter(f"""      <p class="eyebrow">{e(s["privacy_eyebrow"])}</p>
-      <h2>{e(no_orphan(s["privacy_h2"]))}</h2>
-      <p>{e(s["privacy_intro"])}</p>
-      <ul class="checks stagger">
-{checks}      </ul>
-
-      <p class="eyebrow" style="margin-top:clamp(40px,5vw,72px)">{e(s["diagram_title"])}</p>
-      {diagram(lang)}
-
-      <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["proof_h2"]))}</h3>
-      <p>{e(s["proof_p"])}</p>
-      <p>{s["proof_fact"]}{fn("network")}</p>
-      <div class="cta-row">
-        <a class="btn btn-ghost" href="{REPO}">{icon("github")}{e(s["proof_cta_repo"])}</a>
-        <a class="btn btn-ghost" href="{r}privacy/">{icon("shield")}{e(s["privacy_link"])}</a>
+    out += chapter(f"""      <div class="split">
+        <div>
+          <p class="eyebrow">{e(s["privacy_eyebrow"])}</p>
+          <h2>{e(no_orphan(s["privacy_h2"]))}</h2>
+          <p>{t(s["privacy_intro"])}</p>
+          <ul class="checks stagger">
+{checks}          </ul>
+          <div class="cta-row">
+            <a class="btn btn-ghost" href="{r}privacy/">{icon("shield")}{e(s["privacy_link"])}</a>
+          </div>
+        </div>
+        <div class="split-panel">
+          <p class="eyebrow">{e(s["diagram_title"])}</p>
+          {diagram(lang)}
+        </div>
       </div>
-      <p class="meta" style="margin-top:14px">{e(s["proof_caption"])}</p>
 """, ident="privacy")
 
-    # ---- 8. specifications
+    # ---- 7. specifications
     rows = ""
     for i, (label, value) in enumerate(s["specs"]):
-        marker = fn(SPEC_FOOTNOTES[i]) if i in SPEC_FOOTNOTES else ""
+        marker = ""
         rows += f"        <tr><th scope=\"row\">{e(label)}</th><td>{e(value)}{marker}</td></tr>\n"
     out += chapter(f"""      <p class="eyebrow">{e(s["specs_eyebrow"])}</p>
       <h2>{e(no_orphan(s["specs_h2"]))}</h2>
@@ -783,20 +812,32 @@ def build_home(lang):
       </table>
 """, ident="specs", invert=True, inner="inner narrow")
 
-    # ---- 9. the footnotes, and the one disclaimer
-    rendered = notes.render(s)
-    out += chapter(f"""      <p class="eyebrow">{e(s["footnotes_title"])}</p>
-      <p>{e(s["footnotes_intro"])}</p>
-      <div class="footnotes">
-        <ol>
-{rendered}        </ol>
+    # ---- 8. the closing ask
+    #
+    # The page used to end on the disclaimer: nine chapters of persuasion and
+    # then a legal notice, with nothing to do. This is the ask, and it offers
+    # something to the reader who will never send the email either, because the
+    # checker and the crisis numbers are useful today and the app is not out.
+    out += chapter(f"""      <p class="eyebrow">{e(s["close_eyebrow"])}</p>
+      <h2>{e(no_orphan(s["close_h2"]))}</h2>
+      <p class="lede">{t(s["close_p"])}</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="{notify}">{icon("mail")}{e(s["cta_notify"])}</a>
+        <a class="btn btn-ghost" href="#try">{icon("flask")}{e(s["demo_eyebrow"])}</a>
+        <a class="btn btn-ghost" href="{support}">{icon("life")}{e(s["support_help_eyebrow"])}</a>
       </div>
+""", ident="close", invert=True, extra="chapter--close")
 
-      <div class="callout" style="margin-top:clamp(40px,5vw,72px)">
+    # ---- 9. the one disclaimer
+    #
+    # The footnote apparatus that used to live here moved to How it works, next
+    # to the material it actually supports. What has to stay on every page is
+    # this.
+    out += chapter(f"""      <div class="callout">
         {icon("alert")}
-        <p>{e(s["disclaimer"])}</p>
+        <p>{t(s["disclaimer"])}</p>
       </div>
-""", ident="footnotes")
+""", ident="disclaimer", inner="inner narrow")
 
     out += footer(lang, depth)
     return out, canonical
@@ -881,7 +922,7 @@ def build_support(lang):
 
     out += f"""
   <h1>{e(no_orphan(s["support_h1"]))}</h1>
-  <p class="lede">{e(s["support_lede"])}</p>
+  <p class="lede">{t(s["support_lede"])}</p>
 
   <div class="callout urgent" role="note">
     {icon("alert")}
@@ -894,7 +935,7 @@ def build_support(lang):
       <h2 id="services">{icon("life", style="color:var(--purple)")}{e(no_orphan(s["support_help_h2"]))}
         <a class="anchor" href="#services" aria-label="{e(s["support_help_h2"])}">#</a>
       </h2>
-      <p>{e(s["support_help_p"])}</p>
+      <p>{t(s["support_help_p"])}</p>
 
       <div class="picker-row">
         <label for="country">{e(s["support_country_label"])}</label>
@@ -991,25 +1032,25 @@ def build_privacy():
     out += header(lang, depth, "privacy")
     out += f"""
   <h1>Privacy&nbsp;Policy</h1>
-  <p class="lede">ChillMate is built privacy-first. Your information lives on your iPhone, under your control. We do not run servers that collect your data, we do not use advertising or analytics trackers, and we never sell or share your personal information.</p>
+  <p class="lede">ChillMate keeps your information on your iPhone, where you control it. There are no servers collecting your data. There are no ad or analytics trackers. Nothing about you is ever sold or shared.</p>
   <p class="meta">Last updated: {UPDATED} · Applies to the ChillMate iOS app and this website.</p>
 
   <div class="card">
     <h2 id="short">{icon("shield", style="color:var(--primary)")}The short&nbsp;version
       <a class="anchor" href="#short" aria-label="Link to this section">#</a></h2>
     <ul>
-      <li><strong>On your device.</strong> Your profile, logs, plans, and notes are stored locally on your iPhone.</li>
-      <li><strong>No trackers.</strong> No third-party advertising, analytics, or tracking SDKs.</li>
-      <li><strong>Nothing sold.</strong> We never sell or share your personal or health information.</li>
-      <li><strong>You are in control.</strong> You decide what to add, what to sync, and you can delete everything at any time.</li>
+      <li><strong>On your phone.</strong> Your profile, logs, plans and notes are stored on your iPhone.</li>
+      <li><strong>No trackers.</strong> No ad networks, no analytics, no tracking code from anyone else.</li>
+      <li><strong>Nothing sold.</strong> Your personal and health information is never sold or shared.</li>
+      <li><strong>You are in control.</strong> You choose what to add and what to sync. You can delete all of it whenever you want.</li>
     </ul>
   </div>
 
   <div class="card">
     <h2 id="network">{icon("code", style="color:var(--mint)")}Every connection the app&nbsp;makes
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
-    <p>Privacy policies usually describe intentions. This is the list of what actually leaves the device, which is a shorter and more checkable thing.</p>
-    <p>ChillMate's own code contains <strong>no networking at all</strong>: no <code>URLSession</code>, no analytics SDK, no crash reporter, no remote config. Everything below is either an Apple service talking to your own account, or something you tapped.</p>
+    <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
+    <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
     <div class="table-scroll">
       <table>
         <caption>Checked against ChillMate {VERSION} (build {BUILD}), across all 82 Swift files in the repository.</caption>
@@ -1017,24 +1058,24 @@ def build_privacy():
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
         <tbody>
-          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn iCloud on. Apple holds it; the developer cannot read it.</td></tr>
+          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn iCloud on. Apple holds it, and I cannot read it.</td></tr>
           <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
           <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
-          <tr><td>The optional tip</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment; we never see card details.</td></tr>
+          <tr><td>The optional tip</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
           <tr><td>A link you tap</td><td>Safari, to that site</td><td>Only on your tap. ChillMate does not fetch those pages itself.</td></tr>
           <tr><td>A call or message you send</td><td>Your phone app, your messages app</td><td>Only on your tap, and you see the message before it goes.</td></tr>
           <tr><td><strong>Anything to a ChillMate server</strong></td><td><strong>Nowhere</strong></td><td><strong>Never. There is no such server.</strong></td></tr>
         </tbody>
       </table>
     </div>
-    <p><a href="{REPO}">Read the source</a> if you would rather check than believe.</p>
+    <p><a href="{REPO}">Read the source</a> if you would like to check any of this for yourself.</p>
   </div>
 
   <div class="card">
     <h2 id="collected">{icon("doc", style="color:var(--purple)")}Category by&nbsp;category
       <a class="anchor" href="#collected" aria-label="Link to this section">#</a></h2>
-    <p>These are the categories Apple asks every developer about. ChillMate's answer is the same in all of them, which is the point.</p>
+    <p>These are the categories Apple asks every developer about. ChillMate's answer is the same in all of them.</p>
     <div class="table-scroll">
       <table>
         <thead><tr><th scope="col">Category</th><th scope="col">Collected by ChillMate</th><th scope="col">Linked to you</th><th scope="col">Used to track you</th></tr></thead>
@@ -1052,13 +1093,13 @@ def build_privacy():
         </tbody>
       </table>
     </div>
-    <p>To be exact about the word: ChillMate <em>stores</em> a great deal on your phone, including health and sensitive information you type in. It <em>collects</em> none of it, in the sense of taking it off your device and holding it somewhere you cannot reach.</p>
+    <p>To be exact about the word. ChillMate <em>stores</em> a great deal on your phone, including health and other sensitive things you type in. It <em>collects</em> none of it. Collecting would mean taking it off your device and holding it somewhere you cannot reach.</p>
   </div>
 
   <div class="card">
     <h2 id="compare">{icon("hand", style="color:var(--pink)")}What a wellbeing app usually&nbsp;knows
       <a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
-    <p>Not an accusation against anyone in particular. This is simply what the ordinary, above-board version of an app like this holds, because holding it is how the ordinary version works.</p>
+    <p>This is not an accusation against anyone in particular. It is what the ordinary, entirely above-board version of an app like this holds, because holding it is how that version works.</p>
     <div class="table-scroll">
       <table>
         <thead><tr><th scope="col">Question</th><th scope="col">The usual answer</th><th scope="col">ChillMate</th></tr></thead>
@@ -1073,15 +1114,15 @@ def build_privacy():
         </tbody>
       </table>
     </div>
-    <p>The honest cost of the right-hand column: if you lose the phone with no backup, nobody can recover it for you. That is the same property, seen from the other side.</p>
+    <p>There is an honest cost to the right-hand column. If you lose the phone and have no backup, nobody can get your data back for you. That is the same property, seen from the other side.</p>
   </div>
 
   <div class="card">
-    <h2 id="threat">{icon("hand", style="color:var(--amber)")}What we actually designed&nbsp;against
+    <h2 id="threat">{icon("hand", style="color:var(--amber)")}What this is really designed&nbsp;against
       <a class="anchor" href="#threat" aria-label="Link to this section">#</a></h2>
     <p>Most privacy pages talk about breaches and hackers. For an app like this, the realistic risk is closer to home: <strong>someone picking up your unlocked phone.</strong> A partner, a housemate, a family member, a colleague glancing at a notification.</p>
-    <p>That is why the app has a Face ID or PIN lock of its own, on top of the phone's, why notifications can be worded so the lock screen says nothing revealing, why the screen can be paused to a blank moon in one tap, and why ChillMate hides its contents in the App Switcher and while your screen is recorded or mirrored.</p>
-    <p>The design consequence of having no server is that a breach of the developer exposes nothing, because there is nothing held. The trade-off is honest too: if you lose the phone and have no backup, the data is gone. That is the deal, and it is deliberate.</p>
+    <p>So the app has its own Face ID or PIN lock, on top of the phone's. Notifications can be worded so the lock screen says nothing revealing. One tap blanks the screen to a moon. And ChillMate hides what is on screen when you swap apps, and while your screen is being recorded or mirrored.</p>
+    <p>Having no server has a useful side effect. If I were breached, nothing about you would come out, because I hold nothing. The trade is worth saying out loud: if you lose the phone and have no backup, the data is gone. That is deliberate, and it is why an encrypted backup is one setting away.</p>
   </div>
 
   <div class="card">
@@ -1102,9 +1143,10 @@ def build_privacy():
   <div class="card">
     <h2 id="ifitchanged">{icon("hand", style="color:var(--amber)")}What it would take to start collecting your&nbsp;data
       <a class="anchor" href="#ifitchanged" aria-label="Link to this section">#</a></h2>
-    <p>Worth being concrete, because "we will never" is cheap and the honest version of the claim is structural rather than moral.</p>
-    <p>Collecting anything would mean writing a server, standing it up somewhere, adding accounts so records could be attributed to people, adding networking code to an app that currently has none, and shipping all of that through App Review with a privacy label that would have to change from nothing to something. It is not a setting somebody could flip, and it is not a line somebody could sneak in: it is a different app, built differently, and the commit that started it would be public on the day it was written.</p>
-    <p>That is the actual protection. Not a promise about intentions, but a shape that makes the other thing expensive and visible.</p>
+    <p>Worth being concrete, because "I will never" is easy to say. The version of that claim that means anything is about how the app is built, not about how good my intentions are.</p>
+    <p>Collecting anything would take a lot. I would have to write a server and run it somewhere. I would have to add accounts, so records could be tied to people. I would have to add networking code to an app that has none. And all of it would go through App Review, with a privacy label that changed from nothing to something.</p>
+    <p>It is not a setting somebody could flip, and it is not a line somebody could sneak in. It is a different app, built differently, and the first commit would be public on the day it was written.</p>
+    <p>That is the actual protection. Not a promise about what I intend, but a shape that makes the other thing expensive and visible.</p>
   </div>
 
   <div class="card">
@@ -1124,7 +1166,7 @@ def build_privacy():
       <li>To sync with Apple Health only for the categories you approve in iOS settings.</li>
       <li>To create encrypted backups only when you turn backup features on.</li>
     </ul>
-    <p>All of this processing happens on your device. ChillMate does not send your content to the developer.</p>
+    <p>All of this happens on your phone. ChillMate never sends what you write to me.</p>
   </div>
 
   <div class="card">
@@ -1139,15 +1181,15 @@ def build_privacy():
   <div class="card">
     <h2 id="where">{icon("cloud", style="color:var(--amber)")}Where your data is&nbsp;stored</h2>
     <p><strong>On your iPhone.</strong> Data is kept in the app's private storage, protected by iOS file protection and, if you enable it, an extra app lock (Face ID or PIN).</p>
-    <p><strong>Optional iCloud.</strong> If you turn on iCloud backup or sync, ChillMate stores your data in <em>your own</em> private iCloud account through Apple's CloudKit and iCloud Drive. It is protected by Apple's encryption and is accessible only to you. The developer has no access to it.</p>
-    <p><strong>No developer servers.</strong> ChillMate has no backend that receives or stores your personal information.</p>
+    <p><strong>Optional iCloud.</strong> If you turn on iCloud backup or sync, ChillMate stores your data in <em>your own</em> private iCloud account through Apple's CloudKit and iCloud Drive. Apple encrypts it, and only you can reach it. I have no access to it at all.</p>
+    <p><strong>No servers of mine.</strong> There is no ChillMate server anywhere that receives or stores your personal information.</p>
   </div>
 
   <div class="card">
     <h2 id="watch">{icon("watch", style="color:var(--mint)")}Apple&nbsp;Watch</h2>
-    <p>If you pair an Apple Watch, ChillMate mirrors part of your data to the watch app so it still works when your phone is out of reach: your recovery streak and daily score, any running dose timers, your watch settings, your emergency number, and the <strong>name and phone number of your trusted contact</strong>, so the watch can reach them without your phone.</p>
-    <p>This goes directly between your phone and your watch over Apple's Watch Connectivity, on your own devices. It does not pass through our servers, because there are none.</p>
-    <p>Two things worth knowing. The trusted contact's details belong to another person and end up on a second device, so add someone only if they would be comfortable with that. And ChillMate's app lock protects the <em>phone</em> app. The watch app is protected by your watch's own passcode and wrist detection instead.</p>
+    <p>If you pair an Apple Watch, ChillMate copies part of your data to it, so the watch still works when your phone is out of reach. That means your streak and daily score, any running dose timers, your watch settings, your emergency number, and the <strong>name and phone number of your trusted contact</strong>, so the watch can call them without your phone.</p>
+    <p>This goes straight between your phone and your watch, on your own two devices. It does not pass through my servers, because there are none.</p>
+    <p>Two things worth knowing. Your trusted contact's details belong to somebody else, and they end up on a second device, so only add someone who would be comfortable with that. And ChillMate's app lock protects the <em>phone</em> app. On the watch, your watch passcode and wrist detection do that job instead.</p>
     <p>Clearing your trusted contact in Settings, or unpairing the watch, removes this mirrored data.</p>
   </div>
 
@@ -1165,7 +1207,7 @@ def build_privacy():
 
   <div class="card">
     <h2 id="payments">{icon("tag", style="color:var(--mint)")}Payments and&nbsp;tips</h2>
-    <p>ChillMate is free. An optional tip is handled entirely by Apple's In-App Purchase system. Apple processes the payment; the developer never receives your card or account details. Tips do not unlock features and do not change what data is collected.</p>
+    <p>ChillMate is free. The optional tip goes entirely through Apple's In-App Purchase. Apple takes the payment, and I never see your card or account details. Tips unlock nothing, and they change nothing about what data is collected.</p>
   </div>
 
   <div class="card">
@@ -1175,7 +1217,7 @@ def build_privacy():
       <li>Deleting the app removes its local data from your iPhone. iCloud data can be removed from iCloud settings or from within the app's backup controls.</li>
       <li>iOS permission controls for Health, Location, Notifications, Contacts, and Photos remain available in the Settings app at any time.</li>
     </ul>
-    <p>Because ChillMate does not collect your data on a server, there is no remote profile to request, correct, or erase. You already hold and control all of it. If you are in the EU/EEA, your GDPR rights (access, rectification, erasure, portability, objection) are satisfied directly through these on-device controls.</p>
+    <p>Because ChillMate does not collect your data on a server, there is no remote profile to ask for, correct, or erase. You already hold all of it. If you are in the EU or EEA, your GDPR rights (access, correction, erasure, portability, objection) are met directly by these controls on your phone.</p>
   </div>
 
   <div class="card">
@@ -1243,11 +1285,11 @@ def build_howto(lang):
         beats += f"""        <div class="beat">
           <p class="eyebrow">{e(label)}</p>
           <h3>{e(no_orphan(title))}</h3>
-          <p>{e(body)}</p>
+          <p>{t(body)}</p>
         </div>
 """
     out += chapter(f"""      <h1>{e(no_orphan(s["howto_h1"]))}</h1>
-      <p class="lede">{e(s["howto_lede"])}</p>
+      <p class="lede">{t(s["howto_lede"])}</p>
 
       <p class="eyebrow" style="margin-top:clamp(44px,6vw,84px)">{e(s["night_eyebrow"])}</p>
       <h2>{e(no_orphan(s["night_h2"]))}</h2>
@@ -1257,26 +1299,26 @@ def build_howto(lang):
 
     # ---- what it refuses to do
     refusals = "".join(
-        f'          <li>{icon("hand")}<div><b>{e(title)}</b><span>{e(body)}</span></div></li>\n'
+        f'          <li>{icon("hand")}<div><b>{t(title)}</b><span>{t(body)}</span></div></li>\n'
         for title, body in s["refuse"]
     )
     out += chapter(f"""      <p class="eyebrow">{e(s["refuse_eyebrow"])}</p>
       <h2>{e(no_orphan(s["refuse_h2"]))}</h2>
-      <p>{e(s["refuse_p"])}</p>
+      <p>{t(s["refuse_p"])}</p>
       <ul class="refusals stagger">
 {refusals}      </ul>
-      <p class="meta">{e(s["footnotes_intro"])}{fn("network")}{fn("cloudkit")}</p>
+      <p class="meta">{t(s["footnotes_intro"])}{fn("network")}{fn("cloudkit")}</p>
 """, ident="refuse", invert=True)
 
     # ---- is this for you
     scenarios = "".join(
-        f'          <li>{icon("check")}<span>{e(line)}</span></li>\n' for line in s["foryou"]
+        f'          <li>{icon("check")}<span>{t(line)}</span></li>\n' for line in s["foryou"]
     )
     out += chapter(f"""      <p class="eyebrow">{e(s["foryou_eyebrow"])}</p>
       <h2>{e(no_orphan(s["foryou_h2"]))}</h2>
       <ul class="scenarios stagger">
 {scenarios}      </ul>
-      <p>{e(s["foryou_not"])}</p>
+      <p>{t(s["foryou_not"])}</p>
 """, ident="foryou")
 
     # ---- everything that is in it
@@ -1285,7 +1327,7 @@ def build_howto(lang):
         tiles += f"""        <div class="feature">
           <div class="chip {tint}">{icon(ico)}</div>
           <h3>{e(no_orphan(title))}</h3>
-          <p>{e(body)}</p>
+          <p>{t(body)}</p>
         </div>
 """
     out += chapter(f"""      <p class="eyebrow">{e(s["features_eyebrow"])}</p>
@@ -1298,7 +1340,7 @@ def build_howto(lang):
           <div>
             <p class="eyebrow">Apple Watch</p>
             <h2>{e(no_orphan(s["watch_h3"]))}</h2>
-            <p>{e(s["watch_p"])}{fn("switcher")}</p>
+            <p>{t(s["watch_p"])}{fn("switcher")}</p>
             <blockquote class="quote">
               <p>{e(s["watch_quote"])}</p>
               <cite>{e(s["watch_quote_note"])}</cite>
@@ -1307,8 +1349,17 @@ def build_howto(lang):
           <div>{watch(depth)}</div>
       </div>
 
+      <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["proof_h2"]))}</h3>
+      <p>{t(s["proof_p"])}</p>
+      <p>{s["proof_fact"]}{fn("network")}</p>
+      <div class="cta-row">
+        <a class="btn btn-ghost" href="{REPO}">{icon("github")}{e(s["proof_cta_repo"])}</a>
+        <a class="btn btn-ghost" href="{r}privacy/">{icon("shield")}{e(s["privacy_link"])}</a>
+      </div>
+      <p class="meta" style="margin-top:14px">{e(s["proof_caption"])}</p>
+
       <h3 style="margin-top:clamp(48px,6vw,86px)">{e(no_orphan(s["langs_h3"]))}</h3>
-      <p>{e(s["langs_p"])}</p>
+      <p>{t(s["langs_p"])}</p>
 
       <div class="cta-row" style="margin-top:clamp(40px,5vw,72px)">
         <a class="btn btn-ghost" href="{home}">{icon("chev")}{e(s["howto_back"])}</a>
@@ -1376,9 +1427,9 @@ def build_about():
   <div class="card">
     <h2 id="why">{icon("info", style="color:var(--primary)")}The thing it is trying to&nbsp;fix
       <a class="anchor" href="#why" aria-label="Link to this section">#</a></h2>
-    <p>Plenty of apps will happily hold the most sensitive things about you: how you slept, what you took, who you were with, what you are worried about. Almost all of them keep a copy on a server, and almost all of them are honest that they do, in a paragraph nobody reads.</p>
+    <p>Plenty of apps hold the most sensitive things about you: how you slept, what you took, who you were with, what you are worried about. Almost all of them keep a copy on a server, and almost all of them say so, in a paragraph nobody reads.</p>
     <p>ChillMate is the version of that app where the copy does not exist. Not encrypted-at-rest on someone's cloud, not anonymised, not retained for ninety days. There is no server, so there is nothing to leak, subpoena, sell, or change its mind about later.</p>
-    <p>That constraint decides most of the design. It is why there is no account, why sync means <em>your</em> iCloud rather than ours, and why the app has to be genuinely useful offline, in a taxi, at four in the morning.</p>
+    <p>That constraint decides most of the design. It is why there is no account. It is why sync means <em>your</em> iCloud, not mine. And it is why the app has to work properly offline, in a taxi, at four in the morning.</p>
   </div>
 
   <div class="card">
@@ -1386,7 +1437,7 @@ def build_about():
       <div>
         <h2 id="firstlaunch">{icon("phone", style="color:var(--purple)")}The first two&nbsp;seconds
           <a class="anchor" href="#firstlaunch" aria-label="Link to this section">#</a></h2>
-        <p>This plays once, the very first time the app opens, and then never again. It is a small thing to have spent time on, and it is the whole argument in one gesture: nothing is asked of you, nothing is signed up for, the mark draws itself and gets out of the way.</p>
+        <p>This plays once, the very first time the app opens, and then never again. It is a small thing to have spent time on. It is also the whole argument in one gesture. Nothing is asked of you. Nothing is signed up for. The mark draws itself, then gets out of the way.</p>
         <p class="meta">Rendered with Remotion. If you have asked your system for reduced motion, this stays a still image.</p>
       </div>
       <div class="hero-phone-wrap">
@@ -1413,14 +1464,14 @@ def build_about():
       <a class="anchor" href="#built" aria-label="Link to this section">#</a></h2>
     <p>Swift and SwiftUI, SwiftData for storage, HealthKit, WidgetKit, App Intents and a native watchOS app. Everything on-device, including the written summaries, which use Apple's on-device Foundation Models rather than a hosted one.</p>
     <p>Version {VERSION} (build {BUILD}). It runs on iOS 26 and later, with an Apple Watch app, Home Screen and Lock Screen widgets, complications, Siri shortcuts and Spotlight.</p>
-    <p>Every push builds and runs the test suite on GitHub Actions. You can see the runs, passing or not, on the <a href="{REPO}/actions/workflows/ci.yml">CI workflow</a>. There is deliberately no build badge on this page: a badge is an image fetched from someone else's server, which would hand your IP address to a third party on a site whose entire argument is that it does not do that.</p>
+    <p>Every push builds and runs the test suite on GitHub Actions. You can see the runs, passing or not, on the <a href="{REPO}/actions/workflows/ci.yml">CI workflow</a>. There is deliberately no build badge on this page. A badge is an image loaded from someone else's server, so it would hand your IP address to a stranger. On a site built around not doing that, it would be an odd thing to add.</p>
     <p>See the <a href="../changelog/">changelog</a> for what has landed, or the <a href="{REPO}">repository</a> for everything else.</p>
   </div>
 
   <div class="card">
     <h2 id="contact">{icon("mail", style="color:var(--mint)")}Get in&nbsp;touch
       <a class="anchor" href="#contact" aria-label="Link to this section">#</a></h2>
-    <p>Email <a href="mailto:{EMAIL}">{EMAIL}</a>. One person reads it, so it is slower than a support desk and more useful than one.</p>
+    <p>Email <a href="mailto:{EMAIL}">{EMAIL}</a>. One person reads it, which makes it slower than a support desk and means you get a real answer.</p>
     <div class="contact-row">
       <a class="btn btn-primary" href="mailto:{EMAIL}">{icon("mail")}Email</a>
       <a class="btn btn-ghost" href="../press/">{icon("doc")}Press kit</a>
@@ -1579,7 +1630,7 @@ def build_press():
   <div class="card">
     <h2 id="boilerplate">{icon("doc", style="color:var(--purple)")}Boilerplate</h2>
     <p><strong>One line.</strong> ChillMate is a calm, private place to look after yourself, with everything kept on your own iPhone.</p>
-    <p><strong>One paragraph.</strong> ChillMate keeps your logs, reflections, plans, reminders and personal-safety tools in one private overview on your iPhone and Apple Watch. It has no account, no server and no trackers, so nothing about you is held anywhere you cannot reach. Alongside the private log it offers breathing and grounding tools, a combination checker, discreet check-in timers, a safe route home, and a country-aware directory of real crisis and health services that works offline. It is free, open source, and made by one developer in the Netherlands.</p>
+    <p><strong>One paragraph.</strong> ChillMate keeps your logs, reflections, plans, reminders and personal-safety tools in one private overview on your iPhone and Apple Watch. It has no account, no server and no trackers, so nothing about you is held anywhere you cannot reach. Alongside the private log there are breathing and grounding tools, a risk checker for combinations, discreet check-in timers, and a safe route home. It also carries a directory of real crisis and health services for your country, which works with no signal. It is free, open source, and made by one developer in the Netherlands.</p>
   </div>
 
   <div class="card">
@@ -1629,21 +1680,21 @@ def build_security():
       <li><strong>No third-party SDKs</strong> receiving your data, so no supply chain of analytics vendors.</li>
       <li><strong>Sync is Apple's.</strong> iCloud sync and iCloud Drive backups run in your own account under Apple's encryption.</li>
     </ul>
-    <p>What is left, and what is genuinely worth probing: the app lock (PBKDF2-derived PIN held in the Keychain, plus Face ID), the encrypted backup format, the phone to watch mirror, what the widgets and Live Activity expose on a locked screen, and whether the discreet notification wording ever leaks something it should not.</p>
+    <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activity show on a locked screen. And whether the discreet notification wording ever leaks something it should not.</p>
   </div>
 
   <div class="card">
     <h2 id="compelled">{icon("hand", style="color:var(--amber)")}If I were compelled to hand something&nbsp;over
       <a class="anchor" href="#compelled" aria-label="Link to this section">#</a></h2>
     <p>Almost nobody puts this in writing, so here it is. If a court, a police force or any other authority ordered me to produce a user's data, <strong>I would have nothing to produce.</strong> Not because I would refuse, but because there is no copy: no server, no account, no database, no logs tying a person to anything.</p>
-    <p>What I could be compelled to do is change the app so that future versions collect something. That would be a public commit in a public repository, it would go through App Review with a privacy label that changed from nothing to something, and it could not be done retroactively to data that was never taken. If you ever see that commit and no explanation next to it, something has gone wrong and you should stop trusting this page.</p>
-    <p>I have received no such order. If that sentence ever disappears from this page, draw your own conclusion.</p>
+    <p>What I could be compelled to do is change the app, so that future versions collect something. That would be a public commit in a public repository. It would go through App Review, with a privacy label that changed from nothing to something. And it could not reach backwards to data that was never taken. If you ever see that commit with no explanation next to it, something has gone wrong, and you should stop trusting this page.</p>
+    <p>I have received no such order. If that sentence ever disappears from this page, take it seriously.</p>
   </div>
 
   <div class="card">
     <h2 id="audit">{icon("check", style="color:var(--mint)")}An open invitation to audit&nbsp;it
       <a class="anchor" href="#audit" aria-label="Link to this section">#</a></h2>
-    <p>I would rather be told I am wrong than be believed by default. If you work in security, harm reduction, or digital rights and want to look properly, the scope that would be most useful:</p>
+    <p>I would rather be told I am wrong than be believed by default. If you work in security, harm reduction or digital rights and want to look properly, this is the scope that would help most.</p>
     <ul>
       <li>Whether the app really makes no network calls, on device, under instrumentation rather than by reading the source.</li>
       <li>The PIN derivation and Keychain handling, and whether the legacy migration path leaks anything.</li>
@@ -1913,10 +1964,10 @@ def main():
         "One paragraph\n"
         "ChillMate keeps your logs, reflections, plans, reminders and personal-safety tools in one private "
         "overview on your iPhone and Apple Watch. It has no account, no server and no trackers, so nothing "
-        "about you is held anywhere you cannot reach. Alongside the private log it offers breathing and "
-        "grounding tools, a combination checker, discreet check-in timers, a safe route home, and a "
-        "country-aware directory of real crisis and health services that works offline. It is free, open "
-        "source, and made by one developer in the Netherlands.\n\n"
+        "about you is held anywhere you cannot reach. Alongside the private log there are breathing and "
+        "grounding tools, a risk checker for combinations, discreet check-in timers, and a safe route "
+        "home. It also carries a directory of real crisis and health services for your country, which "
+        "works with no signal. It is free, open source, and made by one developer in the Netherlands.\n\n"
         f"Site: {BASE_URL}\nSource: {REPO}\nContact: {EMAIL}\n\n"
         "Please do not describe ChillMate as medical software, a diagnostic tool, or a crisis service.\n"
     )
@@ -1930,6 +1981,21 @@ def main():
     print(f"Built {len(urls)} pages into {DOCS.relative_to(ROOT)}/")
     for path, _ in urls:
         print(f"  {path}")
+
+    # The reading-level budget, enforced here rather than merely written down.
+    # People read these pages tired, anxious, or in their fourth language, so
+    # plain wording is a requirement of the product; a requirement nobody checks
+    # is one that quietly stops holding. Run after writing, so a failure still
+    # leaves you the output to look at.
+    import readability
+    failures = readability.report(quiet=True)
+    if failures:
+        print(f"\nReading level regressed in {len(failures)} place(s):")
+        for failure in failures:
+            print(f"  {failure}")
+        print("Run `python3 tools/readability.py --verbose` for the offending sentences.")
+        raise SystemExit(1)
+    print("\nReading level: every surface inside budget.")
 
 
 if __name__ == "__main__":

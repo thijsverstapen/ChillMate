@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
 """German copy. Translated from lang_en.
 
-"du", not "Sie", for the same reason the Dutch is "je": the app addresses you
-informally, and a safety tool that switches to a formal register on the website
-sounds like a different product than the one you install.
+**du, not Sie.** The app says "du", and a safety tool that switches to a formal
+register the moment you open its website sounds like a different product than
+the one you install. So the site says "du" too, all the way through.
+
+**Plain German.** This is the harder half of the job, and it is a product
+requirement rather than a matter of taste. People read this page tired,
+anxious, coming down, or in their third language, and German punishes all three
+harder than English does. So: no Schachtelsätze, one idea per sentence, the
+verb near the front. Verbs instead of nominalisations, "wenn du etwas einträgst"
+and not "bei der Eintragung". Two short words instead of a three-noun compound.
+Loanwords only where the scene actually uses them (Chems, Hookups, Harm
+Reduction, Check-in) and never as decoration. Every sentence here was read back
+out loud, and the ones nobody would say that way were rewritten.
 """
 
 S = {
+    # ---------- chrome ----------
     "skip": "Zum Inhalt springen",
     "nav_home": "Start",
     "nav_privacy": "Datenschutz",
@@ -14,19 +25,18 @@ S = {
     "nav_about": "Über",
     "nav_github": "GitHub",
     "lang_label": "Sprache",
-    "theme_dark": "Dunkel",
-    "theme_light": "Hell",
-    "theme_hint": "Farbschema wechseln",
     "to_top": "Nach oben",
     "made": "von einer Person in den Niederlanden gemacht",
     "copy": "Kopieren",
     "copied": "Kopiert",
     "call": "Anrufen:",
     "open": "Öffnen:",
-    "policy_en_note": "Die Datenschutzerklärung gibt es auf Englisch und Niederländisch. Der englische Text ist maßgeblich.",
+    "policy_en_note": "Die Datenschutzerklärung gibt es nur auf Englisch. So gibt es einen offiziellen Text und nicht fünf, die langsam auseinanderdriften.",
 
-    "disclaimer": "ChillMate unterstützt Reflexion, Planung und dein Wohlbefinden. Es ersetzt keine Fachperson und entscheidet nie, ob etwas sicher ist. Wenn jemand in akuter Gefahr sein könnte, ruf den örtlichen Notruf.",
+    # The one disclaimer, worded once and used everywhere.
+    "disclaimer": "ChillMate hilft dir, nachzudenken, vorauszuplanen und auf dich zu achten. Es ersetzt keinen Arztbesuch, und es entscheidet nie, ob etwas sicher ist. Wenn jemand in akuter Gefahr sein könnte, ruf den örtlichen Notruf.",
 
+    # ---------- help categories ----------
     "cat_emergency": "Notruf",
     "cat_crisis": "Krisen- und Suizidhilfe",
     "cat_sexual_health": "Sexuelle Gesundheit und STI-Tests",
@@ -36,99 +46,107 @@ S = {
     "cat_lgbtq": "LGBTQ+ Unterstützung",
     "cat_emergency_d": "Akute Gefahr, Bewusstlosigkeit oder jemand, der nicht aufwacht.",
     "cat_crisis_d": "Kostenlos und vertraulich, wenn du dir etwas antun könntest oder dich nicht sicher fühlst.",
-    "cat_sexual_health_d": "STI-Tests, PrEP, PEP-Fragen, Impfungen und sexuelle Gesundheit.",
-    "cat_gp_d": "Wechselwirkungen, Schlaf, psychische Gesundheit, Substanzgebrauch und Überweisungen.",
-    "cat_drugs_d": "Verlässliche, wertungsfreie Drogeninformation und Harm Reduction.",
+    "cat_sexual_health_d": "Tests, PrEP, PEP, Impfungen und Hilfe rund um sexuelle Gesundheit.",
+    "cat_gp_d": "Wechselwirkungen, Schlaf, Psyche, Substanzgebrauch und Überweisungen.",
+    "cat_drugs_d": "Klare Drogeninfos ohne Bewertung, dazu Tipps für sichereren Gebrauch.",
     "cat_assault_d": "Unterstützung nach Gewalt, Nötigung oder Zweifeln an Einvernehmlichkeit.",
     "cat_lgbtq_d": "Ein offenes Ohr, Information und Weitervermittlung.",
     "cat_generic_local": "Frag bei deiner örtlichen Gesundheitsstelle nach.",
 
+    # ---------- home: head ----------
     "home_title": "ChillMate · Ein ruhiger, privater Ort, um auf dich zu achten",
-    "home_desc": "Eine private Übersicht über deine Nächte, Pläne, Erinnerungen und Sicherheitswerkzeuge, komplett auf deinem iPhone. Kostenlos, Open Source, ohne Konto und ohne Server.",
+    "home_desc": "Achte auf dich, rund um deine Nächte. Halt fest, wie es dir ging, sieh, was sich schlecht verträgt, und lass jemanden wissen, dass du zu Hause bist. Privat und kostenlos.",
 
+    # ---------- home: hero ----------
     "h1": "Ein ruhiger, privater Ort, um auf dich zu achten.",
     # Short enough to survive a 1200x630 share card.
-    "og_sub": "Kein Konto. Keine Server. Alles bleibt auf deinem iPhone.",
+    "og_sub": "Kostenlos. Kein Konto. Alles bleibt auf deinem iPhone.",
     "og_foot": "Open Source · iPhone und Apple Watch",
-    "lede": 'Deine Nächte, Pläne und Sicherheitswerkzeuge in einer privaten Übersicht auf deinem iPhone. Kostenlos, Open Source, und ohne Server.',
+    "lede": 'Genieß deine Nacht und wach mit dem Gefühl auf, gut auf dich geachtet zu haben. ChillMate hält fest, was du genommen hast und wie es dir ging, sagt dir, was sich schlecht verträgt, und lässt jemanden leise wissen, dass du zu Hause bist. Alles privat. Alles kostenlos.',
     "cta_notify": "Sag mir Bescheid, wenn es da ist",
     "cta_see": "So funktioniert es",
-    "status_note": "Noch nicht im App Store. Schick eine leere Mail und du hörst genau einmal von mir, an dem Tag, an dem es so weit ist.",
+    "status_note": "Im App Store ist es noch nicht. Lass deine Mailadresse da, dann hörst du genau einmal von mir, an dem Tag, an dem es so weit ist. Sonst nie.",
     "notify_subject": "Sag mir Bescheid, wenn ChillMate da ist",
     "notify_body": "Du musst nichts schreiben. Ich antworte einmal, am Tag des Starts, und lösche deine Adresse danach.",
 
+    # ---------- home: who it is for ----------
     "audience_eyebrow": "Für wen es ist",
-    "audience_h2": "Gemacht für die Nächte, um die es hier wirklich geht",
-    "audience_p": 'Chems, Hookups, oder beides. ChillMate hat dazu keine Meinung und wird dich nie bitten, eine Nacht zu rechtfertigen.',
+    "audience_h2": "Für die Nächte, die andere Apps auslassen",
+    "audience_p": 'Chems, Hookups, oder beides. ChillMate nimmt die Nacht so, wie sie war. Erklären musst du nichts.',
     "audience_points": [
-        "Ein Risikocheck, der weiß, was du ohnehin nimmst, dein eigenes Rezept eingeschlossen.",
+        "Ein Risikocheck, der deine Medikamente schon kennt. So passt die Antwort zu dir.",
         "Ein Check-in-Timer, damit jemand weiß, dass du zu Hause bist, ohne dass du schreiben musst.",
-        "Ein PEP-Fenster, das in dem Moment zu zählen beginnt, in dem es zählen könnte.",
-        "Test-Erinnerungen, die auf dem Sperrbildschirm nie sagen, worum es geht.",
+        "Ein Countdown für PEP, die Medikamente nach einem möglichen HIV-Kontakt. Sie wirken nur, wenn du schnell anfängst. Deshalb läuft die Uhr hier sofort.",
+        "Test-Erinnerungen, die pünktlich kommen und auf dem Sperrbildschirm nie sagen, worum es geht.",
     ],
-    "audience_chill": "Die App nennt eine Nacht einen <strong>Chill</strong>. Deinen, wie er auch war.",
+    "audience_chill": "Die App nennt eine Nacht einen <strong>Chill</strong>. Deiner gehört dir, was auch daraus wurde.",
 
+    # ---------- home: the walk ----------
     "walk_eyebrow": "Ein Blick hinein",
-    "walk_h2": "Fünf Screens, und wofür sie da sind.",
+    "walk_h2": "Fünf Screens, und was jeder für dich tut.",
     "walk": [
-        ('Es ordnet sich selbst', 'Was aus heute Nacht auch wurde', 'Trag eine Nacht ein und der Startbildschirm ordnet sich darum herum. Hier hat er erkannt, dass ein PEP-Gespräch sinnvoll sein könnte, und den Countdown allein nach oben gestellt.'),
-        ('Es sagt, was bekannt ist', 'Und weigert sich zu sagen, es sei sicher', 'Wähl aus, was im Spiel ist, deine Medikamente eingeschlossen, und es zeigt, was zu dieser Kombination dokumentiert ist. Es gibt kein grünes Licht.'),
-        ('Ein Raum mit gedämpftem Licht', 'Für den Moment, in dem es schon schiefgeht', 'Wenig Reize, eins nach dem anderen. Atme, geh die Grounding-Schritte durch, und ruf erst jemanden an, wenn du das willst.'),
-        ('Echte Anlaufstellen, offline', 'Hilfe von Menschen, nicht von einer App', 'Krisentelefone, sexuelle Gesundheit, Drogen und LGBTQ+ Unterstützung für das Land, das du einstellst. Eine Liste auf dem Handy, also auch ohne Empfang.'),
-        ('Eine ehrliche Karte deiner Daten', 'In der App, nicht nur in einer Erklärung', 'Was auf dem Gerät liegt, was in einem verschlüsselten Backup wäre, und was ChillMate nie sendet. Dafür solltest du keine Erklärung lesen müssen.'),
+        ('Es sortiert sich selbst', 'Was du brauchst, steht schon oben', 'Trag eine Nacht ein, und der Startbildschirm ordnet sich neu darum herum. Hier hat er gemerkt: Ein Gespräch über PEP könnte sich lohnen. Also steht der Countdown ganz oben.'),
+        ('Klare Antworten', 'Was bekannt ist, in einfachen Worten', 'Wähl aus, was im Spiel ist, deine eigenen Medikamente eingeschlossen. Es zeigt dir, was zu dieser Mischung bekannt ist, in Worten, die du um vier Uhr nachts lesen kannst. Die Entscheidung bleibt bei dir.'),
+        ('Wenn es schon schwer ist', 'Ruhig, eins nach dem anderen', 'Gedimmter Bildschirm, nichts blinkt, ein Schritt nach dem anderen. Atme, geh die Grounding-Schritte durch, und ruf jemanden an, sobald du willst.'),
+        ('Echte Hilfe, offline', 'Menschen, nur einen Fingertipp entfernt', 'Krisentelefone, sexuelle Gesundheit, Drogeninfos und LGBTQ+ Hilfe für dein Land. Die Liste liegt auf deinem Handy, sie funktioniert also auch ohne Empfang.'),
+        ('Deine Daten, auf einem Screen', 'In der App, nicht im Kleingedruckten', 'Was auf deinem Handy liegt, was in einem Backup wäre, und was ChillMate nie verschickt. Ein Screen zeigt dir alles. Kein Juristendeutsch zum Durchkämpfen.'),
     ],
 
+    # ---------- home: one night ----------
     "night_eyebrow": "Wie es passt",
     "night_h2": "Eine Nacht, in drei Momenten.",
     "night": [
-        ('Bevor du losgehst', 'Entscheide, solange es leicht ist', 'Lass die Kombination vom Risikocheck ansehen, halt fest, worauf du Lust hast, und starte einen Check-in-Timer. Fünf Minuten, solange du klar bist.'),
-        ('Wenn du unterwegs bist', 'Ein Tipp, nichts tippen', 'Der Timer fragt, ob alles gut ist. Hilfe holen kennt deine Vertrauensperson und die richtige Notrufnummer für deinen Ort bereits. Deine Uhr kann für dich antworten.'),
-        ('Der Morgen danach', 'Erinnere dich richtig', 'Schlaf, wie es dir geht, was tatsächlich geholfen hat. Eine Minute jetzt ist der Teil, über den du in drei Monaten froh bist.'),
+        ('Bevor du losgehst', 'Entscheide, solange es leicht fällt', 'Lass die Mischung vom Risikocheck prüfen. Halt fest, worauf du Lust hast und worauf nicht. Starte einen Check-in-Timer. Fünf Minuten, solange du klar im Kopf bist.'),
+        ('Wenn du unterwegs bist', 'Einmal tippen, nichts schreiben', 'Der Timer fragt, ob alles gut ist. Der Button Hilfe holen kennt deine Vertrauensperson schon und weiß, welche Notrufnummer für deinen Ort gilt. Deine Uhr kann für dich antworten.'),
+        ('Der Morgen danach', 'Schreib es auf, solange es frisch ist', 'Schlaf, wie es dir geht, was wirklich geholfen hat. Eine Minute jetzt, und in drei Monaten bist du froh darüber.'),
     ],
 
+    # ---------- home: features ----------
     "features_eyebrow": "Was drin ist",
     "features": [
         ("book", "tint-blue", "Privates Log",
-         "Halte eine Nacht so fest, wie du sie erinnern willst: Schlaf, wie es dir ging, und was danach geholfen hat."),
+         "Halte eine Nacht so fest, wie du sie erinnern willst: Schlaf, wie es dir ging, was danach geholfen hat."),
         ("chart", "tint-mint", "Deine Muster",
-         "Ansichten über 30 und 90 Tage, was sich wirklich ändert, und ein Tageswert, den nur du je siehst."),
-        ("life", "tint-purple", "Care-Werkzeuge",
-         "Atmung, eine Pause bei Verlangen, ein Plan für eine sicherere Session, und ein Weg nach Hause, wenn du ihn willst."),
+         "Sieh über 30 und 90 Tage, was sich bei dir wirklich ändert. Dazu ein Tageswert, den sonst nie jemand sieht."),
+        ("life", "tint-purple", "Selbstfürsorge",
+         "Atmen, eine Pause bei Verlangen, ein Plan für eine sicherere Session, und ein Weg nach Hause, wenn du ihn willst."),
         ("flask", "tint-pink", "Risikocheck",
-         "Hinweise in klarer Sprache zu Kombinationen, auch mit den Medikamenten, die du bereits nimmst."),
+         "Klare Hinweise zu Mischungen, auch mit den Medikamenten, die du schon nimmst."),
         ("bell", "tint-amber", "Erinnerungen, die passen",
-         "Check-in-Timer, ein PEP-Fenster und Test-Erinnerungen, auf Wunsch diskret formuliert."),
+         "Check-in-Timer, ein PEP-Countdown und Test-Erinnerungen, auf Wunsch diskret formuliert."),
         ("watch", "tint-blue", "An deinem Handgelenk",
          "Timer, Check-ins und eine Notrufnummer auf der Apple Watch, ohne zum Handy zu greifen."),
     ],
 
-    "foryou_eyebrow": "Ist das etwas für dich",
-    "foryou_h2": "Daran merkst du es.",
+    # ---------- home: is this for you ----------
+    "foryou_eyebrow": "Kennst du das",
+    "foryou_h2": "Wenn eins davon passt, ist es für dich.",
     "foryou": [
-        "Du willst dich an letzte Nacht genau erinnern, nicht vage, und nicht über jemand anderen.",
-        "Du nimmst PrEP und möchtest lieber nicht, dass die Erinnerung PrEP auf deinen Sperrbildschirm schreibt.",
-        "Du willst einen Anlass, dich bei jemandem zu melden, der kein ganzes Gespräch ist.",
-        "Du hast dich unter der Woche schon gefragt, ob es öfter ist als früher.",
-        "Du willst die Notrufnummer für den Ort, an dem du bist, ohne einen Browser zu entsperren.",
+        "Du willst dich richtig an letzte Nacht erinnern. Du, und sonst niemand.",
+        "Du nimmst PrEP, die tägliche Tablette, die dich vor HIV schützt. Auf deinem Sperrbildschirm soll das lieber nicht stehen.",
+        "Du willst dich bei jemandem melden können, ohne dass daraus ein ganzes Gespräch wird.",
+        "Du hast dich mitten in der Woche schon gefragt, ob es öfter ist als früher.",
+        "Du willst die Notrufnummer für den Ort, an dem du gerade bist, ohne einen Browser zu öffnen.",
     ],
-    "foryou_not": "Wahrscheinlich nichts für dich, wenn du etwas suchst, das die Nacht für dich bewertet, dein Verhalten benotet oder dir sagt, eine Kombination sei sicher. Alle drei lässt es absichtlich."
+    "foryou_not": "Was dich erwartet, damit dich nichts überrascht. ChillMate bewertet keine Nacht, benotet dich nicht als Person und nennt keine Mischung sicher. Es sagt dir, was bekannt ist. Den Rest traut es dir zu.",
 
-                  ,
-    "privacy_eyebrow": "Privat gebaut",
+    # ---------- home: privacy ----------
+    "privacy_eyebrow": "Von Grund auf privat",
     "privacy_h2": "Dein Handy, und sonst nirgends",
-    "privacy_intro": 'Datenschutz ist hier keine Einstellung. Es ist die Form der App.',
+    "privacy_intro": 'Nichts von dem, was du hier schreibst, geht irgendwohin. Nicht zu mir, nicht zu einer Firma, nicht zu einem Werbenetz. Es bleibt auf deinem Handy.',
     "privacy_checks": [
-        'Sichere sie mit Face ID oder PIN, alles auf dem Gerät verschlüsselt.',
-        'Backups sind optional und verschlüsselt und gehen in deine eigene iCloud Drive.',
-        'Mitteilungen können auf dem Sperrbildschirm bewusst vage bleiben.',
+        'Sperr die App mit Face ID oder einer PIN. Alles auf dem Handy ist verschlüsselt, niemand sonst kann es lesen.',
+        'Backups sind freiwillig und ebenfalls verschlüsselt. Sie gehen in dein eigenes iCloud Drive.',
+        'Mitteilungen kannst du so formulieren, dass dein Sperrbildschirm nichts verrät.',
     ],
-    "privacy_link": "Vollständige Datenschutzerklärung lesen",
+    "privacy_link": "Die ganze Datenschutzerklärung lesen",
 
+    # ---------- home: proof ----------
     "proof_eyebrow": "Prüf es selbst",
-    "proof_h2": "Glaub mir nicht einfach so",
-    "proof_p": 'ChillMate ist Open Source. Jede Zeile, die deine Daten berührt, ist öffentlich, und das macht aus dem Versprechen oben etwas Prüfbares.',
-    "proof_fact": 'Im Code der App gibt es keinen einzigen Netzwerkaufruf. Kein Analytics-SDK, kein Crash-Reporter, nirgends eine <code>URLSession</code>. Dein Handy verlässt nur, was du antippst.',
-    "proof_cta_repo": "Quellcode lesen",
+    "proof_h2": "Du kannst hier jedes Wort nachprüfen",
+    "proof_p": 'ChillMate ist Open Source. Jede Zeile, die mit deinen Daten zu tun hat, ist öffentlich. Du kannst das also nachsehen, statt mir glauben zu müssen.',
+    "proof_fact": "Der Code der App baut überhaupt keine Internetverbindung auf. Kein Analytics, kein Crash-Reporter, nirgends eine <code>URLSession</code>. Dein Handy verlässt nur, was du selbst antippst.",
+    "proof_cta_repo": "Den Code lesen",
     "proof_cta_store": "Wo deine Daten liegen",
     "proof_caption": "Geprüft an ChillMate 4.2.1 (Build 422).",
 
@@ -140,42 +158,51 @@ S = {
     "diagram_server": "Meine Server",
     "diagram_none": "gibt es nicht",
 
-    "refuse_eyebrow": "Mit Absicht",
-    "refuse_h2": "Was es nicht tut",
-    "refuse_p": "Die meiste Arbeit steckt in dem, was es nicht tut. Das ist schwerer zu halten als Funktionen, denn jedes davon ist etwas, worum irgendwann jemand bittet.",
+    # ---------- home: the promises ----------
+    "refuse_eyebrow": "Versprechen",
+    "refuse_h2": "Worauf du dich verlassen kannst",
     "refuse": [
-        ("Es sagt nicht, dass etwas sicher ist.", "Es zeigt, was zu einer Kombination dokumentiert ist, und gibt dir die Entscheidung zurück, denn es kennt deinen Körper, deine Dosis und deine Nacht nicht."),
-        ("Es benotet dich nicht als Person.", "Es gibt eine Zahl für den Tag, sie bleibt auf deinem Handy, und nichts wird damit freigeschaltet oder vorenthalten."),
-        ("Es nervt nicht.", "Jede Erinnerung ist aus, bis du sie einschaltest, und lässt sich so formulieren, dass ein Sperrbildschirm nichts verrät."),
-        ("Es will kein Konto.", "Dazu gehörte ein Server, und ein Server ist eine Kopie von dir an einem Ort, an den du nicht kommst."),
-        ("Es lässt dich nicht zahlen.", "Alles kostenlos. Das Trinkgeld schaltet nichts frei, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke ist keines."),
+        ("Du bekommst Fakten, nie ein Urteil.", "Es zeigt, was zu einer Mischung bekannt ist, und lässt dir die Entscheidung. Es kennt deinen Körper nicht, deine Dosis nicht und deine Nacht nicht."),
+        ("Du wirst nie als Person benotet.", "Es gibt eine Zahl für den Tag. Sie bleibt auf deinem Handy. Nichts wird deswegen gesperrt, vorenthalten oder bewertet."),
+        ("Jede Erinnerung schaltest du selbst ein.", "Am Anfang ist alles aus. Schalt an, was du willst, und formulier es so, dass ein Sperrbildschirm nichts verrät."),
+        ("Nach einem Konto wirst du nie gefragt.", "Ein Konto braucht einen Server. Ein Server heißt: eine Kopie von dir, an einem Ort, an den du nicht kommst. Also gibt es keines von beidem."),
+        ("Es ist kostenlos und bleibt kostenlos.", "Jede Funktion, für alle. Das freiwillige Trinkgeld schaltet nichts frei, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke hilft den Falschen."),
     ],
+    "refuse_p": "Fünf Versprechen. Deshalb kannst du hier alles hineinschreiben, ohne dich zu fragen, wer mitliest.",
 
-    "watch_h3": "Es funktioniert, während das Handy in der Tasche bleibt",
-    "watch_p": "Dosis-Timer, Trinken, diskrete Check-ins, eine Atemübung und ein Tipp zu deiner Vertrauensperson oder der örtlichen Notrufnummer, alles auf der Apple Watch, dazu Komplikationen für Zifferblatt und Smart Stack.",
-    "watch_quote": "Wenn sich etwas falsch anfühlt, hol Hilfe. Du bist nicht in Schwierigkeiten.",
-    "watch_quote_note": "Der gesamte Sicherheits-Screen der Uhr, Wortlaut inklusive.",
+    # ---------- home: watch and languages ----------
+    "watch_h3": "Es funktioniert, während dein Handy in der Tasche bleibt",
+    "watch_p": "Dosis-Timer, Erinnerungen ans Trinken, stille Check-ins und eine Atemübung. Einmal tippen, und du erreichst deine Vertrauensperson oder den örtlichen Notruf. Alles auf der Uhr, dazu eine Verknüpfung für dein Zifferblatt.",
+    "watch_quote": "Wenn sich etwas falsch anfühlt, hol dir Hilfe. Du bist nicht in Schwierigkeiten.",
+    "watch_quote_note": "Das ist der komplette Sicherheits-Screen der Uhr, Wortlaut inklusive.",
     "langs_h3": "Es funktioniert in deiner Sprache",
-    "langs_p": "App und Website gibt es auf Englisch, Niederländisch, Deutsch, Französisch und Spanisch. Die Hilfsangebote richten sich nach dem Land, das du einstellst, nicht nach deiner Lesesprache, denn das sind zwei verschiedene Fragen.",
+    "langs_p": "Die App und diese Seite gibt es auf Englisch, Niederländisch, Deutsch, Französisch und Spanisch. Die Hilfsangebote richten sich nach dem Land, das du einstellst, nicht nach deiner Lesesprache. Das sind zwei verschiedene Fragen.",
 
+    # ---------- home: questions ----------
     "faq_teaser_eyebrow": "Bevor du fragst",
     "faq_teaser_h2": "Die drei Fragen, die alle stellen.",
     "faq_teaser_link": "Die übrigen Fragen, und echte Anlaufstellen",
 
+    # ---------- home: the closing ask ----------
+    "close_eyebrow": "Noch eine Sache",
+    "close_h2": "Es ist kostenlos und bleibt kostenlos.",
+    "close_p": "Schick eine leere Mail. Du hörst genau einmal von mir, an dem Tag, an dem ChillMate im App Store landet. Danach lösche ich deine Adresse. Bis dahin läuft der Risikocheck hier oben schon jetzt, und jede Nummer auf der Hilfeseite funktioniert ohne Empfang.",
+
+    # ---------- support page ----------
     "support_title": "ChillMate · Hilfe und Unterstützung",
-    "support_desc": "Krisentelefone und Gesundheitsangebote für dein Land, offline und druckbar, dazu häufige Fragen und wie du mich erreichst.",
+    "support_desc": "Krisentelefone und Gesundheitsangebote für dein Land. Funktioniert ohne Empfang, passt auf eine gedruckte Seite, und beantwortet die häufigsten Fragen.",
     "support_h1": "Hilfe, und wie du mich erreichst",
-    "support_lede": "Zuerst echte Anlaufstellen, denn dafür ist diese Seite am nützlichsten. Fragen zur App stehen weiter unten, und es liest eine einzelne Person jede Nachricht.",
+    "support_lede": "Zuerst echte Anlaufstellen, denn dafür ist diese Seite am nützlichsten. Fragen zur App stehen weiter unten. Jede Nachricht liest ein Mensch.",
     "support_urgent": "<strong>Warte im Notfall nicht auf die App.</strong> Wenn du oder jemand anderes in akuter Gefahr sein könnte, ruf jetzt den örtlichen Notruf.",
-    "support_contact_eyebrow": "Kontakt aufnehmen",
+    "support_contact_eyebrow": "Melde dich",
     "support_contact_h2": "Kontakt",
-    "support_contact_p": "Schreib an {email}. Eine Antwort dauert meist ein paar Tage. Deine iOS-Version und was du gerade getan hast, helfen sehr.",
+    "support_contact_p": "Schreib an {email}. Eine Antwort dauert meist ein paar Tage. Es hilft sehr, wenn du dazuschreibst, welche iOS-Version du hast und was du gerade gemacht hast.",
     "support_email_btn": "Schreib mir",
     "support_issue_btn": "Problem melden",
     "support_faq_eyebrow": "Häufige Fragen",
     "support_help_eyebrow": "Echte Anlaufstellen",
     "support_help_h2": "Hilfe von Menschen, nicht von einer App",
-    "support_help_p": "ChillMate ist kein Krisendienst. Wähl aus, wo du bist, dann helfen dir diese Stellen direkt. Diese Seite lässt sich drucken und funktioniert ohne Empfang, denn genau dann zählen diese Nummern.",
+    "support_help_p": "ChillMate ist kein Krisendienst. Wähl aus, wo du bist, dann helfen dir diese Stellen direkt. Diese Seite lässt sich drucken und funktioniert ohne Empfang. Genau dann zählen diese Nummern.",
     "support_country_label": "Wo bist du?",
     "support_emergency_is": "Notruf hier:",
     "support_emergency_local": "dein örtlicher Notruf",
@@ -183,41 +210,40 @@ S = {
 
     "faq": [
         ("Sind meine Daten privat?",
-         "Ja, und du musst mir nicht glauben. ChillMate hält alles auf deinem iPhone, hat kein Konto und keinen Server und betreibt keine Werbung, Analytics oder Tracker. Die App ist Open Source, du kannst also genau nachlesen, was mit deinen Eingaben passiert."),
+         "Ja, und du musst mir nicht einfach glauben. ChillMate lässt alles auf deinem iPhone. Es gibt kein Konto und keinen Server, keine Werbung, keine Analyse, keine Tracker. Die App ist Open Source, du kannst also genau nachlesen, was mit deinen Eingaben passiert."),
         ("Was kostet es?",
-         "Nichts, und es gibt keine bezahlte Version. Ein optionales Trinkgeld läuft über Apples In-App-Kauf und schaltet überhaupt nichts frei. Jede Funktion steht allen offen, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke ist keines."),
+         "Nichts, und es gibt keine bezahlte Version. Ein freiwilliges Trinkgeld läuft über Apple und schaltet gar nichts frei. Alle bekommen jede Funktion, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke hilft den Falschen."),
         ("Sagt es mir, ob etwas sicher ist?",
-         "Nein, und das wird es nie. Der Risikocheck zeigt, was zu einer Kombination dokumentiert ist, auch mit Medikamenten, die du nimmst, und hört da auf. Es gibt kein grünes Licht. Für alles Wichtige sind Ärztin oder Apotheke die richtige Stelle."),
-        ("Wie mache ich ein Backup oder wechsle das Handy?",
-         "Aktiviere iCloud-Backup in den Einstellungen, um ein verschlüsseltes Backup in deiner eigenen iCloud Drive zu speichern, oder exportiere selbst eine verschlüsselte Backup-Datei. Auf einem neuen Gerät stellst du beim Einrichten aus iCloud wieder her oder importierst die Datei."),
+         "Nein, und das ist Absicht. Der Risikocheck zeigt, was zu einer Mischung bekannt ist, auch mit Medikamenten, die du schon nimmst. Danach liegt die Entscheidung bei dir. Wenn es wirklich darauf ankommt, frag in einer Arztpraxis oder Apotheke nach."),
+        ("Wie mache ich ein Backup, oder wechsle auf ein neues Handy?",
+         "Schalt in den Einstellungen das iCloud-Backup ein, dann geht ein verschlüsseltes Backup in deine eigene iCloud Drive. Du kannst auch selbst eine Backup-Datei exportieren. Auf einem neuen Handy stellst du beim Einrichten aus iCloud wieder her oder importierst diese Datei."),
         ("Wie sperre oder verstecke ich die App?",
-         "Aktiviere in den Einstellungen unter Datenschutz und Sperre Face ID oder setze eine PIN. Du kannst auch diskrete Mitteilungen einschalten, damit der Sperrbildschirm nichts verrät, und ChillMate verbirgt seinen Inhalt im App-Umschalter sowie bei Bildschirmaufnahme oder Spiegelung. Ein Tipp macht den Bildschirm schwarz."),
+         "Geh in die Einstellungen, dann Datenschutz und Sperre, und schalt Face ID ein oder setz eine PIN. Du kannst auch diskrete Mitteilungen einschalten, damit dein Sperrbildschirm nichts verrät. ChillMate verbirgt den Inhalt, sobald du die App wechselst, und während dein Bildschirm aufgenommen oder gespiegelt wird. Einmal tippen, und es bleibt nur ein Mond."),
         ("Wie lösche ich meine Daten?",
-         "Einzelne Einträge oder alles auf einmal, in der App. Die App zu löschen entfernt die lokalen Daten, iCloud-Daten entfernst du über die Backup-Einstellungen oder über iCloud. Es gibt nirgends sonst eine Kopie, nach der du fragen müsstest."),
-        ("Welche Länder werden unterstützt?",
-         "ChillMate funktioniert überall. Die Hilfsangebote richten sich nach dem Land, das du beim Einrichten wählst, mit eingebauten Angeboten für die Niederlande, Belgien, Deutschland, das Vereinigte Königreich, Irland, Frankreich, Spanien, die USA und Australien, und internationalen Alternativen überall sonst."),
+         "Einzeln oder alles auf einmal, direkt in der App. Die App zu löschen entfernt alles, was auf deinem Handy liegt. iCloud-Daten löschst du in den Backup-Einstellungen oder in iCloud selbst. Anderswo gibt es keine Kopie, nach der du fragen müsstest."),
+        ("In welchen Ländern funktioniert es?",
+         "Überall. Die Hilfsangebote richten sich nach dem Land, das du beim Einrichten wählst. Eingebaut sind: die Niederlande, Belgien, Deutschland, das Vereinigte Königreich, Irland, Frankreich, Spanien, die USA und Australien. Überall sonst bekommst du internationale Angebote."),
         ("Welche Sprachen spricht es?",
-         "Englisch, Niederländisch, Deutsch, Französisch und Spanisch, auf dem Handy und auf der Apple Watch. Stell die Sprache in der App oder in den iOS-Einstellungen ein; es gilt die zuletzt geänderte."),
+         "Englisch, Niederländisch, Deutsch, Französisch und Spanisch, auf dem Handy und auf der Uhr. Stell es in der App ein oder in den iOS-Einstellungen. Es gilt, was du zuletzt geändert hast."),
     ],
-    "human": 'Ich bin eine Person in den Niederlanden. Ich habe die App gebaut, die es geben sollte, und ich sehe nie etwas von dem, was du hineinschreibst.',
     "footnotes": [
-        'Nirgends in der App Netzwerkverkehr.',
+        'Die App baut keine Internetverbindung auf.',
         'Sync geht in deine eigene private Datenbank.',
         'Die PIN: 200.000 PBKDF2-Runden, im Schlüsselbund.',
-        'Verborgen im App-Umschalter und bei Bildschirmaufnahme.',
+        'Verborgen, wenn du die App wechselst, und bei Bildschirmaufnahme.',
         'Backups mit AES-GCM versiegelt.',
         'Mitteilungstexte, die nichts verraten.',
         'Zusammenfassungen laufen auf Apples Modell im Gerät.',
         'Die 30 Kombinationen oben.',
         'Das Hilfeverzeichnis für 10 Regionen.',
     ],
-    "statement2_big": 'Es sagt dir nie, dass etwas sicher ist.',
-    "statement2_note": 'Nicht der Risikocheck, nicht die Zusammenfassungen, nirgends. Es zeigt, was bekannt ist, und gibt dir die Entscheidung zurück.',
+    "statement2_big": 'Es sagt dir, was bekannt ist. Die Wahl bleibt bei dir.',
+    "statement2_note": 'Der Risikocheck nennt nichts sicher. Die Zusammenfassungen auch nicht. Nirgends in der App wird dir gesagt, dass etwas in Ordnung ist. Du bekommst, was bekannt ist, in klaren Worten, und entscheidest selbst.',
     "nav_howto": 'So funktioniert es',
     "howto_title": 'ChillMate · So funktioniert es',
-    "howto_desc": 'Eine Nacht in drei Momenten, was die App nicht tut, was drin ist, und die Apple Watch.',
+    "howto_desc": 'Eine Nacht vom ersten Plan bis zum Morgen danach. Dazu die Versprechen der App, alles, was drin ist, und die Apple Watch.',
     "howto_h1": 'So funktioniert es',
-    "howto_lede": 'Die Teile, die vorne keinen Platz hatten: die Form einer Nacht, was es nicht tut, und was wirklich drin ist.',
+    "howto_lede": 'Eine Nacht vom ersten Plan bis zum Morgen danach, die Versprechen der App, und alles, was wirklich drin ist.',
     "howto_back": 'Zurück zur Startseite',
     "demo_meds_label": 'Was du ohnehin nimmst',
     "demo_meds_ph": 'Name des Medikaments, optional',
@@ -227,45 +253,47 @@ S = {
     "demo_shared": 'Link kopiert',
     "demo_print": 'Das drucken',
     "demo_meds_hit": 'Erkannt',
-    "demo_meds_none": 'Keine bekannte Gruppe erkannt.',
+    "demo_meds_none": 'Das steht nicht auf der Liste.',
     "faq_teaser_indices": [0, 1, 2],
 
+    # ---------- chapter navigation ----------
     "nav_chapters": [("who", "Für wen"), ("inside", "Blick hinein"),
-                     ("try", "Ausprobieren"), ("privacy", "Datenschutz"), ("specs", "Technische Daten")],
+                     ("try", "Ausprobieren"), ("privacy", "Datenschutz"), ("specs", "Technik")],
     "scroll_cue": "Scrollen",
 
-    "statement": [("0", "Server"), ("0", "Konten"), ("0", "Tracker")],
-    "statement_note": "Kein Versprechen. Eine Bauweise. Alles hier drunter erklärt wie, mit Link auf die Zeile Code, die es belegt.",
 
+    # ---------- the playable risk checker ----------
     "demo_eyebrow": "Ausprobieren",
     "demo_h2": "Das ist der echte Risikocheck.",
-    "demo_p": 'Kein Screenshot davon. Dieselben 30 Kombinationen, derselbe Wortlaut, hier ausgeführt.',
+    "demo_p": 'Kein Bild davon. Dieselben 30 Kombinationen und derselbe Wortlaut wie in der App, hier direkt auf der Seite. Du musst nichts installieren.',
     "demo_pick": "Wähl, was im Spiel ist",
-    "demo_none_title": "Zu dieser Kombination ist nichts dokumentiert",
-    "demo_none_body": "Das ist nicht dasselbe wie sicher. Es heißt, diese Tabelle hat nichts dazu, und diese Tabelle ist zu nichts das letzte Wort.",
-    "demo_empty": 'Wähl etwas aus oder tipp ein Medikament ein, um zu sehen, was die App sagen würde.',
+    "demo_none_title": "Zu dieser Mischung ist nichts bekannt",
+    "demo_none_body": "Das heißt nicht, dass sie sicher ist. Es heißt nur: Hier steht nichts dazu. Diese Liste ist nicht das letzte Wort, und eine Apotheke kann dir mehr sagen.",
+    "demo_empty": 'Wähl etwas aus oder tipp ein Medikament ein, dann siehst du, was die App sagen würde.',
     "demo_reset": "Zurücksetzen",
-    "demo_note": "Läuft vollständig auf dieser Seite. Was du hier antippst, geht nirgendwohin, aus demselben Grund wie in der App.",
-    "demo_try": "GHB und Alkohol ausprobieren",
+    "demo_note": "Das läuft in dieser Seite. Nichts von dem, was du antippst, geht irgendwohin, genau wie in der App.",
+    "demo_try": "Beispiel: GHB und Alkohol",
 
+    # ---------- tech specs ----------
     "specs_eyebrow": "Die Details",
     "specs_h2": "Technische Daten",
     "specs": [
         ("Voraussetzung", "iPhone mit iOS 26 oder neuer"),
         ("Apple Watch", "Eigene App, watchOS 26 oder neuer"),
-        ("Preis", "Kostenlos. Keine bezahlte Stufe, kein Abo, keine Werbung."),
+        ("Preis", "Kostenlos. Keine bezahlte Version, kein Abo, keine Werbung."),
         ("Konto", "Keins. Es gibt nichts zu registrieren."),
         ("Erhobene Daten", "Keine"),
         ("Sprachen", "English, Nederlands, Deutsch, Français, Español"),
-        ("Hilfsangebote", "10 Regionen, auf dem Gerät, funktioniert offline"),
-        ("Geprüfte Kombinationen", "30 dokumentierte Wechselwirkungen, auf dem Gerät"),
-        ("Geschriebene Zusammenfassungen", "Auf dem Gerät, Apple Foundation Models"),
+        ("Hilfsangebote", "10 Regionen, auf dem Handy, funktioniert offline"),
+        ("Geprüfte Kombinationen", "30 bekannte Wechselwirkungen, auf dem Handy"),
+        ("Geschriebene Zusammenfassungen", "Auf dem Handy, Apple Foundation Models"),
         ("Sync und Backup", "Optional, verschlüsselt, deine eigene iCloud"),
         ("Sperre", "Face ID, oder eine PIN mit 200.000 PBKDF2-Runden"),
         ("Quellcode", "Offen, MIT-Lizenz"),
         ("Version", "4.2.1 (Build 422)"),
     ],
 
+    # ---------- footnotes ----------
     "footnotes_title": "Jede Behauptung auf dieser Seite, und wo du sie prüfst",
-    "footnotes_intro": "Marketingseiten fußnoten ihre Behauptungen ins Kleingedruckte. Diese fußnotet sie in den Quellcode.",
+    "footnotes_intro": "Jede Behauptung auf dieser Seite verlinkt auf den Code dahinter. Du kannst jede einzelne in etwa einer Minute nachprüfen.",
 }

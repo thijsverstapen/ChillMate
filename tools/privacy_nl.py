@@ -51,7 +51,7 @@ SECTIONS = [
         <caption>Gecontroleerd op ChillMate {version} (build {build}), over alle 82 Swift-bestanden in de repository.</caption>
         <thead><tr><th scope="col">Wat</th><th scope="col">Gaat waarheen</th><th scope="col">Wanneer</th></tr></thead>
         <tbody>
-          <tr><td>iCloud-synchronisatie (CloudKit)</td><td>Je eigen privé-iCloud-database</td><td>Alleen als je iCloud aanzet. Apple bewaart het; de ontwikkelaar kan er niet bij.</td></tr>
+          <tr><td>iCloud-synchronisatie (CloudKit)</td><td>Je eigen privé-iCloud-database</td><td>Alleen als je iCloud aanzet. Apple bewaart het, en ik kan er niet bij.</td></tr>
           <tr><td>Versleuteld back-upbestand</td><td>Je eigen iCloud Drive</td><td>Alleen als je back-ups aanzet, of zelf een bestand exporteert.</td></tr>
           <tr><td>Apple Watch-spiegeling</td><td>Je eigen horloge, rechtstreeks</td><td>Als je een horloge koppelt. Toestel naar toestel, via Watch Connectivity.</td></tr>
           <tr><td>Apple Gezondheid</td><td>Blijft op het toestel</td><td>Alleen de categorieën die jij toestaat. HealthKit is lokale opslag, geen dienst.</td></tr>
@@ -66,7 +66,7 @@ SECTIONS = [
 """),
 
     ("collected", "doc", "var(--purple)", "Categorie voor categorie", """
-    <p>Dit zijn de categorieën waar Apple elke ontwikkelaar naar vraagt. Het antwoord van ChillMate is overal hetzelfde, en dat is precies het punt.</p>
+    <p>Dit zijn de categorieën waar Apple elke ontwikkelaar naar vraagt. Het antwoord van ChillMate is overal hetzelfde.</p>
     <div class="table-scroll">
       <table>
         <thead><tr><th scope="col">Categorie</th><th scope="col">Verzameld door ChillMate</th><th scope="col">Gekoppeld aan jou</th><th scope="col">Gebruikt om je te volgen</th></tr></thead>
@@ -84,7 +84,7 @@ SECTIONS = [
         </tbody>
       </table>
     </div>
-    <p>Om precies te zijn over het woord: ChillMate <em>bewaart</em> heel veel op je telefoon, ook gezondheidsgegevens en gevoelige dingen die je zelf intypt. Het <em>verzamelt</em> er niets van, in de zin van het van je toestel halen en ergens bewaren waar jij niet bij kunt.</p>
+    <p>Om precies te zijn over dat woord. ChillMate <em>bewaart</em> heel veel op je telefoon, ook gezondheidsgegevens en andere gevoelige dingen die je intypt. Het <em>verzamelt</em> er niets van. Verzamelen zou betekenen dat het van je toestel af gaat, naar een plek waar jij niet bij kunt.</p>
 """),
 
     ("compare", "hand", "var(--pink)", "Wat een welzijnsapp meestal van je weet", """
@@ -108,8 +108,8 @@ SECTIONS = [
 
     ("threat", "hand", "var(--amber)", "Waar het echt tegen ontworpen is", """
     <p>De meeste privacypagina's gaan over datalekken en hackers. Voor een app als deze ligt het risico dichter bij huis: <strong>iemand die je ontgrendelde telefoon oppakt.</strong> Een partner, een huisgenoot, familie, een collega die naar een melding kijkt.</p>
-    <p>Daarom heeft de app een eigen Face ID- of pinvergrendeling bovenop die van je telefoon, kunnen meldingen zo geformuleerd worden dat je vergrendelscherm niets prijsgeeft, kun je het scherm met één tik zwart maken, en verbergt ChillMate zijn inhoud in de app-switcher en tijdens schermopname of spiegelen.</p>
-    <p>Het gevolg van geen server hebben is dat een inbraak bij de ontwikkelaar niets oplevert, want er ligt niets. De keerzijde is net zo eerlijk: raak je je telefoon kwijt en heb je geen back-up, dan zijn de gegevens weg. Dat is de afspraak, en die is bewust.</p>
+    <p>Daarom heeft de app een eigen Face ID- of pinvergrendeling, bovenop die van je telefoon. Meldingen kun je zo laten formuleren dat je vergrendelscherm niets prijsgeeft. Eén tik maakt het scherm zwart. En ChillMate verbergt wat er op het scherm staat als je van app wisselt, en tijdens schermopname of spiegelen.</p>
+    <p>Geen server hebben heeft een handig neveneffect. Word ik gehackt, dan komt er niets over jou naar buiten, want ik bewaar niets. De keerzijde zeg ik er eerlijk bij: raak je je telefoon kwijt en heb je geen back-up, dan zijn de gegevens weg. Dat is bewust, en daarom staat een versleutelde back-up één instelling verderop.</p>
 """),
 
     ("saves", "mail", "var(--mint)", "Wat ChillMate kan bewaren", """
@@ -127,7 +127,7 @@ SECTIONS = [
       <li>Om te synchroniseren met Apple Gezondheid, alleen voor de categorieën die je in iOS goedkeurt.</li>
       <li>Om versleutelde back-ups te maken, alleen als je back-upfuncties aanzet.</li>
     </ul>
-    <p>Al deze verwerking gebeurt op je toestel. ChillMate stuurt je inhoud niet naar de ontwikkelaar.</p>
+    <p>Dit gebeurt allemaal op je toestel. ChillMate stuurt nooit iets van wat je schrijft naar mij.</p>
 """),
 
     ("never", "hand", "var(--pink)", "Wat ChillMate niet doet", """
@@ -139,13 +139,13 @@ SECTIONS = [
 """),
 
     ("where", "cloud", "var(--amber)", "Waar je gegevens worden bewaard", """
-    <p><strong>Op je iPhone.</strong> In de privéopslag van de app, beschermd door de bestandsbeveiliging van iOS en, als je dat aanzet, een extra appvergrendeling (Face ID of pincode).</p>
-    <p><strong>Optioneel iCloud.</strong> Als je iCloud-back-up of -synchronisatie aanzet, bewaart ChillMate je gegevens in <em>jouw eigen</em> privé-iCloud-account via CloudKit en iCloud Drive van Apple. Het is beschermd door Apple's versleuteling en alleen voor jou toegankelijk. De ontwikkelaar heeft er geen toegang toe.</p>
-    <p><strong>Geen servers van de ontwikkelaar.</strong> ChillMate heeft geen backend die je persoonlijke gegevens ontvangt of bewaart.</p>
+    <p><strong>Op je iPhone.</strong> In de privéopslag van de app, beschermd door de bestandsbeveiliging van iOS. Zet je het aan, dan komt daar een extra appvergrendeling bovenop, met Face ID of een pincode.</p>
+    <p><strong>Optioneel iCloud.</strong> Als je iCloud-back-up of -synchronisatie aanzet, bewaart ChillMate je gegevens in <em>jouw eigen</em> privé-iCloud-account via CloudKit en iCloud Drive van Apple. Apple versleutelt het, en alleen jij kunt erbij. Ik heb er geen enkele toegang toe.</p>
+    <p><strong>Geen servers van mij.</strong> Er bestaat nergens een ChillMate-server die je persoonlijke gegevens ontvangt of bewaart.</p>
 """),
 
     ("watch", "watch", "var(--mint)", "Apple Watch", """
-    <p>Als je een Apple Watch koppelt, spiegelt ChillMate een deel van je gegevens naar de horloge-app zodat die blijft werken als je telefoon buiten bereik is: je herstelreeks en dagscore, lopende dosistimers, je horloge-instellingen, je alarmnummer, en de <strong>naam en het telefoonnummer van je vertrouwenscontact</strong>, zodat het horloge die persoon kan bereiken zonder je telefoon.</p>
+    <p>Koppel je een Apple Watch, dan kopieert ChillMate een deel van je gegevens naar het horloge, zodat dat blijft werken als je telefoon buiten bereik is. Het gaat om je reeks en dagscore, lopende dosistimers, je horloge-instellingen, je alarmnummer, en de <strong>naam en het telefoonnummer van je vertrouwenscontact</strong>, zodat het horloge die persoon kan bellen zonder je telefoon.</p>
     <p>Dit gaat rechtstreeks tussen je telefoon en je horloge via Watch Connectivity van Apple, op je eigen toestellen. Het gaat niet via mijn servers, want die zijn er niet.</p>
     <p>Twee dingen om te weten. De gegevens van je vertrouwenscontact zijn van iemand anders en komen op een tweede toestel terecht, dus voeg alleen iemand toe die dat goed zou vinden. En de appvergrendeling van ChillMate beschermt de <em>telefoon</em>-app. De horloge-app wordt beschermd door de toegangscode en polsdetectie van je horloge zelf.</p>
     <p>Je vertrouwenscontact wissen in Instellingen, of het horloge ontkoppelen, verwijdert deze gespiegelde gegevens.</p>
@@ -172,7 +172,7 @@ SECTIONS = [
       <li>De app verwijderen wist de lokale gegevens van je iPhone. iCloud-gegevens kun je weghalen via iCloud-instellingen of via de back-upinstellingen in de app.</li>
       <li>De iOS-toestemmingen voor Gezondheid, Locatie, Meldingen, Contacten en Foto's blijven altijd beschikbaar in de Instellingen-app.</li>
     </ul>
-    <p>Omdat ChillMate je gegevens niet op een server verzamelt, is er geen profiel op afstand om op te vragen, te corrigeren of te laten wissen. Je hebt en beheert het al helemaal zelf. Woon je in de EU/EER, dan worden je AVG-rechten (inzage, rectificatie, wissing, overdraagbaarheid, bezwaar) rechtstreeks via deze bediening op je toestel vervuld.</p>
+    <p>ChillMate verzamelt je gegevens niet op een server. Er is dus geen profiel op afstand om op te vragen, te corrigeren of te laten wissen. Je hebt alles al zelf in handen. Woon je in de EU of EER, dan regel je je AVG-rechten (inzage, correctie, wissen, overdraagbaarheid, bezwaar) rechtstreeks met deze knoppen op je toestel.</p>
 """),
 
     ("children", "info", "var(--pink)", "Kinderen", """

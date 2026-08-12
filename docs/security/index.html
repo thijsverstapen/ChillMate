@@ -156,7 +156,7 @@ font-weight:800;max-width:19ch;margin:0}
       <a href="../">Home</a>
       <a href="../how-it-works/"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>How it works</a>
       <a href="../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
-      <a href="../support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support</a>
+      <a href="../support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Help</a>
       <a href="../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>About</a>
       <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
       </nav>
@@ -194,21 +194,21 @@ font-weight:800;max-width:19ch;margin:0}
       <li><strong>No third-party SDKs</strong> receiving your data, so no supply chain of analytics vendors.</li>
       <li><strong>Sync is Apple's.</strong> iCloud sync and iCloud Drive backups run in your own account under Apple's encryption.</li>
     </ul>
-    <p>What is left, and what is genuinely worth probing: the app lock (PBKDF2-derived PIN held in the Keychain, plus Face ID), the encrypted backup format, the phone to watch mirror, what the widgets and Live Activity expose on a locked screen, and whether the discreet notification wording ever leaks something it should not.</p>
+    <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activity show on a locked screen. And whether the discreet notification wording ever leaks something it should not.</p>
   </div>
 
   <div class="card">
     <h2 id="compelled"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-hand"/></svg>If I were compelled to hand something&nbsp;over
       <a class="anchor" href="#compelled" aria-label="Link to this section">#</a></h2>
     <p>Almost nobody puts this in writing, so here it is. If a court, a police force or any other authority ordered me to produce a user's data, <strong>I would have nothing to produce.</strong> Not because I would refuse, but because there is no copy: no server, no account, no database, no logs tying a person to anything.</p>
-    <p>What I could be compelled to do is change the app so that future versions collect something. That would be a public commit in a public repository, it would go through App Review with a privacy label that changed from nothing to something, and it could not be done retroactively to data that was never taken. If you ever see that commit and no explanation next to it, something has gone wrong and you should stop trusting this page.</p>
-    <p>I have received no such order. If that sentence ever disappears from this page, draw your own conclusion.</p>
+    <p>What I could be compelled to do is change the app, so that future versions collect something. That would be a public commit in a public repository. It would go through App Review, with a privacy label that changed from nothing to something. And it could not reach backwards to data that was never taken. If you ever see that commit with no explanation next to it, something has gone wrong, and you should stop trusting this page.</p>
+    <p>I have received no such order. If that sentence ever disappears from this page, take it seriously.</p>
   </div>
 
   <div class="card">
     <h2 id="audit"><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-check"/></svg>An open invitation to audit&nbsp;it
       <a class="anchor" href="#audit" aria-label="Link to this section">#</a></h2>
-    <p>I would rather be told I am wrong than be believed by default. If you work in security, harm reduction, or digital rights and want to look properly, the scope that would be most useful:</p>
+    <p>I would rather be told I am wrong than be believed by default. If you work in security, harm reduction or digital rights and want to look properly, this is the scope that would help most.</p>
     <ul>
       <li>Whether the app really makes no network calls, on device, under instrumentation rather than by reading the source.</li>
       <li>The PIN derivation and Keychain handling, and whether the legacy migration path leaks anything.</li>
@@ -241,7 +241,7 @@ font-weight:800;max-width:19ch;margin:0}
     <span class="sep" aria-hidden="true">·</span>
     <a href="../privacy/">Privacy</a>
     <span class="sep" aria-hidden="true">·</span>
-    <a href="../support/">Support</a>
+    <a href="../support/">Help</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="../changelog/">Changelog</a>
     <span class="sep" aria-hidden="true">·</span>

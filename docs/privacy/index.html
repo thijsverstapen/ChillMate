@@ -156,7 +156,7 @@ font-weight:800;max-width:19ch;margin:0}
       <a href="../">Home</a>
       <a href="../how-it-works/"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>How it works</a>
       <a href="../privacy/" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
-      <a href="../support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Support</a>
+      <a href="../support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Help</a>
       <a href="../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>About</a>
       <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
       </nav>
@@ -174,25 +174,25 @@ font-weight:800;max-width:19ch;margin:0}
   </header>
 
   <h1>Privacy&nbsp;Policy</h1>
-  <p class="lede">ChillMate is built privacy-first. Your information lives on your iPhone, under your control. We do not run servers that collect your data, we do not use advertising or analytics trackers, and we never sell or share your personal information.</p>
+  <p class="lede">ChillMate keeps your information on your iPhone, where you control it. There are no servers collecting your data. There are no ad or analytics trackers. Nothing about you is ever sold or shared.</p>
   <p class="meta">Last updated: 2026-08-11 · Applies to the ChillMate iOS app and this website.</p>
 
   <div class="card">
     <h2 id="short"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-shield"/></svg>The short&nbsp;version
       <a class="anchor" href="#short" aria-label="Link to this section">#</a></h2>
     <ul>
-      <li><strong>On your device.</strong> Your profile, logs, plans, and notes are stored locally on your iPhone.</li>
-      <li><strong>No trackers.</strong> No third-party advertising, analytics, or tracking SDKs.</li>
-      <li><strong>Nothing sold.</strong> We never sell or share your personal or health information.</li>
-      <li><strong>You are in control.</strong> You decide what to add, what to sync, and you can delete everything at any time.</li>
+      <li><strong>On your phone.</strong> Your profile, logs, plans and notes are stored on your iPhone.</li>
+      <li><strong>No trackers.</strong> No ad networks, no analytics, no tracking code from anyone else.</li>
+      <li><strong>Nothing sold.</strong> Your personal and health information is never sold or shared.</li>
+      <li><strong>You are in control.</strong> You choose what to add and what to sync. You can delete all of it whenever you want.</li>
     </ul>
   </div>
 
   <div class="card">
     <h2 id="network"><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-code"/></svg>Every connection the app&nbsp;makes
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
-    <p>Privacy policies usually describe intentions. This is the list of what actually leaves the device, which is a shorter and more checkable thing.</p>
-    <p>ChillMate's own code contains <strong>no networking at all</strong>: no <code>URLSession</code>, no analytics SDK, no crash reporter, no remote config. Everything below is either an Apple service talking to your own account, or something you tapped.</p>
+    <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
+    <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
     <div class="table-scroll">
       <table>
         <caption>Checked against ChillMate 4.2.1 (build 422), across all 82 Swift files in the repository.</caption>
@@ -200,24 +200,24 @@ font-weight:800;max-width:19ch;margin:0}
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
         <tbody>
-          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn iCloud on. Apple holds it; the developer cannot read it.</td></tr>
+          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn iCloud on. Apple holds it, and I cannot read it.</td></tr>
           <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
           <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
-          <tr><td>The optional tip</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment; we never see card details.</td></tr>
+          <tr><td>The optional tip</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
           <tr><td>A link you tap</td><td>Safari, to that site</td><td>Only on your tap. ChillMate does not fetch those pages itself.</td></tr>
           <tr><td>A call or message you send</td><td>Your phone app, your messages app</td><td>Only on your tap, and you see the message before it goes.</td></tr>
           <tr><td><strong>Anything to a ChillMate server</strong></td><td><strong>Nowhere</strong></td><td><strong>Never. There is no such server.</strong></td></tr>
         </tbody>
       </table>
     </div>
-    <p><a href="https://github.com/thijsverstapen/ChillMate">Read the source</a> if you would rather check than believe.</p>
+    <p><a href="https://github.com/thijsverstapen/ChillMate">Read the source</a> if you would like to check any of this for yourself.</p>
   </div>
 
   <div class="card">
     <h2 id="collected"><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-doc"/></svg>Category by&nbsp;category
       <a class="anchor" href="#collected" aria-label="Link to this section">#</a></h2>
-    <p>These are the categories Apple asks every developer about. ChillMate's answer is the same in all of them, which is the point.</p>
+    <p>These are the categories Apple asks every developer about. ChillMate's answer is the same in all of them.</p>
     <div class="table-scroll">
       <table>
         <thead><tr><th scope="col">Category</th><th scope="col">Collected by ChillMate</th><th scope="col">Linked to you</th><th scope="col">Used to track you</th></tr></thead>
@@ -235,13 +235,13 @@ font-weight:800;max-width:19ch;margin:0}
         </tbody>
       </table>
     </div>
-    <p>To be exact about the word: ChillMate <em>stores</em> a great deal on your phone, including health and sensitive information you type in. It <em>collects</em> none of it, in the sense of taking it off your device and holding it somewhere you cannot reach.</p>
+    <p>To be exact about the word. ChillMate <em>stores</em> a great deal on your phone, including health and other sensitive things you type in. It <em>collects</em> none of it. Collecting would mean taking it off your device and holding it somewhere you cannot reach.</p>
   </div>
 
   <div class="card">
     <h2 id="compare"><svg class="icon" style="color:var(--pink)" aria-hidden="true"><use href="#i-hand"/></svg>What a wellbeing app usually&nbsp;knows
       <a class="anchor" href="#compare" aria-label="Link to this section">#</a></h2>
-    <p>Not an accusation against anyone in particular. This is simply what the ordinary, above-board version of an app like this holds, because holding it is how the ordinary version works.</p>
+    <p>This is not an accusation against anyone in particular. It is what the ordinary, entirely above-board version of an app like this holds, because holding it is how that version works.</p>
     <div class="table-scroll">
       <table>
         <thead><tr><th scope="col">Question</th><th scope="col">The usual answer</th><th scope="col">ChillMate</th></tr></thead>
@@ -256,15 +256,15 @@ font-weight:800;max-width:19ch;margin:0}
         </tbody>
       </table>
     </div>
-    <p>The honest cost of the right-hand column: if you lose the phone with no backup, nobody can recover it for you. That is the same property, seen from the other side.</p>
+    <p>There is an honest cost to the right-hand column. If you lose the phone and have no backup, nobody can get your data back for you. That is the same property, seen from the other side.</p>
   </div>
 
   <div class="card">
-    <h2 id="threat"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-hand"/></svg>What we actually designed&nbsp;against
+    <h2 id="threat"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-hand"/></svg>What this is really designed&nbsp;against
       <a class="anchor" href="#threat" aria-label="Link to this section">#</a></h2>
     <p>Most privacy pages talk about breaches and hackers. For an app like this, the realistic risk is closer to home: <strong>someone picking up your unlocked phone.</strong> A partner, a housemate, a family member, a colleague glancing at a notification.</p>
-    <p>That is why the app has a Face ID or PIN lock of its own, on top of the phone's, why notifications can be worded so the lock screen says nothing revealing, why the screen can be paused to a blank moon in one tap, and why ChillMate hides its contents in the App Switcher and while your screen is recorded or mirrored.</p>
-    <p>The design consequence of having no server is that a breach of the developer exposes nothing, because there is nothing held. The trade-off is honest too: if you lose the phone and have no backup, the data is gone. That is the deal, and it is deliberate.</p>
+    <p>So the app has its own Face ID or PIN lock, on top of the phone's. Notifications can be worded so the lock screen says nothing revealing. One tap blanks the screen to a moon. And ChillMate hides what is on screen when you swap apps, and while your screen is being recorded or mirrored.</p>
+    <p>Having no server has a useful side effect. If I were breached, nothing about you would come out, because I hold nothing. The trade is worth saying out loud: if you lose the phone and have no backup, the data is gone. That is deliberate, and it is why an encrypted backup is one setting away.</p>
   </div>
 
   <div class="card">
@@ -273,9 +273,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>10 changes since this page first existed.</caption>
+        <caption>11 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-08-12</td><td>Dark only, and give the demo the whole risk engine</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/1461ccd"><code>1461ccd</code></a></td></tr>
           <tr><td>2026-08-12</td><td>Halve the front page by saying each thing once</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c1b282e"><code>c1b282e</code></a></td></tr>
           <tr><td>2026-08-12</td><td>Rebuild the home page as an exhibition, and make the risk checker playable</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/dd77914"><code>dd77914</code></a></td></tr>
           <tr><td>2026-08-11</td><td>Say who the app is for, and stop hiding nine sections when JavaScript fails</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/0f8f20b"><code>0f8f20b</code></a></td></tr>
@@ -295,9 +296,10 @@ font-weight:800;max-width:19ch;margin:0}
   <div class="card">
     <h2 id="ifitchanged"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-hand"/></svg>What it would take to start collecting your&nbsp;data
       <a class="anchor" href="#ifitchanged" aria-label="Link to this section">#</a></h2>
-    <p>Worth being concrete, because "we will never" is cheap and the honest version of the claim is structural rather than moral.</p>
-    <p>Collecting anything would mean writing a server, standing it up somewhere, adding accounts so records could be attributed to people, adding networking code to an app that currently has none, and shipping all of that through App Review with a privacy label that would have to change from nothing to something. It is not a setting somebody could flip, and it is not a line somebody could sneak in: it is a different app, built differently, and the commit that started it would be public on the day it was written.</p>
-    <p>That is the actual protection. Not a promise about intentions, but a shape that makes the other thing expensive and visible.</p>
+    <p>Worth being concrete, because "I will never" is easy to say. The version of that claim that means anything is about how the app is built, not about how good my intentions are.</p>
+    <p>Collecting anything would take a lot. I would have to write a server and run it somewhere. I would have to add accounts, so records could be tied to people. I would have to add networking code to an app that has none. And all of it would go through App Review, with a privacy label that changed from nothing to something.</p>
+    <p>It is not a setting somebody could flip, and it is not a line somebody could sneak in. It is a different app, built differently, and the first commit would be public on the day it was written.</p>
+    <p>That is the actual protection. Not a promise about what I intend, but a shape that makes the other thing expensive and visible.</p>
   </div>
 
   <div class="card">
@@ -317,7 +319,7 @@ font-weight:800;max-width:19ch;margin:0}
       <li>To sync with Apple Health only for the categories you approve in iOS settings.</li>
       <li>To create encrypted backups only when you turn backup features on.</li>
     </ul>
-    <p>All of this processing happens on your device. ChillMate does not send your content to the developer.</p>
+    <p>All of this happens on your phone. ChillMate never sends what you write to me.</p>
   </div>
 
   <div class="card">
@@ -332,15 +334,15 @@ font-weight:800;max-width:19ch;margin:0}
   <div class="card">
     <h2 id="where"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-cloud"/></svg>Where your data is&nbsp;stored</h2>
     <p><strong>On your iPhone.</strong> Data is kept in the app's private storage, protected by iOS file protection and, if you enable it, an extra app lock (Face ID or PIN).</p>
-    <p><strong>Optional iCloud.</strong> If you turn on iCloud backup or sync, ChillMate stores your data in <em>your own</em> private iCloud account through Apple's CloudKit and iCloud Drive. It is protected by Apple's encryption and is accessible only to you. The developer has no access to it.</p>
-    <p><strong>No developer servers.</strong> ChillMate has no backend that receives or stores your personal information.</p>
+    <p><strong>Optional iCloud.</strong> If you turn on iCloud backup or sync, ChillMate stores your data in <em>your own</em> private iCloud account through Apple's CloudKit and iCloud Drive. Apple encrypts it, and only you can reach it. I have no access to it at all.</p>
+    <p><strong>No servers of mine.</strong> There is no ChillMate server anywhere that receives or stores your personal information.</p>
   </div>
 
   <div class="card">
     <h2 id="watch"><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-watch"/></svg>Apple&nbsp;Watch</h2>
-    <p>If you pair an Apple Watch, ChillMate mirrors part of your data to the watch app so it still works when your phone is out of reach: your recovery streak and daily score, any running dose timers, your watch settings, your emergency number, and the <strong>name and phone number of your trusted contact</strong>, so the watch can reach them without your phone.</p>
-    <p>This goes directly between your phone and your watch over Apple's Watch Connectivity, on your own devices. It does not pass through our servers, because there are none.</p>
-    <p>Two things worth knowing. The trusted contact's details belong to another person and end up on a second device, so add someone only if they would be comfortable with that. And ChillMate's app lock protects the <em>phone</em> app. The watch app is protected by your watch's own passcode and wrist detection instead.</p>
+    <p>If you pair an Apple Watch, ChillMate copies part of your data to it, so the watch still works when your phone is out of reach. That means your streak and daily score, any running dose timers, your watch settings, your emergency number, and the <strong>name and phone number of your trusted contact</strong>, so the watch can call them without your phone.</p>
+    <p>This goes straight between your phone and your watch, on your own two devices. It does not pass through my servers, because there are none.</p>
+    <p>Two things worth knowing. Your trusted contact's details belong to somebody else, and they end up on a second device, so only add someone who would be comfortable with that. And ChillMate's app lock protects the <em>phone</em> app. On the watch, your watch passcode and wrist detection do that job instead.</p>
     <p>Clearing your trusted contact in Settings, or unpairing the watch, removes this mirrored data.</p>
   </div>
 
@@ -358,7 +360,7 @@ font-weight:800;max-width:19ch;margin:0}
 
   <div class="card">
     <h2 id="payments"><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-tag"/></svg>Payments and&nbsp;tips</h2>
-    <p>ChillMate is free. An optional tip is handled entirely by Apple's In-App Purchase system. Apple processes the payment; the developer never receives your card or account details. Tips do not unlock features and do not change what data is collected.</p>
+    <p>ChillMate is free. The optional tip goes entirely through Apple's In-App Purchase. Apple takes the payment, and I never see your card or account details. Tips unlock nothing, and they change nothing about what data is collected.</p>
   </div>
 
   <div class="card">
@@ -368,7 +370,7 @@ font-weight:800;max-width:19ch;margin:0}
       <li>Deleting the app removes its local data from your iPhone. iCloud data can be removed from iCloud settings or from within the app's backup controls.</li>
       <li>iOS permission controls for Health, Location, Notifications, Contacts, and Photos remain available in the Settings app at any time.</li>
     </ul>
-    <p>Because ChillMate does not collect your data on a server, there is no remote profile to request, correct, or erase. You already hold and control all of it. If you are in the EU/EEA, your GDPR rights (access, rectification, erasure, portability, objection) are satisfied directly through these on-device controls.</p>
+    <p>Because ChillMate does not collect your data on a server, there is no remote profile to ask for, correct, or erase. You already hold all of it. If you are in the EU or EEA, your GDPR rights (access, correction, erasure, portability, objection) are met directly by these controls on your phone.</p>
   </div>
 
   <div class="card">
@@ -397,7 +399,7 @@ font-weight:800;max-width:19ch;margin:0}
     <span class="sep" aria-hidden="true">·</span>
     <a href="../privacy/">Privacy</a>
     <span class="sep" aria-hidden="true">·</span>
-    <a href="../support/">Support</a>
+    <a href="../support/">Help</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="../changelog/">Changelog</a>
     <span class="sep" aria-hidden="true">·</span>

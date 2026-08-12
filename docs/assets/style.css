@@ -903,6 +903,60 @@ footer .made { margin-left: auto; }
   --line-hi: rgba(255, 255, 255, 0.16);
 }
 
+/* Two-column chapters.
+
+   Every chapter here sits in a 1080px container, but its paragraphs are capped
+   at 48ch and its headings at 18ch, so a single-column chapter stopped around
+   500px and left the right half of a desktop screen empty. Space is only
+   luxurious when something has been placed in it; unoccupied, it reads as a
+   page that did not finish loading.
+
+   `.split` gives those chapters the shape the hero and the walk already had:
+   the argument on the left, the evidence on the right. Below 900px it collapses
+   back to one column, where a single column was always right. */
+.split {
+  display: grid;
+  gap: clamp(26px, 4vw, 60px);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .split { grid-template-columns: 1.05fr 1fr; }
+  /* Inside a half-width column the caps are the column, not a character count.
+     Left as they were, the text would stop halfway across the half. */
+  .split > div > p,
+  .split > div > .checks li { max-width: none; }
+  .split .diagram { margin-top: 0; }
+}
+/* The evidence column is a panel rather than loose text, so the right side has
+   an edge and reads as placed rather than left over. */
+.split-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(20px, 2.4vw, 30px);
+}
+.split-panel > :first-child { margin-top: 0; }
+.split-panel > :last-child { margin-bottom: 0; }
+
+/* The closing ask.
+
+   By the foot of the page the alternation has run out of alternations: specs
+   and the footnotes sit either side of this, and whichever shade it borrowed it
+   would dissolve into one of its neighbours. So it gets a treatment of its own.
+   It is also the only chapter on the page that asks the reader for something,
+   which is its own argument for not looking like the eight before it. */
+.chapter--close {
+  text-align: center;
+  background:
+    radial-gradient(900px 520px at 50% 118%, rgba(124, 140, 255, 0.17), transparent 68%),
+    radial-gradient(620px 420px at 10% -12%, rgba(111, 227, 180, 0.085), transparent 62%),
+    var(--bg-1);
+  border-top: 1px solid var(--line);
+}
+.chapter--close > .inner { max-width: 760px; }
+.chapter--close .lede { margin-inline: auto; }
+.chapter--close .cta-row { justify-content: center; margin-top: 30px; }
+
 /* ---------- exhibition typography ---------- */
 
 .exhibition .chapter h1 {
