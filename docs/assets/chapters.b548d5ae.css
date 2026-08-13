@@ -49,22 +49,36 @@
 .beat h3 { margin: 0 0 6px; font-size: 1.06rem; font-weight: 730; }
 .beat p { margin: 0; font-size: 0.95rem; color: var(--text-dim); }
 
-/* ---------- the walk, narrow fallback ---------- */
+/* ---------- the walk ----------
 
-/* Below 940px there is no sticky stage: each step carries its own phone and
-   the chapter reads as a plain sequence. The scroll-driven version lives in
-   the exhibition layer further down. */
+   One phone, five screens, changing as you read past them. It has three
+   layouts, chosen by how much room the screen has to give it:
+
+     wide          the phone sticks beside the words, two columns
+     upright       the phone pins above the words, one column
+     anything else the phone is printed with each step, no pinning at all
+
+   The third is not a punishment layout. A pinned phone has to be sized to the
+   height it is given, so on a screen wider than it is tall it comes out
+   absurdly small: a 900x700 window produced a 151px phone in a 900px column.
+   Anything on its side, or too short to hold a phone and a sentence at once,
+   is better served by the printed sequence, where each phone is 268px. Someone
+   asking for reduced data gets that layout too, because there every screen is
+   a labelled placeholder rather than a picture, and five placeholders each
+   carrying their own step's caption say more than one repeating the heading. */
 
 .walk-step .phone { margin-bottom: 18px; }
 .walk-step .eyebrow { margin: 0 0 6px; }
 .walk-step p { margin: 0; }
 .copy-done { color: var(--mint); font-size: 0.85rem; margin-left: 6px; }
 
-/* ---------- the scroll-driven walk ---------- */
-
 .walk-scroll { position: relative; }
 .walk-scroll .inner { max-width: 1140px; }
 .walk-scroll .track { display: grid; gap: 0; }
+.walk-scroll .stage { display: none; }
+
+/* ---------- wide: the phone beside the words ---------- */
+
 @media (min-width: 940px) {
   .walk-scroll .track { grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
   .walk-scroll .stage {
@@ -86,8 +100,95 @@
   .walk-scroll .walk-step.is-active { opacity: 1; }
   .walk-scroll .walk-step .phone { display: none; }
 }
-.walk-scroll .stage { display: none; }
-@media (min-width: 940px) { .walk-scroll .stage { display: grid; } }
+
+/* ---------- upright: the phone above the words ---------- */
+
+@media (max-width: 939px) and (orientation: portrait) and (min-height: 640px) {
+  .walk-scroll {
+    /* The two numbers everything else here is derived from. The stage takes
+       just under half the screen, which on the shortest phone this layout
+       runs on leaves 300px for the words: enough for a heading and a short
+       paragraph, which is all a step is. */
+    --stage-h: 47svh;
+    /* Where the phone stops. Nothing is above it by default; the sub-nav is
+       put there by a script, and with that script blocked the bar never
+       appears and the gap would be a strip of text sliding past above the
+       phone. It only claims the room once the bar is actually in it, which
+       happens far higher up the page than this chapter, so the phone is never
+       pinned at the moment the value changes. */
+    --stage-top: 0px;
+  }
+  body:has(.subnav.is-shown) .walk-scroll { --stage-top: 62px; }
+
+  /* Both children are put in the same grid cell, so the stage's containing
+     block is the whole track instead of its own height. Without this a sticky
+     item in a single-column grid has nowhere to travel and simply never
+     pins, which is the trap this layout exists inside of. */
+  .walk-scroll .track > .stage,
+  .walk-scroll .track > .beats-col { grid-column: 1; grid-row: 1; }
+
+  .walk-scroll .stage {
+    display: grid;
+    place-items: center;
+    position: sticky;
+    top: var(--stage-top);
+    /* A stretched grid item is exactly as tall as its area and therefore has
+       no room to move either. */
+    align-self: start;
+    height: var(--stage-h);
+    z-index: 2;
+    /* Opaque on purpose: the words pass behind it, not beside it. */
+    background: var(--bg-1);
+  }
+
+  /* They do not vanish at a hard edge, though. The last centimetre of their
+     travel is a fade, so a sentence leaves the way it arrived. */
+  .walk-scroll .stage::after {
+    content: "";
+    position: absolute;
+    inset: 100% 0 auto;
+    height: 44px;
+    background: linear-gradient(var(--bg-1), transparent);
+    pointer-events: none;
+  }
+
+  /* Sized from the height it has to fit inside, rather than the width it
+     would like. The screen is 1206x2622 inside a 9px shell, so this is that
+     ratio run backwards, with the vw cap for a wide, short window. */
+  .walk-scroll .stage-phone {
+    width: min(58vw, calc((var(--stage-h) - 40px) / 2.174 + 18px));
+  }
+
+  /* No padding under the last step. A sticky element is released by the
+     bottom of its container, so every pixel added here is a pixel of the
+     phone hanging over an empty screen after the last sentence has gone. The
+     step's own lower half already leaves it about 140px to let go in. */
+  .walk-scroll .beats-col {
+    padding-top: var(--stage-h);
+    padding-bottom: 0;
+  }
+  .walk-scroll .walk-step {
+    min-height: 62svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0.28;
+    transition: opacity 0.4s ease;
+  }
+  .walk-scroll .walk-step.is-active { opacity: 1; }
+  .walk-scroll .walk-step .phone { display: none; }
+}
+
+/* Reduced data replaces every screenshot with a hatched box carrying the
+   caption the picture would have had. Five of those, each with its own step's
+   caption, tell a reader more than one pinned box repeating the chapter
+   heading, so this layout stands down and the printed sequence comes back. */
+@media (max-width: 939px) and (prefers-reduced-data: reduce) {
+  .walk-scroll .stage { display: none; }
+  .walk-scroll .beats-col { padding-top: 0; padding-bottom: 0; }
+  .walk-scroll .walk-step { min-height: 0; display: block; opacity: 1; }
+  .walk-scroll .walk-step .phone { display: block; }
+}
 
 .stage-phone {
   width: 340px;
@@ -108,6 +209,17 @@
   transition: opacity 0.5s ease;
 }
 .stage-phone .phone-screen img.is-shown { opacity: 1; }
+
+/* Nothing carries `is-shown` until the script picks a screen, and a stage that
+   is laid out but undriven is an empty black rectangle where the phone should
+   be. Two ways to reach that: the script is blocked, or the stylesheet has
+   switched layouts and the script has not caught up yet, which is what a
+   rotation between the two sticky layouts does.
+
+   So the condition is the state itself, not a guess at the cause: if no screen
+   is showing, show the first one. The moment one is picked this stops
+   matching, and it never fights the script for control. */
+.stage-phone .phone-screen:not(:has(img.is-shown)) picture:first-child img { opacity: 1; }
 
 /* ---------- the playable risk checker ---------- */
 

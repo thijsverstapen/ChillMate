@@ -9,8 +9,8 @@ const CORE = [
   '/ChillMate/support/',
   '/ChillMate/risk-checker/',
   '/ChillMate/assets/style.0061cf26.css',
-  '/ChillMate/assets/chapters.4f1b382d.css',
-  '/ChillMate/assets/site.7be77180.js',
+  '/ChillMate/assets/chapters.b548d5ae.css',
+  '/ChillMate/assets/site.acbb3c08.js',
   '/ChillMate/assets/mark.svg',
 ];
 

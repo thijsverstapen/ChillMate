@@ -34,7 +34,16 @@
     var walk = document.querySelector('[data-walk]');
     if (!walk) return;
 
+    // The stage is wanted in two different layouts, and the query has to say
+    // so in both directions: wide enough for two columns, or upright and tall
+    // enough to pin the phone above the words with room left to read them.
+    // These have to agree with the media queries in chapters.css exactly, or
+    // the script drives a stage the stylesheet is not showing.
     var wide = window.matchMedia('(min-width: 940px)');
+    var upright = window.matchMedia('(orientation: portrait) and (min-height: 640px)');
+    var thrifty = window.matchMedia('(prefers-reduced-data: reduce)');
+    var conditions = [wide, upright, thrifty];
+
     var steps = Array.prototype.slice.call(walk.querySelectorAll('.walk-step'));
     var frames = Array.prototype.slice.call(walk.querySelectorAll('.stage-phone img'));
     var device = walk.querySelector('.stage-phone');
@@ -114,10 +123,26 @@
       shown = -1;
     }
 
-    function sync() { wide.matches ? enable() : disable(); }
+    function wanted() {
+      return wide.matches || (upright.matches && !thrifty.matches);
+    }
+
+    // Only act on a real change of layout, because this now runs on every
+    // resize event as well and enable() is not free.
+    var running = null;
+    function sync() {
+      var want = wanted();
+      if (want === running) return;
+      running = want;
+      want ? enable() : disable();
+    }
 
     sync();
-    wide.addEventListener('change', sync);
+    conditions.forEach(function (mq) { mq.addEventListener('change', sync); });
+    // A belt to the media queries' braces. The two sticky layouts are a
+    // rotation apart, and if the stylesheet switches while the script does
+    // not, the reader is left looking at a phone with nothing in it.
+    window.addEventListener('resize', sync, { passive: true });
   }
 
   /* ---------- sticky sub-nav ---------- */
