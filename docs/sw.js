@@ -4,11 +4,12 @@
    dependable, so they are cached on first visit and served from the cache when
    a fetch fails. Everything else is network-first and simply falls back. */
 
-const CACHE = 'chillmate-4.2.1-422';
+const CACHE = 'chillmate-4.2.1-422-151c9a6f';
 const CORE = [
   '/ChillMate/',
   '/ChillMate/support/',
-  '/ChillMate/assets/site.js',
+  '/ChillMate/assets/site.7be77180.js',
+  '/ChillMate/assets/style.151c9a6f.css',
   '/ChillMate/assets/mark.svg',
 ];
 

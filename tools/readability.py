@@ -49,7 +49,6 @@ LIMITS = {
     "support": 8.0,      # crisis numbers and what to do in an emergency
     "faq": 9.0,
     "privacy": 11.0,     # a near-legal document, held to a looser bar
-    "about": 10.0,
     "security": 12.0,    # written for people who audit software
     "press": 11.0,
 }
@@ -171,7 +170,6 @@ def surface_text(lang: str, surface: str, skip: set | None = None) -> str:
 
 PAGE_FUNCS = {
     "privacy": "build_privacy",
-    "about": "build_about",
     "security": "build_security",
     "press": "build_press",
 }

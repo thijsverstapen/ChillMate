@@ -182,6 +182,25 @@ def main():
             if asset is not None and not asset.exists():
                 problems.append(f"{where}: missing image {src.group(1)}")
 
+        # Every candidate a browser could pick, not just the `src` fallback.
+        # An <img> whose src exists while its AVIF sibling does not is a page
+        # that looks fine to whoever built it and is broken for everyone on a
+        # current browser, because the modern <source> is the one they get.
+        for tag in re.findall(r"<(?:img|source)\s[^>]*>", markup):
+            candidates = re.search(r'srcset="([^"]+)"', tag)
+            if not candidates:
+                continue
+            for candidate in candidates.group(1).split(","):
+                url = candidate.strip().split(" ")[0]
+                if not url:
+                    continue
+                asset = resolve(page, url)
+                if asset is not None and not asset.exists():
+                    problems.append(f"{where}: srcset points at missing {url}")
+            if tag.startswith("<source") and 'type="' not in tag:
+                problems.append(f"{where}: <source> with no type, so the browser "
+                                f"cannot tell whether it can decode it")
+
         # ---- the dash rule, on what a reader actually sees
         text = visible_text(markup)
         for match in re.finditer(r"[^.!?]{0,60}(?:—|–|\w \- \w)[^.!?]{0,60}", text):

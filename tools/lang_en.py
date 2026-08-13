@@ -40,7 +40,6 @@ S = {
     "nav_home": "Home",
     "nav_privacy": "Privacy",
     "nav_support": "Help",
-    "nav_about": "About",
     "nav_github": "GitHub",
     "lang_label": "Language",
     "to_top": "Back to top",

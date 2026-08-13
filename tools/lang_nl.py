@@ -27,7 +27,6 @@ S = {
     "nav_home": "Home",
     "nav_privacy": "Privacy",
     "nav_support": "Hulp",
-    "nav_about": "Over",
     "nav_github": "GitHub",
     "lang_label": "Taal",
     "to_top": "Terug naar boven",

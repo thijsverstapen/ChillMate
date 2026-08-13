@@ -93,21 +93,35 @@ def bind_last_two(text: str) -> str:
     return parts[0] + " " + parts[1] if len(parts) == 2 and parts[0] else text
 
 
-def render(lang: str) -> Path:
+# A card per page as well as per language. Someone sharing the help directory
+# or the risk checker was handing over a card that described the home page, so
+# the preview promised one thing and the link delivered another. Each of these
+# reuses copy the site already has: no new strings to translate, and no way for
+# a card to drift from the page it advertises.
+PAGES = {
+    "": ("h1", "og_sub"),
+    "support": ("support_h1", "support_help_p"),
+    "checker": ("demo_h2", "demo_p"),
+    "howto": ("howto_h1", "howto_lede"),
+}
+
+
+def render(lang: str, key: str = "") -> Path:
     s = C.STRINGS[lang]
-    # German and Dutch headlines are longer; drop a step so they still fit.
-    title = s["h1"]
+    title_key, sub_key = PAGES[key]
+    title = s[title_key]
     size = 62 if len(title) <= 46 else (56 if len(title) <= 56 else 50)
 
     page = TEMPLATE.format(
         lang=C.LANG_TAGS[lang],
         size=size,
         title=html.escape(bind_last_two(title)),
-        sub=html.escape(s["og_sub"]),
+        sub=html.escape(s[sub_key]),
         foot=html.escape(s["og_foot"]),
     )
 
-    out = ASSETS / (f"og.png" if lang == "en" else f"og-{lang}.png")
+    stem = "og" if not key else f"og-{key}"
+    out = ASSETS / (f"{stem}.png" if lang == "en" else f"{stem}-{lang}.png")
     with tempfile.TemporaryDirectory() as tmp:
         src = Path(tmp) / "og.html"
         src.write_text(page, encoding="utf-8")
@@ -123,9 +137,10 @@ def render(lang: str) -> Path:
 def main():
     if not Path(CHROME).exists():
         sys.exit(f"Chrome not found at {CHROME}; the committed og-*.png stay as they are.")
-    for lang in C.LANGS:
-        path = render(lang)
-        print(f"  {path.relative_to(ROOT)}  {path.stat().st_size // 1024} KB")
+    for key in PAGES:
+        for lang in C.LANGS:
+            path = render(lang, key)
+            print(f"  {path.relative_to(ROOT)}  {path.stat().st_size // 1024} KB")
 
 
 if __name__ == "__main__":

@@ -27,7 +27,6 @@ S = {
     "nav_home": "Accueil",
     "nav_privacy": "Confidentialité",
     "nav_support": "Aide",
-    "nav_about": "À propos",
     "nav_github": "GitHub",
     "lang_label": "Langue",
     "to_top": "Retour en haut",

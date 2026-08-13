@@ -16,7 +16,9 @@
   <link rel="alternate" hreflang="x-default" href="https://thijsverstapen.github.io/ChillMate/" />
   <link rel="icon" href="../assets/mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/icon-180.png" />
-  <link rel="preload" as="image" href="../assets/shots/home.jpg" fetchpriority="high" />
+  <link rel="preload" as="image" type="image/avif" fetchpriority="high"
+        imagesrcset="../assets/shots/home@half.avif 320w, ../assets/shots/home.avif 640w"
+        imagesizes="(max-width: 620px) 78vw, 400px" href="../assets/shots/home.avif" />
   <link rel="manifest" href="/ChillMate/manifest.webmanifest" />
   <link rel="alternate" type="application/atom+xml" title="ChillMate releases" href="/ChillMate/changelog/feed.xml" />
 
@@ -50,7 +52,8 @@ flex-wrap:wrap;max-width:1080px;margin-inline:auto;padding:18px 20px 0}
 h1{font-size:clamp(2.7rem,6.6vw,5.4rem);line-height:1;letter-spacing:-.035em;
 font-weight:800;max-width:19ch;margin:0}
 </style>
-  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/style.151c9a6f.css" />
+  <link rel="stylesheet" href="../assets/chapters.f593a7ae.css" />
 </head>
 <body class="exhibition">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -163,7 +166,6 @@ font-weight:800;max-width:19ch;margin:0}
       <a href="./how-it-works/"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>Comment ça marche</a>
       <a href="../privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Confidentialité</a>
       <a href="./support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Aide</a>
-      <a href="../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>À propos</a>
       <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
       </nav>
       <details class="lang">
@@ -207,8 +209,11 @@ font-weight:800;max-width:19ch;margin:0}
         <div class="hero-phone-big">
           <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Ce qu&#x27;il vous faut, déjà en haut" decoding="async" fetchpriority="high" />
+          <div class="phone-screen" data-reduced-label="Ce qu&#x27;il vous faut, déjà en haut">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/home@half.avif 320w, ../assets/shots/home.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Ce qu&#x27;il vous faut, déjà en haut" decoding="async" fetchpriority="high" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -248,12 +253,27 @@ font-weight:800;max-width:19ch;margin:0}
           <div class="stage-phone">
             <div class="phone">
               <div class="phone-shell">
-                <div class="phone-screen">
+                <div class="phone-screen" data-reduced-label="Cinq écrans, et ce que chacun fait pour vous.">
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/home@half.avif 320w, ../assets/shots/home.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Ce qu&#x27;il vous faut, déjà en haut" loading="lazy" decoding="async" />
+              </picture>
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/risk@half.avif 320w, ../assets/shots/risk.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/risk.jpg" srcset="../assets/shots/risk@half.jpg 320w, ../assets/shots/risk.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Ce qu&#x27;on sait, en mots simples" loading="lazy" decoding="async" />
+              </picture>
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/help@half.avif 320w, ../assets/shots/help.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/help.jpg" srcset="../assets/shots/help@half.jpg 320w, ../assets/shots/help.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Une chose à la fois, au calme" loading="lazy" decoding="async" />
+              </picture>
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/support@half.avif 320w, ../assets/shots/support.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/support.jpg" srcset="../assets/shots/support@half.jpg 320w, ../assets/shots/support.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Des humains, en un geste" loading="lazy" decoding="async" />
+              </picture>
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/privacy@half.avif 320w, ../assets/shots/privacy.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/privacy.jpg" srcset="../assets/shots/privacy@half.jpg 320w, ../assets/shots/privacy.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Dans l&#x27;app, pas dans les petits caractères" loading="lazy" decoding="async" />
+              </picture>
                   <span class="phone-island"></span>
                 </div>
               </div>
@@ -265,8 +285,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Il se range tout seul</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Ce qu&#x27;il vous faut, déjà en haut" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Ce qu&#x27;il vous faut, déjà en haut">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/home@half.avif 320w, ../assets/shots/home.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Ce qu&#x27;il vous faut, déjà en haut" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -279,8 +302,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Des réponses claires</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/risk.jpg" srcset="../assets/shots/risk@half.jpg 320w, ../assets/shots/risk.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Ce qu&#x27;on sait, en mots simples" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Ce qu&#x27;on sait, en mots simples">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/risk@half.avif 320w, ../assets/shots/risk.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/risk.jpg" srcset="../assets/shots/risk@half.jpg 320w, ../assets/shots/risk.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Ce qu&#x27;on sait, en mots simples" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -293,8 +319,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Quand ça va déjà mal</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/help.jpg" srcset="../assets/shots/help@half.jpg 320w, ../assets/shots/help.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Une chose à la fois, au calme" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Une chose à la fois, au calme">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/help@half.avif 320w, ../assets/shots/help.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/help.jpg" srcset="../assets/shots/help@half.jpg 320w, ../assets/shots/help.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Une chose à la fois, au calme" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -307,8 +336,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">De vrais services, hors ligne</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/support.jpg" srcset="../assets/shots/support@half.jpg 320w, ../assets/shots/support.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Des humains, en un geste" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Des humains, en un geste">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/support@half.avif 320w, ../assets/shots/support.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/support.jpg" srcset="../assets/shots/support@half.jpg 320w, ../assets/shots/support.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Des humains, en un geste" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -321,8 +353,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Vos données, sur un seul écran</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/privacy.jpg" srcset="../assets/shots/privacy@half.jpg 320w, ../assets/shots/privacy.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Dans l&#x27;app, pas dans les petits caractères" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Dans l&#x27;app, pas dans les petits caractères">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/privacy@half.avif 320w, ../assets/shots/privacy.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/privacy.jpg" srcset="../assets/shots/privacy@half.jpg 320w, ../assets/shots/privacy.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Dans l&#x27;app, pas dans les petits caractères" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -340,7 +375,6 @@ font-weight:800;max-width:19ch;margin:0}
       <p class="eyebrow">Essayer</p>
       <h2>Voici le vrai vérificateur de risques.</h2>
       <p>Pas une capture d&#x27;écran. Les mêmes 30 associations et les mêmes mots que dans l&#x27;app, ici même. Rien à installer.</p>
-
       <div class="demo demo--wide panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
         <div>
           <p class="eyebrow">Choisissez ce qui est en jeu</p>
@@ -387,6 +421,9 @@ font-weight:800;max-width:19ch;margin:0}
         </div>
       </div>
       <script type="application/json" id="cm-interactions">{"levels": {"caution": "À noter", "serious": "Risque important", "critical": "Combinaison à haut risque"}, "riskLabels": {"lower": "Aucune connue", "caution": "Prudence", "high": "Higher risk"}, "medication": [{"key": "serotonergic", "label": "Affecte la sérotonine", "aliases": ["ssri", "snri", "tramadol", "lithium", "linezolid", "mirtazapine", "venlafaxine", "fluoxetine", "sertraline", "citalopram", "escitalopram", "paroxetine", "duloxetine", "vortioxetine", "dextromethorphan", "sumatriptan", "triptan", "st johns wort"]}, {"key": "maoi", "label": "IMAO", "aliases": ["maoi", "phenelzine", "tranylcypromine", "moclobemide", "selegiline"]}, {"key": "sedative", "label": "Sédatif", "aliases": ["benzodiazepine", "benzo", "diazepam", "alprazolam", "lorazepam", "oxazepam", "temazepam", "zolpidem", "zopiclone", "pregabalin", "gabapentin", "baclofen", "quetiapine"]}, {"key": "opioid", "label": "Opioïde", "aliases": ["opioid", "opiate", "oxycodone", "morphine", "fentanyl", "codeine", "methadone", "buprenorphine", "tramadol"]}, {"key": "nitrateLike", "label": "Type nitrate", "aliases": ["nitrate", "nitroglycerin", "glyceryl trinitrate", "isosorbide", "mononitrate", "dinitrate", "nicorandil", "riociguat"]}, {"key": "alphaBlocker", "label": "Alphabloquant", "aliases": ["alpha blocker", "tamsulosin", "doxazosin", "alfuzosin", "prazosin", "terazosin"]}, {"key": "stimulantMedication", "label": "Médicament stimulant", "aliases": ["methylphenidate", "ritalin", "concerta", "dexamfetamine", "dexamphetamine", "lisdexamfetamine", "vyvanse", "elvanse", "adderall", "modafinil", "bupropion"]}, {"key": "ritonavirBooster", "label": "Ritonavir/cobicistat", "aliases": ["ritonavir", "cobicistat"]}], "assessments": {"serotonin": {"title": "Syndrome sérotoninergique", "levels": {"high": "Tu as sélectionné un mélange de médicaments ou de substances qui peut affecter la sérotonine, une substance chimique du cerveau impliquée dans l'humeur et le fonctionnement du corps. Signes à surveiller : confusion, fièvre, agitation, tremblements, transpiration ou diarrhée. Demande de l'aide si ces signes apparaissent.", "caution": "L'une de tes sélections peut affecter les niveaux de sérotonine. Le risque peut augmenter avec un usage répété, la chaleur, la déshydratation ou d'autres médicaments.", "lower": "Aucune combinaison connue liée à la sérotonine n'est sélectionnée."}}, "dehydration": {"title": "Déshydratation", "levels": {"high": "Les stimulants, l'alcool, la chaleur, la danse et les longues sessions peuvent augmenter le risque de déshydratation et de surchauffe.", "caution": "L'hydratation et le rafraîchissement comptent, surtout si le sommeil, la nourriture ou les pauses ont été limités.", "lower": "Aucun schéma marqué de déshydratation n'est sélectionné, mais vérifie l'eau, la nourriture, la température et le repos."}}, "stimulant": {"title": "Surcharge de stimulants", "levels": {"high": "Plus d'un schéma stimulant est sélectionné, y compris un possible médicament stimulant prescrit. La fréquence cardiaque, l'anxiété, la tension de la mâchoire, la surchauffe et la pression pour continuer peuvent se cumuler.", "caution": "Un stimulant est sélectionné dans la fenêtre de temps actuelle. Fais une pause, repose-toi et laisse du temps à ton corps.", "lower": "Aucun cumul évident de stimulants n'est sélectionné."}}}, "copy": {"empty": "Choisissez quelque chose, ou tapez un médicament, pour voir ce que l'app dirait.", "noneTitle": "Rien de connu sur ce mélange", "noneBody": "Ça ne veut pas dire que c'est sûr. Ça veut dire qu'ici, on n'a rien là-dessus. Cette liste n'a le dernier mot sur rien, et un pharmacien en saura plus.", "medsHit": "Reconnu", "medsNone": "Ce médicament n'est pas dans la liste."}, "rules": [{"substances": ["Alcohol", "GHB"], "level": "critical", "warning": "Le GHB et l'alcool ensemble augmentent fortement le risque de perte de connaissance et de problèmes respiratoires. Cette combinaison a causé des décès. Demande de l'aide immédiatement si une personne ne peut pas être réveillée."}, {"substances": ["Alcohol", "GBL"], "level": "critical", "warning": "Le GBL se transforme en GHB dans le corps. Combiné à l'alcool, le risque de perdre connaissance ou d'arrêter de respirer augmente fortement. C'est une combinaison potentiellement mortelle."}, {"substances": ["GBL", "GHB"], "level": "critical", "warning": "Le GHB et le GBL sont en pratique la même substance. Les combiner cumule la dose de façon imprévisible et peut provoquer une perte de connaissance soudaine."}, {"substances": ["Kamagra", "Poppers"], "level": "critical", "warning": "Les poppers et la Kamagra ensemble peuvent provoquer une chute soudaine et dangereuse de la tension artérielle. Cela peut entraîner un évanouissement, un AVC ou un arrêt cardiaque. Ne les combine pas."}, {"substances": ["Poppers", "Viagra"], "level": "critical", "warning": "Les poppers et le Viagra ensemble peuvent provoquer une chute dangereuse de la tension artérielle. C'est une combinaison à haut risque. Évite-la."}, {"substances": ["GHB", "Ketamine"], "level": "serious", "warning": "Le GHB et la kétamine combinent des effets dépresseurs et dissociatifs. Cela augmente le risque de perdre la capacité de réagir aux problèmes autour de toi."}, {"substances": ["GBL", "Ketamine"], "level": "serious", "warning": "Le GBL et la kétamine ensemble comportent un risque accru de perte de contrôle et de difficulté à obtenir de l'aide."}, {"substances": ["Alcohol", "Ketamine"], "level": "serious", "warning": "L'alcool et la kétamine ensemble combinent des effets dépresseurs et peuvent provoquer une désorientation plus profonde et des problèmes respiratoires."}, {"substances": ["Cocaine", "MDMA"], "level": "serious", "warning": "La cocaïne et la MDMA sollicitent toutes deux le cœur. Combinées, le risque de battements irréguliers et de surchauffe est nettement plus élevé."}, {"substances": ["3MMC", "Cocaine"], "level": "serious", "warning": "La cocaïne et la 3-MMC ensemble cumulent les effets stimulants sur le cœur et augmentent le risque de problèmes cardiaques et d'anxiété."}, {"substances": ["3MMC", "MDMA"], "level": "serious", "warning": "La MDMA et la 3-MMC ensemble augmentent la charge stimulante et sérotoninergique. La combinaison élève la fréquence cardiaque, la température et le risque d'une descente difficile."}, {"substances": ["Cocaine", "GHB"], "level": "caution", "warning": "Les stimulants peuvent masquer les effets du GHB, rendant plus difficile de remarquer qu'une dose est trop élevée. Cela augmente le risque de surdose accidentelle."}, {"substances": ["Cocaine", "GBL"], "level": "caution", "warning": "Les stimulants peuvent masquer les effets du GBL, rendant plus difficile de remarquer qu'une dose est trop élevée."}, {"substances": ["Alcohol", "Cocaine"], "level": "serious", "warning": "La cocaïne et l'alcool forment ensemble du cocaéthylène dans le foie. Il sollicite le cœur plus que la cocaïne seule et reste plus longtemps dans le corps, augmentant le risque de douleurs thoraciques et d'arythmie. L'alcool masque aussi la quantité de cocaïne prise."}, {"substances": ["Alcohol", "MDMA"], "level": "serious", "warning": "L'alcool te déshydrate pendant que la MDMA augmente ta température corporelle, et chacun masque la force de l'autre. Ensemble, ils augmentent le risque de surchauffe, de déshydratation et d'une descente bien plus dure."}, {"substances": ["3MMC", "Alcohol"], "level": "serious", "warning": "La 3-MMC masque ton degré d'ivresse, ce qui pousse facilement à boire au-delà de tes limites. La combinaison augmente aussi le rythme cardiaque et la tension, et rend le redosage plus difficile à juger."}, {"substances": ["Alcohol", "Cannabis"], "level": "caution", "warning": "Le cannabis supprime l'envie de vomir, l'une des défenses du corps contre l'intoxication alcoolique. Combinés, l'altération et les vertiges augmentent aussi fortement. Si une personne ne se réveille pas, place-la sur le côté et appelle les secours."}, {"substances": ["GHB", "Poppers"], "level": "serious", "warning": "Le GHB et les poppers font tous deux baisser la tension. Ensemble, ils peuvent provoquer un évanouissement, une chute ou une perte de conscience à un moment où tu ne peux pas te protéger."}, {"substances": ["GBL", "Poppers"], "level": "serious", "warning": "Le GBL et les poppers font tous deux baisser la tension. La chute peut être brutale et provoquer un évanouissement ou une chute."}, {"substances": ["Ketamine", "MDMA"], "level": "caution", "warning": "La MDMA et la kétamine ensemble accentuent la désorientation et rendent plus difficile d'évaluer ton environnement, tes limites et les personnes autour de toi. Le consentement devient plus dur à donner et à lire."}, {"substances": ["MDMA", "Psychedelics"], "level": "serious", "warning": "Les psychédéliques et la MDMA cumulent la charge sérotoninergique et cardiaque, et les effets psychologiques deviennent bien moins prévisibles. La surchauffe et une descente lourde et longue sont plus probables."}, {"substances": ["Cocaine", "Psychedelics"], "level": "caution", "warning": "Ajouter un stimulant à un psychédélique augmente le rythme cardiaque et transforme souvent une expérience gérable en anxiété ou en panique. Il devient aussi plus dur de rester tranquille et de laisser passer un moment difficile."}, {"substances": ["3MMC", "Psychedelics"], "level": "caution", "warning": "Ajouter de la 3-MMC à un psychédélique augmente le rythme cardiaque et l'anxiété et rend l'expérience plus difficile à diriger. La panique en est une issue fréquente."}, {"substances": ["Kamagra", "Viagra"], "level": "serious", "warning": "Le Kamagra, c'est du sildénafil, le même principe actif que le Viagra. Prendre les deux empile une dose sur l'autre et augmente le risque de chute de tension, de maux de tête, de troubles de la vision et d'une érection qui ne retombe pas. Une érection de plus de quatre heures nécessite des soins médicaux urgents."}, {"substances": ["Cocaine", "Viagra"], "level": "serious", "warning": "Le Viagra et la cocaïne tirent ta circulation dans des directions opposées tout en sollicitant le cœur. Cela augmente le risque de douleurs thoraciques et d'arythmie, surtout lors d'une longue session."}, {"substances": ["Cocaine", "Kamagra"], "level": "serious", "warning": "Le Kamagra et la cocaïne sollicitent tous deux le cœur tout en tirant ta circulation dans des directions opposées, augmentant le risque de douleurs thoraciques et d'arythmie."}, {"substances": ["MDMA", "Viagra"], "level": "caution", "warning": "Le Viagra et la MDMA ajoutent une contrainte cardiaque et peuvent faire baisser la tension plus que prévu. Fais des pauses, reste au frais et arrête-toi si ta poitrine se serre."}, {"substances": ["Kamagra", "MDMA"], "level": "caution", "warning": "Le Kamagra et la MDMA ajoutent une contrainte cardiaque et peuvent faire baisser la tension plus que prévu. Fais des pauses et arrête-toi si ta poitrine se serre."}, {"substances": ["3MMC", "Viagra"], "level": "caution", "warning": "Le Viagra et la 3-MMC ajoutent une contrainte cardiaque pendant une session souvent déjà longue. Surveille l'oppression thoracique et un cœur qui s'emballe sans se calmer."}, {"substances": ["3MMC", "Kamagra"], "level": "caution", "warning": "Le Kamagra et la 3-MMC ajoutent une contrainte cardiaque pendant une session souvent déjà longue. Surveille l'oppression thoracique et un cœur qui s'emballe sans se calmer."}]}</script>
+      <div class="cta-row">
+        <a class="btn btn-ghost" href="./risk-checker/"><svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg>Voici le vrai vérificateur de risques</a>
+      </div>
     </div>
   </section>
 
@@ -446,7 +483,7 @@ font-weight:800;max-width:19ch;margin:0}
   </section>
 
   <section class="chapter chapter--invert" id="specs">
-    <div class="inner narrow">
+    <div class="inner">
       <p class="eyebrow">Les détails</p>
       <h2>Fiche technique</h2>
       <table class="specs">
@@ -510,6 +547,6 @@ font-weight:800;max-width:19ch;margin:0}
 <button type="button" class="to-top" data-to-top hidden aria-label="Retour en haut">
   <svg class="icon" aria-hidden="true"><use href="#i-up"/></svg>
 </button>
-<script src="../assets/site.js" defer></script>
+<script src="../assets/site.7be77180.js" defer></script>
 </body>
 </html>

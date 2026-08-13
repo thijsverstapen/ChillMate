@@ -16,7 +16,9 @@
   <link rel="alternate" hreflang="x-default" href="https://thijsverstapen.github.io/ChillMate/" />
   <link rel="icon" href="../assets/mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/icon-180.png" />
-  <link rel="preload" as="image" href="../assets/shots/home.jpg" fetchpriority="high" />
+  <link rel="preload" as="image" type="image/avif" fetchpriority="high"
+        imagesrcset="../assets/shots/home@half.avif 320w, ../assets/shots/home.avif 640w"
+        imagesizes="(max-width: 620px) 78vw, 400px" href="../assets/shots/home.avif" />
   <link rel="manifest" href="/ChillMate/manifest.webmanifest" />
   <link rel="alternate" type="application/atom+xml" title="ChillMate releases" href="/ChillMate/changelog/feed.xml" />
 
@@ -50,7 +52,8 @@ flex-wrap:wrap;max-width:1080px;margin-inline:auto;padding:18px 20px 0}
 h1{font-size:clamp(2.7rem,6.6vw,5.4rem);line-height:1;letter-spacing:-.035em;
 font-weight:800;max-width:19ch;margin:0}
 </style>
-  <link rel="stylesheet" href="../assets/style.css" />
+  <link rel="stylesheet" href="../assets/style.151c9a6f.css" />
+  <link rel="stylesheet" href="../assets/chapters.f593a7ae.css" />
 </head>
 <body class="exhibition">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -163,7 +166,6 @@ font-weight:800;max-width:19ch;margin:0}
       <a href="./how-it-works/"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>Hoe het werkt</a>
       <a href="./privacy/"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg>Privacy</a>
       <a href="./support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Hulp</a>
-      <a href="../about/"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Over</a>
       <a href="https://github.com/thijsverstapen/ChillMate"><svg class="icon" aria-hidden="true"><use href="#i-github"/></svg>GitHub</a>
       </nav>
       <details class="lang">
@@ -207,8 +209,11 @@ font-weight:800;max-width:19ch;margin:0}
         <div class="hero-phone-big">
           <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Wat je nodig hebt, staat al bovenaan" decoding="async" fetchpriority="high" />
+          <div class="phone-screen" data-reduced-label="Wat je nodig hebt, staat al bovenaan">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/home@half.avif 320w, ../assets/shots/home.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Wat je nodig hebt, staat al bovenaan" decoding="async" fetchpriority="high" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -248,12 +253,27 @@ font-weight:800;max-width:19ch;margin:0}
           <div class="stage-phone">
             <div class="phone">
               <div class="phone-shell">
-                <div class="phone-screen">
+                <div class="phone-screen" data-reduced-label="Vijf schermen, en wat je aan elk hebt.">
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/home@half.avif 320w, ../assets/shots/home.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Wat je nodig hebt, staat al bovenaan" loading="lazy" decoding="async" />
+              </picture>
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/risk@half.avif 320w, ../assets/shots/risk.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/risk.jpg" srcset="../assets/shots/risk@half.jpg 320w, ../assets/shots/risk.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Wat bekend is, in gewone taal" loading="lazy" decoding="async" />
+              </picture>
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/help@half.avif 320w, ../assets/shots/help.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/help.jpg" srcset="../assets/shots/help@half.jpg 320w, ../assets/shots/help.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Eén rustig ding tegelijk" loading="lazy" decoding="async" />
+              </picture>
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/support@half.avif 320w, ../assets/shots/support.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/support.jpg" srcset="../assets/shots/support@half.jpg 320w, ../assets/shots/support.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Mensen, één tik verderop" loading="lazy" decoding="async" />
+              </picture>
+              <picture>
+                <source type="image/avif" srcset="../assets/shots/privacy@half.avif 320w, ../assets/shots/privacy.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
               <img src="../assets/shots/privacy.jpg" srcset="../assets/shots/privacy@half.jpg 320w, ../assets/shots/privacy.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="In de app, niet in de kleine lettertjes" loading="lazy" decoding="async" />
+              </picture>
                   <span class="phone-island"></span>
                 </div>
               </div>
@@ -265,8 +285,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Hij schikt zichzelf</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Wat je nodig hebt, staat al bovenaan" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Wat je nodig hebt, staat al bovenaan">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/home@half.avif 320w, ../assets/shots/home.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/home.jpg" srcset="../assets/shots/home@half.jpg 320w, ../assets/shots/home.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Wat je nodig hebt, staat al bovenaan" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -279,8 +302,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Eerlijke antwoorden</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/risk.jpg" srcset="../assets/shots/risk@half.jpg 320w, ../assets/shots/risk.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Wat bekend is, in gewone taal" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Wat bekend is, in gewone taal">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/risk@half.avif 320w, ../assets/shots/risk.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/risk.jpg" srcset="../assets/shots/risk@half.jpg 320w, ../assets/shots/risk.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Wat bekend is, in gewone taal" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -293,8 +319,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Als het al zwaar is</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/help.jpg" srcset="../assets/shots/help@half.jpg 320w, ../assets/shots/help.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Eén rustig ding tegelijk" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Eén rustig ding tegelijk">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/help@half.avif 320w, ../assets/shots/help.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/help.jpg" srcset="../assets/shots/help@half.jpg 320w, ../assets/shots/help.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Eén rustig ding tegelijk" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -307,8 +336,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Echte hulp, ook offline</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/support.jpg" srcset="../assets/shots/support@half.jpg 320w, ../assets/shots/support.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Mensen, één tik verderop" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="Mensen, één tik verderop">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/support@half.avif 320w, ../assets/shots/support.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/support.jpg" srcset="../assets/shots/support@half.jpg 320w, ../assets/shots/support.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="Mensen, één tik verderop" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -321,8 +353,11 @@ font-weight:800;max-width:19ch;margin:0}
             <p class="eyebrow">Je gegevens, op één scherm</p>
             <div class="phone">
         <div class="phone-shell">
-          <div class="phone-screen">
-            <img src="../assets/shots/privacy.jpg" srcset="../assets/shots/privacy@half.jpg 320w, ../assets/shots/privacy.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="In de app, niet in de kleine lettertjes" loading="lazy" decoding="async" />
+          <div class="phone-screen" data-reduced-label="In de app, niet in de kleine lettertjes">
+            <picture>
+              <source type="image/avif" srcset="../assets/shots/privacy@half.avif 320w, ../assets/shots/privacy.avif 640w" sizes="(max-width: 620px) 78vw, 400px" />
+              <img src="../assets/shots/privacy.jpg" srcset="../assets/shots/privacy@half.jpg 320w, ../assets/shots/privacy.jpg 640w" sizes="(max-width: 620px) 78vw, 400px" width="640" height="1391" alt="In de app, niet in de kleine lettertjes" loading="lazy" decoding="async" />
+            </picture>
             <span class="phone-island"></span>
           </div>
         </div>
@@ -340,7 +375,6 @@ font-weight:800;max-width:19ch;margin:0}
       <p class="eyebrow">Probeer het</p>
       <h2>Dit is de echte risicocheck.</h2>
       <p>Geen plaatje ervan. Dezelfde 30 combinaties en dezelfde woorden als in de app, hier draaiend. Je hoeft niets te installeren.</p>
-
       <div class="demo demo--wide panel" data-demo style="margin-top:clamp(26px,3vw,44px)">
         <div>
           <p class="eyebrow">Kies wat er speelt</p>
@@ -387,6 +421,9 @@ font-weight:800;max-width:19ch;margin:0}
         </div>
       </div>
       <script type="application/json" id="cm-interactions">{"levels": {"caution": "Goed om te weten", "serious": "Aanzienlijk risico", "critical": "Combinatie met hoog risico"}, "riskLabels": {"lower": "Niet bekend", "caution": "Let op", "high": "Higher risk"}, "medication": [{"key": "serotonergic", "label": "Beïnvloedt serotonine", "aliases": ["ssri", "snri", "tramadol", "lithium", "linezolid", "mirtazapine", "venlafaxine", "fluoxetine", "sertraline", "citalopram", "escitalopram", "paroxetine", "duloxetine", "vortioxetine", "dextromethorphan", "sumatriptan", "triptan", "st johns wort"]}, {"key": "maoi", "label": "MAOI", "aliases": ["maoi", "phenelzine", "tranylcypromine", "moclobemide", "selegiline"]}, {"key": "sedative", "label": "Kalmerend middel", "aliases": ["benzodiazepine", "benzo", "diazepam", "alprazolam", "lorazepam", "oxazepam", "temazepam", "zolpidem", "zopiclone", "pregabalin", "gabapentin", "baclofen", "quetiapine"]}, {"key": "opioid", "label": "Opioïde", "aliases": ["opioid", "opiate", "oxycodone", "morphine", "fentanyl", "codeine", "methadone", "buprenorphine", "tramadol"]}, {"key": "nitrateLike", "label": "Nitraatachtig", "aliases": ["nitrate", "nitroglycerin", "glyceryl trinitrate", "isosorbide", "mononitrate", "dinitrate", "nicorandil", "riociguat"]}, {"key": "alphaBlocker", "label": "Alfablokker", "aliases": ["alpha blocker", "tamsulosin", "doxazosin", "alfuzosin", "prazosin", "terazosin"]}, {"key": "stimulantMedication", "label": "Stimulantmedicatie", "aliases": ["methylphenidate", "ritalin", "concerta", "dexamfetamine", "dexamphetamine", "lisdexamfetamine", "vyvanse", "elvanse", "adderall", "modafinil", "bupropion"]}, {"key": "ritonavirBooster", "label": "Ritonavir/cobicistat", "aliases": ["ritonavir", "cobicistat"]}], "assessments": {"serotonin": {"title": "Serotoninesyndroom", "levels": {"high": "Je hebt een medicatie- of middelencombinatie geselecteerd die serotonine kan beïnvloeden, een stof in de hersenen die betrokken is bij stemming en lichaamsfunctie. Let op: verwardheid, koorts, onrust, trillen, zweten of diarree. Zoek hulp als deze optreden.", "caution": "Een van je keuzes kan de serotoninespiegel beïnvloeden. Het risico kan toenemen bij herhaald gebruik, hitte, uitdroging of andere medicatie.", "lower": "Er is geen bekende serotonine-gerelateerde combinatie geselecteerd."}}, "dehydration": {"title": "Uitdroging", "levels": {"high": "Stimulanten, alcohol, hitte, dansen en lange sessies kunnen het risico op uitdroging en oververhitting verhogen.", "caution": "Hydratatie en afkoeling zijn belangrijk, zeker als slaap, eten of pauzes beperkt waren.", "lower": "Er is geen sterk uitdrogingspatroon geselecteerd, maar let op water, eten, temperatuur en rust."}}, "stimulant": {"title": "Stimulant-overbelasting", "levels": {"high": "Er is meer dan één stimulantpatroon geselecteerd, mogelijk inclusief voorgeschreven stimulantmedicatie. Hartslag, angst, kaakspanning, oververhitting en druk om door te gaan kunnen zich opstapelen.", "caution": "Er is een stimulant geselecteerd in het huidige tijdvenster. Pauzeer, rust en geef je lichaam tijd.", "lower": "Er is geen duidelijke stimulantstapeling geselecteerd."}}}, "copy": {"empty": "Kies iets, of typ een medicijn, om te zien wat de app zou zeggen.", "noneTitle": "Niets bekend over deze mix", "noneBody": "Dat betekent niet dat het veilig is. Het betekent dat er hier niets over vastligt. Deze lijst is over niets het laatste woord, en een apotheker weet meer.", "medsHit": "Herkend", "medsNone": "Dat staat niet op de lijst."}, "rules": [{"substances": ["Alcohol", "GHB"], "level": "critical", "warning": "GHB en alcohol samen verhogen het risico op bewusteloosheid en ademhalingsproblemen sterk. Deze combinatie heeft al doden veroorzaakt. Zoek direct hulp als iemand niet wakker te krijgen is."}, {"substances": ["Alcohol", "GBL"], "level": "critical", "warning": "GBL wordt in het lichaam omgezet in GHB. Gecombineerd met alcohol stijgt het risico op bewusteloosheid of ademstilstand sterk. Dit is een levensgevaarlijke combinatie."}, {"substances": ["GBL", "GHB"], "level": "critical", "warning": "GHB en GBL zijn in feite hetzelfde middel. Ze combineren stapelt de dosis onvoorspelbaar en kan plotselinge bewusteloosheid veroorzaken."}, {"substances": ["Kamagra", "Poppers"], "level": "critical", "warning": "Poppers en Kamagra samen kunnen een plotselinge, gevaarlijke bloeddrukdaling veroorzaken. Dit kan leiden tot flauwvallen, een beroerte of hartstilstand. Combineer deze niet."}, {"substances": ["Poppers", "Viagra"], "level": "critical", "warning": "Poppers en Viagra samen kunnen een gevaarlijke bloeddrukdaling veroorzaken. Dit is een combinatie met hoog risico. Vermijd het."}, {"substances": ["GHB", "Ketamine"], "level": "serious", "warning": "GHB en ketamine combineren onderdrukkende en dissociatieve effecten. Dit verhoogt het risico dat je niet meer kunt reageren op problemen om je heen."}, {"substances": ["GBL", "Ketamine"], "level": "serious", "warning": "GBL en ketamine samen geven een hoger risico op controleverlies en moeite om hulp te krijgen."}, {"substances": ["Alcohol", "Ketamine"], "level": "serious", "warning": "Alcohol en ketamine samen combineren onderdrukkende effecten en kunnen diepere desoriëntatie en ademhalingsproblemen veroorzaken."}, {"substances": ["Cocaine", "MDMA"], "level": "serious", "warning": "Cocaïne en MDMA belasten beide het hart. Gecombineerd is het risico op een onregelmatige hartslag en oververhitting aanzienlijk hoger."}, {"substances": ["3MMC", "Cocaine"], "level": "serious", "warning": "Cocaïne en 3-MMC samen stapelen stimulant-effecten op het hart en verhogen het risico op hartproblemen en angst."}, {"substances": ["3MMC", "MDMA"], "level": "serious", "warning": "MDMA en 3-MMC samen verhogen de stimulant- en serotonerge belasting. De combinatie verhoogt de hartslag, temperatuur en de kans op een zware crash."}, {"substances": ["Cocaine", "GHB"], "level": "caution", "warning": "Stimulanten kunnen de effecten van GHB maskeren, waardoor het moeilijker is te merken wanneer een dosis te hoog is. Dit verhoogt het risico op een onbedoelde overdosis."}, {"substances": ["Cocaine", "GBL"], "level": "caution", "warning": "Stimulanten kunnen de effecten van GBL maskeren, waardoor het moeilijker is te merken wanneer een dosis te hoog is."}, {"substances": ["Alcohol", "Cocaine"], "level": "serious", "warning": "Cocaïne en alcohol vormen samen cocaethyleen in de lever. Dat belast het hart meer dan cocaïne alleen en blijft langer in je lichaam, waardoor de kans op pijn op de borst en hartritmestoornissen stijgt. Alcohol maskeert bovendien hoeveel cocaïne je hebt genomen."}, {"substances": ["Alcohol", "MDMA"], "level": "serious", "warning": "Alcohol droogt je uit terwijl MDMA je lichaamstemperatuur verhoogt, en ze maskeren allebei hoe hard de ander aankomt. Samen vergroten ze de kans op oververhitting, uitdroging en een veel zwaardere dip."}, {"substances": ["3MMC", "Alcohol"], "level": "serious", "warning": "3-MMC maskeert hoe dronken je bent, waardoor je makkelijk over je grens doordrinkt. De combinatie verhoogt ook je hartslag en bloeddruk en maakt bijdoseren lastiger in te schatten."}, {"substances": ["Alcohol", "Cannabis"], "level": "caution", "warning": "Cannabis onderdrukt de neiging om over te geven, een van de verdedigingen van je lichaam tegen alcoholvergiftiging. Samen nemen ook je verminderde controle en duizeligheid sterk toe. Kun je iemand niet wakker krijgen? Leg diegene op de zij en bel het alarmnummer."}, {"substances": ["GHB", "Poppers"], "level": "serious", "warning": "GHB en poppers verlagen allebei je bloeddruk. Samen kunnen ze flauwvallen, een val of bewusteloosheid veroorzaken op een moment dat je jezelf niet kunt beschermen."}, {"substances": ["GBL", "Poppers"], "level": "serious", "warning": "GBL en poppers verlagen allebei je bloeddruk. Die daling kan plotseling zijn en flauwvallen of een val veroorzaken."}, {"substances": ["Ketamine", "MDMA"], "level": "caution", "warning": "MDMA en ketamine samen versterken desoriëntatie en maken het lastiger om je omgeving, je grenzen en de mensen om je heen goed in te schatten. Toestemming geven én aflezen wordt moeilijker."}, {"substances": ["MDMA", "Psychedelics"], "level": "serious", "warning": "Psychedelica en MDMA stapelen serotonerge en cardiale belasting op, en de psychische effecten worden veel minder voorspelbaar. Oververhitting en een zware, lange dip worden allebei waarschijnlijker."}, {"substances": ["Cocaine", "Psychedelics"], "level": "caution", "warning": "Een stimulerend middel bij een psychedelicum verhoogt je hartslag en verandert een hanteerbare ervaring vaak in angst of paniek. Het maakt het ook moeilijker om stil te zitten en een lastig moment voorbij te laten gaan."}, {"substances": ["3MMC", "Psychedelics"], "level": "caution", "warning": "3-MMC bij een psychedelicum verhoogt je hartslag en angst en maakt de ervaring lastiger te sturen. Paniek is een veelvoorkomende uitkomst."}, {"substances": ["Kamagra", "Viagra"], "level": "serious", "warning": "Kamagra is sildenafil, dezelfde werkzame stof als Viagra. Allebei nemen stapelt de ene dosis op de andere en vergroot de kans op een bloeddrukdaling, hoofdpijn, veranderd zicht en een erectie die niet zakt. Een erectie die langer dan vier uur duurt, heeft met spoed medische zorg nodig."}, {"substances": ["Cocaine", "Viagra"], "level": "serious", "warning": "Viagra en cocaïne trekken je bloedsomloop twee kanten op terwijl ze allebei je hart belasten. Dat verhoogt de kans op pijn op de borst en hartritmestoornissen, zeker tijdens een lange sessie."}, {"substances": ["Cocaine", "Kamagra"], "level": "serious", "warning": "Kamagra en cocaïne belasten allebei je hart en trekken je bloedsomloop twee kanten op, waardoor de kans op pijn op de borst en hartritmestoornissen stijgt."}, {"substances": ["MDMA", "Viagra"], "level": "caution", "warning": "Viagra en MDMA samen belasten je hart extra en kunnen je bloeddruk sterker verlagen dan verwacht. Neem pauzes, blijf koel en stop als je borst benauwd aanvoelt."}, {"substances": ["Kamagra", "MDMA"], "level": "caution", "warning": "Kamagra en MDMA samen belasten je hart extra en kunnen je bloeddruk sterker verlagen dan verwacht. Neem pauzes en stop als je borst benauwd aanvoelt."}, {"substances": ["3MMC", "Viagra"], "level": "caution", "warning": "Viagra en 3-MMC samen belasten je hart extra tijdens een sessie die vaak toch al lang duurt. Let op een benauwde borst en een hartslag die niet tot rust komt."}, {"substances": ["3MMC", "Kamagra"], "level": "caution", "warning": "Kamagra en 3-MMC samen belasten je hart extra tijdens een sessie die vaak toch al lang duurt. Let op een benauwde borst en een hartslag die niet tot rust komt."}]}</script>
+      <div class="cta-row">
+        <a class="btn btn-ghost" href="./risk-checker/"><svg class="icon" aria-hidden="true"><use href="#i-ext"/></svg>Dit is de echte risicocheck</a>
+      </div>
     </div>
   </section>
 
@@ -446,7 +483,7 @@ font-weight:800;max-width:19ch;margin:0}
   </section>
 
   <section class="chapter chapter--invert" id="specs">
-    <div class="inner narrow">
+    <div class="inner">
       <p class="eyebrow">De details</p>
       <h2>Specificaties</h2>
       <table class="specs">
@@ -510,6 +547,6 @@ font-weight:800;max-width:19ch;margin:0}
 <button type="button" class="to-top" data-to-top hidden aria-label="Terug naar boven">
   <svg class="icon" aria-hidden="true"><use href="#i-up"/></svg>
 </button>
-<script src="../assets/site.js" defer></script>
+<script src="../assets/site.7be77180.js" defer></script>
 </body>
 </html>
