@@ -427,15 +427,6 @@ h2:hover .anchor, h3:hover .anchor, .anchor:focus-visible { opacity: 1; }
 .watch-shell::before { top: 27%; width: 5px; height: 13%; }
 .watch-shell::after { top: 46%; width: 4px; height: 10%; opacity: 0.75; }
 
-.quote {
-  margin: 16px 0 0;
-  padding: 14px 18px;
-  border-left: 3px solid var(--mint);
-  background: color-mix(in srgb, var(--mint) 7%, transparent);
-  border-radius: 0 14px 14px 0;
-}
-.quote p { margin: 0; color: var(--text); font-size: 1.06rem; }
-.quote cite { display: block; margin-top: 7px; font-size: 0.86rem; color: var(--text-dim); font-style: normal; }
 
 /* ---------- what it refuses to do ---------- */
 

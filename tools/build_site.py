@@ -104,13 +104,21 @@ def fingerprint(name: str) -> str:
     target = ASSETS / hashed
     if not target.exists():
         target.write_bytes(source.read_bytes())
-    return hashed
+    return hashed.split("/")[-1] if "/" in name else hashed
 
 
 def asset_map() -> dict:
-    """Hashed names for the assets every page links, built once per run."""
-    return {name: fingerprint(name)
-            for name in ("style.css", "chapters.css", "site.js")}
+    """Hashed names for every asset a page links, built once per run.
+
+    The screenshots are in here as well as the code. A service worker that
+    caches aggressively is only safe if the name changes when the bytes do;
+    otherwise the first visitor to see a redesigned screen keeps the old one
+    until they clear their browser.
+    """
+    names = ["style.css", "chapters.css", "site.js"]
+    names += [f"shots/{p.name}" for p in sorted((ASSETS / "shots").iterdir())
+              if p.suffix in (".avif", ".jpg", ".png")]
+    return {name: fingerprint(name) for name in names}
 
 
 ASSET = {}
@@ -333,8 +341,8 @@ def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=
         sizes = "(max-width: 620px) 78vw, 400px"
         preload = (
             f'  <link rel="preload" as="image" type="image/avif" fetchpriority="high"\n'
-            f'        imagesrcset="{a}shots/home@half.avif 320w, {a}shots/home.avif 640w"\n'
-            f'        imagesizes="{sizes}" href="{a}shots/home.avif" />')
+            f'        imagesrcset="{a}shots/{ASSET["shots/home@half.avif"]} 320w, {a}shots/{ASSET["shots/home.avif"]} 640w"\n'
+            f'        imagesizes="{sizes}" href="{a}shots/{ASSET["shots/home.avif"]}" />')
     # The checker and the walk only exist on two pages; everything else stops
     # downloading them.
     chapters_css = ('\n  <link rel="stylesheet" href="%s%s" />' % (a, ASSET["chapters.css"])
@@ -357,6 +365,8 @@ def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=
   <title>{e(title)}</title>
   <meta name="description" content="{e(desc)}" />
   <meta name="theme-color" content="#0e1430" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" />
   <meta name="color-scheme" content="dark" />
   <link rel="canonical" href="{SITE_ORIGIN}{canonical}" />{alts}
   <link rel="icon" href="{a}mark.svg" type="image/svg+xml" />
@@ -465,13 +475,18 @@ def footer(lang, depth):
 """
 
 
+def shot(name):
+    """Fingerprinted filename for a screenshot, falling back to the plain one."""
+    return ASSET.get(f"shots/{name}", name)
+
+
 def srcset_for(src, depth, full_w, half_w):
     """`srcset` over the full and half-width variants of one file."""
     r = rel(depth)
     half = src.replace(".", "@half.")
     if not (ASSETS / "shots" / half).exists():
-        return f'{r}assets/shots/{src} {full_w}w'
-    return f'{r}assets/shots/{half} {half_w}w, {r}assets/shots/{src} {full_w}w'
+        return f'{r}assets/shots/{shot(src)} {full_w}w'
+    return f'{r}assets/shots/{shot(half)} {half_w}w, {r}assets/shots/{shot(src)} {full_w}w'
 
 
 def picture(src, alt, depth, sizes, full_w, half_w, lazy=True, priority=False, cls=""):
@@ -499,7 +514,7 @@ def picture(src, alt, depth, sizes, full_w, half_w, lazy=True, priority=False, c
     modern = srcset_for(avif, depth, full_w, half_w) if (ASSETS / "shots" / avif).exists() else ""
     source = (f'<source type="image/avif" srcset="{modern}" sizes="{sizes}" />\n              '
               if modern else "")
-    return (f'{source}<img{klass} src="{r}assets/shots/{src}" srcset="{fallback}" '
+    return (f'{source}<img{klass} src="{r}assets/shots/{shot(src)}" srcset="{fallback}" '
             f'sizes="{sizes}" width="{w}" height="{h}" alt="{e(alt)}"{loading} />')
 
 
@@ -699,7 +714,7 @@ def demo_body(lang, depth):
           <input class="demo-input" type="text" data-demo-meds autocomplete="off"
                  spellcheck="false" placeholder="{e(s["demo_meds_ph"])}"
                  aria-label="{e(s["demo_meds_label"])}" />
-          <p class="meds-out" data-demo-meds-out></p>
+          <p class="meds-out" data-demo-meds-out role="status" aria-live="polite"></p>
 
           <p class="eyebrow" style="margin-top:22px">{e(s["demo_timing_label"])}</p>
           <div class="demo-picker" role="group" aria-label="{e(s["demo_timing_label"])}">
@@ -715,7 +730,7 @@ def demo_body(lang, depth):
           </div>
         </div>
         <div>
-          <div class="demo-out" data-demo-out></div>
+          <div class="demo-out" data-demo-out role="status" aria-live="polite" aria-atomic="true"></div>
           <p class="meta">{e(s["demo_note"])}</p>
         </div>
       </div>
@@ -1054,6 +1069,22 @@ def build_support(lang):
     </div>
   </section>
 """
+    # Nine real questions with real answers, marked up as such. This is how a
+    # search for "is ChillMate private" reaches the answer rather than the
+    # home page.
+    faq_ld = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "inLanguage": C.LANG_TAGS[lang],
+        "mainEntity": [
+            {"@type": "Question", "name": question,
+             "acceptedAnswer": {"@type": "Answer", "text": answer}}
+            for question, answer in s["faq"]
+        ],
+    }
+    out = out.replace("</head>", '  <script type="application/ld+json">'
+                      + json.dumps(faq_ld, ensure_ascii=False) + "</script>\n</head>", 1)
+
     out += footer(lang, depth)
     return out, canonical
 
@@ -1444,10 +1475,6 @@ def build_howto(lang):
             <p class="eyebrow">Apple Watch</p>
             <h2>{e(no_orphan(s["watch_h3"]))}</h2>
             <p>{t(s["watch_p"])}{fn("switcher")}</p>
-            <blockquote class="quote">
-              <p>{e(s["watch_quote"])}</p>
-              <cite>{e(s["watch_quote_note"])}</cite>
-            </blockquote>
           </div>
           <div>{watch(depth)}</div>
       </div>
@@ -1545,6 +1572,61 @@ RELEASES = [
 ]
 
 
+def combination_table(lang):
+    """The 30 documented combinations, rendered as HTML rather than hidden in JSON.
+
+    The checker page carried 196 visible words and kept every warning inside a
+    `<script type="application/json">` blob. That is invisible to a crawler and
+    to anyone with JavaScript off, which means the single most useful thing on
+    this site could not be found by somebody searching for exactly it. A person
+    typing "GHB and alcohol" into a search engine at two in the morning is the
+    reader this whole project is for.
+
+    So the table is static, sorted worst first, and the demo above it is the
+    progressive enhancement rather than the only way in.
+    """
+    raw = json.loads((Path(__file__).resolve().parent / "interactions.json")
+                     .read_text(encoding="utf-8"))
+    s = C.STRINGS[lang]
+    order = {"critical": 0, "serious": 1, "caution": 2}
+    rules = sorted(raw["rules"], key=lambda r: (order.get(r["level"], 9),
+                                                r["substances"]))
+    rows = ""
+    for rule in rules:
+        pair = " + ".join(rule["substances"])
+        level = raw["levels"][rule["level"]][lang]
+        rows += (f'          <tr>\n'
+                 f'            <th scope="row">{e(pair)}</th>\n'
+                 f'            <td><span class="pill pill--{rule["level"]}">{e(level)}</span></td>\n'
+                 f'            <td>{e(rule["warning"][lang])}</td>\n'
+                 f'          </tr>\n')
+
+    groups = "".join(
+        f'          <li><b>{e(group["label"][lang])}</b> '
+        f'<span>{e(", ".join(group["aliases"][:6]))}</span></li>\n'
+        for group in raw["medication"]
+    )
+    return f"""      <h2 id="combinations">{e(no_orphan(s["combos_h2"]))}</h2>
+      <p>{t(s["demo_note"])}</p>
+      <div class="table-scroll">
+        <table class="combos">
+          <caption>{e(s["proof_caption"])}</caption>
+          <thead>
+            <tr><th scope="col">{e(s["demo_pick"])}</th>
+                <th scope="col">{e(s["demo_assess_label"])}</th>
+                <th scope="col">{e(s["demo_h2"].rstrip("."))}</th></tr>
+          </thead>
+          <tbody>
+{rows}          </tbody>
+        </table>
+      </div>
+
+      <h2 id="medication" style="margin-top:clamp(40px,5vw,72px)">{e(no_orphan(s["combos_meds_h2"]))}</h2>
+      <ul class="med-groups">
+{groups}      </ul>
+"""
+
+
 def build_checker(lang):
     """The risk checker on a URL of its own.
 
@@ -1572,6 +1654,7 @@ def build_checker(lang):
         <p>{t(s["disclaimer"])}</p>
       </div>
 
+{combination_table(lang)}
       <div class="cta-row" style="margin-top:clamp(28px,3vw,44px)">
         <a class="btn btn-ghost" href="{home}">{icon("chev")}{e(s["howto_back"])}</a>
       </div>
@@ -1805,6 +1888,8 @@ def build_404():
   <meta name="description" content="That page is not here. The things people usually want are." />
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#0e1430" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" />
   <link rel="icon" href="{a}mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="{a}icon-180.png" />
 {JS_BOOT}
@@ -1855,29 +1940,51 @@ def build_404():
 # --------------------------------------------------------------------------
 
 def service_worker() -> str:
-    """Built as a function, not a module constant.
+    """The caching layer, since there will not be a CDN in front of this.
 
-    It interpolates the fingerprinted asset names, and those do not exist
-    until the build has hashed the files. As a module-level f-string this
-    was evaluated at import time and raised KeyError on an empty map.
+    GitHub Pages sends `Cache-Control: max-age=600` on everything and offers no
+    way to change it, so ten minutes after a visit the browser starts asking for
+    every file again. Without a CDN to override that, the service worker is the
+    only place the caching can happen.
+
+    So it splits the difference by URL rather than treating everything alike:
+
+      * Fingerprinted assets are cache-first and never revalidated. The hash is
+        in the filename, so if the bytes change the URL changes, and a stale
+        answer is impossible by construction.
+      * Pages are network-first, because a page has no hash and its content is
+        the thing most likely to be wrong if it is stale.
+      * Anything that fails falls back to the cache, and a failed page request
+        falls back to the support page, which is the one worth reaching when the
+        network is gone.
     """
-    return f"""/* Keeps the support page reachable with no signal.
+    return f"""/* Built by tools/build_site.py. Do not edit here.
 
-   The crisis numbers on that page are needed exactly when a network is least
-   dependable, so they are cached on first visit and served from the cache when
-   a fetch fails. Everything else is network-first and simply falls back. */
+   The crisis numbers on the support page are needed exactly when a network is
+   least dependable, so that page is precached on first visit. */
 
 const CACHE = 'chillmate-{VERSION}-{BUILD}-{ASSET["style.css"].split('.')[1]}';
 const CORE = [
   '{BASE_PATH}',
   '{BASE_PATH}support/',
-  '{BASE_PATH}assets/{ASSET["site.js"]}',
+  '{BASE_PATH}risk-checker/',
   '{BASE_PATH}assets/{ASSET["style.css"]}',
+  '{BASE_PATH}assets/{ASSET["chapters.css"]}',
+  '{BASE_PATH}assets/{ASSET["site.js"]}',
   '{BASE_PATH}assets/mark.svg',
 ];
 
+/* A fingerprinted name carries an eight-character hex digest, so its contents
+   can never change under the same URL. Those are safe to serve from the cache
+   without asking. */
+const IMMUTABLE = /\.[0-9a-f]{{8}}\.(css|js|avif|jpg|png|woff2)$/;
+
 self.addEventListener('install', (event) => {{
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting()));
+  event.waitUntil(
+    caches.open(CACHE)
+      .then((cache) => cache.addAll(CORE))
+      .then(() => self.skipWaiting())
+  );
 }});
 
 self.addEventListener('activate', (event) => {{
@@ -1890,6 +1997,22 @@ self.addEventListener('activate', (event) => {{
 
 self.addEventListener('fetch', (event) => {{
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (IMMUTABLE.test(url.pathname)) {{
+    event.respondWith(
+      caches.match(event.request).then((hit) => hit || fetch(event.request).then((response) => {{
+        if (response && response.status === 200) {{
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+        }}
+        return response;
+      }}))
+    );
+    return;
+  }}
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {{
@@ -1899,11 +2022,11 @@ self.addEventListener('fetch', (event) => {{
         }}
         return response;
       }})
-      .catch(() => caches.match(event.request).then((hit) => hit || caches.match('{BASE_PATH}support/')))
+      .catch(() => caches.match(event.request)
+        .then((hit) => hit || caches.match('{BASE_PATH}support/')))
   );
 }});
 """
-
 
 MANIFEST = {
     "name": "ChillMate",
@@ -1970,8 +2093,8 @@ def main():
 
     # Rebuild the fingerprint map first, and sweep away the previous build's
     # hashed copies so they do not accumulate one file per edit forever.
-    for stale in ASSETS.glob("*.*.*"):
-        if re.fullmatch(r"(style|site)\.[0-9a-f]{8}\.(css|js)", stale.name):
+    for stale in list(ASSETS.glob("*.*.*")) + list((ASSETS / "shots").glob("*.*.*")):
+        if re.fullmatch(r".+\.[0-9a-f]{8}\.(css|js|avif|jpg|png)", stale.name):
             stale.unlink()
     ASSET.update(asset_map())
 

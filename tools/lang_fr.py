@@ -177,8 +177,6 @@ S = {
     # ---------- home: watch and languages ----------
     "watch_h3": "Ça marche pendant que le téléphone reste dans la poche",
     "watch_p": "Minuteurs de dose, rappels pour boire, check-ins discrets, un exercice de respiration. Et un geste pour joindre votre personne de confiance ou le numéro d'urgence local. Tout est sur la montre, avec un raccourci que vous pouvez poser sur le cadran.",
-    "watch_quote": "Si quelque chose ne va pas, cherche de l'aide. Tu n'as rien fait de mal.",
-    "watch_quote_note": "Tout l'écran Sécurité de la montre, formulation comprise.",
     "langs_h3": "Ça marche dans votre langue",
     "langs_p": "L'app et ce site existent en anglais, néerlandais, allemand, français et espagnol. Les services d'aide suivent le pays que vous indiquez, pas la langue que vous lisez. Ce sont deux questions différentes.",
 
@@ -276,6 +274,8 @@ S = {
     "demo_empty": "Choisissez quelque chose, ou tapez un médicament, pour voir ce que l'app dirait.",
     "demo_reset": "Effacer",
     "demo_note": "Tout se passe dans cette page. Rien de ce que vous touchez n'est envoyé où que ce soit, exactement comme dans l'app.",
+    "combos_h2": "Les 30 associations, en une seule liste",
+    "combos_meds_h2": "Les groupes de médicaments reconnus",
     "demo_try": "Essayer GHB et alcool",
 
     # ---------- tech specs ----------

@@ -177,8 +177,6 @@ S = {
     # ---------- home: watch and languages ----------
     "watch_h3": "Hij werkt terwijl je telefoon in je zak blijft",
     "watch_p": "Dosistimers, drinkherinneringen, discrete check-ins, een ademhalingsoefening, en met één tik je vertrouwenscontact of het lokale alarmnummer. Allemaal op het horloge, plus een knop die je op je wijzerplaat kunt zetten.",
-    "watch_quote": "Als iets niet goed voelt, zoek hulp. Je bent niet in de problemen.",
-    "watch_quote_note": "Het hele Veiligheid-scherm van het horloge, precies zo geformuleerd.",
     "langs_h3": "Hij werkt in jouw taal",
     "langs_p": "De app en deze site zijn er in het Engels, Nederlands, Duits, Frans en Spaans. De hulpdiensten volgen het land dat je instelt, niet de taal die je leest. Dat zijn twee verschillende vragen.",
 
@@ -276,6 +274,8 @@ S = {
     "demo_empty": "Kies iets, of typ een medicijn, om te zien wat de app zou zeggen.",
     "demo_reset": "Wissen",
     "demo_note": "Dit draait in de pagina zelf. Wat je aantikt gaat nergens heen, precies zoals in de app.",
+    "combos_h2": "Alle 30 combinaties, in één lijst",
+    "combos_meds_h2": "De medicijngroepen die hij herkent",
     "demo_try": "Probeer GHB en alcohol",
 
     # ---------- tech specs ----------

@@ -177,8 +177,6 @@ S = {
     # ---------- home: watch and languages ----------
     "watch_h3": "Funciona con el teléfono en el bolsillo",
     "watch_p": "Temporizadores de dosis, avisos para beber agua, check-ins discretos y un ejercicio de respiración. Un toque llama a tu contacto de confianza o al número de emergencias local. Todo en el reloj, y además un acceso directo que puedes poner en la esfera.",
-    "watch_quote": "Si algo no va bien, busca ayuda. No estás en problemas.",
-    "watch_quote_note": "La pantalla de Seguridad del reloj entera, con esas mismas palabras.",
     "langs_h3": "Funciona en tu idioma",
     "langs_p": "La app y esta web están en inglés, neerlandés, alemán, francés y español. Los servicios de ayuda siguen al país que elijas, no al idioma en que lees. Son dos preguntas distintas.",
 
@@ -276,6 +274,8 @@ S = {
     "demo_empty": 'Elige algo, o escribe un medicamento, para ver qué diría la app.',
     "demo_reset": "Borrar",
     "demo_note": "Esto funciona dentro de la página. Nada de lo que toques se envía a ningún sitio, igual que en la app.",
+    "combos_h2": "Las 30 combinaciones, en una lista",
+    "combos_meds_h2": "Los grupos de medicamentos que reconoce",
     "demo_try": "Probar GHB y alcohol",
 
     # ---------- tech specs ----------

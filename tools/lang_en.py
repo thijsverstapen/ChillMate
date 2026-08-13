@@ -190,8 +190,6 @@ S = {
     # ---------- home: watch and languages ----------
     "watch_h3": "It works while your phone stays in your pocket",
     "watch_p": "Dose timers, water reminders, quiet check-ins, a breathing exercise, and one tap to your trusted contact or the local emergency number. All on the watch, plus a shortcut you can put on your watch face.",
-    "watch_quote": "If something feels wrong, get help. You are not in trouble.",
-    "watch_quote_note": "The whole of the watch’s Safety screen, wording included.",
     "langs_h3": "It works in your language",
     "langs_p": "The app and this site are in English, Dutch, German, French and Spanish. Help services follow the country you set, not the language you read. Those are two different questions.",
 
@@ -289,6 +287,8 @@ S = {
     "demo_empty": 'Pick something, or type a medicine, to see what the app would say.',
     "demo_reset": "Clear",
     "demo_note": "This runs inside the page. Nothing you tap gets sent anywhere, exactly like the app.",
+    "combos_h2": "All 30 combinations, in one list",
+    "combos_meds_h2": "The medication groups it recognises",
     "demo_try": "Try GHB and alcohol",
 
     # ---------- tech specs ----------

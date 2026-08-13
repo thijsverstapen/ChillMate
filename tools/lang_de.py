@@ -172,8 +172,6 @@ S = {
     # ---------- home: watch and languages ----------
     "watch_h3": "Es funktioniert, während dein Handy in der Tasche bleibt",
     "watch_p": "Dosis-Timer, Erinnerungen ans Trinken, stille Check-ins und eine Atemübung. Einmal tippen, und du erreichst deine Vertrauensperson oder den örtlichen Notruf. Alles auf der Uhr, dazu eine Verknüpfung für dein Zifferblatt.",
-    "watch_quote": "Wenn sich etwas falsch anfühlt, hol dir Hilfe. Du bist nicht in Schwierigkeiten.",
-    "watch_quote_note": "Das ist der komplette Sicherheits-Screen der Uhr, Wortlaut inklusive.",
     "langs_h3": "Es funktioniert in deiner Sprache",
     "langs_p": "Die App und diese Seite gibt es auf Englisch, Niederländisch, Deutsch, Französisch und Spanisch. Die Hilfsangebote richten sich nach dem Land, das du einstellst, nicht nach deiner Lesesprache. Das sind zwei verschiedene Fragen.",
 
@@ -271,6 +269,8 @@ S = {
     "demo_empty": 'Wähl etwas aus oder tipp ein Medikament ein, dann siehst du, was die App sagen würde.',
     "demo_reset": "Zurücksetzen",
     "demo_note": "Das läuft in dieser Seite. Nichts von dem, was du antippst, geht irgendwohin, genau wie in der App.",
+    "combos_h2": "Alle 30 Kombinationen auf einen Blick",
+    "combos_meds_h2": "Die Medikamentengruppen, die es erkennt",
     "demo_try": "Beispiel: GHB und Alkohol",
 
     # ---------- tech specs ----------

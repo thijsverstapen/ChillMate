@@ -68,58 +68,6 @@ def resolve(page: Path, href: str) -> Path | None:
     return target
 
 
-# The site quotes the app in one place, and says so: `watch_quote` reproduces
-# the whole of the watch's Safety screen and `watch_quote_note` claims it is the
-# app's own wording. That is a checkable claim, so it gets checked.
-#
-# This exists because of a mistake worth recording. Looking for the quote, I
-# searched ChillMate/Localizable.xcstrings, could not find it, and concluded the
-# string was unlocalised and the site was lying in four languages. Both halves
-# were wrong: the watch is a separate target with its own catalog at
-# ChillMateWatchApp/Localizable.xcstrings, where all of it is present and
-# translated. What the search actually proved is that a phone catalog contains
-# phone strings. The check below looks in the right place, and would have failed
-# loudly on the two languages that really had drifted instead of leaving me to
-# find them by eye.
-WATCH_CATALOG = ROOT / "ChillMateWatchApp" / "Localizable.xcstrings"
-WATCH_QUOTE = "If something feels wrong, get help. You are not in trouble."
-
-
-def check_app_quotes() -> list[str]:
-    import json as _json
-    import sys as _sys
-    _sys.path.insert(0, str(ROOT / "tools"))
-    import site_content as C
-
-    if not WATCH_CATALOG.exists():
-        return [f"{WATCH_CATALOG.relative_to(ROOT)} is missing, so the quoted "
-                f"watch wording cannot be verified"]
-
-    strings = _json.loads(WATCH_CATALOG.read_text(encoding="utf-8"))["strings"]
-    entry = strings.get(WATCH_QUOTE)
-    if entry is None:
-        return [f"the watch catalog no longer contains {WATCH_QUOTE!r}, which the "
-                f"site quotes as the app's own wording"]
-
-    problems = []
-    if C.STRINGS["en"]["watch_quote"] != WATCH_QUOTE:
-        problems.append("en watch_quote no longer matches the app's source string")
-    localisations = entry.get("localizations") or {}
-    for lang in C.LANGS:
-        if lang == "en":
-            continue
-        actual = (localisations.get(lang, {}).get("stringUnit", {}) or {}).get("value")
-        quoted = C.STRINGS[lang]["watch_quote"]
-        if actual is None:
-            problems.append(f"{lang}: the app has no translation for the watch quote, "
-                            f"so the site must not claim its wording")
-        elif actual != quoted:
-            problems.append(f"{lang}: watch_quote is not what the app says.\n"
-                            f"      app : {actual}\n"
-                            f"      site: {quoted}")
-    return problems
-
-
 def main():
     problems: list[str] = []
     checked_links = 0
@@ -225,8 +173,6 @@ def main():
         problems.append(f"sitemap lists {url}, which was not built")
     for url in sorted(built - listed):
         problems.append(f"{url} was built but is not in the sitemap")
-
-    problems.extend(check_app_quotes())
 
     print(f"{len(files)} pages, {checked_links} links, {checked_anchors} in-page anchors")
     if problems:

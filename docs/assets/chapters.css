@@ -227,3 +227,29 @@
   .demo { display: block !important; }
   .verdict, .assess { break-inside: avoid; border: 1px solid #999 !important; background: none !important; }
 }
+
+/* ---------- the static combination table ----------
+
+   The interactive checker sits above this; the table is what a crawler, a
+   reader with JavaScript off, and anyone who just wants to scan all thirty at
+   once actually gets. Worst first, because that is the order they matter in. */
+.combos { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.combos caption { text-align: left; color: var(--text-dim); font-size: 0.84rem; padding-bottom: 12px; }
+.combos th, .combos td { text-align: left; vertical-align: top; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--line); }
+.combos thead th { color: var(--text-dim); font-size: 0.78rem; letter-spacing: 1.4px; text-transform: uppercase; font-weight: 650; }
+.combos tbody th { color: var(--text); font-weight: 680; white-space: nowrap; }
+.combos td:last-child { color: var(--text-soft); min-width: 24ch; }
+
+.pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 650; white-space: nowrap; }
+.pill--critical { background: rgba(255, 105, 120, 0.16); color: #ff9aa6; }
+.pill--serious  { background: rgba(255, 176, 80, 0.16);  color: #ffc07a; }
+.pill--caution  { background: rgba(111, 227, 180, 0.14); color: #8fe6c2; }
+
+.med-groups { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 10px; }
+.med-groups li { display: grid; gap: 2px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.med-groups b { color: var(--text); font-weight: 680; }
+.med-groups span { color: var(--text-dim); font-size: 0.88rem; }
+@media (min-width: 760px) {
+  .med-groups { grid-template-columns: 1fr 1fr; column-gap: clamp(24px, 3vw, 48px); }
+  .med-groups li { grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); align-items: baseline; }
+}
