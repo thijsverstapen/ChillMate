@@ -3,12 +3,12 @@
    The crisis numbers on the support page are needed exactly when a network is
    least dependable, so that page is precached on first visit. */
 
-const CACHE = 'chillmate-4.2.1-422-b24645b9';
+const CACHE = 'chillmate-4.2.1-422-0061cf26';
 const CORE = [
   '/ChillMate/',
   '/ChillMate/support/',
   '/ChillMate/risk-checker/',
-  '/ChillMate/assets/style.b24645b9.css',
+  '/ChillMate/assets/style.0061cf26.css',
   '/ChillMate/assets/chapters.4f1b382d.css',
   '/ChillMate/assets/site.7be77180.js',
   '/ChillMate/assets/mark.svg',

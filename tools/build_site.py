@@ -991,7 +991,8 @@ def build_support(lang):
     r = rel(depth)
     canonical = page_urls("support")[lang]
 
-    out = head(lang, s["support_title"], s["support_desc"], canonical, depth, "support")
+    out = head(lang, s["support_title"], s["support_desc"], canonical, depth, "support",
+               body_class="support-page")
     out += header(lang, depth, "support", "support")
 
     faq = ""

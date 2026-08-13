@@ -784,7 +784,6 @@ footer .made { margin-left: auto; }
   .faq details > .body { display: block !important; }
   a { color: #000; border: 0; }
   a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #444; }
-  .country-panel[hidden] { display: block !important; }
   .chapter { padding: 18px 0 !important; min-height: 0 !important; }
   .hero-full { min-height: 0 !important; }
   .exhibition .chapter h1 { font-size: 26pt !important; }
@@ -1263,3 +1262,62 @@ sup.fn a { border: 0; font-weight: 700; }
   .chapter .specs tbody { display: contents; }
   .chapter .specs tr { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); align-items: baseline; }
 }
+
+
+/* ---------- printing the help page ----------
+
+   The copy on this page promises that it prints, because these are the numbers
+   you want when the network is gone and a screen is the wrong place to read
+   them. It printed as eleven pages: the crisis numbers, and then the whole FAQ,
+   the contact card, the policy note and the page furniture behind them. Eleven
+   pages is not something anybody puts on a fridge.
+
+   So printing this page prints the thing it is for: the emergency number and
+   the services for the country you chose. Everything else is on the screen you
+   printed it from. */
+@media print {
+  .support-page .lede,
+  .support-page .callout.calm,
+  .support-page .picker-row,
+  .support-page footer,
+  .support-page .faq,
+  .support-page .section:has(.faq),
+  .support-page .section:has(.contact-row) { display: none; }
+
+  .support-page h1 { font-size: 20pt; margin-bottom: 6pt; }
+  .support-page h2 { font-size: 13pt; }
+  .support-page .section { margin: 0 0 10pt; }
+  .support-page .card { border: 0; padding: 0; }
+  .support-page .emergency-line { font-size: 15pt; font-weight: 700; margin: 0 0 8pt; }
+
+  /* Two columns of services, each kept whole across a page break. */
+  .support-page .grid.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; }
+  .support-page .res { break-inside: avoid; padding: 6pt 0; border: 0; border-bottom: 1px solid #ccc; }
+  .support-page .res .t { font-size: 11pt; font-weight: 700; }
+  .support-page .res .d { font-size: 9pt; color: #333; }
+
+  /* The URL after every link is the point on paper, but it must not swamp the
+     name of the service it belongs to. */
+  .support-page a[href^="http"]::after { font-size: 8pt; word-break: break-all; }
+
+  /* It came to one page of numbers plus a second page holding nothing but the
+     disclaimer. A sheet you fold into a wallet should be one sheet, so the
+     margins and the two callouts give back the few lines that were costing a
+     whole extra page. */
+  .support-page .callout { padding: 6pt 8pt; margin: 6pt 0; break-inside: avoid; }
+  .support-page .callout p { font-size: 8.5pt; line-height: 1.35; }
+  .support-page .callout .icon { display: none; }
+  .support-page .section:last-of-type { margin-bottom: 0; }
+
+  /* On paper you want the numbers, not the paragraph explaining what the page
+     is; you are holding the page. Dropping it, and tightening the service rows,
+     is what fits the disclaimer onto the same sheet. */
+  .support-page [data-countries] > p { display: none; }
+  .support-page .grid.two { gap: 4pt 10pt; }
+  .support-page .res { padding: 3pt 0; }
+  .support-page .res .t { font-size: 10pt; }
+  .support-page .res .d { font-size: 8pt; line-height: 1.3; }
+  .support-page .emergency-line { font-size: 14pt; margin: 0 0 5pt; }
+}
+
+@page { margin: 12mm; }
