@@ -67,11 +67,10 @@ S = {
     "og_sub": "Gratuit. Sans compte. Tout reste sur votre iPhone.",
     "og_foot": "Open source · iPhone et Apple Watch",
     "lede": "Profitez de votre soirée, et réveillez-vous content d'avoir pris soin de vous. ChillMate note ce que vous avez pris et comment vous vous sentiez, vous dit ce qui se mélange mal, et peut discrètement prévenir un ami que vous êtes rentré. Tout est privé. Tout est gratuit.",
-    "cta_notify": "Prévenez-moi à la sortie",
+    "cta_get": "Télécharger dans l'App Store",
+    "cta_get_short": "Obtenir l'app",
     "cta_see": "Voir comment ça marche",
-    "status_note": "Pas encore sur l'App Store. Laissez votre e-mail : je vous écris une seule fois, le jour de la sortie. Rien d'autre, jamais.",
-    "notify_subject": "Prévenez-moi quand ChillMate sort",
-    "notify_body": "Rien à écrire. Je réponds une seule fois, le jour du lancement, puis je supprime votre adresse.",
+    "status_note": "Gratuit sur l'App Store, pour iPhone et Apple Watch. Pas de compte, rien à configurer : vous l'ouvrez et ça marche.",
 
     # ---------- home: who it is for ----------
     "audience_eyebrow": "Pour qui c'est fait",
@@ -188,7 +187,7 @@ S = {
     # ---------- home: the closing ask ----------
     "close_eyebrow": "Une dernière chose",
     "close_h2": "C'est gratuit, et ça le restera.",
-    "close_p": "Laissez votre e-mail et je vous écris une seule fois, le jour où ChillMate arrive sur l'App Store. Ensuite je supprime votre adresse. En attendant, le vérificateur de risques plus haut marche déjà, et tous les numéros de la page d'aide marchent sans réseau.",
+    "close_p": "Tout est là dès la première ouverture, sans compte à créer et sans rien à débloquer. Et si vous préférez ne rien installer, le vérificateur de risques plus haut marche déjà, et tous les numéros de la page d'aide marchent sans réseau.",
 
     # ---------- support page ----------
     "support_title": "ChillMate · Aide et soutien",
@@ -284,7 +283,7 @@ S = {
     "specs": [
         ("Nécessite", "iPhone sous iOS 26 ou plus récent"),
         ("Apple Watch", "Sa propre app, watchOS 26 ou plus récent"),
-        ("Prix", "Gratuit. Pas de version payante, pas d'abonnement, pas de publicité."),
+        ("Prix", "Gratuit. Pas de version payante, pas d'abonnement, pas de publicité. Un pourboire facultatif, qui ne débloque rien."),
         ("Compte", "Aucun. Il n'y a rien à créer."),
         ("Données collectées", "Aucune"),
         ("Langues", "English, Nederlands, Deutsch, Français, Español"),

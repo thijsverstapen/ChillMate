@@ -9,6 +9,10 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" />
   <meta name="color-scheme" content="dark" />
+  <!-- Safari on iOS turns this into a banner offering the app directly. It is
+       the one visitor who is already holding the device the app runs on, so
+       they should not have to find the button. -->
+  <meta name="apple-itunes-app" content="app-id=6774212606" />
   <link rel="canonical" href="https://thijsverstapen.github.io/ChillMate/" />
   <link rel="alternate" hreflang="en" href="https://thijsverstapen.github.io/ChillMate/" />
   <link rel="alternate" hreflang="nl" href="https://thijsverstapen.github.io/ChillMate/nl/" />
@@ -57,7 +61,7 @@ font-weight:800;max-width:19ch;margin:0}
   <link rel="stylesheet" href="assets/style.0061cf26.css" />
   <link rel="stylesheet" href="assets/chapters.b548d5ae.css" />
 
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ChillMate", "applicationCategory": "HealthApplication", "operatingSystem": "iOS 26, watchOS", "softwareVersion": "4.2.1", "url": "https://thijsverstapen.github.io/ChillMate/", "description": "Look after yourself around your nights out. Track how you felt, see what mixes badly, and let a friend know you got home. Private, and free.", "inLanguage": ["en", "nl", "de", "fr", "es"], "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "author": {"@type": "Person", "name": "Thijs Verstappen"}, "image": "https://thijsverstapen.github.io/ChillMate/assets/og.png", "privacyPolicy": "https://thijsverstapen.github.io/ChillMate/privacy/"}</script>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ChillMate", "applicationCategory": "HealthApplication", "operatingSystem": "iOS 26, watchOS", "softwareVersion": "4.2.1", "url": "https://thijsverstapen.github.io/ChillMate/", "installUrl": "https://apps.apple.com/app/id6774212606", "downloadUrl": "https://apps.apple.com/app/id6774212606", "description": "Look after yourself around your nights out. Track how you felt, see what mixes badly, and let a friend know you got home. Private, and free.", "inLanguage": ["en", "nl", "de", "fr", "es"], "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR", "url": "https://apps.apple.com/app/id6774212606", "availability": "https://schema.org/InStock"}, "author": {"@type": "Person", "name": "Thijs Verstappen"}, "image": "https://thijsverstapen.github.io/ChillMate/assets/og.png", "privacyPolicy": "https://thijsverstapen.github.io/ChillMate/privacy/"}</script>
 </head>
 <body class="exhibition">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -124,6 +128,14 @@ font-weight:800;max-width:19ch;margin:0}
   </symbol>
   <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 19V5.5"/><path d="M6 11.5L12 5.5l6 6"/>
+  </symbol>
+  <!-- Deliberately not Apple's logo. Every other glyph on this site is a
+       24px stroked line, and a solid black mark dropped among them looks
+       like something that failed to load. Apple's own guidelines allow a
+       plain text link, so the words carry the meaning and this just says
+       "download". -->
+  <symbol id="i-get" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4v11"/><path d="M6.5 9.5L12 15l5.5-5.5"/><path d="M4.5 19.5h15"/>
   </symbol>
   <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="8.5"/><path d="M3.6 12h16.8"/>
@@ -193,7 +205,7 @@ font-weight:800;max-width:19ch;margin:0}
         <a href="#try">Try it</a>
         <a href="#privacy">Privacy</a>
         <a href="#specs">Specs</a>
-      <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Tell%20me%20when%20ChillMate%20is%20out&body=You%20don%E2%80%99t%20need%20to%20write%20anything.%20I%E2%80%99ll%20reply%20once%2C%20on%20launch%20day%2C%20and%20then%20delete%20your%20address.">Tell me when it’s out</a>
+      <a class="btn btn-primary" href="https://apps.apple.com/app/id6774212606">Get the app</a>
     </div>
   </nav>
 
@@ -204,10 +216,10 @@ font-weight:800;max-width:19ch;margin:0}
         <div>
           <p class="lede">Enjoy your night, and wake up glad you looked after yourself. ChillMate keeps track of what you took and how you felt, tells you what mixes badly, and can quietly let a friend know you got home. All private. All free.</p>
           <div class="cta-row">
-            <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Tell%20me%20when%20ChillMate%20is%20out&body=You%20don%E2%80%99t%20need%20to%20write%20anything.%20I%E2%80%99ll%20reply%20once%2C%20on%20launch%20day%2C%20and%20then%20delete%20your%20address."><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Tell me when it’s out</a>
+            <a class="btn btn-primary" href="https://apps.apple.com/app/id6774212606"><svg class="icon" aria-hidden="true"><use href="#i-get"/></svg>Download on the App Store</a>
             <a class="btn btn-ghost" href="#inside"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>See how it works</a>
           </div>
-          <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>It’s not in the App Store yet. Leave your email and you’ll hear from me once, the day it lands. Nothing else, ever.</p>
+          <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Free on the App Store, for iPhone and Apple Watch. No account, and nothing to set up: open it and it works.</p>
           <a class="scroll-cue" href="#who">Scroll<svg class="icon" aria-hidden="true"><use href="#i-chev"/></svg></a>
         </div>
         <div class="hero-phone-big">
@@ -494,7 +506,7 @@ font-weight:800;max-width:19ch;margin:0}
         <tbody>
         <tr><th scope="row">Requires</th><td>iPhone with iOS 26 or later</td></tr>
         <tr><th scope="row">Apple Watch</th><td>Its own app, watchOS 26 or later</td></tr>
-        <tr><th scope="row">Price</th><td>Free. No paid version, no subscription, no ads.</td></tr>
+        <tr><th scope="row">Price</th><td>Free. No paid version, no subscription, no ads. One optional tip, which unlocks nothing.</td></tr>
         <tr><th scope="row">Account</th><td>None. There’s nothing to sign up for.</td></tr>
         <tr><th scope="row">Data collected</th><td>None</td></tr>
         <tr><th scope="row">Languages</th><td>English, Nederlands, Deutsch, Français, Español</td></tr>
@@ -514,9 +526,9 @@ font-weight:800;max-width:19ch;margin:0}
     <div class="inner">
       <p class="eyebrow">One last thing</p>
       <h2>It’s free, and it stays free.</h2>
-      <p class="lede">Leave your email and you’ll hear from me once, the day ChillMate reaches the App Store. Then I delete your address. In the meantime the risk checker above works right now, and every number on the help page works with no signal.</p>
+      <p class="lede">Every feature is there from the first launch, with no account to make and nothing to unlock. And if you would rather not install anything, the risk checker above works right now, and every number on the help page works with no signal.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Tell%20me%20when%20ChillMate%20is%20out&body=You%20don%E2%80%99t%20need%20to%20write%20anything.%20I%E2%80%99ll%20reply%20once%2C%20on%20launch%20day%2C%20and%20then%20delete%20your%20address."><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Tell me when it’s out</a>
+        <a class="btn btn-primary" href="https://apps.apple.com/app/id6774212606"><svg class="icon" aria-hidden="true"><use href="#i-get"/></svg>Download on the App Store</a>
         <a class="btn btn-ghost" href="#try"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg>Try it</a>
         <a class="btn btn-ghost" href="support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Real services</a>
       </div>

@@ -67,11 +67,10 @@ S = {
     "og_sub": "Gratis. Geen account. Alles blijft op je iPhone.",
     "og_foot": "Open source · iPhone en Apple Watch",
     "lede": "Geniet van je nacht, en word wakker met het gevoel dat je goed voor jezelf gezorgd hebt. ChillMate houdt bij wat je nam en hoe je je voelde, vertelt wat slecht samengaat, en laat een vriend rustig weten dat je thuis bent. Allemaal privé. Allemaal gratis.",
-    "cta_notify": "Laat het me weten als hij er is",
+    "cta_get": "Download in de App Store",
+    "cta_get_short": "Download de app",
     "cta_see": "Kijk hoe het werkt",
-    "status_note": "Hij staat nog niet in de App Store. Laat je mailadres achter, dan hoor je één keer van me, op de dag dat hij er is. Verder nooit iets.",
-    "notify_subject": "Laat het me weten als ChillMate er is",
-    "notify_body": "Je hoeft niets te schrijven. Ik mail je één keer, op de dag van de lancering. Daarna verwijder ik je adres.",
+    "status_note": "Gratis in de App Store, voor iPhone en Apple Watch. Geen account, en niets in te stellen: je opent hem en hij werkt.",
 
     # ---------- home: who it is for ----------
     "audience_eyebrow": "Voor wie het is",
@@ -188,7 +187,7 @@ S = {
     # ---------- home: the closing ask ----------
     "close_eyebrow": "Nog één ding",
     "close_h2": "Hij is gratis, en dat blijft zo.",
-    "close_p": "Laat je mailadres achter, dan hoor je één keer van me: op de dag dat ChillMate in de App Store staat. Daarna verwijder ik je adres. Ondertussen werkt de risicocheck hierboven nu al, en werkt elk nummer op de hulppagina ook zonder bereik.",
+    "close_p": "Alles zit er vanaf de eerste keer openen in, zonder account en zonder iets te ontgrendelen. En wil je liever niets installeren: de risicocheck hierboven werkt nu al, en elk nummer op de hulppagina werkt ook zonder bereik.",
 
     # ---------- support page ----------
     "support_title": "ChillMate · Hulp en ondersteuning",
@@ -284,7 +283,7 @@ S = {
     "specs": [
         ("Vereist", "iPhone met iOS 26 of nieuwer"),
         ("Apple Watch", "Eigen app, watchOS 26 of nieuwer"),
-        ("Prijs", "Gratis. Geen betaalde versie, geen abonnement, geen advertenties."),
+        ("Prijs", "Gratis. Geen betaalde versie, geen abonnement, geen advertenties. Eén optionele fooi, die niets ontgrendelt."),
         ("Account", "Geen. Er valt niets aan te melden."),
         ("Verzamelde gegevens", "Geen"),
         ("Talen", "English, Nederlands, Deutsch, Français, Español"),

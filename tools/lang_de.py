@@ -62,11 +62,10 @@ S = {
     "og_sub": "Kostenlos. Kein Konto. Alles bleibt auf deinem iPhone.",
     "og_foot": "Open Source · iPhone und Apple Watch",
     "lede": 'Genieß deine Nacht und wach mit dem Gefühl auf, gut auf dich geachtet zu haben. ChillMate hält fest, was du genommen hast und wie es dir ging, sagt dir, was sich schlecht verträgt, und lässt jemanden leise wissen, dass du zu Hause bist. Alles privat. Alles kostenlos.',
-    "cta_notify": "Sag mir Bescheid, wenn es da ist",
+    "cta_get": "Laden im App Store",
+    "cta_get_short": "App laden",
     "cta_see": "So funktioniert es",
-    "status_note": "Im App Store ist es noch nicht. Lass deine Mailadresse da, dann hörst du genau einmal von mir, an dem Tag, an dem es so weit ist. Sonst nie.",
-    "notify_subject": "Sag mir Bescheid, wenn ChillMate da ist",
-    "notify_body": "Du musst nichts schreiben. Ich antworte einmal, am Tag des Starts, und lösche deine Adresse danach.",
+    "status_note": "Kostenlos im App Store, für iPhone und Apple Watch. Kein Konto, nichts einzurichten: öffnen, und es läuft.",
 
     # ---------- home: who it is for ----------
     "audience_eyebrow": "Für wen es ist",
@@ -183,7 +182,7 @@ S = {
     # ---------- home: the closing ask ----------
     "close_eyebrow": "Noch eine Sache",
     "close_h2": "Es ist kostenlos und bleibt kostenlos.",
-    "close_p": "Schick eine leere Mail. Du hörst genau einmal von mir, an dem Tag, an dem ChillMate im App Store landet. Danach lösche ich deine Adresse. Bis dahin läuft der Risikocheck hier oben schon jetzt, und jede Nummer auf der Hilfeseite funktioniert ohne Empfang.",
+    "close_p": "Alles ist ab dem ersten Öffnen da, ohne Konto und ohne etwas freizuschalten. Und wenn du lieber nichts installieren willst: der Risikocheck hier oben läuft schon jetzt, und jede Nummer auf der Hilfeseite funktioniert ohne Empfang.",
 
     # ---------- support page ----------
     "support_title": "ChillMate · Hilfe und Unterstützung",
@@ -279,7 +278,7 @@ S = {
     "specs": [
         ("Voraussetzung", "iPhone mit iOS 26 oder neuer"),
         ("Apple Watch", "Eigene App, watchOS 26 oder neuer"),
-        ("Preis", "Kostenlos. Keine bezahlte Version, kein Abo, keine Werbung."),
+        ("Preis", "Kostenlos. Keine bezahlte Version, kein Abo, keine Werbung. Ein optionales Trinkgeld, das nichts freischaltet."),
         ("Konto", "Keins. Es gibt nichts zu registrieren."),
         ("Erhobene Daten", "Keine"),
         ("Sprachen", "English, Nederlands, Deutsch, Français, Español"),

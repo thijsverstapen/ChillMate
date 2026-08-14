@@ -9,6 +9,10 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" />
   <meta name="color-scheme" content="dark" />
+  <!-- Safari on iOS turns this into a banner offering the app directly. It is
+       the one visitor who is already holding the device the app runs on, so
+       they should not have to find the button. -->
+  <meta name="apple-itunes-app" content="app-id=6774212606" />
   <link rel="canonical" href="https://thijsverstapen.github.io/ChillMate/de/" />
   <link rel="alternate" hreflang="en" href="https://thijsverstapen.github.io/ChillMate/" />
   <link rel="alternate" hreflang="nl" href="https://thijsverstapen.github.io/ChillMate/nl/" />
@@ -123,6 +127,14 @@ font-weight:800;max-width:19ch;margin:0}
   <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 19V5.5"/><path d="M6 11.5L12 5.5l6 6"/>
   </symbol>
+  <!-- Deliberately not Apple's logo. Every other glyph on this site is a
+       24px stroked line, and a solid black mark dropped among them looks
+       like something that failed to load. Apple's own guidelines allow a
+       plain text link, so the words carry the meaning and this just says
+       "download". -->
+  <symbol id="i-get" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4v11"/><path d="M6.5 9.5L12 15l5.5-5.5"/><path d="M4.5 19.5h15"/>
+  </symbol>
   <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="8.5"/><path d="M3.6 12h16.8"/>
     <path d="M12 3.5c2.3 2.4 3.5 5.4 3.5 8.5S14.3 18.1 12 20.5c-2.3-2.4-3.5-5.4-3.5-8.5S9.7 5.9 12 3.5z"/>
@@ -191,7 +203,7 @@ font-weight:800;max-width:19ch;margin:0}
         <a href="#try">Ausprobieren</a>
         <a href="#privacy">Datenschutz</a>
         <a href="#specs">Technik</a>
-      <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Sag%20mir%20Bescheid%2C%20wenn%20ChillMate%20da%20ist&body=Du%20musst%20nichts%20schreiben.%20Ich%20antworte%20einmal%2C%20am%20Tag%20des%20Starts%2C%20und%20l%C3%B6sche%20deine%20Adresse%20danach.">Sag mir Bescheid, wenn es da ist</a>
+      <a class="btn btn-primary" href="https://apps.apple.com/app/id6774212606">App laden</a>
     </div>
   </nav>
 
@@ -202,10 +214,10 @@ font-weight:800;max-width:19ch;margin:0}
         <div>
           <p class="lede">Genieß deine Nacht und wach mit dem Gefühl auf, gut auf dich geachtet zu haben. ChillMate hält fest, was du genommen hast und wie es dir ging, sagt dir, was sich schlecht verträgt, und lässt jemanden leise wissen, dass du zu Hause bist. Alles privat. Alles kostenlos.</p>
           <div class="cta-row">
-            <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Sag%20mir%20Bescheid%2C%20wenn%20ChillMate%20da%20ist&body=Du%20musst%20nichts%20schreiben.%20Ich%20antworte%20einmal%2C%20am%20Tag%20des%20Starts%2C%20und%20l%C3%B6sche%20deine%20Adresse%20danach."><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Sag mir Bescheid, wenn es da ist</a>
+            <a class="btn btn-primary" href="https://apps.apple.com/app/id6774212606"><svg class="icon" aria-hidden="true"><use href="#i-get"/></svg>Laden im App Store</a>
             <a class="btn btn-ghost" href="#inside"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>So funktioniert es</a>
           </div>
-          <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Im App Store ist es noch nicht. Lass deine Mailadresse da, dann hörst du genau einmal von mir, an dem Tag, an dem es so weit ist. Sonst nie.</p>
+          <p class="status-note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg>Kostenlos im App Store, für iPhone und Apple Watch. Kein Konto, nichts einzurichten: öffnen, und es läuft.</p>
           <a class="scroll-cue" href="#who">Scrollen<svg class="icon" aria-hidden="true"><use href="#i-chev"/></svg></a>
         </div>
         <div class="hero-phone-big">
@@ -492,7 +504,7 @@ font-weight:800;max-width:19ch;margin:0}
         <tbody>
         <tr><th scope="row">Voraussetzung</th><td>iPhone mit iOS 26 oder neuer</td></tr>
         <tr><th scope="row">Apple Watch</th><td>Eigene App, watchOS 26 oder neuer</td></tr>
-        <tr><th scope="row">Preis</th><td>Kostenlos. Keine bezahlte Version, kein Abo, keine Werbung.</td></tr>
+        <tr><th scope="row">Preis</th><td>Kostenlos. Keine bezahlte Version, kein Abo, keine Werbung. Ein optionales Trinkgeld, das nichts freischaltet.</td></tr>
         <tr><th scope="row">Konto</th><td>Keins. Es gibt nichts zu registrieren.</td></tr>
         <tr><th scope="row">Erhobene Daten</th><td>Keine</td></tr>
         <tr><th scope="row">Sprachen</th><td>English, Nederlands, Deutsch, Français, Español</td></tr>
@@ -512,9 +524,9 @@ font-weight:800;max-width:19ch;margin:0}
     <div class="inner">
       <p class="eyebrow">Noch eine Sache</p>
       <h2>Es ist kostenlos und bleibt kostenlos.</h2>
-      <p class="lede">Schick eine leere Mail. Du hörst genau einmal von mir, an dem Tag, an dem ChillMate im App Store landet. Danach lösche ich deine Adresse. Bis dahin läuft der Risikocheck hier oben schon jetzt, und jede Nummer auf der Hilfeseite funktioniert ohne Empfang.</p>
+      <p class="lede">Alles ist ab dem ersten Öffnen da, ohne Konto und ohne etwas freizuschalten. Und wenn du lieber nichts installieren willst: der Risikocheck hier oben läuft schon jetzt, und jede Nummer auf der Hilfeseite funktioniert ohne Empfang.</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="mailto:chillmate@icloud.com?subject=Sag%20mir%20Bescheid%2C%20wenn%20ChillMate%20da%20ist&body=Du%20musst%20nichts%20schreiben.%20Ich%20antworte%20einmal%2C%20am%20Tag%20des%20Starts%2C%20und%20l%C3%B6sche%20deine%20Adresse%20danach."><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Sag mir Bescheid, wenn es da ist</a>
+        <a class="btn btn-primary" href="https://apps.apple.com/app/id6774212606"><svg class="icon" aria-hidden="true"><use href="#i-get"/></svg>Laden im App Store</a>
         <a class="btn btn-ghost" href="#try"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg>Ausprobieren</a>
         <a class="btn btn-ghost" href="./support/"><svg class="icon" aria-hidden="true"><use href="#i-life"/></svg>Echte Anlaufstellen</a>
       </div>

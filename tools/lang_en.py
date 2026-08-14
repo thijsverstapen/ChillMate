@@ -80,11 +80,11 @@ S = {
     "og_sub": "Free. No account. Everything stays on your iPhone.",
     "og_foot": "Open source · iPhone and Apple Watch",
     "lede": 'Enjoy your night, and wake up glad you looked after yourself. ChillMate keeps track of what you took and how you felt, tells you what mixes badly, and can quietly let a friend know you got home. All private. All free.',
-    "cta_notify": "Tell me when it’s out",
+    "cta_get": "Download on the App Store",
+    # The sub-nav button sits next to five chapter links and has to stay short.
+    "cta_get_short": "Get the app",
     "cta_see": "See how it works",
-    "status_note": "It’s not in the App Store yet. Leave your email and you’ll hear from me once, the day it lands. Nothing else, ever.",
-    "notify_subject": "Tell me when ChillMate is out",
-    "notify_body": "You don’t need to write anything. I’ll reply once, on launch day, and then delete your address.",
+    "status_note": "Free on the App Store, for iPhone and Apple Watch. No account, and nothing to set up: open it and it works.",
 
     # ---------- home: who it is for ----------
     "audience_eyebrow": "Who it’s for",
@@ -201,7 +201,7 @@ S = {
     # ---------- home: the closing ask ----------
     "close_eyebrow": "One last thing",
     "close_h2": "It’s free, and it stays free.",
-    "close_p": "Leave your email and you’ll hear from me once, the day ChillMate reaches the App Store. Then I delete your address. In the meantime the risk checker above works right now, and every number on the help page works with no signal.",
+    "close_p": "Every feature is there from the first launch, with no account to make and nothing to unlock. And if you would rather not install anything, the risk checker above works right now, and every number on the help page works with no signal.",
 
     # ---------- support page ----------
     "support_title": "ChillMate · Help and support",
@@ -297,7 +297,10 @@ S = {
     "specs": [
         ("Requires", "iPhone with iOS 26 or later"),
         ("Apple Watch", "Its own app, watchOS 26 or later"),
-        ("Price", "Free. No paid version, no subscription, no ads."),
+        # The store badge reads "Free · In-App Purchases", which on its own
+        # looks like a paywall. Saying what the purchase actually is here means
+        # the two pages agree instead of appearing to contradict each other.
+        ("Price", "Free. No paid version, no subscription, no ads. One optional tip, which unlocks nothing."),
         ("Account", "None. There’s nothing to sign up for."),
         ("Data collected", "None"),
         ("Languages", "English, Nederlands, Deutsch, Français, Español"),

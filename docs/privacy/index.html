@@ -9,6 +9,10 @@
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" />
   <meta name="color-scheme" content="dark" />
+  <!-- Safari on iOS turns this into a banner offering the app directly. It is
+       the one visitor who is already holding the device the app runs on, so
+       they should not have to find the button. -->
+  <meta name="apple-itunes-app" content="app-id=6774212606" />
   <link rel="canonical" href="https://thijsverstapen.github.io/ChillMate/privacy/" />
   <link rel="icon" href="../assets/mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/icon-180.png" />
@@ -114,6 +118,14 @@ font-weight:800;max-width:19ch;margin:0}
   <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 19V5.5"/><path d="M6 11.5L12 5.5l6 6"/>
   </symbol>
+  <!-- Deliberately not Apple's logo. Every other glyph on this site is a
+       24px stroked line, and a solid black mark dropped among them looks
+       like something that failed to load. Apple's own guidelines allow a
+       plain text link, so the words carry the meaning and this just says
+       "download". -->
+  <symbol id="i-get" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 4v11"/><path d="M6.5 9.5L12 15l5.5-5.5"/><path d="M4.5 19.5h15"/>
+  </symbol>
   <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="8.5"/><path d="M3.6 12h16.8"/>
     <path d="M12 3.5c2.3 2.4 3.5 5.4 3.5 8.5S14.3 18.1 12 20.5c-2.3-2.4-3.5-5.4-3.5-8.5S9.7 5.9 12 3.5z"/>
@@ -194,7 +206,7 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 63 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/c247148"><code>c247148</code></a>, whose combined SHA-256 begins <code>7f453c1a7e4bb624</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 63 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/d81ad85"><code>d81ad85</code></a>, whose combined SHA-256 begins <code>7f453c1a7e4bb624</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
         <caption>Checked against ChillMate 4.2.1 (build 422), across all 63 Swift files in the app targets.</caption>
@@ -275,9 +287,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>15 changes since this page first existed.</caption>
+        <caption>16 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-08-13</td><td>Give the phone walk to the phone</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/d81ad85"><code>d81ad85</code></a></td></tr>
           <tr><td>2026-08-13</td><td>Make the help page print the way its own copy promises</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c247148"><code>c247148</code></a></td></tr>
           <tr><td>2026-08-13</td><td>Make the checker findable, cacheable and audible</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/617e663"><code>617e663</code></a></td></tr>
           <tr><td>2026-08-13</td><td>Stop shipping 96% of the page as images</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/1654c98"><code>1654c98</code></a></td></tr>

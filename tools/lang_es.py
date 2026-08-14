@@ -67,11 +67,10 @@ S = {
     "og_sub": "Gratis. Sin cuenta. Todo se queda en tu iPhone.",
     "og_foot": "Código abierto · iPhone y Apple Watch",
     "lede": 'Disfruta de la noche y despierta contento de haberte cuidado. ChillMate apunta qué tomaste y cómo te sentiste, te dice qué se mezcla mal, y puede avisar sin ruido a alguien de que has llegado a casa. Todo privado. Todo gratis.',
-    "cta_notify": "Avísame cuando salga",
+    "cta_get": "Descárgalo en el App Store",
+    "cta_get_short": "Descargar la app",
     "cta_see": "Ver cómo funciona",
-    "status_note": "Todavía no está en la App Store. Déjame tu correo y sabrás de mí una sola vez, el día que salga. Nada más, nunca.",
-    "notify_subject": "Avísame cuando salga ChillMate",
-    "notify_body": "No hace falta que escribas nada. Te contesto una vez, el día del lanzamiento, y después borro tu dirección.",
+    "status_note": "Gratis en el App Store, para iPhone y Apple Watch. Sin cuenta y sin nada que configurar: la abres y funciona.",
 
     # ---------- home: who it is for ----------
     "audience_eyebrow": "Para quién es",
@@ -188,7 +187,7 @@ S = {
     # ---------- home: the closing ask ----------
     "close_eyebrow": "Una última cosa",
     "close_h2": "Es gratis, y seguirá siendo gratis.",
-    "close_p": "Déjame tu correo y te escribo una sola vez, el día que ChillMate llegue a la App Store. Después borro tu dirección. Mientras tanto, el comprobador de riesgos de arriba ya funciona. Y todos los números de la página de ayuda funcionan sin cobertura.",
+    "close_p": "Todo está ahí desde que la abres por primera vez, sin cuenta que crear y sin nada que desbloquear. Y si prefieres no instalar nada, el comprobador de riesgos de arriba ya funciona. Y todos los números de la página de ayuda funcionan sin cobertura.",
 
     # ---------- support page ----------
     "support_title": "ChillMate · Ayuda y apoyo",
@@ -284,7 +283,7 @@ S = {
     "specs": [
         ("Requiere", "iPhone con iOS 26 o posterior"),
         ("Apple Watch", "App propia, watchOS 26 o posterior"),
-        ("Precio", "Gratis. Sin versión de pago, sin suscripción, sin anuncios."),
+        ("Precio", "Gratis. Sin versión de pago, sin suscripción, sin anuncios. Una propina opcional, que no desbloquea nada."),
         ("Cuenta", "Ninguna. No tienes que registrarte."),
         ("Datos recogidos", "Ninguno"),
         ("Idiomas", "English, Nederlands, Deutsch, Français, Español"),

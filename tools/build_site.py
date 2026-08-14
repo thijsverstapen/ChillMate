@@ -43,6 +43,13 @@ BASE_PATH = "/ChillMate/"
 BASE_URL = SITE_ORIGIN + BASE_PATH
 REPO = "https://github.com/thijsverstapen/ChillMate"
 EMAIL = "chillmate@icloud.com"
+
+# No storefront in the path. `apps.apple.com/app/id...` sends a reader to their
+# own regional store, which for a site in five languages is the difference
+# between a Dutch visitor landing in a Dutch listing and landing in the US one
+# with a price in dollars and a button that will not install anything for them.
+APP_ID = "6774212606"
+APP_STORE_URL = f"https://apps.apple.com/app/id{APP_ID}"
 VERSION = "4.2.1"
 BUILD = "422"
 UPDATED = "2026-08-11"
@@ -241,6 +248,14 @@ SPRITE = f"""<svg width="0" height="0" style="position:absolute" aria-hidden="tr
   <symbol id="i-up" viewBox="0 0 24 24" {_STROKE}>
     <path d="M12 19V5.5"/><path d="M6 11.5L12 5.5l6 6"/>
   </symbol>
+  <!-- Deliberately not Apple's logo. Every other glyph on this site is a
+       24px stroked line, and a solid black mark dropped among them looks
+       like something that failed to load. Apple's own guidelines allow a
+       plain text link, so the words carry the meaning and this just says
+       "download". -->
+  <symbol id="i-get" viewBox="0 0 24 24" {_STROKE}>
+    <path d="M12 4v11"/><path d="M6.5 9.5L12 15l5.5-5.5"/><path d="M4.5 19.5h15"/>
+  </symbol>
   <symbol id="i-globe" viewBox="0 0 24 24" {_STROKE}>
     <circle cx="12" cy="12" r="8.5"/><path d="M3.6 12h16.8"/>
     <path d="M12 3.5c2.3 2.4 3.5 5.4 3.5 8.5S14.3 18.1 12 20.5c-2.3-2.4-3.5-5.4-3.5-8.5S9.7 5.9 12 3.5z"/>
@@ -368,6 +383,10 @@ def head(lang, title, desc, canonical, depth, key="", extra_head="", body_class=
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; form-action 'none'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'" />
   <meta name="color-scheme" content="dark" />
+  <!-- Safari on iOS turns this into a banner offering the app directly. It is
+       the one visitor who is already holding the device the app runs on, so
+       they should not have to find the button. -->
+  <meta name="apple-itunes-app" content="app-id={APP_ID}" />
   <link rel="canonical" href="{SITE_ORIGIN}{canonical}" />{alts}
   <link rel="icon" href="{a}mark.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="{a}icon-180.png" />
@@ -744,8 +763,10 @@ def build_home(lang):
     r = rel(depth)
     canonical = page_urls("home")[lang]
     support = (r + "support/") if lang == "en" else "./support/"
-    notify = (f"mailto:{EMAIL}"
-              f"?subject={quote(s['notify_subject'])}&body={quote(s['notify_body'])}")
+    # This used to be a mailto that put the reader in their own mail client to
+    # send a blank message and wait for a reply. Now there is an app to install,
+    # so the ask is the install.
+    get = APP_STORE_URL
 
     out = head(lang, s["home_title"], s["home_desc"], canonical, depth, "home",
                body_class="exhibition")
@@ -759,7 +780,7 @@ def build_home(lang):
   <nav class="subnav" data-subnav aria-label="{e(s["walk_eyebrow"])}">
     <div class="inner">
       <span class="title">ChillMate</span>
-{chapters}      <a class="btn btn-primary" href="{notify}">{e(s["cta_notify"])}</a>
+{chapters}      <a class="btn btn-primary" href="{get}">{e(s["cta_get_short"])}</a>
     </div>
   </nav>
 """
@@ -770,7 +791,7 @@ def build_home(lang):
         <div>
           <p class="lede">{t(s["lede"])}</p>
           <div class="cta-row">
-            <a class="btn btn-primary" href="{notify}">{icon("mail")}{e(s["cta_notify"])}</a>
+            <a class="btn btn-primary" href="{get}">{icon("get")}{e(s["cta_get"])}</a>
             <a class="btn btn-ghost" href="#inside">{icon("phone")}{e(s["cta_see"])}</a>
           </div>
           <p class="status-note">{icon("info")}{t(s["status_note"])}</p>
@@ -903,14 +924,14 @@ def build_home(lang):
     # ---- 8. the closing ask
     #
     # The page used to end on the disclaimer: nine chapters of persuasion and
-    # then a legal notice, with nothing to do. This is the ask, and it offers
-    # something to the reader who will never send the email either, because the
-    # checker and the crisis numbers are useful today and the app is not out.
+    # then a legal notice, with nothing to do. This is the ask, and it keeps
+    # offering the checker and the crisis numbers beside it, because those are
+    # useful to someone who is not going to install anything today.
     out += chapter(f"""      <p class="eyebrow">{e(s["close_eyebrow"])}</p>
       <h2>{e(no_orphan(s["close_h2"]))}</h2>
       <p class="lede">{t(s["close_p"])}</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="{notify}">{icon("mail")}{e(s["cta_notify"])}</a>
+        <a class="btn btn-primary" href="{get}">{icon("get")}{e(s["cta_get"])}</a>
         <a class="btn btn-ghost" href="#try">{icon("flask")}{e(s["demo_eyebrow"])}</a>
         <a class="btn btn-ghost" href="{support}">{icon("life")}{e(s["support_help_eyebrow"])}</a>
       </div>
@@ -2069,10 +2090,16 @@ def structured_data():
         "operatingSystem": "iOS 26, watchOS",
         "softwareVersion": VERSION,
         "url": BASE_URL,
+        # `url` is where you read about it, `installUrl` is where you get it.
+        # Search engines treat those as different questions and it is the second
+        # one a person is asking by the time they see this.
+        "installUrl": APP_STORE_URL,
+        "downloadUrl": APP_STORE_URL,
         "description": C.STRINGS["en"]["home_desc"],
         "inLanguage": [C.LANG_TAGS[l] for l in C.LANGS],
         "isAccessibleForFree": True,
-        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR",
+                   "url": APP_STORE_URL, "availability": "https://schema.org/InStock"},
         "author": {"@type": "Person", "name": "Thijs Verstappen"},
         "image": BASE_URL + "assets/og.png",
         "privacyPolicy": BASE_URL + "privacy/",
