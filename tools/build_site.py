@@ -125,6 +125,8 @@ def asset_map() -> dict:
     names = ["style.css", "chapters.css", "site.js"]
     names += [f"shots/{p.name}" for p in sorted((ASSETS / "shots").iterdir())
               if p.suffix in (".avif", ".jpg", ".png")]
+    names += [f"badges/{p.name}" for p in sorted((ASSETS / "badges").iterdir())
+              if p.suffix == ".svg"]
     return {name: fingerprint(name) for name in names}
 
 
@@ -247,14 +249,6 @@ SPRITE = f"""<svg width="0" height="0" style="position:absolute" aria-hidden="tr
   </symbol>
   <symbol id="i-up" viewBox="0 0 24 24" {_STROKE}>
     <path d="M12 19V5.5"/><path d="M6 11.5L12 5.5l6 6"/>
-  </symbol>
-  <!-- Deliberately not Apple's logo. Every other glyph on this site is a
-       24px stroked line, and a solid black mark dropped among them looks
-       like something that failed to load. Apple's own guidelines allow a
-       plain text link, so the words carry the meaning and this just says
-       "download". -->
-  <symbol id="i-get" viewBox="0 0 24 24" {_STROKE}>
-    <path d="M12 4v11"/><path d="M6.5 9.5L12 15l5.5-5.5"/><path d="M4.5 19.5h15"/>
   </symbol>
   <symbol id="i-globe" viewBox="0 0 24 24" {_STROKE}>
     <circle cx="12" cy="12" r="8.5"/><path d="M3.6 12h16.8"/>
@@ -540,6 +534,36 @@ def picture(src, alt, depth, sizes, full_w, half_w, lazy=True, priority=False, c
 PHONE_SIZES = "(max-width: 620px) 78vw, 400px"
 
 
+# Apple asks for a minimum of 40px and clear space around the badge worth 10%
+# of its height, which `.badge-link` provides as padding. Sized above that
+# minimum because at 40 the badge is narrower and shorter than the ghost button
+# next to it, which puts the secondary action ahead of the primary one.
+BADGE_HEIGHT = 52
+
+
+def store_badge(lang, depth):
+    """Apple's own "Download on the App Store" artwork, in the reader's language.
+
+    These are the official files, straight from Apple's marketing toolbox, and
+    they are used unmodified because that is the condition attached to them:
+    no recolouring, no redrawing, no setting the words in our own typeface. The
+    black variant is the one meant for a dark background; it carries a #a6a6a6
+    border so it reads as a bordered pill rather than a hole in the page.
+
+    French is 126.5 wide where the others are 119.7, so the size is read out of
+    each file rather than assumed. Getting that wrong would either stretch the
+    artwork, which is also against the terms, or make the page jump as it
+    loads.
+    """
+    name = f"badges/appstore-{lang}.svg"
+    markup = (ASSETS / name).read_text(encoding="utf-8")
+    w, h = re.search(r'width="([0-9.]+)"\s+height="([0-9.]+)"', markup).groups()
+    scale = BADGE_HEIGHT / float(h)
+    return (f'<img class="badge" src="{rel(depth)}assets/badges/{ASSET[name]}" '
+            f'width="{round(float(w) * scale)}" height="{BADGE_HEIGHT}" '
+            f'alt="{e(C.STRINGS[lang]["cta_get"])}" decoding="async" />')
+
+
 def phone(src, alt, depth, lazy=True, priority=False):
     # The label is what a reader in reduced-data mode sees instead of the
     # screenshot, so it has to be the same sentence the image was showing.
@@ -791,7 +815,7 @@ def build_home(lang):
         <div>
           <p class="lede">{t(s["lede"])}</p>
           <div class="cta-row">
-            <a class="btn btn-primary" href="{get}">{icon("get")}{e(s["cta_get"])}</a>
+            <a class="badge-link" href="{get}">{store_badge(lang, depth)}</a>
             <a class="btn btn-ghost" href="#inside">{icon("phone")}{e(s["cta_see"])}</a>
           </div>
           <p class="status-note">{icon("info")}{t(s["status_note"])}</p>
@@ -931,7 +955,7 @@ def build_home(lang):
       <h2>{e(no_orphan(s["close_h2"]))}</h2>
       <p class="lede">{t(s["close_p"])}</p>
       <div class="cta-row">
-        <a class="btn btn-primary" href="{get}">{icon("get")}{e(s["cta_get"])}</a>
+        <a class="badge-link" href="{get}">{store_badge(lang, depth)}</a>
         <a class="btn btn-ghost" href="#try">{icon("flask")}{e(s["demo_eyebrow"])}</a>
         <a class="btn btn-ghost" href="{support}">{icon("life")}{e(s["support_help_eyebrow"])}</a>
       </div>
@@ -1218,7 +1242,7 @@ def build_privacy():
           <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
           <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
-          <tr><td>The optional tip</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
+          <tr><td>An optional donation</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
           <tr><td>A link you tap</td><td>Safari, to that site</td><td>Only on your tap. ChillMate does not fetch those pages itself.</td></tr>
           <tr><td>A call or message you send</td><td>Your phone app, your messages app</td><td>Only on your tap, and you see the message before it goes.</td></tr>
           <tr><td><strong>Anything to a ChillMate server</strong></td><td><strong>Nowhere</strong></td><td><strong>Never. There is no such server.</strong></td></tr>
@@ -1362,8 +1386,8 @@ def build_privacy():
   </div>
 
   <div class="card">
-    <h2 id="payments">{icon("tag", style="color:var(--mint)")}Payments and&nbsp;tips</h2>
-    <p>ChillMate is free. The optional tip goes entirely through Apple's In-App Purchase. Apple takes the payment, and I never see your card or account details. Tips unlock nothing, and they change nothing about what data is collected.</p>
+    <h2 id="payments">{icon("tag", style="color:var(--mint)")}Payments and&nbsp;donations</h2>
+    <p>ChillMate is free. If you choose to donate, that goes entirely through Apple's In-App Purchase. Apple takes the payment, and I never see your card or account details. Donations unlock nothing, and they change nothing about what data is collected.</p>
   </div>
 
   <div class="card">
@@ -1786,7 +1810,7 @@ def build_press():
         <tbody>
           <tr><th scope="row">Name</th><td>ChillMate</td></tr>
           <tr><th scope="row">What it is</th><td>A private wellbeing, safety and reflection app for iPhone and Apple Watch</td></tr>
-          <tr><th scope="row">Price</th><td>Free. No ads, no subscription, no paid tier. An optional tip unlocks nothing.</td></tr>
+          <tr><th scope="row">Price</th><td>Free. No ads, no subscription, no paid tier. You can donate if you want to, which unlocks nothing.</td></tr>
           <tr><th scope="row">Platform</th><td>iOS 26 and later, with a native Apple Watch app</td></tr>
           <tr><th scope="row">Version</th><td>{VERSION} (build {BUILD})</td></tr>
           <tr><th scope="row">Languages</th><td>English, Dutch, German, French, Spanish</td></tr>
@@ -1999,7 +2023,11 @@ const CORE = [
 /* A fingerprinted name carries an eight-character hex digest, so its contents
    can never change under the same URL. Those are safe to serve from the cache
    without asking. */
-const IMMUTABLE = /\.[0-9a-f]{{8}}\.(css|js|avif|jpg|png|woff2)$/;
+// Anything with a content hash in its name can never change under that name,
+// so it is safe to serve from the cache forever. `svg` is on the list for the
+// App Store badges; the unhashed `mark.svg` does not match this and keeps
+// going through the normal path.
+const IMMUTABLE = /\.[0-9a-f]{{8}}\.(css|js|avif|jpg|png|svg|woff2)$/;
 
 self.addEventListener('install', (event) => {{
   event.waitUntil(

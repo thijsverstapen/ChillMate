@@ -169,7 +169,7 @@ S = {
         ("Vous n'êtes jamais noté en tant que personne.", "Il y a un chiffre pour la journée. Il reste sur votre téléphone, et rien n'est jamais bloqué, retenu ou jugé à cause de lui."),
         ("Chaque rappel, c'est vous qui l'allumez.", "Ils sont tous éteints au départ. Activez ceux que vous voulez, et formulez-les pour qu'un écran verrouillé ne révèle rien."),
         ("Aucun compte ne vous sera jamais demandé.", "Un compte, ça demande un serveur. Un serveur, c'est une copie de vous quelque part où vous ne pouvez pas aller. Donc il n'y a ni l'un ni l'autre."),
-        ("C'est gratuit, et ça le restera.", "Toutes les fonctions, pour tout le monde. Le pourboire facultatif ne débloque rien, parce qu'un outil de sécurité payant n'aide que ceux qui peuvent payer."),
+        ("C'est gratuit, et ça le restera.", "Toutes les fonctions, pour tout le monde. Vous pouvez faire un don si vous voulez, et cela ne débloque rien, parce qu'un outil de sécurité payant n'aide que ceux qui peuvent payer."),
     ],
     "refuse_p": "Cinq promesses. C'est ce qui vous permet de tout écrire ici sans vous demander qui d'autre le lit.",
 
@@ -213,7 +213,7 @@ S = {
         ("Mes données sont-elles privées ?",
          "Oui, et vous n'avez pas à me croire sur parole. ChillMate garde tout sur votre iPhone. Il n'y a ni compte ni serveur, et aucune publicité, aucune analytique, aucun traceur. L'app est open source : vous pouvez lire exactement ce qu'elle fait de ce que vous écrivez."),
         ("Combien ça coûte ?",
-         "Rien, et il n'y a pas de version payante. Il y a un pourboire facultatif, géré par Apple, et il ne débloque rien du tout. Tout le monde a toutes les fonctions, parce qu'un outil de sécurité payant n'aide que ceux qui peuvent payer."),
+         "Rien, et il n'y a pas de version payante. Vous pouvez faire un don via Apple si vous voulez, et cela ne débloque rien du tout. Tout le monde a toutes les fonctions, parce qu'un outil de sécurité payant n'aide que ceux qui peuvent payer."),
         ("Est-ce qu'il me dit si quelque chose est sûr ?",
          "Non, et c'est voulu. Le vérificateur de risques montre ce qu'on sait d'un mélange, y compris avec les médicaments que vous prenez déjà, puis il vous laisse décider. Pour tout ce qui compte vraiment, demandez à un médecin ou à un pharmacien."),
         ("Comment sauvegarder, ou changer de téléphone ?",
@@ -283,7 +283,7 @@ S = {
     "specs": [
         ("Nécessite", "iPhone sous iOS 26 ou plus récent"),
         ("Apple Watch", "Sa propre app, watchOS 26 ou plus récent"),
-        ("Prix", "Gratuit. Pas de version payante, pas d'abonnement, pas de publicité. Un pourboire facultatif, qui ne débloque rien."),
+        ("Prix", "Gratuit. Pas de version payante, pas d'abonnement, pas de publicité. Vous pouvez faire un don si vous voulez, et cela ne débloque rien."),
         ("Compte", "Aucun. Il n'y a rien à créer."),
         ("Données collectées", "Aucune"),
         ("Langues", "English, Nederlands, Deutsch, Français, Español"),

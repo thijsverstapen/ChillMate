@@ -55,7 +55,7 @@ SECTIONS = [
           <tr><td>Versleuteld back-upbestand</td><td>Je eigen iCloud Drive</td><td>Alleen als je back-ups aanzet, of zelf een bestand exporteert.</td></tr>
           <tr><td>Apple Watch-spiegeling</td><td>Je eigen horloge, rechtstreeks</td><td>Als je een horloge koppelt. Toestel naar toestel, via Watch Connectivity.</td></tr>
           <tr><td>Apple Gezondheid</td><td>Blijft op het toestel</td><td>Alleen de categorieën die jij toestaat. HealthKit is lokale opslag, geen dienst.</td></tr>
-          <tr><td>De optionele fooi</td><td>Apple In-App Purchase</td><td>Alleen als jij erop tikt. Apple verwerkt de betaling; ik zie nooit je kaartgegevens.</td></tr>
+          <tr><td>Een optionele donatie</td><td>Apple In-App Purchase</td><td>Alleen als jij erop tikt. Apple verwerkt de betaling; ik zie nooit je kaartgegevens.</td></tr>
           <tr><td>Een link waar je op tikt</td><td>Safari, naar die site</td><td>Alleen op jouw tik. ChillMate haalt die pagina's niet zelf op.</td></tr>
           <tr><td>Een gesprek of bericht dat jij stuurt</td><td>Je telefoon-app, je berichten-app</td><td>Alleen op jouw tik, en je ziet het bericht voordat het weggaat.</td></tr>
           <tr><td><strong>Iets naar een ChillMate-server</strong></td><td><strong>Nergens heen</strong></td><td><strong>Nooit. Die server bestaat niet.</strong></td></tr>
@@ -162,8 +162,8 @@ SECTIONS = [
     </ul>
 """),
 
-    ("payments", "tag", "var(--mint)", "Betalingen en fooien", """
-    <p>ChillMate is gratis. Een optionele fooi wordt volledig afgehandeld door het In-App Purchase-systeem van Apple. Apple verwerkt de betaling; ik ontvang nooit je kaart- of accountgegevens. Fooien ontgrendelen geen functies en veranderen niets aan wat er wordt verzameld.</p>
+    ("payments", "tag", "var(--mint)", "Betalingen en donaties", """
+    <p>ChillMate is gratis. Als je wilt doneren, wordt dat volledig afgehandeld door het In-App Purchase-systeem van Apple. Apple verwerkt de betaling; ik ontvang nooit je kaart- of accountgegevens. Donaties ontgrendelen geen functies en veranderen niets aan wat er wordt verzameld.</p>
 """),
 
     ("control", "lock", "var(--purple)", "Jouw beheer en verwijdering", """

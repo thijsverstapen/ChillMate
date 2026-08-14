@@ -169,7 +169,7 @@ S = {
         ("Jij krijgt als persoon geen cijfer.", "Er is een getal voor die dag. Dat blijft op je telefoon. Er gaat niets op slot, je mist er niets door, en er wordt niets van gevonden."),
         ("Elke herinnering zet jij zelf aan.", "Ze staan allemaal uit. Zet aan wat je wilt, en formuleer het zo dat je vergrendelscherm niets prijsgeeft."),
         ("Er wordt nooit om een account gevraagd.", "Een account heeft een server nodig. Een server is een kopie van jou, op een plek waar jij niet bij kunt. Dus is er geen van beide."),
-        ("Hij is gratis, en dat blijft zo.", "Elke functie, voor iedereen. De fooi is vrijwillig en ontgrendelt niets, want een veiligheidstool achter een betaalmuur helpt de verkeerde mensen."),
+        ("Hij is gratis, en dat blijft zo.", "Elke functie, voor iedereen. Doneren kan als je wilt, en het ontgrendelt niets, want een veiligheidstool achter een betaalmuur helpt de verkeerde mensen."),
     ],
     "refuse_p": "Vijf beloftes. Daardoor kun je hier alles in kwijt zonder je af te vragen wie er meeleest.",
 
@@ -213,7 +213,7 @@ S = {
         ("Zijn mijn gegevens privé?",
          "Ja, en je hoeft me niet op mijn woord te geloven. ChillMate houdt alles op je iPhone. Er is geen account en geen server, en er zijn geen advertenties, analytics of trackers. De app is open source, dus je kunt precies nalezen wat er gebeurt met wat je invult."),
         ("Wat kost het?",
-         "Niets, en er is geen betaalde versie. Je kunt een fooi geven via Apple, maar die ontgrendelt helemaal niets. Iedereen krijgt elke functie, want een veiligheidstool achter een betaalmuur helpt de verkeerde mensen."),
+         "Niets, en er is geen betaalde versie. Je kunt doneren via Apple als je wilt, maar dat ontgrendelt helemaal niets. Iedereen krijgt elke functie, want een veiligheidstool achter een betaalmuur helpt de verkeerde mensen."),
         ("Zegt hij of iets veilig is?",
          "Nee, en dat is met opzet. De risicocheck laat zien wat er over een mix bekend is, ook met medicijnen die je al slikt. De beslissing blijft daarna aan jou. Gaat het ergens echt om? Vraag het dan aan een arts of apotheker."),
         ("Hoe maak ik een back-up, of stap ik over naar een nieuwe telefoon?",
@@ -283,7 +283,7 @@ S = {
     "specs": [
         ("Vereist", "iPhone met iOS 26 of nieuwer"),
         ("Apple Watch", "Eigen app, watchOS 26 of nieuwer"),
-        ("Prijs", "Gratis. Geen betaalde versie, geen abonnement, geen advertenties. Eén optionele fooi, die niets ontgrendelt."),
+        ("Prijs", "Gratis. Geen betaalde versie, geen abonnement, geen advertenties. Doneren kan als je wilt, en dat ontgrendelt niets."),
         ("Account", "Geen. Er valt niets aan te melden."),
         ("Verzamelde gegevens", "Geen"),
         ("Talen", "English, Nederlands, Deutsch, Français, Español"),

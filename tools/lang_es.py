@@ -169,7 +169,7 @@ S = {
         ("Nunca te pone nota como persona.", "Hay un número para el día. Se queda en tu teléfono. No bloquea nada, no te quita nada y no te juzga."),
         ("Cada recordatorio lo enciendes tú.", "Todos empiezan apagados. Enciende los que quieras y redáctalos para que la pantalla de bloqueo no delate nada."),
         ("Nunca tendrás que crearte una cuenta.", "Una cuenta necesita un servidor. Un servidor es una copia de ti en un sitio al que tú no llegas. Así que no hay ninguna de las dos cosas."),
-        ("Es gratis, y seguirá siendo gratis.", "Todas las funciones, para todo el mundo. La propina opcional no desbloquea nada, porque una herramienta de seguridad tras un muro de pago ayuda a quien menos la necesita."),
+        ("Es gratis, y seguirá siendo gratis.", "Todas las funciones, para todo el mundo. Puedes donar si quieres, y no desbloquea nada, porque una herramienta de seguridad tras un muro de pago ayuda a quien menos la necesita."),
     ],
     "refuse_p": "Cinco promesas. Por eso puedes escribir aquí lo que sea sin preguntarte quién más lo está leyendo.",
 
@@ -213,7 +213,7 @@ S = {
         ("¿Mis datos son privados?",
          "Sí, y no hace falta que te fíes de mi palabra. ChillMate lo guarda todo en tu iPhone. No hay cuenta ni servidor, y no hay anuncios, analítica ni rastreadores. La app es de código abierto, así que puedes leer qué hace exactamente con lo que escribes."),
         ("¿Cuánto cuesta?",
-         "Nada, y no hay versión de pago. Hay una propina opcional, que gestiona Apple, y no desbloquea absolutamente nada. Todas las funciones son para todo el mundo. Una herramienta de seguridad tras un muro de pago ayuda a quien menos la necesita."),
+         "Nada, y no hay versión de pago. Puedes donar a través de Apple si quieres, y no desbloquea absolutamente nada. Todas las funciones son para todo el mundo. Una herramienta de seguridad tras un muro de pago ayuda a quien menos la necesita."),
         ("¿Me dice si algo es seguro?",
          "No, y es a propósito. El comprobador de riesgos enseña qué se sabe de una mezcla, también con la medicación que ya tomas. La decisión te la deja a ti. Para lo que de verdad importa, pregunta a un médico o a un farmacéutico."),
         ("¿Cómo hago una copia de seguridad o cambio de teléfono?",
@@ -283,7 +283,7 @@ S = {
     "specs": [
         ("Requiere", "iPhone con iOS 26 o posterior"),
         ("Apple Watch", "App propia, watchOS 26 o posterior"),
-        ("Precio", "Gratis. Sin versión de pago, sin suscripción, sin anuncios. Una propina opcional, que no desbloquea nada."),
+        ("Precio", "Gratis. Sin versión de pago, sin suscripción, sin anuncios. Puedes donar si quieres, y no desbloquea nada."),
         ("Cuenta", "Ninguna. No tienes que registrarte."),
         ("Datos recogidos", "Ninguno"),
         ("Idiomas", "English, Nederlands, Deutsch, Français, Español"),

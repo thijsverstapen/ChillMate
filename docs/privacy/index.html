@@ -50,7 +50,7 @@ flex-wrap:wrap;max-width:1080px;margin-inline:auto;padding:18px 20px 0}
 h1{font-size:clamp(2.7rem,6.6vw,5.4rem);line-height:1;letter-spacing:-.035em;
 font-weight:800;max-width:19ch;margin:0}
 </style>
-  <link rel="stylesheet" href="../assets/style.0061cf26.css" />
+  <link rel="stylesheet" href="../assets/style.1b42e0e6.css" />
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -117,14 +117,6 @@ font-weight:800;max-width:19ch;margin:0}
   </symbol>
   <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12 19V5.5"/><path d="M6 11.5L12 5.5l6 6"/>
-  </symbol>
-  <!-- Deliberately not Apple's logo. Every other glyph on this site is a
-       24px stroked line, and a solid black mark dropped among them looks
-       like something that failed to load. Apple's own guidelines allow a
-       plain text link, so the words carry the meaning and this just says
-       "download". -->
-  <symbol id="i-get" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M12 4v11"/><path d="M6.5 9.5L12 15l5.5-5.5"/><path d="M4.5 19.5h15"/>
   </symbol>
   <symbol id="i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="8.5"/><path d="M3.6 12h16.8"/>
@@ -206,7 +198,7 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 63 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/d81ad85"><code>d81ad85</code></a>, whose combined SHA-256 begins <code>7f453c1a7e4bb624</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 63 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/3d9c34c"><code>3d9c34c</code></a>, whose combined SHA-256 begins <code>7f453c1a7e4bb624</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
         <caption>Checked against ChillMate 4.2.1 (build 422), across all 63 Swift files in the app targets.</caption>
@@ -218,7 +210,7 @@ font-weight:800;max-width:19ch;margin:0}
           <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
           <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
-          <tr><td>The optional tip</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
+          <tr><td>An optional donation</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
           <tr><td>A link you tap</td><td>Safari, to that site</td><td>Only on your tap. ChillMate does not fetch those pages itself.</td></tr>
           <tr><td>A call or message you send</td><td>Your phone app, your messages app</td><td>Only on your tap, and you see the message before it goes.</td></tr>
           <tr><td><strong>Anything to a ChillMate server</strong></td><td><strong>Nowhere</strong></td><td><strong>Never. There is no such server.</strong></td></tr>
@@ -287,9 +279,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>16 changes since this page first existed.</caption>
+        <caption>17 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-08-14</td><td>Point the site at the App Store</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/3d9c34c"><code>3d9c34c</code></a></td></tr>
           <tr><td>2026-08-13</td><td>Give the phone walk to the phone</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/d81ad85"><code>d81ad85</code></a></td></tr>
           <tr><td>2026-08-13</td><td>Make the help page print the way its own copy promises</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c247148"><code>c247148</code></a></td></tr>
           <tr><td>2026-08-13</td><td>Make the checker findable, cacheable and audible</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/617e663"><code>617e663</code></a></td></tr>
@@ -378,8 +371,8 @@ font-weight:800;max-width:19ch;margin:0}
   </div>
 
   <div class="card">
-    <h2 id="payments"><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-tag"/></svg>Payments and&nbsp;tips</h2>
-    <p>ChillMate is free. The optional tip goes entirely through Apple's In-App Purchase. Apple takes the payment, and I never see your card or account details. Tips unlock nothing, and they change nothing about what data is collected.</p>
+    <h2 id="payments"><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-tag"/></svg>Payments and&nbsp;donations</h2>
+    <p>ChillMate is free. If you choose to donate, that goes entirely through Apple's In-App Purchase. Apple takes the payment, and I never see your card or account details. Donations unlock nothing, and they change nothing about what data is collected.</p>
   </div>
 
   <div class="card">

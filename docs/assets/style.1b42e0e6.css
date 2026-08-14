@@ -334,6 +334,28 @@ h2:hover .anchor, h3:hover .anchor, .anchor:focus-visible { opacity: 1; }
 }
 .btn .icon { width: 18px; height: 18px; }
 .btn:hover { transform: translateY(-1px); }
+
+/* ---------- the App Store badge ----------
+
+   Apple supplies this artwork and attaches conditions to it: use the file as
+   it comes, do not recolour it, do not redraw the words, and leave clear space
+   around it worth a tenth of its height. So there is no background, no border
+   and no radius here. The badge already is all of those things, and anything
+   this rule added would be a modification of it.
+
+   The padding is that clear space. It also happens to make the badge the same
+   height as the ghost button beside it, which is why the row lines up. */
+.badge-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px;
+  border: 0;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: transform 0.14s ease, opacity 0.16s ease;
+}
+.badge-link:hover { transform: translateY(-1px); opacity: 0.88; }
+.badge-link .badge { display: block; height: 52px; width: auto; }
 .btn-primary {
   background: linear-gradient(135deg, var(--btn-a), var(--btn-b));
   color: var(--on-primary);

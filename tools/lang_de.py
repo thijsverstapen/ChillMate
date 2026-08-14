@@ -164,7 +164,7 @@ S = {
         ("Du wirst nie als Person benotet.", "Es gibt eine Zahl für den Tag. Sie bleibt auf deinem Handy. Nichts wird deswegen gesperrt, vorenthalten oder bewertet."),
         ("Jede Erinnerung schaltest du selbst ein.", "Am Anfang ist alles aus. Schalt an, was du willst, und formulier es so, dass ein Sperrbildschirm nichts verrät."),
         ("Nach einem Konto wirst du nie gefragt.", "Ein Konto braucht einen Server. Ein Server heißt: eine Kopie von dir, an einem Ort, an den du nicht kommst. Also gibt es keines von beidem."),
-        ("Es ist kostenlos und bleibt kostenlos.", "Jede Funktion, für alle. Das freiwillige Trinkgeld schaltet nichts frei, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke hilft den Falschen."),
+        ("Es ist kostenlos und bleibt kostenlos.", "Jede Funktion, für alle. Spenden kannst du, wenn du willst, und es schaltet nichts frei, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke hilft den Falschen."),
     ],
     "refuse_p": "Fünf Versprechen. Deshalb kannst du hier alles hineinschreiben, ohne dich zu fragen, wer mitliest.",
 
@@ -208,7 +208,7 @@ S = {
         ("Sind meine Daten privat?",
          "Ja, und du musst mir nicht einfach glauben. ChillMate lässt alles auf deinem iPhone. Es gibt kein Konto und keinen Server, keine Werbung, keine Analyse, keine Tracker. Die App ist Open Source, du kannst also genau nachlesen, was mit deinen Eingaben passiert."),
         ("Was kostet es?",
-         "Nichts, und es gibt keine bezahlte Version. Ein freiwilliges Trinkgeld läuft über Apple und schaltet gar nichts frei. Alle bekommen jede Funktion, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke hilft den Falschen."),
+         "Nichts, und es gibt keine bezahlte Version. Spenden kannst du über Apple, wenn du willst, und es schaltet gar nichts frei. Alle bekommen jede Funktion, denn ein Sicherheitswerkzeug hinter einer Bezahlschranke hilft den Falschen."),
         ("Sagt es mir, ob etwas sicher ist?",
          "Nein, und das ist Absicht. Der Risikocheck zeigt, was zu einer Mischung bekannt ist, auch mit Medikamenten, die du schon nimmst. Danach liegt die Entscheidung bei dir. Wenn es wirklich darauf ankommt, frag in einer Arztpraxis oder Apotheke nach."),
         ("Wie mache ich ein Backup, oder wechsle auf ein neues Handy?",
@@ -278,7 +278,7 @@ S = {
     "specs": [
         ("Voraussetzung", "iPhone mit iOS 26 oder neuer"),
         ("Apple Watch", "Eigene App, watchOS 26 oder neuer"),
-        ("Preis", "Kostenlos. Keine bezahlte Version, kein Abo, keine Werbung. Ein optionales Trinkgeld, das nichts freischaltet."),
+        ("Preis", "Kostenlos. Keine bezahlte Version, kein Abo, keine Werbung. Spenden kannst du, wenn du willst, und es schaltet nichts frei."),
         ("Konto", "Keins. Es gibt nichts zu registrieren."),
         ("Erhobene Daten", "Keine"),
         ("Sprachen", "English, Nederlands, Deutsch, Français, Español"),

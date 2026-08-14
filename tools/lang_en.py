@@ -183,7 +183,7 @@ S = {
         ("You’re never scored as a person.", "There’s a number for the day. It stays on your phone, and nothing is ever locked, withheld or judged because of it."),
         ("Every reminder is yours to switch on.", "They all start off. Turn on the ones you want, and word them so a lock screen gives nothing away."),
         ("You’ll never be asked for an account.", "An account needs a server. A server means a copy of you, somewhere you can’t reach. So there’s neither."),
-        ("It’s free, and it stays free.", "Every feature, for everyone. The optional tip unlocks nothing, because a safety tool behind a paywall helps the wrong people."),
+        ("It’s free, and it stays free.", "Every feature, for everyone. You can donate if you want to, and it unlocks nothing, because a safety tool behind a paywall helps the wrong people."),
     ],
     "refuse_p": "Five promises. They’re the reason you can put anything in here without wondering who else is reading.",
 
@@ -227,7 +227,7 @@ S = {
         ("Is my data private?",
          "Yes, and you don’t have to take my word for it. ChillMate keeps everything on your iPhone. There’s no account and no server, and no ads, analytics or trackers. The app is open source, so you can read exactly what it does with what you type in."),
         ("What does it cost?",
-         "Nothing, and there’s no paid version. There’s an optional tip, handled by Apple, and it unlocks nothing at all. Everyone gets every feature, because a safety tool behind a paywall helps the wrong people."),
+         "Nothing, and there’s no paid version. You can donate through Apple if you want to, and it unlocks nothing at all. Everyone gets every feature, because a safety tool behind a paywall helps the wrong people."),
         ("Does it tell me if something is safe?",
          "No, and that’s on purpose. The risk checker shows what’s known about a mix, including with medication you already take, and then leaves the decision to you. For anything that really matters, ask a doctor or a pharmacist."),
         ("How do I back up, or move to a new phone?",
@@ -300,7 +300,7 @@ S = {
         # The store badge reads "Free · In-App Purchases", which on its own
         # looks like a paywall. Saying what the purchase actually is here means
         # the two pages agree instead of appearing to contradict each other.
-        ("Price", "Free. No paid version, no subscription, no ads. One optional tip, which unlocks nothing."),
+        ("Price", "Free. No paid version, no subscription, no ads. You can donate if you want to, which unlocks nothing."),
         ("Account", "None. There’s nothing to sign up for."),
         ("Data collected", "None"),
         ("Languages", "English, Nederlands, Deutsch, Français, Español"),
