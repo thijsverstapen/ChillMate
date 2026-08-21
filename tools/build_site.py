@@ -21,6 +21,7 @@ docs/ except assets/ is generated and safe to delete.
 
 from __future__ import annotations
 
+import functools
 import html
 import json
 import os
@@ -1139,6 +1140,35 @@ def build_support(lang):
 # English-only pages
 # --------------------------------------------------------------------------
 
+def git(args, timeout=45, attempts=3):
+    """Run a git command, retrying a stalled one before giving up.
+
+    Building this site deletes and recreates several hundred files in docs/.
+    Whatever watches this directory reacts to that by contending on the tree
+    hard enough that git calls which normally take 20ms have been observed
+    timing out at 60s, repeatedly, and then running at 20ms again minutes
+    later with nothing changed. It is not the pathspec, not rename detection
+    and not the git-lfs filter in the global config; all three were measured
+    and cleared. It is transient and it is outside this script.
+
+    So: try, wait, try again. A stall should cost a slow build, not a failed
+    one, and a genuine breakage still surfaces after the last attempt.
+    """
+    import subprocess
+    import time
+    last = None
+    for attempt in range(attempts):
+        try:
+            return subprocess.run(["git", *args], cwd=ROOT, capture_output=True,
+                                  text=True, timeout=timeout, check=True).stdout.strip()
+        except Exception as failure:
+            last = failure
+            if attempt + 1 < attempts:
+                time.sleep(2 * (attempt + 1))
+    raise last
+
+
+@functools.lru_cache(maxsize=1)
 def policy_history():
     """Every commit that has ever touched the privacy page, from git.
 
@@ -1147,23 +1177,33 @@ def policy_history():
     out of git at build time, not typed in, which means it cannot fall out of
     step with what actually happened.
     """
-    import subprocess
     try:
-        raw = subprocess.run(
-            ["git", "log", "--format=%h\x1f%ad\x1f%s", "--date=short",
-             "--", "docs/privacy/index.html"],
-            cwd=ROOT, capture_output=True, text=True, timeout=20, check=True,
-        ).stdout.strip()
-    except Exception:
+        raw = git(["log", "--format=%h\x1f%ad\x1f%s", "--date=short",
+                   "--", "docs/privacy/index.html"])
+    except Exception as failure:
+        # Outside a checkout there is genuinely no history and the page says so.
+        # Inside one there always is, so falling back here would put "no history
+        # available" directly under a paragraph promising the whole history.
+        # That is worse than not building, so refuse.
+        if (ROOT / ".git").exists():
+            raise SystemExit(
+                f"policy_history: git failed inside a checkout after retries "
+                f"({failure}).\nThe privacy page would have shipped with an empty "
+                f"history table. Build again once the tree is quiet."
+            )
         return []
-    rows = []
-    for line in raw.splitlines():
-        parts = line.split("\x1f")
-        if len(parts) == 3:
-            rows.append(tuple(parts))
+    rows = [tuple(parts) for parts in (line.split("\x1f") for line in raw.splitlines())
+            if len(parts) == 3]
+    if not rows and (ROOT / ".git").exists():
+        raise SystemExit(
+            "policy_history: git ran but returned nothing for "
+            "docs/privacy/index.html, which has a long history. Refusing to "
+            "ship an empty history table."
+        )
     return rows
 
 
+@functools.lru_cache(maxsize=1)
 def source_checksum() -> tuple[str, int, str]:
     """A fingerprint of the app's Swift source, and the commit it came from.
 
@@ -1174,7 +1214,6 @@ def source_checksum() -> tuple[str, int, str]:
     and you can tell whether you are looking at what was audited.
     """
     import hashlib
-    import subprocess
     targets = ("ChillMate", "ChillMateWatchApp", "ChillMateWatchAppWidget")
     swift = sorted(f for target in targets
                    for f in ROOT.glob(f"{target}/**/*.swift")
@@ -1184,9 +1223,7 @@ def source_checksum() -> tuple[str, int, str]:
         digest.update(path.relative_to(ROOT).as_posix().encode())
         digest.update(path.read_bytes())
     try:
-        commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
-                                capture_output=True, text=True, timeout=10,
-                                check=True).stdout.strip()
+        commit = git(["rev-parse", "--short", "HEAD"])
     except Exception:
         commit = "unknown"
     return digest.hexdigest()[:16], len(swift), commit
@@ -2108,6 +2145,21 @@ Allow: /
 Sitemap: {BASE_URL}sitemap.xml
 """
 
+# Google Search Console proves you own a site by asking for a file back at a
+# path only its owner could put something at. The name and the one line inside
+# both have to match what Google issued, byte for byte, so this is a verbatim
+# copy and not a template: no trailing newline, nothing interpolated.
+#
+# It lives here rather than being dropped into docs/ by hand because main()
+# clears everything in docs/ except assets/ on every run, so a hand-placed file
+# survives exactly until the next build and then verification quietly lapses.
+#
+# This verifies the URL-prefix property for BASE_URL only. github.io is a
+# shared host and the domain-level property would need a file at the host root,
+# which belongs to a different repository.
+GOOGLE_VERIFY_FILE = "googlee86e55f3d19408b6.html"
+GOOGLE_VERIFY_BODY = "google-site-verification: googlee86e55f3d19408b6.html"
+
 
 def structured_data():
     return {
@@ -2149,10 +2201,24 @@ def main():
 
     # Rebuild the fingerprint map first, and sweep away the previous build's
     # hashed copies so they do not accumulate one file per edit forever.
-    for stale in list(ASSETS.glob("*.*.*")) + list((ASSETS / "shots").glob("*.*.*")):
-        if re.fullmatch(r".+\.[0-9a-f]{8}\.(css|js|avif|jpg|png)", stale.name):
+    for stale in (list(ASSETS.glob("*.*.*"))
+                  + list((ASSETS / "shots").glob("*.*.*"))
+                  + list((ASSETS / "badges").glob("*.*.*"))):
+        if re.fullmatch(r".+\.[0-9a-f]{8}\.(css|js|avif|jpg|png|svg)", stale.name):
             stale.unlink()
     ASSET.update(asset_map())
+
+    # Read everything that comes out of git BEFORE touching docs/.
+    #
+    # These used to run inside build_privacy(), which happens after the wipe
+    # below. Deleting several hundred files at once makes the sync daemon on
+    # this directory thrash, and git calls made during that storm were timing
+    # out at twenty seconds while the same command takes twenty milliseconds on
+    # a quiet tree. The result was a privacy page whose history table silently
+    # collapsed to nothing. Nothing here depends on the build output, so there
+    # is no reason to ask git anything after the wipe.
+    policy_history()
+    source_checksum()
 
     # Wipe generated output, keeping the hand-authored assets folder.
     for child in DOCS.iterdir():
@@ -2202,6 +2268,7 @@ def main():
     write(DOCS / "changelog" / "feed.xml", build_feed())
     write(DOCS / "404.html", build_404())
     write(DOCS / "robots.txt", ROBOTS)
+    write(DOCS / GOOGLE_VERIFY_FILE, GOOGLE_VERIFY_BODY)
     write(DOCS / "sw.js", service_worker())
     write(DOCS / "manifest.webmanifest", json.dumps(MANIFEST, indent=2, ensure_ascii=False) + "\n")
     write(DOCS / ".well-known" / "security.txt", SECURITY_TXT)

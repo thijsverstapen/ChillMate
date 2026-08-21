@@ -44,8 +44,16 @@ def visible_text(markup: str) -> str:
     return html.unescape(body)
 
 
+# Google's site-verification file is named .html and is not one. It is a
+# single line of text whose exact bytes Google dictates, so it has no lang, no
+# title and no description, and every head rule below would fail it. Checking
+# it as a page would mean either weakening those rules for real pages or
+# editing the file, and editing it breaks verification.
+NOT_A_PAGE = re.compile(r"^google[0-9a-f]+\.html$")
+
+
 def pages() -> list[Path]:
-    return sorted(DOCS.rglob("*.html"))
+    return sorted(p for p in DOCS.rglob("*.html") if not NOT_A_PAGE.fullmatch(p.name))
 
 
 def resolve(page: Path, href: str) -> Path | None:
