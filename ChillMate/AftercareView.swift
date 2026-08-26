@@ -62,6 +62,7 @@ struct AftercareView: View {
 
 private struct AftercareEntryCard: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.requestReview) private var requestReview
     @Bindable var entry: NightEntry
     @State private var isImportingSleep = false
     @State private var sleepImportMessage = ""
@@ -265,6 +266,17 @@ private struct AftercareEntryCard: View {
                 entry.sleepHours = entry.aftercareSleepHours
             }
             modelContext.saveChanges()
+
+            // A finished check-in is the one moment worth asking for a rating at.
+            // Never the panic screen, and never the emergency sheet.
+            ReviewPrompt.recordCheckIn()
+            if ReviewPrompt.shouldAsk() {
+                ReviewPrompt.recordAsked()
+                Task {
+                    try? await Task.sleep(for: .seconds(1.2))
+                    requestReview()
+                }
+            }
 
             // Mirror the mood to Apple Health's State of Mind when the user
             // already syncs logs to Health. Failures stay silent because the

@@ -10,8 +10,10 @@ import SwiftUI
 ///
 /// A `Task` is cancellable, ties naturally to view lifetime, and checks
 /// cancellation before doing anything.
+// No observable state: views hold this purely for its lifetime, so it needs
+// @State for ownership rather than @Observable for change tracking.
 @MainActor
-final class DelayedActionRunner: ObservableObject {
+final class DelayedActionRunner {
     private var tasks: [Task<Void, Never>] = []
 
     /// Runs `action` after `delay`, unless cancelled first.

@@ -52,6 +52,17 @@ enum WidgetSharedKey {
     static let watchQuickSkipDay = "watchQuickSkipDay"
     static let watchEmergencyNumber = "watchEmergencyNumber"
 
+    // MARK: Written by the Control Center controls, read by the phone app
+
+    /// Where the app should navigate on next foreground. A control runs in the
+    /// extension's process, so it cannot reach the app's own `UserDefaults`
+    /// and has to hand the destination over through the shared suite instead.
+    static let pendingDestination = "widgetPendingDestination"
+
+    /// Must equal `NotificationDestination.panic.rawValue` in the app target,
+    /// which the extension cannot see. `ControlDestinationTests` asserts it.
+    static let destinationPanic = "panic"
+
     /// The shared suite, or nil when the App Group is unavailable.
     static var suite: UserDefaults? {
         UserDefaults(suiteName: suiteName)

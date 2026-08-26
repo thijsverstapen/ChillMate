@@ -1214,7 +1214,11 @@ def source_checksum() -> tuple[str, int, str]:
     and you can tell whether you are looking at what was audited.
     """
     import hashlib
-    targets = ("ChillMate", "ChillMateWatchApp", "ChillMateWatchAppWidget")
+    # Every target that ships in the binary. Omitting the Live Activity
+    # extension excluded shipped code from a page whose whole point is that
+    # the digest covers what was audited.
+    targets = ("ChillMate", "ChillMateWatchApp", "ChillMateWatchAppWidget",
+               "ChillMateLiveActivityExtension")
     swift = sorted(f for target in targets
                    for f in ROOT.glob(f"{target}/**/*.swift")
                    if "DerivedData" not in str(f))
@@ -2041,7 +2045,7 @@ def service_worker() -> str:
         falls back to the support page, which is the one worth reaching when the
         network is gone.
     """
-    return f"""/* Built by tools/build_site.py. Do not edit here.
+    return rf"""/* Built by tools/build_site.py. Do not edit here.
 
    The crisis numbers on the support page are needed exactly when a network is
    least dependable, so that page is precached on first visit. */

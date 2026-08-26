@@ -255,3 +255,37 @@ extension ModelContext {
         }
     }
 }
+
+/// Enforces the user's retention window without them having to ask each time.
+/// Opt-in: does nothing unless both a window and the automatic toggle are set.
+@MainActor
+enum DataRetentionSweep {
+    private static let interval: TimeInterval = 60 * 60 * 24
+
+    static func runIfNeeded() {
+        let defaults = UserDefaults.standard
+        guard defaults.bool(forKey: DefaultsKey.dataRetentionAutomatic) else { return }
+
+        let months = defaults.integer(forKey: DefaultsKey.dataRetentionMonths)
+        guard months > 0 else { return }
+
+        // Deleting is irreversible, so sweep at most once a day rather than on
+        // every foreground.
+        let last = defaults.double(forKey: DefaultsKey.dataRetentionLastSweep)
+        guard Date.now.timeIntervalSince1970 - last > interval else { return }
+
+        guard let cutoff = Calendar.current.date(byAdding: .month, value: -months, to: .now) else { return }
+        let context = ChillMateModelContainer.container().mainContext
+        var descriptor = FetchDescriptor<NightEntry>(predicate: #Predicate { $0.date < cutoff })
+        descriptor.fetchLimit = 500
+
+        guard let stale = try? context.fetch(descriptor), !stale.isEmpty else {
+            defaults.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.dataRetentionLastSweep)
+            return
+        }
+
+        for entry in stale { context.delete(entry) }
+        guard (try? context.save()) != nil else { return }
+        defaults.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.dataRetentionLastSweep)
+    }
+}

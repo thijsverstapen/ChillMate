@@ -34,11 +34,14 @@ struct ChillMateApp: App {
             // every descendant, including sheets and covers.
             .chillMotionPreference()
             .onAppear {
+                adoptControlDestination()
                 recordAppUse()
                 refreshPrivacyAndNotificationState()
                 WatchConnectivityService.shared.activate()
                 SpotlightService.shared.indexTools()
+                ChillTips.configure()
                 TypedRecordsMigration.runIfNeeded()
+                DataRetentionSweep.runIfNeeded()
             }
             .onContinueUserActivity(CSSearchableItemActionType) { activity in
                 guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
@@ -50,6 +53,7 @@ struct ChillMateApp: App {
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
+                    adoptControlDestination()
                     recordAppUse()
                     refreshLiveActivities()
                     WatchConnectivityService.shared.syncStandaloneState()
@@ -58,6 +62,17 @@ struct ChillMateApp: App {
                 refreshPrivacyAndNotificationState()
             }
         }
+    }
+
+    /// Moves a destination left by a Control Center control into the key the rest
+    /// of the app already watches, then clears it so it fires once.
+    private func adoptControlDestination() {
+        guard let suite = WidgetSharedKey.suite,
+              let destination = suite.string(forKey: WidgetSharedKey.pendingDestination),
+              !destination.isEmpty else { return }
+
+        suite.removeObject(forKey: WidgetSharedKey.pendingDestination)
+        UserDefaults.standard.set(destination, forKey: DefaultsKey.pendingAppDestination)
     }
 
     private func recordAppUse() {

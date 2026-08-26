@@ -67,6 +67,8 @@ enum DefaultsKey {
     static let healthKitHeartRateReadEnabled = "healthKitHeartRateReadEnabled"
     static let healthKitHRVReadEnabled = "healthKitHRVReadEnabled"
     static let healthKitWorkoutReadEnabled = "healthKitWorkoutReadEnabled"
+    static let healthKitVitalsReadEnabled = "healthKitVitalsReadEnabled"
+    static let healthKitMindfulWriteEnabled = "healthKitMindfulWriteEnabled"
     static let lastKnownHRVms = "lastKnownHRVms"
     static let lastDailyRecoveryScore = "lastDailyRecoveryScore"
     static let reductionGoalSessions = "reductionGoalSessions"
@@ -99,7 +101,18 @@ enum DefaultsKey {
     static let lastOnDeviceRecoveryStatus = "lastOnDeviceRecoveryStatus"
     static let lastOnDeviceRecoverySnapshotTimestamp = "lastOnDeviceRecoverySnapshotTimestamp"
     static let lastOnDeviceRecoveryRestoreTimestamp = "lastOnDeviceRecoveryRestoreTimestamp"
+    /// Counts completed aftercare check-ins, the only moment ChillMate asks for
+    /// an App Store rating. Read by `ReviewPrompt`.
+    /// When the reader last said they got home safely, from the watch.
+    static let lastHomeSafeTimestamp = "lastHomeSafeTimestamp"
+    static let reviewCheckInCount = "reviewCheckInCount"
+    static let reviewPromptedVersion = "reviewPromptedVersion"
+    static let reviewPromptedAt = "reviewPromptedAt"
     static let dataRetentionMonths = "dataRetentionMonths"
+    /// When true, the retention window is enforced on launch instead of only
+    /// when the user taps the button in Settings. Swept at most once a day.
+    static let dataRetentionAutomatic = "dataRetentionAutomatic"
+    static let dataRetentionLastSweep = "dataRetentionLastSweep"
     /// Per-install identifier stamped into encrypted backup files, so a restore can
     /// tell a backup this device made from one another device made. Minted on first
     /// read and never rotated: rotating it would make every existing backup look

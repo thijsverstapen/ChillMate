@@ -1,6 +1,8 @@
 import SwiftUI
 
-enum Substance: String, CaseIterable, Identifiable {
+// Sendable has to be declared here rather than alongside the AppEnum
+// conformance in AppIntents.swift: Swift requires it in the defining file.
+enum Substance: String, CaseIterable, Identifiable, Sendable {
     case cannabis = "Cannabis"
     case alcohol = "Alcohol"
     case mdma = "MDMA"

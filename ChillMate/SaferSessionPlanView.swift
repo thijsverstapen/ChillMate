@@ -164,7 +164,7 @@ struct SaferSessionPlanView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: chillPinnedTrailingPlacement) {
                     Button(action: savePlan) {
                         Text("Save").font(.headline.weight(.semibold))
                     }

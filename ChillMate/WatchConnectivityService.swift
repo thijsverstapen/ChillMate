@@ -130,6 +130,11 @@ final class WatchConnectivityService: NSObject {
     private func handleInbound(_ payload: [String: Any]) {
         if payload["hydrationLogged"] as? Bool == true { logHydrationFromWatch() }
         if payload["quickSkipRequested"] as? Bool == true { requestQuickSkipFromWatch() }
+        if payload["homeSafeReported"] as? Bool == true {
+            UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.lastHomeSafeTimestamp)
+            NotificationCenter.default.post(name: .watchDidReportHomeSafe, object: nil)
+            Task { await NotificationService.shared.clearSafetyCheckInsForTonight() }
+        }
         if payload["sosRequested"] as? Bool == true {
             NotificationCenter.default.post(name: .watchDidRequestSOS, object: nil)
         }
@@ -179,4 +184,5 @@ extension Notification.Name {
     static let chillMateRefreshTimers = Notification.Name("ChillMate.refreshTimers")
     static let watchDidRequestQuickSkip = Notification.Name("ChillMate.watchDidRequestQuickSkip")
     static let watchDidRequestSOS = Notification.Name("ChillMate.watchDidRequestSOS")
+    static let watchDidReportHomeSafe = Notification.Name("ChillMate.watchDidReportHomeSafe")
 }

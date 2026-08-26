@@ -94,7 +94,7 @@ struct DrugTimerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: chillPinnedTrailingPlacement) {
                     Button(action: startTimer) {
                         Text("Start").font(.headline.weight(.semibold))
                     }

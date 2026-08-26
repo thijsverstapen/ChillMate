@@ -66,7 +66,7 @@ struct STDTestsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: chillPinnedTrailingPlacement) {
                     Button(action: saveTest) {
                         Text("Save").font(.headline.weight(.semibold))
                     }
@@ -536,10 +536,35 @@ private struct STIWarningMessagePanel: View {
 }
 
 private struct STIExposureGuideCard: View {
-    private let rows = [
-        ("Oral", "Ask whether throat testing is included when oral exposure matters.", "May miss infections if only genital samples are tested."),
-        ("Genital", "Covers genital swabs or urine samples depending on the clinic/test type.", "Does not automatically cover throat or rectal exposure."),
-        ("Anal", "Ask for rectal testing when anal exposure matters.", "May be missed by urine-only or genital-only testing.")
+    /// LocalizedStringResource, not String: `Text(someString)` renders verbatim,
+    /// so this whole table read in English on a Dutch, German, French or
+    /// Spanish device.
+    private struct CoverageRow: Identifiable {
+        let id: String
+        let site: LocalizedStringResource
+        let covers: LocalizedStringResource
+        let caveat: LocalizedStringResource
+    }
+
+    private let rows: [CoverageRow] = [
+        CoverageRow(
+            id: "oral",
+            site: "Oral",
+            covers: "Ask whether throat testing is included when oral exposure matters.",
+            caveat: "May miss infections if only genital samples are tested."
+        ),
+        CoverageRow(
+            id: "genital",
+            site: "Genital",
+            covers: "Covers genital swabs or urine samples depending on the clinic/test type.",
+            caveat: "Does not automatically cover throat or rectal exposure."
+        ),
+        CoverageRow(
+            id: "anal",
+            site: "Anal",
+            covers: "Ask for rectal testing when anal exposure matters.",
+            caveat: "May be missed by urine-only or genital-only testing."
+        )
     ]
 
     var body: some View {
@@ -551,15 +576,15 @@ private struct STIExposureGuideCard: View {
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            ForEach(rows, id: \.0) { row in
+            ForEach(rows) { row in
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(row.0)
+                    Text(row.site)
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(Color.chillText)
-                    Text(row.1)
+                    Text(row.covers)
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
-                    Text(row.2)
+                    Text(row.caveat)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillIconOrange)
                 }

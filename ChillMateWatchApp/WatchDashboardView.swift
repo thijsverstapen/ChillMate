@@ -467,6 +467,7 @@ private struct BreathingScreen: View {
 private struct SafetyScreen: View {
     @ObservedObject var connectivity: WatchConnectivityReceiver
     @State private var pinged = false
+    @State private var homeSafe = false
 
     var body: some View {
         ScrollView {
@@ -495,6 +496,17 @@ private struct SafetyScreen: View {
                     tint: .red
                 ) {
                     connectivity.call(connectivity.emergencyNumber)
+                }
+
+                SafetyActionButton(
+                    title: homeSafe ? String(localized: "Marked home safe") : String(localized: "I'm home safe"),
+                    symbol: homeSafe ? "checkmark.circle.fill" : "house.fill",
+                    tint: .green
+                ) {
+                    guard !homeSafe else { return }
+                    connectivity.sendHomeSafe()
+                    homeSafe = true
+                    WKInterfaceDevice.current().play(.success)
                 }
 
                 SafetyActionButton(
@@ -669,6 +681,12 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
 
     func sendSOS() {
         sendEvent(["sosRequested": true])
+    }
+
+    /// "I got home." The phone stops the tonight-only safety check-ins, because
+    /// the question they were asking has been answered.
+    func sendHomeSafe() {
+        sendEvent(["homeSafeReported": true])
     }
 
     func call(_ number: String) {

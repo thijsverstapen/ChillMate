@@ -311,6 +311,11 @@ final class RiskCheckRecord {
     var serotoninLevel: String = ""
     var dehydrationLevel: String = ""
     var stimulantLevel: String = ""
+    // Added in 4.3.0. Defaulted like every other property here, so existing rows
+    // migrate without a mapping step and simply read back as empty.
+    var respiratoryLevel: String = ""
+    var cardiacLevel: String = ""
+    var bloodPressureLevel: String = ""
     var warningsData: Data = Data("[]".utf8)
     var createdAt: Date = Date.now
 
@@ -322,6 +327,9 @@ final class RiskCheckRecord {
         serotoninLevel: String,
         dehydrationLevel: String,
         stimulantLevel: String,
+        respiratoryLevel: String = "",
+        cardiacLevel: String = "",
+        bloodPressureLevel: String = "",
         warnings: [String],
         createdAt: Date = .now
     ) {
@@ -332,6 +340,9 @@ final class RiskCheckRecord {
         self.serotoninLevel = serotoninLevel
         self.dehydrationLevel = dehydrationLevel
         self.stimulantLevel = stimulantLevel
+        self.respiratoryLevel = respiratoryLevel
+        self.cardiacLevel = cardiacLevel
+        self.bloodPressureLevel = bloodPressureLevel
         self.warningsData = Self.encode(warnings)
         self.createdAt = createdAt
     }
@@ -385,7 +396,8 @@ enum DrugTimerLiveActivityController {
         let contentState = DrugTimerActivityAttributes.ContentState(
             substanceName: timer.substanceName,
             endsAt: timer.endsAt,
-            redoseNudgeActive: timer.redoseNudgeIsActive(at: now)
+            redoseNudgeActive: timer.redoseNudgeIsActive(at: now),
+            startedAt: timer.startedAt
         )
 
         do {
@@ -411,7 +423,8 @@ enum DrugTimerLiveActivityController {
         let contentState = DrugTimerActivityAttributes.ContentState(
             substanceName: timer.substanceName,
             endsAt: timer.endsAt,
-            redoseNudgeActive: timer.redoseNudgeIsActive(at: now)
+            redoseNudgeActive: timer.redoseNudgeIsActive(at: now),
+            startedAt: timer.startedAt
         )
 
         for activity in Activity<DrugTimerActivityAttributes>.activities where activity.id == timer.liveActivityID {
@@ -428,7 +441,8 @@ enum DrugTimerLiveActivityController {
         let contentState = DrugTimerActivityAttributes.ContentState(
             substanceName: timer.substanceName,
             endsAt: timer.endsAt,
-            redoseNudgeActive: false
+            redoseNudgeActive: false,
+            startedAt: timer.startedAt
         )
 
         for activity in Activity<DrugTimerActivityAttributes>.activities where activity.id == timer.liveActivityID {

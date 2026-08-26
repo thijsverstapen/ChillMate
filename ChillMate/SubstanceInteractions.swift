@@ -226,6 +226,191 @@ enum SubstanceInteractionChecker {
             level: .caution,
             warning: String(localized: "Kamagra and 3-MMC together add cardiac strain during a session that is often already long. Watch for chest tightness and a racing heart that does not settle.")
         ),
+
+        // Filling out the table: the checker previously held 30 of the 66 possible
+        // pairs, so "nothing on file" was the answer more often than not. A no-match
+        // still never means safe, but it should be rare rather than routine.
+
+        SubstanceInteraction(
+            substances: [.alcohol, .poppers],
+            level: .serious,
+            warning: String(localized: "Alcohol and poppers both widen blood vessels and drop blood pressure. Together that means dizziness, fainting, and a pounding heart, and alcohol makes it harder to notice you are already lightheaded. Sit down before you use poppers.")
+        ),
+        SubstanceInteraction(
+            substances: [.alcohol, .viagra],
+            level: .serious,
+            warning: String(localized: "Alcohol lowers blood pressure and Viagra lowers it further. Together they cause dizziness, headache, and fainting, and alcohol works against the erection you took Viagra for. Keep the drinking light if you use both.")
+        ),
+        SubstanceInteraction(
+            substances: [.alcohol, .kamagra],
+            level: .serious,
+            warning: String(localized: "Kamagra is the same drug as Viagra and often sold at an unverified dose. With alcohol it can drop your blood pressure enough to make you faint, especially when you stand up quickly.")
+        ),
+        SubstanceInteraction(
+            substances: [.alcohol, .psychedelics],
+            level: .caution,
+            warning: String(localized: "Alcohol blunts and muddles a trip rather than smoothing it, and it adds nausea and dehydration. It also makes a difficult headspace harder to steer out of.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .cocaine],
+            level: .serious,
+            warning: String(localized: "Cannabis does not calm cocaine down. Together they push heart rate and blood pressure higher than either alone, and the mix raises the chance of panic and chest pain. Stop and rest if your heart is racing.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .ghb],
+            level: .serious,
+            warning: String(localized: "Both are sedating, and cannabis suppresses vomiting. That matters here: it can mask the nausea that warns you a GHB dose is too high, and it raises the risk of choking if you fall asleep.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .gbl],
+            level: .serious,
+            warning: String(localized: "GBL becomes GHB in the body. Cannabis adds sedation and suppresses the nausea that would normally warn you a dose is too high, so an overshoot can arrive without warning.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .ketamine],
+            level: .serious,
+            warning: String(localized: "Both cloud coordination and awareness. Together you are much more likely to fall, lose track of where you are, or vomit while too out of it to sit up. Stay seated and stay with someone.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .mdma],
+            level: .caution,
+            warning: String(localized: "Cannabis can stretch and sharpen an MDMA experience in ways people do not expect, including anxiety and paranoia. It also dulls the sense of overheating, so keep drinking water and taking breaks.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .poppers],
+            level: .caution,
+            warning: String(localized: "Both lower blood pressure. Expect dizziness and a head rush, particularly if you stand up straight after.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .psychedelics],
+            level: .caution,
+            warning: String(localized: "Cannabis can amplify psychedelics unpredictably, turning a manageable trip into an overwhelming one. If you are going to use it at all, leave it until the peak has passed.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .threeMMC],
+            level: .caution,
+            warning: String(localized: "Cannabis on top of a stimulant tends to add anxiety and a faster heartbeat rather than taking the edge off, and it blurs how hard the comedown is hitting you.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .kamagra],
+            level: .caution,
+            warning: String(localized: "Both can lower blood pressure a little. The usual result is dizziness or a headache rather than anything serious, but stand up slowly.")
+        ),
+        SubstanceInteraction(
+            substances: [.cannabis, .viagra],
+            level: .caution,
+            warning: String(localized: "Both can lower blood pressure a little. Expect dizziness or a headache, and stand up slowly.")
+        ),
+        SubstanceInteraction(
+            substances: [.cocaine, .ketamine],
+            level: .serious,
+            warning: String(localized: "Cocaine drives your heart rate and blood pressure up while ketamine leaves you far less able to notice how your body is doing. Both also damage the nose. This combination puts real strain on the heart.")
+        ),
+        SubstanceInteraction(
+            substances: [.cocaine, .poppers],
+            level: .serious,
+            warning: String(localized: "Cocaine tightens blood vessels and poppers open them suddenly. Swinging between the two strains the heart and can trigger an irregular heartbeat or a blackout. Get help for chest pain that does not pass.")
+        ),
+        SubstanceInteraction(
+            substances: [.ketamine, .poppers],
+            level: .serious,
+            warning: String(localized: "Poppers drop blood pressure sharply and ketamine already takes your balance and judgement. Fainting and falls are the real risk here. Never use poppers standing up on ketamine.")
+        ),
+        SubstanceInteraction(
+            substances: [.ketamine, .psychedelics],
+            level: .serious,
+            warning: String(localized: "Together these can detach you from your surroundings completely. People lose track of where they are, panic, or injure themselves without registering it. Only do this somewhere safe with someone sober.")
+        ),
+        SubstanceInteraction(
+            substances: [.ketamine, .threeMMC],
+            level: .serious,
+            warning: String(localized: "The stimulant hides how sedated you actually are, so it is easy to take more ketamine than you can handle. It also raises heart rate and blood pressure, and heavy ketamine use damages the bladder.")
+        ),
+        SubstanceInteraction(
+            substances: [.ketamine, .kamagra],
+            level: .caution,
+            warning: String(localized: "Ketamine pushes blood pressure up and Kamagra pushes it down, and ketamine makes it hard to notice feeling faint. Stay seated if you feel your head go light.")
+        ),
+        SubstanceInteraction(
+            substances: [.ketamine, .viagra],
+            level: .caution,
+            warning: String(localized: "Ketamine raises blood pressure while Viagra lowers it, and ketamine makes it hard to tell how you are doing. Stay seated if you feel lightheaded.")
+        ),
+        SubstanceInteraction(
+            substances: [.mdma, .poppers],
+            level: .serious,
+            warning: String(localized: "MDMA already raises heart rate, blood pressure, and body temperature. Poppers drop blood pressure suddenly on top of that, which can cause fainting and puts extra strain on the heart. Sit down first, and keep cooling down.")
+        ),
+        SubstanceInteraction(
+            substances: [.mdma, .ghb],
+            level: .serious,
+            warning: String(localized: "MDMA masks how sedated GHB is making you, which is exactly how people redose past the point of going under. When the MDMA fades the full GHB dose is still there. Do not redose to chase the feeling.")
+        ),
+        SubstanceInteraction(
+            substances: [.mdma, .gbl],
+            level: .serious,
+            warning: String(localized: "GBL turns into GHB in the body, and MDMA hides how sedated you are becoming. That combination is how people redose into unconsciousness. Once the MDMA fades the full GBL dose is still working.")
+        ),
+        SubstanceInteraction(
+            substances: [.ghb, .threeMMC],
+            level: .serious,
+            warning: String(localized: "3MMC masks the sedation GHB is causing, so it is easy to redose past a safe amount. When the stimulant wears off the GHB is still there, and it can arrive all at once.")
+        ),
+        SubstanceInteraction(
+            substances: [.gbl, .threeMMC],
+            level: .serious,
+            warning: String(localized: "3MMC hides how sedated GBL is making you, which is how doses stack up unnoticed. The sedation lands hard once the stimulant fades.")
+        ),
+        SubstanceInteraction(
+            substances: [.ghb, .psychedelics],
+            level: .serious,
+            warning: String(localized: "Psychedelics distort time, which makes it very easy to lose track of when you last dosed GHB. GHB has a narrow margin between a normal dose and unconsciousness. Have someone sober keep the timing.")
+        ),
+        SubstanceInteraction(
+            substances: [.gbl, .psychedelics],
+            level: .serious,
+            warning: String(localized: "Psychedelics distort your sense of time, and GBL has a very narrow margin between a normal dose and going under. Losing track of the last dose is the danger. Have someone sober hold the timing.")
+        ),
+        SubstanceInteraction(
+            substances: [.ghb, .viagra],
+            level: .serious,
+            warning: String(localized: "Both lower blood pressure, and GHB can take you under with little warning. Fainting during sex, with nobody realising you are unconscious rather than asleep, is the risk.")
+        ),
+        SubstanceInteraction(
+            substances: [.ghb, .kamagra],
+            level: .serious,
+            warning: String(localized: "Both lower blood pressure, and Kamagra is often an unverified dose. GHB can take you under quickly, and it is easy for others to mistake that for sleep.")
+        ),
+        SubstanceInteraction(
+            substances: [.gbl, .viagra],
+            level: .serious,
+            warning: String(localized: "Both lower blood pressure and GBL can take you under fast. Losing consciousness during sex can be mistaken for falling asleep, which delays help.")
+        ),
+        SubstanceInteraction(
+            substances: [.gbl, .kamagra],
+            level: .serious,
+            warning: String(localized: "Both lower blood pressure, and Kamagra is often sold at an unverified strength. GBL can take you under quickly, and that is easily mistaken for sleep.")
+        ),
+        SubstanceInteraction(
+            substances: [.poppers, .threeMMC],
+            level: .serious,
+            warning: String(localized: "3MMC tightens blood vessels and raises blood pressure while poppers drop it suddenly. Swinging between the two strains the heart and can cause fainting or an irregular heartbeat.")
+        ),
+        SubstanceInteraction(
+            substances: [.poppers, .psychedelics],
+            level: .caution,
+            warning: String(localized: "The sudden head rush from poppers can be disorienting and frightening in an altered state, and the blood pressure drop still brings a real risk of fainting. Sit down before using them.")
+        ),
+        SubstanceInteraction(
+            substances: [.psychedelics, .viagra],
+            level: .caution,
+            warning: String(localized: "Viagra raises heart rate and can add to the physical anxiety a trip already brings, making it harder to tell nerves from a real problem.")
+        ),
+        SubstanceInteraction(
+            substances: [.psychedelics, .kamagra],
+            level: .caution,
+            warning: String(localized: "Kamagra is often an unverified dose, and the racing heart it can cause is easily mistaken for trip anxiety, or the other way round.")
+        ),
     ]}
 
     /// Warnings for the selected set, most severe first.

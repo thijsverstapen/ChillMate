@@ -153,6 +153,7 @@ struct PageHeader: View {
                 Image(systemName: symbol)
                     .font(.system(size: 18, weight: .black))
                     .foregroundStyle(tint)
+                    .accessibilityHidden(true)
                     .frame(width: 44, height: 44)
                     .background(
                         LinearGradient(
@@ -172,6 +173,9 @@ struct PageHeader: View {
                     .foregroundStyle(palette.heroText)
                     .fixedSize(horizontal: false, vertical: true)
                     .minimumScaleFactor(0.80)
+                    // Every page gets its title into the VoiceOver rotor's
+                    // heading list, across all 33 call sites.
+                    .accessibilityAddTraits(.isHeader)
             }
 
             Text(subtitle)
@@ -285,10 +289,13 @@ struct CareSectionTitle: View {
                 .font(.system(size: 14, weight: .black))
                 .foregroundStyle(LinearGradient.chillBrand)
                 .symbolRenderingMode(.hierarchical)
+                .accessibilityHidden(true)
             Text(title)
                 .font(.headline.weight(.bold))
                 .foregroundStyle(Color.chillText)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
     }
 }
 

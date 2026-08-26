@@ -681,7 +681,7 @@ private struct TipOption: Identifiable {
 
 struct SupportDeveloperView: View {
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var store = TipStore()
+    @State private var store = TipStore()
 
     private let options: [TipOption] = [
         TipOption(id: TipProduct.coffee, title: String(localized: "Buy me a coffee"), detail: String(localized: "A little caffeine for late-night coding"), symbol: "cup.and.saucer.fill", tint: Color.chillIconAmber, fallbackPrice: "€3"),
@@ -918,12 +918,13 @@ struct SupportDeveloperView: View {
 
 /// Loads and purchases the tip In-App Purchases via StoreKit 2.
 @MainActor
-final class TipStore: ObservableObject {
+@Observable
+final class TipStore {
     enum Outcome { case success, cancelled, failed(String?) }
     enum LoadState { case idle, loading, loaded, failed }
 
-    @Published private(set) var products: [Product] = []
-    @Published private(set) var loadState: LoadState = .idle
+    private(set) var products: [Product] = []
+    private(set) var loadState: LoadState = .idle
 
     func loadProducts() async {
         guard products.isEmpty else { return }
@@ -2651,9 +2652,10 @@ struct ProfileSetupMedicationSection: View {
 /// device motion, so this reads as a harmless zero there. Gated behind Reduce Motion
 /// by the caller (updates are never started when motion is off).
 @MainActor
-private final class MotionTilt: ObservableObject {
-    @Published var x: CGFloat = 0
-    @Published var y: CGFloat = 0
+@Observable
+private final class MotionTilt {
+    var x: CGFloat = 0
+    var y: CGFloat = 0
     private let manager = CMMotionManager()
 
     func start() {
@@ -2674,14 +2676,14 @@ private final class MotionTilt: ObservableObject {
 
 @MainActor
 private struct ProfileIntroductionView: View {
-    @StateObject private var delays = DelayedActionRunner()
+    @State private var delays = DelayedActionRunner()
     let continueAction: () -> Void
     @State private var activePage = 0
     @State private var isCompleting = false
     @State private var dragX: CGFloat = 0
     @State private var nudge: CGFloat = 0
     @State private var containerWidth: CGFloat = 1
-    @StateObject private var tilt = MotionTilt()
+    @State private var tilt = MotionTilt()
     @Environment(\.accessibilityReduceMotion) private var reduceSystemMotion
     @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
     @AppStorage(DefaultsKey.onboardingSwipeHintShown) private var swipeHintShown = false
@@ -2814,7 +2816,7 @@ private struct ProfileIntroductionView: View {
 }
 
 private struct IntroBottomControls: View {
-    @StateObject private var delays = DelayedActionRunner()
+    @State private var delays = DelayedActionRunner()
     let index: Int
     let count: Int
     let isCompleting: Bool
@@ -2976,7 +2978,7 @@ private enum IntroAnimationKind {
 
 @MainActor
 private struct IntroSlideView: View {
-    @StateObject private var delays = DelayedActionRunner()
+    @State private var delays = DelayedActionRunner()
     let page: IntroPage
     let index: Int
     let isCompleting: Bool
@@ -3398,7 +3400,7 @@ private struct MorphingIntroHero: View {
 
 @MainActor
 private struct IntroHeroScene: View {
-    @StateObject private var delays = DelayedActionRunner()
+    @State private var delays = DelayedActionRunner()
     let kind: IntroAnimationKind
     let phase: TimeInterval
     let isCompleting: Bool
@@ -3533,7 +3535,9 @@ private struct IntroHeroScene: View {
 
     private var logScene: some View {
         ZStack {
-            let titles = ["Time", "Sleep", "Condom", "People", "Location"]
+            // LocalizedStringResource, not String: Text(someString) renders
+            // verbatim, so these onboarding labels were English everywhere.
+            let titles: [LocalizedStringResource] = ["Time", "Sleep", "Condom", "People", "Location"]
             let symbols = ["clock.fill", "bed.double.fill", "checkmark.shield.fill", "person.2.fill", "location.fill"]
             let tints: [Color] = [.chillSecondaryBlue, Color(red: 251/255, green: 146/255, blue: 60/255), .chillMint, Color(red: 244/255, green: 114/255, blue: 182/255), .chillAccentTeal]
 
@@ -3886,7 +3890,7 @@ private struct ScoreRing: View {
 }
 
 private struct TimelinePill: View {
-    let title: String
+    let title: LocalizedStringResource
     let symbol: String
     let tint: Color
 

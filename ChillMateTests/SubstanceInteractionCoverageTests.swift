@@ -206,13 +206,29 @@ struct RiskCheckerScreenTests {
         }
     }
 
+    // MARK: Coverage
+
+    @Test("Every selectable pair has a curated warning", .tags(.safety))
+    func everySelectablePairIsCurated() {
+        let uncovered = Self.selectablePairs.filter {
+            SubstanceInteractionChecker.warnings(for: $0).isEmpty
+        }
+        #expect(uncovered.isEmpty,
+                "Uncurated pairs: \(uncovered.map { $0.map(\.rawValue).sorted().joined(separator: "+") }.sorted())")
+    }
+
     // MARK: The fallback
 
+    // [.cannabis, .psychedelics] used to live here. It was only ever silent
+    // because the table had a hole, and it stopped being silent once the hole
+    // was filled. Every selectable pair is now curated, so a genuinely silent
+    // multi-substance case has to involve Unknown or Other.
     @Test("The fallback appears only when both sources are silent", .tags(.safety), arguments: [
         Set<Substance>([]),
         Set<Substance>([.cannabis]),
         Set<Substance>([.psychedelics]),
-        Set<Substance>([.cannabis, .psychedelics]),
+        Set<Substance>([.cannabis, .unknown]),
+        Set<Substance>([.unknown, .other]),
     ])
     func fallbackAppearsWhenNothingMatched(combo: Set<Substance>) throws {
         #expect(SubstanceInteractionChecker.warnings(for: combo).isEmpty,

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import TipKit
 import UIKit
 
 struct PanicSupportView: View {
@@ -8,9 +9,30 @@ struct PanicSupportView: View {
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
     @State private var isBreathing = false
     @State private var breathStep = 0
+    @State private var breathingTask: Task<Void, Never>?
+    @State private var breathingStartedAt: Date?
+    @AppStorage(DefaultsKey.healthKitMindfulWriteEnabled) private var healthKitMindfulWriteEnabled = false
     @State private var completedGroundingSteps: Set<Int> = []
 
-    private let breathingSteps = ["Breathe in", "Hold gently", "Breathe out", "Rest"]
+    /// LocalizedStringResource, not String: `Text(someString)` renders verbatim,
+    /// so these four prompts were English on every device. The exhale is the
+    /// longest phase on purpose, which is what settles a racing heart.
+    private struct BreathPhase {
+        let label: LocalizedStringResource
+        let seconds: Double
+        let expanded: Bool
+    }
+
+    private let breathingSteps: [BreathPhase] = [
+        BreathPhase(label: "Breathe in", seconds: 4, expanded: true),
+        BreathPhase(label: "Hold gently", seconds: 4, expanded: true),
+        BreathPhase(label: "Breathe out", seconds: 6, expanded: false),
+        BreathPhase(label: "Rest", seconds: 2, expanded: false)
+    ]
+
+    private var breathCircleIsExpanded: Bool {
+        isBreathing && breathingSteps[breathStep].expanded
+    }
     private let groundingSteps = [
         String(localized: "Name 5 things you can see."),
         String(localized: "Touch 4 things and notice texture."),
@@ -34,26 +56,51 @@ struct PanicSupportView: View {
                         )
                         .sensoryFeedback(.impact(flexibility: .soft), trigger: breathStep)
 
+                        TipView(ControlCentreTip())
+
                         VStack(spacing: 18) {
                             ZStack {
                                 Circle()
                                     .fill(Color.chillPrimary.opacity(0.18))
-                                    .frame(width: isBreathing ? 174 : 118, height: isBreathing ? 174 : 118)
+                                    .frame(
+                                        width: breathCircleIsExpanded ? 174 : 118,
+                                        height: breathCircleIsExpanded ? 174 : 118
+                                    )
+                                    .animation(
+                                        .easeInOut(duration: breathingSteps[breathStep].seconds),
+                                        value: breathCircleIsExpanded
+                                    )
 
                                 Circle()
                                     .stroke(Color.chillMint.opacity(0.70), lineWidth: 8)
                                     .frame(width: 150, height: 150)
 
                                 VStack(spacing: 6) {
-                                    Text(isBreathing ? breathingSteps[breathStep] : String(localized: "Ready"))
-                                        .font(.title3.bold())
-                                        .foregroundStyle(Color.chillText)
+                                    if isBreathing {
+                                        Text(breathingSteps[breathStep].label)
+                                            .font(.title3.bold())
+                                            .foregroundStyle(Color.chillText)
+                                    } else {
+                                        Text("Ready")
+                                            .font(.title3.bold())
+                                            .foregroundStyle(Color.chillText)
+                                    }
+
                                     Text("You’re safe right now")
                                         .font(.caption.weight(.semibold))
                                         .foregroundStyle(Color.chillSecondary)
                                 }
                             }
                             .frame(maxWidth: .infinity)
+                            // One element so VoiceOver announces the changing phase
+                            // instead of re-reading the whole circle.
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(Text("Breathing guide"))
+                            .accessibilityValue(
+                                isBreathing
+                                    ? Text(breathingSteps[breathStep].label)
+                                    : Text("Not started")
+                            )
 
                             Button(isBreathing ? "Stop breathing timer" : "Start breathing timer") {
                                 toggleBreathing()
@@ -95,6 +142,7 @@ struct PanicSupportView: View {
                 .scrollIndicators(.hidden)
             }
             .navigationTitle(Text(verbatim: ""))
+            .onDisappear(perform: stopBreathing)
         }
     }
 
@@ -144,6 +192,11 @@ struct PanicSupportView: View {
                         .glassSurface(radius: 18, tint: (completedGroundingSteps.contains(index) ? Color.chillMint : Color.chillPrimary).opacity(0.08), interactive: true)
                     }
                     .buttonStyle(ChillPlainButtonStyle())
+                    // Without .isSelected the checked and unchecked states read
+                    // identically to VoiceOver: the tick is the only difference.
+                    .accessibilityAddTraits(
+                        completedGroundingSteps.contains(index) ? [.isButton, .isSelected] : .isButton
+                    )
                 }
             }
             .padding(16)
@@ -167,16 +220,42 @@ struct PanicSupportView: View {
     }
 
     private func toggleBreathing() {
-        isBreathing.toggle()
-        if isBreathing {
-            Task {
-                while isBreathing {
-                    await MainActor.run {
-                        breathStep = (breathStep + 1) % breathingSteps.count
-                    }
-                    try? await Task.sleep(for: .seconds(4))
-                }
+        isBreathing ? stopBreathing() : startBreathing()
+    }
+
+    private func startBreathing() {
+        breathingTask?.cancel()
+        // Start on "Breathe in". The old loop advanced before its first sleep, so
+        // the first instruction anyone saw was "Hold gently".
+        breathStep = 0
+        breathingStartedAt = .now
+        isBreathing = true
+        breathingTask = Task {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(breathingSteps[breathStep].seconds))
+                if Task.isCancelled { return }
+                breathStep = (breathStep + 1) % breathingSteps.count
             }
+        }
+    }
+
+    private func stopBreathing() {
+        breathingTask?.cancel()
+        breathingTask = nil
+        isBreathing = false
+        breathStep = 0
+
+        // Only when the user already granted it in Settings. Prompting for Health
+        // access on the panic screen would be the worst possible moment to ask.
+        let startedAt = breathingStartedAt
+        breathingStartedAt = nil
+        guard healthKitMindfulWriteEnabled,
+              let startedAt,
+              Date.now.timeIntervalSince(startedAt) >= 60 else { return }
+
+        Task {
+            // Silent on failure. The session happened whether Health records it or not.
+            try? await HealthKitService.shared.saveMindfulMinutes(from: startedAt, to: .now)
         }
     }
 

@@ -24,11 +24,55 @@ struct WidgetLogHydrationIntent: AppIntent {
     }
 }
 
+/// Opens ChillMate on panic support. A control runs in this extension's process,
+/// so it cannot write the app's own `UserDefaults`; it leaves the destination in
+/// the shared App Group and `adoptControlDestination()` picks it up on foreground.
+struct OpenPanicSupportControlIntent: AppIntent {
+    static let title: LocalizedStringResource = "Open panic support"
+    static let description = IntentDescription("Opens breathing, grounding, and emergency contacts in ChillMate.")
+    static let openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        let defaults = UserDefaults(suiteName: WidgetSharedKey.suiteName) ?? .standard
+        defaults.set(WidgetSharedKey.destinationPanic, forKey: WidgetSharedKey.pendingDestination)
+        return .result()
+    }
+}
+
+/// Panic support from the Lock Screen without unlocking first, which is the
+/// point: at 4am the phone is locked and the person needing it is not at their best.
+struct PanicSupportControl: ControlWidget {
+    var body: some ControlWidgetConfiguration {
+        StaticControlConfiguration(kind: "com.BIJTHIJS.ChillMate.control.panic") {
+            ControlWidgetButton(action: OpenPanicSupportControlIntent()) {
+                Label("Get help", systemImage: "cross.case.fill")
+            }
+        }
+        .displayName("ChillMate help")
+        .description("Opens breathing, grounding, and emergency contacts.")
+    }
+}
+
+/// Logs water without opening anything at all.
+struct LogWaterControl: ControlWidget {
+    var body: some ControlWidgetConfiguration {
+        StaticControlConfiguration(kind: "com.BIJTHIJS.ChillMate.control.water") {
+            ControlWidgetButton(action: WidgetLogHydrationIntent()) {
+                Label("Log water", systemImage: "drop.fill")
+            }
+        }
+        .displayName("Log water")
+        .description("Records that you drank water, without opening ChillMate.")
+    }
+}
+
 @main
 struct ChillMateLiveActivityBundle: WidgetBundle {
     var body: some Widget {
         DrugTimerLiveActivityWidget()
         ChillMateWidgetDescriptor()
+        PanicSupportControl()
+        LogWaterControl()
     }
 }
 
@@ -82,7 +126,10 @@ private struct ChillMateWidgetDescriptorView: View {
     @Environment(\.widgetFamily) private var family
 
     private var streakText: String {
-        entry.recoveryStreakDays == 1 ? "1 day" : "\(entry.recoveryStreakDays) days"
+        // Verbatim before: "1 day" / "5 days" were plain Swift strings, so the
+        // widget counted in English on every device. The catalog now carries the
+        // plural forms for all five languages.
+        String(localized: "\(entry.recoveryStreakDays) days")
     }
 
     var body: some View {
@@ -201,39 +248,89 @@ struct DrugTimerLiveActivityWidget: Widget {
                 .activityBackgroundTint(Color.black.opacity(0.86))
                 .activitySystemActionForegroundColor(.cyan)
         } dynamicIsland: { context in
-            DynamicIsland {
+            let accent: Color = context.state.redoseNudgeActive ? .orange : .cyan
+
+            return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Image(systemName: context.state.redoseNudgeActive ? "hand.raised.fill" : "timer")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(context.state.redoseNudgeActive ? .orange : .cyan)
+                    HStack(spacing: 6) {
+                        Image(systemName: context.state.redoseNudgeActive ? "hand.raised.fill" : "timer")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(accent)
+
+                        Text(context.attributes.substanceName)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                    }
                 }
 
                 DynamicIslandExpandedRegion(.trailing) {
                     TimerText(endDate: context.state.endsAt)
-                        .font(.caption.weight(.bold))
+                        .font(.caption.monospacedDigit().weight(.bold))
+                        .foregroundStyle(.white)
                 }
 
                 DynamicIslandExpandedRegion(.bottom) {
-                    if context.state.redoseNudgeActive {
-                        Text("Consider waiting")
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(.orange)
+                    VStack(spacing: 8) {
+                        SessionProgressBar(state: context.state, accent: accent)
+
+                        HStack(spacing: 10) {
+                            if context.state.redoseNudgeActive {
+                                Label("Consider waiting", systemImage: "hand.raised.fill")
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(.orange)
+                                    .lineLimit(1)
+                            } else {
+                                Text("Ends \(context.state.endsAt, style: .time)")
+                                    .font(.caption2)
+                                    .foregroundStyle(.white.opacity(0.66))
+                            }
+
+                            Spacer(minLength: 0)
+
+                            Button(intent: WidgetLogHydrationIntent()) {
+                                Label("Log water", systemImage: "drop.fill")
+                                    .font(.caption2.weight(.bold))
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(.cyan)
+                        }
                     }
                 }
             } compactLeading: {
-                Image(systemName: "timer")
-                    .foregroundStyle(.cyan)
+                Image(systemName: context.state.redoseNudgeActive ? "hand.raised.fill" : "timer")
+                    .foregroundStyle(accent)
             } compactTrailing: {
                 // Show the (fixed) end time rather than a ticking H:MM:SS countdown.
                 // The countdown reserves a wide area and stretches the Dynamic Island
                 // pill; the end time is content-sized and always correct without ticking.
                 Text(context.state.endsAt, style: .time)
                     .font(.caption2.weight(.bold))
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(accent)
             } minimal: {
                 Image(systemName: context.state.redoseNudgeActive ? "hand.raised.fill" : "timer")
-                    .foregroundStyle(context.state.redoseNudgeActive ? .orange : .cyan)
+                    .foregroundStyle(accent)
             }
+        }
+    }
+}
+
+/// Fills as the session runs. ActivityKit animates this between updates on its
+/// own, so it stays accurate without the app pushing a new state every minute.
+/// Draws nothing when the activity predates `startedAt`.
+private struct SessionProgressBar: View {
+    let state: DrugTimerActivityAttributes.ContentState
+    let accent: Color
+
+    var body: some View {
+        if let startedAt = state.startedAt, startedAt < state.endsAt {
+            ProgressView(timerInterval: startedAt...state.endsAt, countsDown: false) {
+                EmptyView()
+            } currentValueLabel: {
+                EmptyView()
+            }
+            .progressViewStyle(.linear)
+            .tint(accent)
         }
     }
 }
@@ -241,31 +338,53 @@ struct DrugTimerLiveActivityWidget: Widget {
 private struct DrugTimerLiveActivityView: View {
     let context: ActivityViewContext<DrugTimerActivityAttributes>
 
+    private var accent: Color { context.state.redoseNudgeActive ? .orange : .cyan }
+
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: context.state.redoseNudgeActive ? "hand.raised.fill" : "timer")
-                .font(.headline.bold())
-                .foregroundStyle(context.state.redoseNudgeActive ? .orange : .cyan)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: context.state.redoseNudgeActive ? "hand.raised.fill" : "timer")
+                    .font(.headline.bold())
+                    .foregroundStyle(accent)
+                    .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(context.attributes.substanceName)
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(context.attributes.substanceName)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .lineLimit(1)
 
-                Text(context.state.redoseNudgeActive ? "Pause and check in" : "Wellbeing check-in")
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(context.state.redoseNudgeActive ? .orange : .white.opacity(0.76))
+                    Text(context.state.redoseNudgeActive ? "Pause and check in" : "Wellbeing check-in")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(context.state.redoseNudgeActive ? .orange : .white.opacity(0.76))
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 8)
+
+                VStack(alignment: .trailing, spacing: 2) {
+                    TimerText(endDate: context.state.endsAt)
+                        .font(.title3.monospacedDigit().weight(.bold))
+                        .foregroundStyle(.white)
+
+                    Text("Ends \(context.state.endsAt, style: .time)")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.6))
+                }
             }
 
-            Spacer()
+            SessionProgressBar(state: context.state, accent: accent)
 
-            TimerText(endDate: context.state.endsAt)
-                .font(.subheadline.monospacedDigit().weight(.bold))
-                .foregroundStyle(.white)
+            Button(intent: WidgetLogHydrationIntent()) {
+                Label("Log water", systemImage: "drop.fill")
+                    .font(.caption.weight(.bold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.cyan)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 7)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
     }
 }
 

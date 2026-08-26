@@ -116,7 +116,8 @@ final class NotificationService {
             return discreetBody
         case .playful:
             if let playfulBody { return playfulBody }
-            return String(
+            // String(format:) takes CVarArg, which strict memory safety flags.
+            return unsafe String(
                 format: String(localized: "%@ Small check, future-you says thanks."),
                 body
             )
@@ -134,6 +135,14 @@ final class NotificationService {
         discreetBody: String? = nil,
         destination: NotificationDestination? = nil,
         categoryIdentifier: String? = nil,
+        /// Default stays `.passive`. Anything that should cut through says so at the
+        /// call site, and only a handful do.
+        ///
+        /// `.timeSensitive` is live: `com.apple.developer.usernotifications.time-sensitive`
+        /// is in ChillMate.entitlements and the capability is enabled on the App ID.
+        /// Automatic signing added it, so a command-line build needs
+        /// `-allowProvisioningUpdates` or it fails claiming the profile lacks the
+        /// capability. That error is about the build invocation, not the account.
         interruptionLevel: UNNotificationInterruptionLevel = .passive
     ) -> UNMutableNotificationContent {
         // Resolved here rather than as a default argument value: a default is
@@ -233,7 +242,8 @@ final class NotificationService {
             playfulBody: String(localized: "Sleep, notes, or a skipped Chill? Small check, future-you says thanks."),
             discreetBody: String(localized: "Private check-in available."),
             destination: .home,
-            categoryIdentifier: "CHECKIN"
+            categoryIdentifier: "CHECKIN",
+            interruptionLevel: .active
         )
 
         var components = DateComponents()
@@ -639,7 +649,8 @@ final class NotificationService {
             body: body,
             discreetBody: String(localized: "A private health check-in is available."),
             destination: .home,
-            categoryIdentifier: "RISK"
+            categoryIdentifier: "RISK",
+            interruptionLevel: .timeSensitive
         )
 
         center.removePendingNotificationRequests(withIdentifiers: [riskWarningIdentifier])
@@ -656,7 +667,8 @@ final class NotificationService {
             title: String(localized: "STI results check"),
             body: String(localized: "If your results are in, add oral, genital, and anal results to ChillMate."),
             discreetBody: String(localized: "A private results reminder is available."),
-            destination: .home
+            destination: .home,
+            interruptionLevel: .active
         )
 
         let request = UNNotificationRequest(
@@ -673,7 +685,8 @@ final class NotificationService {
             body: String(localized: "How did you sleep, and how do you feel about last Chill?"),
             discreetBody: String(localized: "A private aftercare check-in is available."),
             destination: .home,
-            categoryIdentifier: "CHECKIN"
+            categoryIdentifier: "CHECKIN",
+            interruptionLevel: .active
         )
 
         let request = UNNotificationRequest(
@@ -718,7 +731,8 @@ final class NotificationService {
             body: String(localized: "It's been two days since your last Chill. How are you really feeling: sleep, mood, energy?"),
             discreetBody: String(localized: "A private follow-up is available."),
             destination: .home,
-            categoryIdentifier: "CHECKIN"
+            categoryIdentifier: "CHECKIN",
+            interruptionLevel: .active
         )
         let request = UNNotificationRequest(
             identifier: "chillmate.followup48h.\(entryID.uuidString)",
@@ -735,7 +749,8 @@ final class NotificationService {
             title: String(localized: "STI test reminder"),
             body: String(localized: "Based on your test schedule, it may be time for a check-up. Regular STI testing is part of staying healthy."),
             discreetBody: String(localized: "A private health reminder is available."),
-            destination: .home
+            destination: .home,
+            interruptionLevel: .active
         )
         let request = UNNotificationRequest(
             identifier: "chillmate.sti.periodic",
@@ -752,7 +767,7 @@ final class NotificationService {
     func schedulePositiveSleepNotification(hours: Double) {
         let content = notificationContent(
             title: String(localized: "Good recovery sleep"),
-            body: "Apple Health shows \(hours.formatted(.number.precision(.fractionLength(0...1)))) hours of sleep. That is a strong recovery signal.",
+            body: String(localized: "Apple Health shows \(hours.formatted(.number.precision(.fractionLength(0...1)))) hours of sleep. That is a strong recovery signal."),
             discreetBody: String(localized: "A private recovery update is available."),
             destination: .home
         )
@@ -789,7 +804,8 @@ final class NotificationService {
                 body: "Your safer session plan ends in \(label). Check water, transport, and your limits now.",
                 discreetBody: String(localized: "Your private plan has a timing reminder."),
                 destination: .saferPlan,
-                categoryIdentifier: "CHECKIN"
+                categoryIdentifier: "CHECKIN",
+                interruptionLevel: .active
             )
 
             let request = UNNotificationRequest(
@@ -819,7 +835,8 @@ final class NotificationService {
                 title: reminder.1,
                 body: reminder.2,
                 discreetBody: String(localized: "A private medication reminder is available."),
-                destination: .saferPlan
+                destination: .saferPlan,
+                interruptionLevel: .timeSensitive
             )
 
             let request = UNNotificationRequest(
@@ -879,7 +896,7 @@ final class NotificationService {
                 discreetBody: String(localized: "A private safety check is available."),
                 destination: .emergency,
                 categoryIdentifier: "SAFETY_CHECKIN",
-                interruptionLevel: .active
+                interruptionLevel: .timeSensitive
             )
             let endRequest = UNNotificationRequest(
                 identifier: sessionCheckInIdentifier(id: id, index: index),
@@ -888,6 +905,20 @@ final class NotificationService {
             )
             center.add(endRequest)
         }
+    }
+
+    /// Called when the reader says they got home. Everything cleared here is a
+    /// "still okay?" ping, and being home is the answer. Redose nudges, PEP
+    /// windows, and results reminders are deliberately left alone: those are
+    /// still due whether or not anyone made it home.
+    func clearSafetyCheckInsForTonight() async {
+        let pending = await center.pendingNotificationRequests()
+        let stale = pending
+            .map(\.identifier)
+            .filter { $0.hasPrefix("chillmate.sessionCheckIn.") || $0.hasPrefix("chillmate.weekendsafety.") }
+
+        guard !stale.isEmpty else { return }
+        center.removePendingNotificationRequests(withIdentifiers: stale)
     }
 
     func clearSessionCheckIns(id: UUID) {
@@ -911,7 +942,8 @@ final class NotificationService {
             body: String(localized: "You are partway through the effect window. If more is on your mind, pause first: are you safe, hydrated, and still choosing what protects tomorrow?"),
             discreetBody: String(localized: "A private timing check is available."),
             destination: .timers,
-            categoryIdentifier: "CHECKIN"
+            categoryIdentifier: "CHECKIN",
+            interruptionLevel: .timeSensitive
         )
 
         center.add(UNNotificationRequest(
@@ -935,7 +967,8 @@ final class NotificationService {
             body: String(localized: "Your planned ending time has passed. Pause first: are you safe, supported, and still choosing what protects you tomorrow?"),
             discreetBody: String(localized: "A private timing check is available."),
             destination: .timers,
-            categoryIdentifier: "CHECKIN"
+            categoryIdentifier: "CHECKIN",
+            interruptionLevel: .active
         )
 
         let request = UNNotificationRequest(
@@ -973,14 +1006,16 @@ final class NotificationService {
             body: "A recent log may indicate a risk. Contact a doctor or sexual health clinic today. Window closes \(deadlineString).",
             discreetTitle: String(localized: "ChillMate"),
             discreetBody: String(localized: "A private health reminder is waiting for you."),
-            destination: .emergency
+            destination: .emergency,
+            interruptionLevel: .timeSensitive
         )
         let morningContent2 = notificationContent(
             title: String(localized: "PEP window still open"),
             body: "You still have time to speak with a clinician before \(deadlineString). Don't wait longer than needed.",
             discreetTitle: String(localized: "ChillMate"),
             discreetBody: String(localized: "A private health follow-up is available."),
-            destination: .emergency
+            destination: .emergency,
+            interruptionLevel: .timeSensitive
         )
 
         center.add(UNNotificationRequest(

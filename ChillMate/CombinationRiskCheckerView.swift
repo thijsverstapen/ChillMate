@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import TipKit
 
 struct CombinationRiskCheckerView: View {
     @Environment(\.dismiss) private var dismiss
@@ -85,7 +86,7 @@ struct CombinationRiskCheckerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: chillPinnedTrailingPlacement) {
                     Button(action: saveRiskCheck) {
                         Text("Save").font(.headline.weight(.semibold))
                     }
@@ -258,6 +259,9 @@ struct CombinationRiskCheckerView: View {
             serotoninLevel: assessment.serotoninRisk.label,
             dehydrationLevel: assessment.dehydrationRisk.label,
             stimulantLevel: assessment.stimulantOverloadRisk.label,
+            respiratoryLevel: assessment.respiratoryRisk.label,
+            cardiacLevel: assessment.cardiacRisk.label,
+            bloodPressureLevel: assessment.bloodPressureRisk.label,
             warnings: assessment.interactionWarnings
         )
         modelContext.insert(record)
@@ -348,6 +352,8 @@ private struct RiskAssessmentPanel: View {
         VStack(alignment: .leading, spacing: 14) {
             CareSectionTitle(title: String(localized: "Assessment"), symbol: "waveform.path.ecg")
 
+            TipView(SiriCombinationTip())
+
             if assessment.substances.isEmpty && assessment.medicationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 CareEmptyState(text: String(localized: "Select at least one substance or add medication to see a risk check."))
             } else {
@@ -355,6 +361,9 @@ private struct RiskAssessmentPanel: View {
                     RiskLevelRow(title: String(localized: "Serotonin syndrome"), level: assessment.serotoninRisk, detail: assessment.serotoninDetail)
                     RiskLevelRow(title: String(localized: "Dehydration"), level: assessment.dehydrationRisk, detail: assessment.dehydrationDetail)
                     RiskLevelRow(title: String(localized: "Stimulant overload"), level: assessment.stimulantOverloadRisk, detail: assessment.stimulantDetail)
+                    RiskLevelRow(title: String(localized: "Breathing"), level: assessment.respiratoryRisk, detail: assessment.respiratoryDetail)
+                    RiskLevelRow(title: String(localized: "Heart strain"), level: assessment.cardiacRisk, detail: assessment.cardiacDetail)
+                    RiskLevelRow(title: String(localized: "Blood pressure"), level: assessment.bloodPressureRisk, detail: assessment.bloodPressureDetail)
                 }
 
                 if !assessment.matchedMedicationSummary.isEmpty {
@@ -615,6 +624,122 @@ struct CombinationAssessment {
         }
 
         return .lower
+    }
+
+    /// Substances that slow breathing. Medication the user typed is folded in
+    /// through `hasMedicationCategory`, so a prescribed sedative or opioid counts
+    /// as another depressant on the pile.
+    private var depressants: [Substance] {
+        substances.filter { [.ghb, .gbl, .alcohol, .ketamine].contains($0) }
+    }
+
+    private var depressantMedicationCount: Int {
+        (hasMedicationCategory(.sedative) ? 1 : 0) + (hasMedicationCategory(.opioid) ? 1 : 0)
+    }
+
+    /// Breathing slowing or stopping. This is the hazard behind most fatal
+    /// outcomes involving the substances ChillMate tracks, and nothing on this
+    /// screen used to name it.
+    var respiratoryRisk: RiskLevel {
+        let total = depressants.count + depressantMedicationCount
+
+        // GHB and GBL have a narrow margin on their own; anything else sedating
+        // on top of them is the pattern that stops people breathing.
+        if hasGHBLike && total >= 2 {
+            return .high
+        }
+
+        if total >= 2 {
+            return .high
+        }
+
+        if total == 1 {
+            return hasGHBLike || timing == .sameSession ? .caution : .lower
+        }
+
+        return .lower
+    }
+
+    /// Strain on the heart: stimulants driving rate and pressure up, and
+    /// vasodilators swinging pressure the other way.
+    var cardiacRisk: RiskLevel {
+        let stimulantCount = stimulants.count + (hasMedicationCategory(.stimulantMedication) ? 1 : 0)
+        let hasPoppers = substanceSet.contains(.poppers)
+
+        if stimulantCount >= 1 && hasPoppers {
+            return .high
+        }
+
+        if stimulantCount >= 2 {
+            return .high
+        }
+
+        if stimulantCount == 1 && hasErectileMedication {
+            return .caution
+        }
+
+        if stimulantCount == 1 {
+            return timing == .sameSession ? .caution : .lower
+        }
+
+        return hasPoppers ? .caution : .lower
+    }
+
+    /// A sudden drop in blood pressure. The poppers and erection-medication pair
+    /// is the well-known one, but nitrates and alpha blockers reach it too.
+    var bloodPressureRisk: RiskLevel {
+        let hasPoppers = substanceSet.contains(.poppers)
+
+        if hasPoppers && (hasErectileMedication || hasMedicationCategory(.nitrateLike)) {
+            return .high
+        }
+
+        if hasErectileMedication && (hasMedicationCategory(.nitrateLike) || hasMedicationCategory(.alphaBlocker)) {
+            return .high
+        }
+
+        if hasPoppers && substanceSet.contains(.alcohol) {
+            return .caution
+        }
+
+        if hasPoppers || hasErectileMedication {
+            return .caution
+        }
+
+        return .lower
+    }
+
+    var respiratoryDetail: String {
+        switch respiratoryRisk {
+        case .high:
+            String(localized: "More than one thing that slows breathing is selected. Signs to watch for: snoring or gurgling, slow or shallow breaths, blue lips, or someone who cannot be woken. Put them on their side and call emergency services. Do not leave them to sleep it off.")
+        case .caution:
+            String(localized: "One thing that slows breathing is selected. Keep the dose low, leave long gaps, and stay with someone who knows what you took.")
+        case .lower:
+            String(localized: "Nothing selected is a known breathing depressant, though amount and other medication still matter.")
+        }
+    }
+
+    var cardiacDetail: String {
+        switch cardiacRisk {
+        case .high:
+            String(localized: "This mix puts real strain on the heart, either by stacking stimulants or by swinging blood pressure up and down. Chest pain, a heart rate that will not settle, or breathlessness at rest all mean stop and get help.")
+        case .caution:
+            String(localized: "Something selected raises heart rate or moves blood pressure. Sit down if your heart races, and give yourself long breaks.")
+        case .lower:
+            String(localized: "No obvious pattern of heart strain is selected.")
+        }
+    }
+
+    var bloodPressureDetail: String {
+        switch bloodPressureRisk {
+        case .high:
+            String(localized: "This combination can drop blood pressure suddenly and severely. That means fainting, and at worst a stroke or cardiac arrest. Do not combine these. If someone collapses, lie them flat, raise their legs, and call emergency services.")
+        case .caution:
+            String(localized: "Something selected widens blood vessels and lowers blood pressure. Sit or lie down before using it, and stand up slowly afterwards.")
+        case .lower:
+            String(localized: "No obvious blood pressure drop is selected.")
+        }
     }
 
     var serotoninDetail: String {

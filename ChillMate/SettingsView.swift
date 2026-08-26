@@ -1,7 +1,34 @@
 import PhotosUI
 import SwiftData
 import SwiftUI
+import TipKit
 import UniformTypeIdentifiers
+
+/// Eleven full-width cards made Settings a long, undifferentiated scroll. The
+/// same eleven destinations now sit in five labelled groups of compact rows.
+private enum SettingsGroup: String, CaseIterable, Identifiable {
+    case security
+    case alerts
+    case presentation
+    case data
+    case review
+
+    var id: String { rawValue }
+
+    var title: LocalizedStringResource {
+        switch self {
+        case .security: "Privacy and security"
+        case .alerts: "Alerts and devices"
+        case .presentation: "Look and feel"
+        case .data: "Your data"
+        case .review: "Goals and review"
+        }
+    }
+
+    var pages: [SettingsSectionPage] {
+        SettingsSectionPage.allCases.filter { $0.group == self }
+    }
+}
 
 private enum SettingsSectionPage: String, CaseIterable, Identifiable {
     case privacy = "Privacy & lock"
@@ -17,6 +44,16 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
     case account = "Account data"
 
     var id: String { rawValue }
+
+    var group: SettingsGroup {
+        switch self {
+        case .privacy, .privacyDashboard, .permissions: .security
+        case .notifications, .watch: .alerts
+        case .appearance, .accessibility: .presentation
+        case .iCloud, .account: .data
+        case .goals, .quality: .review
+        }
+    }
 
     var symbol: String {
         switch self {
@@ -84,6 +121,8 @@ struct SettingsView: View {
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
     @AppStorage(DefaultsKey.healthKitWorkoutReadEnabled) private var healthKitWorkoutReadEnabled = false
+    @AppStorage(DefaultsKey.healthKitVitalsReadEnabled) private var healthKitVitalsReadEnabled = false
+    @AppStorage(DefaultsKey.healthKitMindfulWriteEnabled) private var healthKitMindfulWriteEnabled = false
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
     @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
@@ -131,6 +170,7 @@ struct SettingsView: View {
     @AppStorage(DefaultsKey.stiReminderEnabled) private var stiReminderEnabled = false
     @AppStorage(DefaultsKey.stiReminderMonths) private var stiReminderMonths = 3
     @AppStorage(DefaultsKey.dataRetentionMonths) private var dataRetentionMonths = 0
+    @AppStorage(DefaultsKey.dataRetentionAutomatic) private var dataRetentionAutomatic = false
     @AppStorage(DefaultsKey.reductionGoalSessions) private var reductionGoalSessions = 0
     @AppStorage(DefaultsKey.reductionGoalCountSubstanceOnly) private var reductionGoalCountSubstanceOnly = true
 
@@ -243,12 +283,30 @@ struct SettingsView: View {
             }
             .padding(.top, 8)
 
-            VStack(spacing: 12) {
-                ForEach(SettingsSectionPage.allCases) { page in
-                    NavigationLink(value: page) {
-                        SettingsCategoryCard(page: page)
+            VStack(spacing: 20) {
+                ForEach(SettingsGroup.allCases) { group in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(group.title)
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                            .padding(.leading, 4)
+
+                        VStack(spacing: 0) {
+                            ForEach(Array(group.pages.enumerated()), id: \.element.id) { index, page in
+                                if index > 0 {
+                                    Divider()
+                                        .overlay(Color.chillSecondary.opacity(0.18))
+                                        .padding(.leading, 56)
+                                }
+
+                                NavigationLink(value: page) {
+                                    SettingsCategoryRow(page: page)
+                                }
+                                .buttonStyle(ChillPlainButtonStyle())
+                            }
+                        }
+                        .glassSurface(radius: 26, tint: .black.opacity(0.04))
                     }
-                    .buttonStyle(ChillPlainButtonStyle())
                 }
             }
 
@@ -483,7 +541,13 @@ struct SettingsView: View {
 
                         CSVExportCard(isWorking: isWorking, export: exportCSV)
 
-                        DataRetentionCard(selectedMonths: $dataRetentionMonths, applyRetention: applyDataRetention)
+                        TipView(AutomaticRetentionTip())
+
+                        DataRetentionCard(
+                            selectedMonths: $dataRetentionMonths,
+                            isAutomatic: $dataRetentionAutomatic,
+                            applyRetention: applyDataRetention
+                        )
 
                         DeleteAccountCard {
                             isShowingDeleteWarning = true
@@ -658,6 +722,10 @@ struct SettingsView: View {
             healthKitHeartRateReadEnabled = enabled
         case .heartRateVariabilityRead:
             healthKitHRVReadEnabled = enabled
+        case .vitalsRead:
+            healthKitVitalsReadEnabled = enabled
+        case .mindfulWrite:
+            healthKitMindfulWriteEnabled = enabled
         case .workoutRead:
             healthKitWorkoutReadEnabled = enabled
         }
@@ -986,7 +1054,7 @@ struct SettingsView: View {
                 for entry in old { modelContext.delete(entry) }
                 try modelContext.save()
                 await MainActor.run {
-                    message = "Deleted \(old.count) entries older than \(dataRetentionMonths) months."
+                    message = String(localized: "Deleted \(old.count) entries older than \(dataRetentionMonths) months.")
                     isWorking = false
                 }
             } catch {
@@ -1055,42 +1123,45 @@ private struct SettingsToggleCard: View {
     }
 }
 
-private struct SettingsCategoryCard: View {
+private struct SettingsCategoryRow: View {
     let page: SettingsSectionPage
 
     var body: some View {
-        HStack(spacing: 14) {
+        HStack(spacing: 12) {
             Image(systemName: page.symbol)
-                .font(.system(size: 20, weight: .bold))
+                .font(.system(size: 14, weight: .bold))
                 .foregroundStyle(Color.chillPrimary)
-                .frame(width: 42, height: 42)
-                .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.14))
+                .frame(width: 32, height: 32)
+                .glassSurface(radius: 10, tint: Color.chillPrimary.opacity(0.14))
+                .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(page.localizedDisplayName)
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
+            Text(page.localizedDisplayName)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color.chillText)
+                .fixedSize(horizontal: false, vertical: true)
 
-                Text(page.subtitle)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-
-            Spacer()
+            Spacer(minLength: 8)
 
             Image(systemName: "chevron.right")
-                .font(.caption.weight(.bold))
+                .font(.caption2.weight(.bold))
                 .foregroundStyle(Color.chillSecondary)
+                .accessibilityHidden(true)
         }
-        .padding(16)
-        .glassSurface(radius: 26, tint: .black.opacity(0.04), interactive: true)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .contentShape(Rectangle())
+        // The subtitle no longer takes a second line, but VoiceOver still reads it.
+        .accessibilityElement(children: .combine)
+        .accessibilityHint(Text(page.subtitle))
     }
 }
 
 private struct AutoLockTimeoutCard: View {
     @Binding var selectedMinutes: Int
 
-    private let options: [(label: String, minutes: Int)] = [
+    // LocalizedStringResource, not String: `Text(someString)` renders verbatim, so
+    // plain strings here shipped as English in every language.
+    private let options: [(label: LocalizedStringResource, minutes: Int)] = [
         ("Immediately", 0),
         ("After 1 minute", 1),
         ("After 5 minutes", 5),
@@ -1099,25 +1170,31 @@ private struct AutoLockTimeoutCard: View {
     ]
 
     var body: some View {
-        HStack(spacing: 14) {
-            Image(systemName: "timer.circle.fill")
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundStyle(Color.chillPrimary)
-                .frame(width: 42, height: 42)
-                .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.10))
+        // The picker sits on its own row. Inline, its longest menu label
+        // ("After 15 minutes", longer once translated) squeezed the caption
+        // into a ragged two-line wrap and then truncated itself.
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "timer.circle.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(Color.chillPrimary)
+                    .frame(width: 42, height: 42)
+                    .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.10))
+                    .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Auto-lock")
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Auto-lock")
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
 
-                Text("Re-lock when returning from the background.")
-                    .font(.caption)
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                    Text("Re-lock when returning from the background.")
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
             }
-
-            Spacer(minLength: 8)
 
             Picker("Auto-lock", selection: $selectedMinutes) {
                 ForEach(options, id: \.minutes) { option in
@@ -1126,7 +1203,9 @@ private struct AutoLockTimeoutCard: View {
             }
             .pickerStyle(.menu)
             .tint(Color.chillPrimary)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
     }
@@ -1458,18 +1537,16 @@ private struct ICloudBackupCard: View {
     let restore: () -> Void
     let deleteBackups: () -> Void
 
-    private var statusText: String {
-        if !status.isEmpty {
-            return status
+    /// Always shown. `status` is persisted, so the old `if !status.isEmpty` early
+    /// return meant a stored line like "Backup complete." hid the date forever.
+    private var lastBackupText: String {
+        guard lastBackupTimestamp > 0 else {
+            return String(localized: "No backup yet.")
         }
-
-        if lastBackupTimestamp > 0 {
-            let date = Date(timeIntervalSince1970: lastBackupTimestamp)
-            let stamp = date.formatted(date: .abbreviated, time: .shortened)
-            return String(localized: "Latest encrypted iCloud backup: \(stamp).")
-        }
-
-        return String(localized: "Turn this on to keep an encrypted backup in iCloud Drive and restore it from Settings or setup.")
+        let date = Date(timeIntervalSince1970: lastBackupTimestamp)
+        let relative = date.formatted(.relative(presentation: .named))
+        let stamp = date.formatted(date: .abbreviated, time: .shortened)
+        return String(localized: "Last backup \(relative), on \(stamp).")
     }
 
     var body: some View {
@@ -1499,21 +1576,39 @@ private struct ICloudBackupCard: View {
                     .tint(Color.chillPrimary)
             }
 
-            Text(statusText)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Color.chillSecondary)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(lastBackupText)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if !status.isEmpty {
+                    Text(status)
+                        .font(.caption)
+                        .foregroundStyle(Color.chillTertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             HStack(spacing: 10) {
+                // Both buttons carry the same content shape so the HStack splits
+                // evenly. Previously the spinner sat beside a full-width label,
+                // making "Back up now" measure far wider than "Restore".
                 Button(action: saveNow) {
-                    HStack {
+                    Label {
+                        Text("Back up now")
+                    } icon: {
                         if isWorking {
-                            ProgressView()
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Image(systemName: "icloud.and.arrow.up.fill")
                         }
-                        Label("Back up now", systemImage: "icloud.and.arrow.up.fill")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
                     }
+                    .font(.headline)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+                    .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(ChillPillButtonStyle(prominent: true))
                 .disabled(isWorking || !isEnabled)
@@ -1521,6 +1616,8 @@ private struct ICloudBackupCard: View {
                 Button(action: restore) {
                     Label("Restore", systemImage: "icloud.and.arrow.down.fill")
                         .font(.headline)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(ChillPillButtonStyle(prominent: false))
@@ -1941,9 +2038,21 @@ private struct CSVExportCard: View {
 
 private struct DataRetentionCard: View {
     @Binding var selectedMonths: Int
+    @Binding var isAutomatic: Bool
     let applyRetention: () -> Void
 
-    private let options = [(0, "Keep everything"), (6, "6 months"), (12, "1 year"), (24, "2 years"), (36, "3 years")]
+    // LocalizedStringResource, not String: Text(someString) renders verbatim, so
+    // these labels shipped as English in every language. Widened to eight options.
+    private let options: [(months: Int, label: LocalizedStringResource)] = [
+        (0, "Keep everything"),
+        (1, "1 month"),
+        (3, "3 months"),
+        (6, "6 months"),
+        (12, "1 year"),
+        (24, "2 years"),
+        (36, "3 years"),
+        (60, "5 years")
+    ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -1969,16 +2078,31 @@ private struct DataRetentionCard: View {
             }
 
             Picker("Keep data for", selection: $selectedMonths) {
-                ForEach(options, id: \.0) { option in
-                    Text(option.1).tag(option.0)
+                ForEach(options, id: \.months) { option in
+                    Text(option.label).tag(option.months)
                 }
             }
             .pickerStyle(.menu)
             .tint(.orange)
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             if selectedMonths > 0 {
+                Toggle(isOn: $isAutomatic) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Delete automatically")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.chillText)
+
+                        Text("Applies the window once a day, so you do not have to remember.")
+                            .font(.caption)
+                            .foregroundStyle(Color.chillSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .tint(.orange)
+
                 Button(role: .destructive, action: applyRetention) {
-                    Label("Delete entries older than \(options.first(where: { $0.0 == selectedMonths })?.1 ?? "")", systemImage: "trash.fill")
+                    Label("Delete those entries now", systemImage: "trash.fill")
                         .font(.headline)
                         .frame(maxWidth: .infinity)
                 }

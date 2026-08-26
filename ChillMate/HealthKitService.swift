@@ -47,6 +47,18 @@ final class HealthKitService {
         HKObjectType.quantityType(forIdentifier: .heartRate)
     }
 
+    private var restingHeartRateType: HKQuantityType? {
+        HKObjectType.quantityType(forIdentifier: .restingHeartRate)
+    }
+
+    private var respiratoryRateType: HKQuantityType? {
+        HKObjectType.quantityType(forIdentifier: .respiratoryRate)
+    }
+
+    private var mindfulSessionType: HKCategoryType? {
+        HKObjectType.categoryType(forIdentifier: .mindfulSession)
+    }
+
     private var heartRateVariabilityType: HKQuantityType? {
         HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)
     }
@@ -86,6 +98,16 @@ final class HealthKitService {
         if scopes.contains(.heartRateVariabilityRead), let heartRateVariabilityType {
             shareTypes.insert(heartRateVariabilityType)
             readTypes.insert(heartRateVariabilityType)
+        }
+
+        if scopes.contains(.vitalsRead) {
+            // Read only. ChillMate never writes a vital sign it did not measure.
+            if let restingHeartRateType { readTypes.insert(restingHeartRateType) }
+            if let respiratoryRateType { readTypes.insert(respiratoryRateType) }
+        }
+
+        if scopes.contains(.mindfulWrite), let mindfulSessionType {
+            shareTypes.insert(mindfulSessionType)
         }
 
         if scopes.contains(.workoutRead) {
@@ -277,6 +299,52 @@ final class HealthKitService {
         }
     }
 
+    /// Resting heart rate is a steadier recovery signal than a spot heart-rate
+    /// reading, because Apple Health derives it across a whole day.
+    func latestRestingHeartRate() async throws -> Double? {
+        guard isAvailable, let restingHeartRateType else { return nil }
+        try await requestAuthorization(scopes: [.vitalsRead])
+        return try await latestQuantity(restingHeartRateType, unit: HKUnit(from: "count/min"))
+    }
+
+    /// Breaths per minute. Depressant stacking shows up here before it shows up
+    /// anywhere the user would notice on their own.
+    func latestRespiratoryRate() async throws -> Double? {
+        guard isAvailable, let respiratoryRateType else { return nil }
+        try await requestAuthorization(scopes: [.vitalsRead])
+        return try await latestQuantity(respiratoryRateType, unit: HKUnit(from: "count/min"))
+    }
+
+    private func latestQuantity(_ type: HKQuantityType, unit: HKUnit) async throws -> Double? {
+        let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
+        return try await withCheckedThrowingContinuation { continuation in
+            let query = HKSampleQuery(sampleType: type, predicate: nil, limit: 1, sortDescriptors: [sort]) { _, samples, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                continuation.resume(returning: (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: unit))
+            }
+            store.execute(query)
+        }
+    }
+
+    /// Records a completed breathing session as mindful minutes. Called from panic
+    /// support, so the time someone spent calming down counts for something outside
+    /// ChillMate too. Silent on failure: the session already happened either way.
+    func saveMindfulMinutes(from startDate: Date, to endDate: Date) async throws {
+        guard isAvailable, let mindfulSessionType, endDate > startDate else { return }
+        try await requestAuthorization(scopes: [.mindfulWrite])
+
+        let sample = HKCategorySample(
+            type: mindfulSessionType,
+            value: HKCategoryValue.notApplicable.rawValue,
+            start: startDate,
+            end: endDate
+        )
+        try await store.save(sample)
+    }
+
     func sleepHoursAfterEntry(startDate: Date) async throws -> Double {
         let windowEnd = startDate.addingTimeInterval(16 * 60 * 60)
         return try await sleepHours(from: startDate, to: windowEnd)
@@ -357,6 +425,8 @@ enum HealthKitPermissionScope: String, CaseIterable, Identifiable {
     case sleepReadWrite = "Sleep read/write"
     case heartRateRead = "Heart rate read/write"
     case heartRateVariabilityRead = "HRV read/write"
+    case vitalsRead = "Resting heart rate and breathing"
+    case mindfulWrite = "Mindful minutes write"
     case workoutRead = "Workout read/write"
 
     var id: String { rawValue }
@@ -371,6 +441,10 @@ enum HealthKitPermissionScope: String, CaseIterable, Identifiable {
             "healthKitHeartRateReadEnabled"
         case .heartRateVariabilityRead:
             "healthKitHRVReadEnabled"
+        case .vitalsRead:
+            "healthKitVitalsReadEnabled"
+        case .mindfulWrite:
+            "healthKitMindfulWriteEnabled"
         case .workoutRead:
             "healthKitWorkoutReadEnabled"
         }
@@ -386,6 +460,10 @@ enum HealthKitPermissionScope: String, CaseIterable, Identifiable {
             "heart.fill"
         case .heartRateVariabilityRead:
             "waveform.path.ecg"
+        case .vitalsRead:
+            "lungs.fill"
+        case .mindfulWrite:
+            "brain.head.profile"
         case .workoutRead:
             "figure.run"
         }
@@ -401,6 +479,10 @@ enum HealthKitPermissionScope: String, CaseIterable, Identifiable {
             String(localized: "Prepare heart-rate signals for safer check-ins and Watch support.")
         case .heartRateVariabilityRead:
             String(localized: "Prepare HRV as a future recovery-score input.")
+        case .vitalsRead:
+            String(localized: "Read resting heart rate and breathing rate as recovery signals.")
+        case .mindfulWrite:
+            String(localized: "Write breathing sessions from panic support as mindful minutes.")
         case .workoutRead:
             String(localized: "Use workout context later to avoid false stress alerts.")
         }

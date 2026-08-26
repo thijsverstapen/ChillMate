@@ -93,6 +93,7 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar(.hidden, for: .tabBar)
+            .chillMinimizingNavigationBar()
     }
 
     @ViewBuilder
@@ -2185,7 +2186,7 @@ private struct GetHelpNowBar: View {
 }
 
 private struct MetricsGrid: View {
-    @StateObject private var delays = DelayedActionRunner()
+    @State private var delays = DelayedActionRunner()
     @Environment(\.chillReduceMotion) private var reduceMotion
 
     let trackedCount: Int
@@ -3152,24 +3153,35 @@ struct ProfileOverviewView: View {
             return []
         }
 
+        // `group` is an enum, not the label. Sections used to be filtered by
+        // comparing the localized label against English literals, so every
+        // section came out empty in Dutch, German, French and Spanish.
         var items = [
-            ProfileDetail(label: String(localized: "Name"), value: profile.name, symbol: "person.fill"),
-            ProfileDetail(label: String(localized: "Date of birth"), value: "\(profile.dateOfBirth.formatted(date: .abbreviated, time: .omitted)) (\(profile.calculatedAge))", symbol: "calendar"),
-            ProfileDetail(label: String(localized: "Weight"), value: "\(Int(profile.weightKg.rounded())) kg", symbol: "scalemass.fill"),
-            ProfileDetail(label: String(localized: "Height"), value: "\(Int(profile.heightCm.rounded())) cm", symbol: "ruler.fill"),
-            ProfileDetail(label: String(localized: "Sex"), value: profile.sex, symbol: "person.2.fill"),
-            ProfileDetail(label: String(localized: "Sexual orientation"), value: profile.sexualOrientation, symbol: "heart.fill")
+            ProfileDetail(group: .identity, label: String(localized: "Name"), value: profile.name, symbol: "person.fill"),
+            ProfileDetail(group: .identity, label: String(localized: "Date of birth"), value: "\(profile.dateOfBirth.formatted(date: .abbreviated, time: .omitted)) (\(profile.calculatedAge))", symbol: "calendar"),
+            ProfileDetail(group: .body, label: String(localized: "Weight"), value: "\(Int(profile.weightKg.rounded())) kg", symbol: "scalemass.fill"),
+            ProfileDetail(group: .body, label: String(localized: "Height"), value: "\(Int(profile.heightCm.rounded())) cm", symbol: "ruler.fill"),
+            ProfileDetail(group: .identity, label: String(localized: "Sex"), value: profile.sex, symbol: "person.2.fill"),
+            ProfileDetail(group: .identity, label: String(localized: "Sexual orientation"), value: profile.sexualOrientation, symbol: "heart.fill")
         ]
 
         if profile.sexualRole != SexualRole.notApplicable.rawValue {
-            items.append(ProfileDetail(label: String(localized: "Role"), value: profile.sexualRole, symbol: "arrow.left.arrow.right"))
+            items.append(ProfileDetail(group: .identity, label: String(localized: "Role"), value: profile.sexualRole, symbol: "arrow.left.arrow.right"))
         }
 
-        items.append(ProfileDetail(label: String(localized: "PrEP"), value: profile.isOnPrEP ? "Yes" : "No", symbol: "cross.case.fill"))
+        items.append(
+            ProfileDetail(
+                group: .health,
+                label: String(localized: "PrEP"),
+                value: profile.isOnPrEP ? String(localized: "Yes") : String(localized: "No"),
+                symbol: "cross.case.fill"
+            )
+        )
 
         if profile.isOnPrEP {
             items.append(
                 ProfileDetail(
+                    group: .health,
                     label: String(localized: "PrEP schedule"),
                     value: profile.prepSchedule,
                     symbol: "clock.badge.checkmark.fill"
@@ -3177,14 +3189,13 @@ struct ProfileOverviewView: View {
             )
             items.append(
                 ProfileDetail(
+                    group: .health,
                     label: String(localized: "PrEP since"),
                     value: profile.prepStartDate.formatted(date: .abbreviated, time: .omitted),
                     symbol: "calendar.badge.clock"
                 )
             )
         }
-
-        items.append(ProfileDetail(label: String(localized: "Medication"), value: "\(profile.medications.count) saved", symbol: "pills.fill"))
 
         return items
     }
@@ -3204,7 +3215,7 @@ struct ProfileOverviewView: View {
                                 updatePhoto: updateProfilePhoto
                             )
 
-                            ProfileCompactSections(details: details, medications: profile?.medications ?? [])
+                            ProfileAllSections(details: details, medications: profile?.medications ?? [])
                         }
                     }
                     .padding(20)
@@ -3214,9 +3225,6 @@ struct ProfileOverviewView: View {
             .navigationTitle(Text(verbatim: ""))
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
-            .navigationDestination(for: ProfileSectionPage.self) { page in
-                ProfileSectionDetailView(page: page, details: details, medications: profile?.medications ?? [])
-            }
             .toolbar {
                 if profile != nil {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -3815,117 +3823,54 @@ private enum ProfileSectionPage: String, CaseIterable, Identifiable {
     }
 }
 
-private struct ProfileCompactSections: View {
+/// One page with everything on it. Profile used to be four rows that reported
+/// only how many items each held, so reading your own details took four taps
+/// and four screens.
+private struct ProfileAllSections: View {
     let details: [ProfileDetail]
     let medications: [ProfileMedication]
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 20) {
             ForEach(ProfileSectionPage.allCases) { page in
-                NavigationLink(value: page) {
-                    HStack(spacing: 14) {
-                        Image(systemName: page.symbol)
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(Color.chillPrimary)
-                            .frame(width: 40, height: 40)
-                            .glassSurface(radius: 20, tint: Color.chillPrimary.opacity(0.12))
+                let rows = details.filter { $0.group == page }
 
-                        VStack(alignment: .leading, spacing: 4) {
+                if page == .medications || !rows.isEmpty {
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(spacing: 10) {
+                            Image(systemName: page.symbol)
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(Color.chillPrimary)
+                                .frame(width: 30, height: 30)
+                                .glassSurface(radius: 10, tint: Color.chillPrimary.opacity(0.12))
+                                .accessibilityHidden(true)
+
                             Text(page.localizedDisplayName)
                                 .font(.headline)
                                 .foregroundStyle(Color.chillText)
-                            Text(summary(for: page))
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(Color.chillSecondary)
+
+                            Spacer(minLength: 0)
                         }
+                        .accessibilityAddTraits(.isHeader)
 
-                        Spacer()
-
-                        Image(systemName: "chevron.right")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(Color.chillSecondary)
-                    }
-                    .padding(16)
-                    .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
-                }
-                .buttonStyle(ChillPlainButtonStyle())
-            }
-        }
-    }
-
-    private func summary(for page: ProfileSectionPage) -> String {
-        let labels: [String]
-        switch page {
-        case .identity:
-            labels = ["Name", "Date of birth", "Sex", "Sexual orientation", "Role"]
-        case .body:
-            labels = ["Weight", "Height"]
-        case .health:
-            labels = ["PrEP", "PrEP schedule", "PrEP since"]
-        case .medications:
-            return "\(medications.count) saved"
-        }
-
-        let count = details.filter { labels.contains($0.label) }.count
-        return "\(count) item\(count == 1 ? "" : "s")"
-    }
-}
-
-private struct ProfileSectionDetailView: View {
-    let page: ProfileSectionPage
-    let details: [ProfileDetail]
-    let medications: [ProfileMedication]
-
-    private var filteredDetails: [ProfileDetail] {
-        let labels: [String]
-        switch page {
-        case .identity:
-            labels = ["Name", "Date of birth", "Sex", "Sexual orientation", "Role"]
-        case .body:
-            labels = ["Weight", "Height"]
-        case .health:
-            labels = ["PrEP", "PrEP schedule", "PrEP since"]
-        case .medications:
-            labels = []
-        }
-        return details.filter { labels.contains($0.label) }
-    }
-
-    var body: some View {
-        ZStack {
-            DashboardBackdrop()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    PageHeader(
-                        title: page.rawValue,
-                        subtitle: String(localized: "Profile details from setup and edit profile."),
-                        symbol: page.symbol,
-                        tint: Color.chillPrimary
-                    )
-
-                    if page == .medications {
-                        if medications.isEmpty {
-                            EmptyGlassState(text: String(localized: "No medication saved yet. Use Edit on your profile to add medication, prescription amount, timing, and duration."))
-                        } else {
-                            VStack(spacing: 12) {
-                                ForEach(medications) { medication in
-                                    ProfileMedicationDetailCard(medication: medication)
+                        if page == .medications {
+                            if medications.isEmpty {
+                                EmptyGlassState(text: String(localized: "No medication saved yet. Use Edit on your profile to add medication, prescription amount, timing, and duration."))
+                            } else {
+                                VStack(spacing: 12) {
+                                    ForEach(medications) { medication in
+                                        ProfileMedicationDetailCard(medication: medication)
+                                    }
                                 }
                             }
+                        } else {
+                            ProfileDetailList(details: rows)
                         }
-                    } else {
-                        ProfileDetailList(details: filteredDetails)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(20)
-                .padding(.bottom, 36)
             }
         }
-        .navigationTitle(Text(verbatim: ""))
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .toolbar(.hidden, for: .tabBar)
     }
 }
 
@@ -3959,6 +3904,7 @@ private struct ProfileDetailRow: View {
 }
 
 private struct ProfileDetail: Identifiable {
+    let group: ProfileSectionPage
     let label: String
     let value: String
     let symbol: String
@@ -3967,7 +3913,7 @@ private struct ProfileDetail: Identifiable {
 
     var displayValue: String {
         let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmedValue.isEmpty ? "Not added yet" : trimmedValue
+        return trimmedValue.isEmpty ? String(localized: "Not added yet") : trimmedValue
     }
 }
 
