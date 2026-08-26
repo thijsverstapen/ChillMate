@@ -23,6 +23,9 @@ CATALOGS = [
     ROOT / "ChillMate/InfoPlist.xcstrings",
     ROOT / "ChillMateWatchApp/Localizable.xcstrings",
     ROOT / "ChillMateWatchAppWidget/Localizable.xcstrings",
+    # Added in 4.3.0. The Live Activity extension shipped with no catalog at
+    # all, so its strings were English on every device and nothing caught it.
+    ROOT / "ChillMateLiveActivityExtension/Localizable.xcstrings",
 ]
 SPECIFIER = re.compile(r"%(?:\d+\$)?(?:@|lld|ld|d|f|\.\d+f)")
 
