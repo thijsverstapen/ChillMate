@@ -33,15 +33,9 @@ struct SubstanceInteractionCoverageTests {
         #expect(match.level == expected)
     }
 
-    @Test("Cocaine and alcohol warn about cocaethylene", .tags(.safety))
-    func cocaethyleneNamed() throws {
-        // This is the pair whose absence prompted the addition; the mechanism is
-        // the reason it matters, so the text has to carry it.
-        let match = try #require(
-            SubstanceInteractionChecker.warnings(for: [.cocaine, .alcohol]).first
-        )
-        #expect(match.warning.localizedCaseInsensitiveContains("cocaethylene"))
-    }
+    // "Cocaine and alcohol name cocaethylene" now lives in SafetyTranslationTests,
+    // which makes the same claim about all five languages. Asserting it here meant
+    // asserting it about English, and the Dutch text says "cocaethyleen".
 
     @Test("Every warning carries non-empty text", .tags(.safety))
     func everyWarningHasText() {
@@ -106,8 +100,9 @@ struct SubstanceInteractionCoverageTests {
 struct MedicationBranchCase: Sendable {
     let medication: String
     let substances: Set<Substance>
-    /// A fragment of the warning the branch is responsible for.
-    let expectedFragment: String
+    /// The warning the branch is responsible for, named by its catalog key so the
+    /// expectation holds in whichever language the run resolved.
+    let expectedLine: SafetyLine
 }
 
 /// Asserts on what `CombinationRiskCheckerView` actually renders, rather than on
@@ -153,9 +148,13 @@ struct RiskCheckerScreenTests {
         #expect(findings.contains { $0.level == nil } == false,
                 "The nothing matched line is still showing for a rated depressant stack")
 
+        // Identify the line by the table row it has to come from, not by a word
+        // that only appears in it in English.
+        let curated = try #require(SubstanceInteractionChecker.warnings(for: [.alcohol, .ketamine]).first,
+                                   "Alcohol with ketamine is no longer in the table")
         let match = try #require(
-            findings.first { $0.text.localizedCaseInsensitiveContains("breathing") },
-            "The breathing risk never reaches the user: \(findings.map(\.text))"
+            findings.first { $0.text == curated.warning },
+            "The depressant risk never reaches the user: \(findings.map(\.text))"
         )
         #expect(match.level == .serious)
     }
@@ -238,7 +237,7 @@ struct RiskCheckerScreenTests {
         #expect(findings.count == 1)
         let only = try #require(findings.first)
         #expect(only.level == nil)
-        #expect(only.text.localizedCaseInsensitiveContains("no known major preset warning"))
+        #expect(only.text == SafetyLine.nothingMatched.localized)
     }
 
     @Test("No selection ever falls back while either source has something", .tags(.safety))
@@ -252,17 +251,20 @@ struct RiskCheckerScreenTests {
 
     // MARK: Deduplication
 
+    // These assert a line is ABSENT. Spelled as an English fragment, that held
+    // trivially in every other language, so the four of them passed on a Dutch
+    // run without ever exercising the merge they exist to check.
     @Test("The same hazard is never stated twice", .tags(.safety), arguments: [
         // Preset line, and the selection where the table supersedes it.
-        ("Alcohol and cocaine together can increase strain on the heart", Set<Substance>([.cocaine, .alcohol])),
-        ("Poppers with Viagra or Kamagra can drop blood pressure sharply", Set<Substance>([.poppers, .viagra])),
-        ("Multiple stimulants can stack heart strain", Set<Substance>([.cocaine, .mdma])),
-        ("GHB/GBL with alcohol, ketamine, sedatives, or opioids", Set<Substance>([.ghb, .alcohol])),
+        (SafetyLine.alcoholWithCocaine, Set<Substance>([.cocaine, .alcohol])),
+        (SafetyLine.poppersWithErectileMedication, Set<Substance>([.poppers, .viagra])),
+        (SafetyLine.multipleStimulants, Set<Substance>([.cocaine, .mdma])),
+        (SafetyLine.ghbWithDepressants, Set<Substance>([.ghb, .alcohol])),
     ])
-    func supersededPresetLinesDisappear(fragment: String, combo: Set<Substance>) {
+    func supersededPresetLinesDisappear(line: SafetyLine, combo: Set<Substance>) {
         let findings = assessment(combo).interactionFindings
 
-        #expect(findings.contains { $0.text.contains(fragment) } == false,
+        #expect(findings.contains { $0.text == line.localized } == false,
                 "\(combo.map(\.rawValue).sorted()) still shows the generic preset line as well as the rated one")
         #expect(findings.isEmpty == false)
         #expect(findings.contains { $0.level == nil } == false)
@@ -303,57 +305,57 @@ struct RiskCheckerScreenTests {
         MedicationBranchCase(
             medication: "isosorbide mononitrate",
             substances: [.viagra],
-            expectedFragment: "Nitrates, nicorandil, or riociguat"
+            expectedLine: .nitratesWithErectileMedication
         ),
         MedicationBranchCase(
             medication: "isosorbide mononitrate",
             substances: [.poppers],
-            expectedFragment: "Nitrates, nicorandil, or riociguat"
+            expectedLine: .nitratesWithErectileMedication
         ),
         MedicationBranchCase(
             medication: "tamsulosin",
             substances: [.kamagra],
-            expectedFragment: "Alpha blockers with Viagra or Kamagra"
+            expectedLine: .alphaBlockersWithErectileMedication
         ),
         MedicationBranchCase(
             medication: "diazepam",
             substances: [.alcohol],
-            expectedFragment: "Sedatives or opioids with alcohol"
+            expectedLine: .sedativesWithDepressants
         ),
         MedicationBranchCase(
             medication: "oxycodone",
             substances: [.cannabis],
-            expectedFragment: "Sedatives or opioids with alcohol"
+            expectedLine: .sedativesWithDepressants
         ),
         MedicationBranchCase(
             medication: "oxycodone",
             substances: [.ghb],
-            expectedFragment: "GHB/GBL with alcohol, ketamine, sedatives, or opioids"
+            expectedLine: .ghbWithDepressants
         ),
         MedicationBranchCase(
             medication: "methylphenidate",
             substances: [.cocaine],
-            expectedFragment: "Prescribed stimulant medication"
+            expectedLine: .prescribedStimulants
         ),
         MedicationBranchCase(
             medication: "phenelzine",
             substances: [.mdma],
-            expectedFragment: "Certain antidepressants (MAOIs)"
+            expectedLine: .maoiWithSerotonergics
         ),
         MedicationBranchCase(
             medication: "sertraline",
             substances: [.mdma],
-            expectedFragment: "Some antidepressants or mood medication"
+            expectedLine: .antidepressantsWithSerotonergics
         ),
         MedicationBranchCase(
             medication: "ritonavir",
             substances: [.viagra],
-            expectedFragment: "Ritonavir or cobicistat"
+            expectedLine: .ritonavirBooster
         ),
     ])
     func medicationBranchesSurvive(branch: MedicationBranchCase) {
         let findings = assessment(branch.substances, medication: branch.medication).interactionFindings
-        #expect(findings.contains { $0.text.contains(branch.expectedFragment) },
+        #expect(findings.contains { $0.text == branch.expectedLine.localized },
                 "\(branch.medication) with \(branch.substances.map(\.rawValue).sorted()) lost its warning: \(findings.map(\.text))")
     }
 
@@ -363,7 +365,7 @@ struct RiskCheckerScreenTests {
         // sedatives and opioids are named. It must not be superseded here even
         // though the table rates GHB with alcohol critical.
         let findings = assessment([.ghb, .alcohol], medication: "diazepam").interactionFindings
-        #expect(findings.contains { $0.text.contains("GHB/GBL with alcohol, ketamine, sedatives, or opioids") },
+        #expect(findings.contains { $0.text == SafetyLine.ghbWithDepressants.localized },
                 "The sedative branch was superseded by a table row that knows nothing about medication")
         #expect(findings.contains { $0.level == .critical })
     }
@@ -382,13 +384,13 @@ struct RiskCheckerScreenTests {
     // MARK: Generic preset lines that have no table equivalent
 
     @Test("Generic single substance preset lines are untouched", .tags(.safety), arguments: [
-        (Set<Substance>([.ghb]), "GHB/GBL effects can be hard to predict"),
-        (Set<Substance>([.gbl]), "GHB/GBL effects can be hard to predict"),
-        (Set<Substance>([.poppers]), "Poppers can drop blood pressure sharply, especially with"),
+        (Set<Substance>([.ghb]), SafetyLine.ghbAlone),
+        (Set<Substance>([.gbl]), SafetyLine.ghbAlone),
+        (Set<Substance>([.poppers]), SafetyLine.poppersAlone),
     ])
-    func genericPresetLinesRemain(combo: Set<Substance>, fragment: String) {
+    func genericPresetLinesRemain(combo: Set<Substance>, line: SafetyLine) {
         let findings = assessment(combo).interactionFindings
-        #expect(findings.contains { $0.text.contains(fragment) },
+        #expect(findings.contains { $0.text == line.localized },
                 "\(combo.map(\.rawValue).sorted()) lost its generic preset line")
     }
 
