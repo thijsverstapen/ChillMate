@@ -85,16 +85,40 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
 
-      - name: Unit tests
+      # Once per shipped language, not once overall.
+      #
+      # The suite used to assert English literals, so it only ever proved
+      # anything about English, and this job could not reveal that because
+      # GitHub's runners are en_US. On a Dutch simulator 21 of these failed while
+      # the risk engine was behaving perfectly, and four more passed for the
+      # worst reason: they asserted an English fragment was absent, which holds
+      # trivially in every other language.
+      #
+      # The assertions are language-independent now, which is what makes running
+      # them per language worth the minutes: each pass exercises the engine
+      # against the catalog a user of that language actually reads, and
+      # SafetyTranslationTests checks the served strings really came from that
+      # language rather than falling back to English.
+      #
+      # One loop rather than a job matrix, because the build above is the
+      # expensive part and this reuses it; the five test passes are seconds each.
+      - name: Unit tests (all five languages)
         run: |
           set -o pipefail
-          xcodebuild test-without-building \
-            -scheme "$SCHEME" \
-            -destination "$DESTINATION" \
-            -only-testing:ChillMateTests \
-            -resultBundlePath TestResults/UnitTests.xcresult \
-            CODE_SIGNING_ALLOWED=NO \
-            | xcbeautify
+          status=0
+          for lang in en nl de fr es; do
+            echo "::group::Unit tests ($lang)"
+            xcodebuild test-without-building \
+              -scheme "$SCHEME" \
+              -destination "$DESTINATION" \
+              -only-testing:ChillMateTests \
+              -testLanguage "$lang" \
+              -resultBundlePath "TestResults/UnitTests-$lang.xcresult" \
+              CODE_SIGNING_ALLOWED=NO \
+              | xcbeautify || status=1
+            echo "::endgroup::"
+          done
+          exit $status
 
       # Advisory, not a gate. These four tests drive a real simulator through
       # first-run onboarding by tapping labelled controls, which on a shared
