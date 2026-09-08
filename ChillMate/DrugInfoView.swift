@@ -45,6 +45,10 @@ struct DrugInfoView: View {
                                     .foregroundStyle(Color.chillSecondary)
                                     .fixedSize(horizontal: false, vertical: true)
 
+                                if let reference = substance.reference {
+                                    DrugReferenceSection(reference: reference, tint: substance.tint)
+                                }
+
                                 DrugInfoMiniSection(title: String(localized: "Main risks"), rows: substance.mainRisks, tint: substance.tint)
                                 DrugInfoMiniSection(title: String(localized: "Mixing risks"), rows: substance.mixingRisks, tint: .orange)
                                 DrugInfoMiniSection(title: String(localized: "Seek help now if"), rows: substance.seekHelpSigns, tint: .red)
@@ -98,5 +102,96 @@ private struct DrugInfoMiniSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .glassSurface(radius: 18, tint: tint.opacity(0.06))
+    }
+}
+
+
+/// Dose ladder and timings for one substance, with the source under them.
+///
+/// The attribution is not decoration. These are numbers someone may act on, so
+/// the screen says where each came from and lets the reader go and check. The
+/// heading says "commonly reported" rather than "recommended" for the same
+/// reason: this describes what is reported, it does not endorse it.
+private struct DrugReferenceSection: View {
+    let reference: SubstanceReference
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Commonly reported ranges")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.chillText)
+
+            Text("Not a recommendation. Strength and contents vary between batches, and neither is something ChillMate can see.")
+                .font(.caption2)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let reason = reference.noDoseReason {
+                Text(reason)
+                    .font(.caption)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            ForEach(Array(reference.doses.enumerated()), id: \.offset) { _, dose in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(dose.route.label)
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(tint)
+
+                    DoseRow(label: String(localized: "Light"), value: dose.unit.range(dose.light))
+                    DoseRow(label: String(localized: "Common"), value: dose.unit.range(dose.common))
+                    DoseRow(label: String(localized: "Strong"), value: dose.unit.range(dose.strong))
+                    DoseRow(
+                        label: String(localized: "Heavy"),
+                        value: String(localized: "\(dose.unit.from(dose.heavyFrom)) and above"),
+                        isWarning: true
+                    )
+                }
+                .padding(.top, 2)
+            }
+
+            if let timing = reference.timing {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Timing")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(tint)
+
+                    DoseRow(label: String(localized: "Onset"), value: timing.onsetText)
+                    DoseRow(label: String(localized: "Peak"), value: timing.peakText)
+                    DoseRow(label: String(localized: "Total"), value: timing.totalText)
+                }
+                .padding(.top, 2)
+            }
+
+            Text("Source: \(reference.source.name)")
+                .font(.caption2)
+                .foregroundStyle(Color.chillSecondary.opacity(0.85))
+                .accessibilityLabel(Text("Source: \(reference.source.name)"))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .glassSurface(radius: 18, tint: tint.opacity(0.06))
+    }
+}
+
+private struct DoseRow: View {
+    let label: String
+    let value: String
+    var isWarning = false
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+            Spacer(minLength: 12)
+            Text(value)
+                .font(.caption.weight(.semibold))
+                .monospacedDigit()
+                .foregroundStyle(isWarning ? Color.chillIconOrange : Color.chillText)
+        }
+        .accessibilityElement(children: .combine)
     }
 }

@@ -212,12 +212,95 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// What an emergency looks like for *this* substance.
+    ///
+    /// This used to ignore `self` entirely and return the same three sentences for
+    /// all fourteen, which is the least useful moment to be generic: someone
+    /// checking this is looking at a specific person in front of them. The signs
+    /// below are the ones that distinguish an emergency from a heavy night, and
+    /// they differ enormously — GHB drops someone abruptly minutes after a dose,
+    /// poppers turn lips grey through methaemoglobinaemia that fresh air will not
+    /// fix, sildenafil's is a four-hour erection.
+    ///
+    /// Sources: NHS medicines guidance (sildenafil), WHO opioid overdose fact
+    /// sheet, and the published case literature on alkyl nitrite
+    /// methaemoglobinaemia. Fetched 8 September 2026.
     var seekHelpSigns: [String] {
-        [
-            String(localized: "Chest pain, seizure, fainting, or cannot be woken"),
-            String(localized: "Blue lips, slow breathing, overheating, or severe confusion"),
-            String(localized: "Severe panic, hallucinations, or feeling unsafe with people nearby")
-        ]
+        switch self {
+        case .alcohol:
+            [
+                String(localized: "Cannot be woken, or is snoring or gurgling"),
+                String(localized: "Breathing is slow, shallow, or has stopped"),
+                String(localized: "Has been sick while unable to sit up"),
+                String(localized: "Skin is cold, clammy, or looks grey")
+            ]
+
+        case .ghb, .gbl:
+            [
+                String(localized: "Went under suddenly, within minutes of a dose"),
+                String(localized: "Cannot be woken, or is snoring or gurgling"),
+                String(localized: "Breathing is slow, shallow, or has stopped"),
+                String(localized: "Woke briefly, was confused or combative, then went under again")
+            ]
+
+        case .ketamine:
+            [
+                String(localized: "Cannot move and is being sick"),
+                String(localized: "Breathing is slow, shallow, or has stopped"),
+                String(localized: "Cannot be woken, or is snoring or gurgling")
+            ]
+
+        case .mdma, .threeMMC:
+            [
+                String(localized: "Very high temperature, or has stopped sweating"),
+                String(localized: "Confusion with shivering, stiff muscles, or fever"),
+                String(localized: "Seizure, or severe agitation that will not settle"),
+                String(localized: "Drank a lot of water and became confused or had a seizure")
+            ]
+
+        case .cocaine:
+            [
+                String(localized: "Chest pain, or a heartbeat that is racing or irregular"),
+                String(localized: "Very high temperature, or has stopped sweating"),
+                String(localized: "Seizure, or severe agitation that will not settle"),
+                String(localized: "Sudden severe headache, or weakness on one side")
+            ]
+
+        case .poppers:
+            [
+                String(localized: "Lips or fingertips are blue or grey and fresh air does not help"),
+                String(localized: "Fainting, or a sudden severe headache"),
+                String(localized: "Swallowed rather than inhaled, which can be life-threatening")
+            ]
+
+        case .viagra, .kamagra:
+            [
+                String(localized: "An erection lasting longer than four hours"),
+                String(localized: "Chest pain, fainting, or an irregular heartbeat"),
+                String(localized: "Sudden loss of vision or hearing")
+            ]
+
+        case .cannabis:
+            [
+                String(localized: "Repeated cycles of severe vomiting"),
+                String(localized: "Panic with a racing heart that will not settle"),
+                String(localized: "Chest pain, or fainting")
+            ]
+
+        case .psychedelics:
+            [
+                String(localized: "Severe panic that will not settle, or does not know where they are"),
+                String(localized: "Seizure, or a dangerously high temperature"),
+                String(localized: "At risk of harming themselves or cannot be kept safe")
+            ]
+
+        case .unknown, .other:
+            [
+                String(localized: "Chest pain, seizure, fainting, or cannot be woken"),
+                String(localized: "Blue lips, slow breathing, overheating, or severe confusion"),
+                String(localized: "Severe panic, hallucinations, or feeling unsafe with people nearby")
+            ]
+        }
     }
 
     var referenceLabel: String {
