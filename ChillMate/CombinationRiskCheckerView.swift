@@ -482,6 +482,8 @@ enum PresetLineID: String {
     /// Shown when medication was typed but matched nothing in the database, so
     /// the user knows it was not weighed rather than assuming it was safe.
     case medicationNotRecognised
+    /// Three or more things that slow breathing, stacked in one session.
+    case depressantLoad
 }
 
 private struct RiskWarningLine: View {
@@ -881,6 +883,26 @@ struct CombinationAssessment {
     /// already carried, with the one deliberate exception noted at the GHB branch.
     private func presetFindings(supersededBy ratedTopics: [HazardTopic: SubstanceInteraction.Level]) -> [InteractionFinding] {
         var findings: [InteractionFinding] = []
+
+        // The table rates pairs, and a real night rarely stops at two. Alcohol with
+        // GHB with ketamine produced three separate pair warnings and nothing
+        // anywhere saying the depressant load compounds, which is the mechanism
+        // behind most fatal outcomes involving these substances. `respiratoryRisk`
+        // has counted the load since 4.2.1; until now nothing said it out loud.
+        //
+        // Stated first because it describes the whole selection rather than one
+        // pairing, and it is never superseded: no table row can cover it, because
+        // no table row looks at more than two things at once.
+        let depressantLoad = depressants.count + depressantMedicationCount
+        if depressantLoad >= 3 {
+            findings.append(
+                InteractionFinding(
+                    id: PresetLineID.depressantLoad.rawValue,
+                    text: String(localized: "Three or more things here slow breathing. Stacked in one session they multiply rather than add, and this is the pattern behind most overdoses involving these substances. Do not use alone, and stagger or drop one."),
+                    level: .critical
+                )
+            )
+        }
 
         func add(_ id: PresetLineID, _ text: String, _ level: SubstanceInteraction.Level, superseding topic: HazardTopic? = nil) {
             if let topic, let rated = ratedTopics[topic], rated >= level { return }

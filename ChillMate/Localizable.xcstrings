@@ -50311,6 +50311,34 @@
         }
       }
     },
+    "Three or more things here slow breathing. Stacked in one session they multiply rather than add, and this is the pattern behind most overdoses involving these substances. Do not use alone, and stagger or drop one.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drei oder mehr Dinge hier verlangsamen die Atmung. In einer Session gestapelt vervielfachen sie sich, statt sich zu addieren, und das ist das Muster hinter den meisten Überdosierungen mit diesen Substanzen. Nimm sie nicht allein, und strecke oder streiche eine."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tres o más de estas cosas ralentizan la respiración. Combinadas en una misma sesión se multiplican en lugar de sumarse, y ese es el patrón detrás de la mayoría de las sobredosis con estas sustancias. No lo hagas a solas, y espacia o elimina una."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trois éléments ou plus ralentissent ici la respiration. Cumulés sur une même session, ils se multiplient au lieu de s'additionner, et c'est le schéma derrière la plupart des overdoses impliquant ces substances. Ne consomme pas seul, et espace ou retire-en un."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drie of meer dingen hier remmen de ademhaling. Op één avond gestapeld versterken ze elkaar in plaats van op te tellen, en dat is het patroon achter de meeste overdoses met deze middelen. Doe dit niet alleen, en spreid het of laat er één weg."
+          }
+        }
+      }
+    },
     "Time": {
       "extractionState": "manual",
       "localizations": {

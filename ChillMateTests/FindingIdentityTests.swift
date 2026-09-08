@@ -96,3 +96,76 @@ struct FindingIdentityTests {
         #expect(findings.contains { $0.text == SafetyLine.medicationNotRecognised.localized } == false)
     }
 }
+
+/// The stack the pairwise table cannot see.
+///
+/// Every pair in a three-depressant selection has its own table row, so the old
+/// output was three warnings about three pairs and nothing about the pile. The
+/// mechanism that kills is the pile.
+@Suite("Depressant load")
+struct DepressantLoadTests {
+
+    private func assessment(_ substances: Set<Substance>, medication: String = "") -> CombinationAssessment {
+        CombinationAssessment(
+            substances: Array(substances),
+            medicationText: medication,
+            timing: .sameSession
+        )
+    }
+
+    private func hasLoadWarning(_ findings: [InteractionFinding]) -> Bool {
+        findings.contains { $0.id == "depressantLoad" }
+    }
+
+    @Test("Three depressants are named as a stack, not just as pairs", .tags(.safety), arguments: [
+        Set<Substance>([.alcohol, .ghb, .ketamine]),
+        Set<Substance>([.alcohol, .gbl, .ketamine]),
+        Set<Substance>([.ghb, .gbl, .alcohol]),
+    ])
+    func threeDepressantsWarn(combo: Set<Substance>) throws {
+        let findings = assessment(combo).interactionFindings
+        #expect(hasLoadWarning(findings),
+                "\(combo.map(\.rawValue).sorted()) shows only pairwise warnings")
+
+        let warning = try #require(findings.first { $0.id == "depressantLoad" })
+        #expect(warning.level == .critical)
+    }
+
+    @Test("Sedative medication counts toward the pile", .tags(.safety))
+    func medicationCounts() {
+        // Two substances plus a prescribed sedative is three things slowing
+        // breathing, and the table can see none of that third one.
+        #expect(hasLoadWarning(assessment([.alcohol, .ketamine], medication: "diazepam").interactionFindings))
+        #expect(hasLoadWarning(assessment([.alcohol, .ghb], medication: "oxycodone").interactionFindings))
+    }
+
+    @Test("Two depressants do not trip it", .tags(.safety), arguments: [
+        Set<Substance>([.alcohol, .ketamine]),
+        Set<Substance>([.ghb, .alcohol]),
+    ])
+    func twoDepressantsDoNotWarn(combo: Set<Substance>) {
+        #expect(hasLoadWarning(assessment(combo).interactionFindings) == false,
+                "\(combo.map(\.rawValue).sorted()) is a pair, which the table already covers")
+    }
+
+    @Test("Stimulants do not count as depressants", .tags(.safety))
+    func stimulantsDoNotCount() {
+        #expect(hasLoadWarning(assessment([.cocaine, .mdma, .threeMMC]).interactionFindings) == false)
+    }
+
+    @Test("The stack warning is never superseded by a table row", .tags(.safety))
+    func neverSuperseded() {
+        // GHB with alcohol is rated critical by the table, which supersedes the
+        // generic GHB preset line. It must not take the load warning with it.
+        let findings = assessment([.alcohol, .ghb, .ketamine]).interactionFindings
+        #expect(hasLoadWarning(findings))
+        #expect(findings.contains { $0.level == .critical })
+    }
+
+    @Test("It leads, because it describes the whole selection", .tags(.safety))
+    func loadWarningComesFirst() throws {
+        let findings = assessment([.alcohol, .ghb, .ketamine]).interactionFindings
+        let first = try #require(findings.first)
+        #expect(first.id == "depressantLoad", "The stack is stated after the pairs: \(findings.map(\.id))")
+    }
+}
