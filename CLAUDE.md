@@ -94,6 +94,27 @@ there too.
 `InteractionFinding` and `SubstanceInteraction` carry stable, language-independent
 `id`s. Do not key anything on localized text.
 
+### Changing the schema
+
+`TypedRecordsMigration` is the worked example: it runs once, is idempotent, dedupes
+children, and guards against a sync race. Follow its shape.
+
+1. **Additive changes are free.** A new optional property, or one with a default, needs
+   no migration — SwiftData handles it in place. Prefer this. Most schema changes can be
+   made additive with a little thought.
+2. **Anything else is a versioned migration.** Add a new `VersionedSchema`, add it to the
+   `SchemaMigrationPlan` stages in order, and write the migration as a one-shot that can
+   run twice without doing damage. The app may be killed mid-migration.
+3. **Never renumber or reuse an existing stage.** Installs in the wild are at every
+   version you have ever shipped.
+4. **Test against real old data**, not a fresh store. A migration that only runs on an
+   empty container proves nothing.
+5. **Remember the backups.** `EncryptedBackupService` writes a versioned payload, so a
+   schema change means a restore path for the old shape too. A backup taken on the
+   previous version has to keep restoring.
+6. **The watch and the widgets read the same container.** A schema change is not done
+   until they build against it.
+
 ## Releasing
 
 `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` appear ten times each in
