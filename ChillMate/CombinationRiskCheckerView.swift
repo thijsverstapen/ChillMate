@@ -444,12 +444,44 @@ private struct RiskLevelRow: View {
 /// stamped the "nothing matched" line with a risk badge because that sentence
 /// happens to contain the word "can".
 struct InteractionFinding: Identifiable, Hashable {
+    /// Stable, language-independent identity.
+    ///
+    /// This used to be the finding's own localized text, which made a row's
+    /// SwiftUI identity change whenever the app language did: every row was
+    /// destroyed and rebuilt on a language switch, and two languages could not be
+    /// compared without comparing prose. Table rows borrow
+    /// `SubstanceInteraction.id` (the sorted substance names); preset lines carry
+    /// the branch that produced them.
+    let id: String
     let text: String
     /// Nil only on the "nothing matched" line, which is informational and gets no
     /// severity badge.
     let level: SubstanceInteraction.Level?
+}
 
-    var id: String { text }
+/// The branches of the preset chain, as identifiers rather than sentences.
+///
+/// Gives each hand-written line an identity that survives translation, so
+/// `InteractionFinding` never has to fall back to keying on its own text.
+enum PresetLineID: String {
+    case nitratesWithErectileMedication
+    case alphaBlockersWithErectileMedication
+    case ghbWithDepressants
+    case ghbAlone
+    case poppersWithErectileMedication
+    case poppersAlone
+    case sedativesWithDepressants
+    case multipleStimulants
+    case prescribedStimulants
+    case maoiWithSerotonergics
+    case antidepressantsWithSerotonergics
+    case ritonavirBooster
+    case alcoholWithCocaine
+    /// Shown when neither the preset chain nor the table matched anything.
+    case nothingMatched
+    /// Shown when medication was typed but matched nothing in the database, so
+    /// the user knows it was not weighed rather than assuming it was safe.
+    case medicationNotRecognised
 }
 
 private struct RiskWarningLine: View {
@@ -804,14 +836,31 @@ struct CombinationAssessment {
         // the topic rules above should already prevent it, but a duplicate row here
         // would also collide in SwiftUI, which identifies these rows by their text.
         var seenText: Set<String> = []
-        let merged = (presetFindings(supersededBy: ratedTopics)
-            + rated.map { InteractionFinding(text: $0.warning, level: $0.level) })
+        var merged = (presetFindings(supersededBy: ratedTopics)
+            + rated.map { InteractionFinding(id: "table.\($0.id)", text: $0.warning, level: $0.level) })
             .filter { seenText.insert($0.text).inserted }
+
+        // Typing a medication we cannot place is not the same as typing nothing,
+        // and until now both produced the same silence. Someone who misspells
+        // "diazepam" gets the warnings their substances earned and no sign at all
+        // that the sedative they told us about was never weighed. Say so, and say
+        // it whether or not anything else matched.
+        if !medicationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+           medicationMatches.isEmpty {
+            merged.append(
+                InteractionFinding(
+                    id: PresetLineID.medicationNotRecognised.rawValue,
+                    text: String(localized: "The medication you entered was not recognised, so this check does not account for it. Check the spelling, or ask a pharmacist."),
+                    level: nil
+                )
+            )
+        }
 
         guard merged.isEmpty else { return merged }
 
         return [
             InteractionFinding(
+                id: PresetLineID.nothingMatched.rawValue,
                 text: String(localized: "No known major preset warning matched. Unknown amount, contents, health conditions, and medication changes can still matter."),
                 level: nil
             )
@@ -833,17 +882,17 @@ struct CombinationAssessment {
     private func presetFindings(supersededBy ratedTopics: [HazardTopic: SubstanceInteraction.Level]) -> [InteractionFinding] {
         var findings: [InteractionFinding] = []
 
-        func add(_ text: String, _ level: SubstanceInteraction.Level, superseding topic: HazardTopic? = nil) {
+        func add(_ id: PresetLineID, _ text: String, _ level: SubstanceInteraction.Level, superseding topic: HazardTopic? = nil) {
             if let topic, let rated = ratedTopics[topic], rated >= level { return }
-            findings.append(InteractionFinding(text: text, level: level))
+            findings.append(InteractionFinding(id: id.rawValue, text: text, level: level))
         }
 
         if hasMedicationCategory(.nitrateLike) && (hasErectileMedication || substanceSet.contains(.poppers)) {
-            add(String(localized: "Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine."), .critical)
+            add(.nitratesWithErectileMedication, String(localized: "Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine."), .critical)
         }
 
         if hasMedicationCategory(.alphaBlocker) && hasErectileMedication {
-            add(String(localized: "Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining."), .serious)
+            add(.alphaBlockersWithErectileMedication, String(localized: "Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining."), .serious)
         }
 
         if hasGHBLike {
@@ -858,30 +907,32 @@ struct CombinationAssessment {
                 // that speaks for it.
                 let sedatingMedication = hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)
                 add(
+                    .ghbWithDepressants,
                     String(localized: "GHB/GBL with alcohol, ketamine, sedatives, or opioids can cause unconsciousness or breathing problems."),
                     .critical,
                     superseding: sedatingMedication ? nil : .ghbDepressantStack
                 )
             } else {
-                add(String(localized: "GHB/GBL effects can be hard to predict and can become serious quickly."), .serious)
+                add(.ghbAlone, String(localized: "GHB/GBL effects can be hard to predict and can become serious quickly."), .serious)
             }
         }
 
         if substanceSet.contains(.poppers) {
             if substanceSet.contains(.viagra) || substanceSet.contains(.kamagra) {
                 add(
+                    .poppersWithErectileMedication,
                     String(localized: "Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination."),
                     .critical,
                     superseding: .poppersWithErectileMedication
                 )
             } else {
-                add(String(localized: "Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication."), .serious)
+                add(.poppersAlone, String(localized: "Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication."), .serious)
             }
         }
 
         if (hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)) &&
             (substanceSet.contains(.alcohol) || substanceSet.contains(.ketamine) || substanceSet.contains(.cannabis) || hasGHBLike) {
-            add(String(localized: "Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse."), .serious)
+            add(.sedativesWithDepressants, String(localized: "Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse."), .serious)
         }
 
         if stimulants.count >= 2 {
@@ -889,6 +940,7 @@ struct CombinationAssessment {
             // those name the specific two substances, so this generic summary always
             // gives way when the table speaks.
             add(
+                .multipleStimulants,
                 String(localized: "Multiple stimulants can stack heart strain, anxiety, and overheating."),
                 .serious,
                 superseding: .stimulantStack
@@ -896,23 +948,24 @@ struct CombinationAssessment {
         }
 
         if hasMedicationCategory(.stimulantMedication) && !stimulants.isEmpty {
-            add(String(localized: "Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk."), .serious)
+            add(.prescribedStimulants, String(localized: "Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk."), .serious)
         }
 
         if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
-            add(String(localized: "Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice."), .critical)
+            add(.maoiWithSerotonergics, String(localized: "Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice."), .critical)
         } else if hasMedicationCategory(.serotonergic) && !serotonergicSubstances.isEmpty {
-            add(String(localized: "Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics."), .serious)
+            add(.antidepressantsWithSerotonergics, String(localized: "Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics."), .serious)
         }
 
         if hasMedicationCategory(.ritonavirBooster) && (hasErectileMedication || substanceSet.contains(.mdma) || substanceSet.contains(.threeMMC)) {
-            add(String(localized: "Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist."), .serious)
+            add(.ritonavirBooster, String(localized: "Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist."), .serious)
         }
 
         if substanceSet.contains(.alcohol) && substanceSet.contains(.cocaine) {
             // The table entry for this pair names cocaethylene and why it matters,
             // so it supersedes this line rather than repeating it.
             add(
+                .alcoholWithCocaine,
                 String(localized: "Alcohol and cocaine together can increase strain on the heart and reduce judgment."),
                 .serious,
                 superseding: .alcoholWithCocaine

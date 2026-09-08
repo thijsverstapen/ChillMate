@@ -102,6 +102,27 @@ jobs:
       #
       # One loop rather than a job matrix, because the build above is the
       # expensive part and this reuses it; the five test passes are seconds each.
+      # The ChillMate scheme is iOS-only, so until now a Swift error in
+      # ChillMateWatchApp/ reached main without any pull request turning red.
+      # Xcode Cloud archives watchOS, but that runs after the fact.
+      #
+      # -target rather than -scheme because there is only one scheme in the
+      # project; -derivedDataPath is omitted deliberately, since xcodebuild
+      # rejects it without -scheme.
+      - name: Build the watch targets
+        run: |
+          set -o pipefail
+          for target in ChillMateWatchApp ChillMateWatchAppWidgetExtension; do
+            echo "::group::$target"
+            xcodebuild build \
+              -project ChillMate.xcodeproj \
+              -target "$target" \
+              -destination 'generic/platform=watchOS Simulator' \
+              CODE_SIGNING_ALLOWED=NO \
+              | xcbeautify
+            echo "::endgroup::"
+          done
+
       - name: Unit tests (all five languages)
         run: |
           set -o pipefail
@@ -139,6 +160,7 @@ jobs:
             -only-testing:ChillMateUITests/ChillMateUITests/testLaunchesInEveryLanguage \
             -only-testing:ChillMateUITests/ChillMateUITests/testEachTabOpens \
             -only-testing:ChillMateUITests/ChillMateUITests/testLogSheetOpens \
+            -only-testing:ChillMateUITests/AccessibilityAuditTests \
             -retry-tests-on-failure \
             -test-iterations 2 \
             -parallel-testing-enabled NO \

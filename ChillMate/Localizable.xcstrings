@@ -48068,6 +48068,34 @@
         }
       }
     },
+    "The medication you entered was not recognised, so this check does not account for it. Check the spelling, or ask a pharmacist.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das eingegebene Medikament wurde nicht erkannt, daher berücksichtigt diese Prüfung es nicht. Überprüfe die Schreibweise oder frage in einer Apotheke nach."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha reconocido el medicamento que has introducido, así que esta comprobación no lo tiene en cuenta. Revisa la ortografía o pregunta a un farmacéutico."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le médicament saisi n'a pas été reconnu, cette vérification n'en tient donc pas compte. Vérifie l'orthographe ou demande à un pharmacien."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het medicijn dat je hebt ingevuld is niet herkend, dus deze controle houdt er geen rekening mee. Controleer de spelling of vraag het na bij een apotheker."
+          }
+        }
+      }
+    },
     "The moment you’re in rises to the top": {
       "localizations": {
         "de": {

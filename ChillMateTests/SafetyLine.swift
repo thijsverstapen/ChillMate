@@ -41,9 +41,10 @@ enum SafetyLine: String, CaseIterable, Sendable {
     case multipleStimulants = "Multiple stimulants can stack heart strain, anxiety, and overheating."
     case alcoholWithCocaine = "Alcohol and cocaine together can increase strain on the heart and reduce judgment."
 
-    // MARK: The line shown when neither source matched
+    // MARK: Lines that report the state of the check itself
 
     case nothingMatched = "No known major preset warning matched. Unknown amount, contents, health conditions, and medication changes can still matter."
+    case medicationNotRecognised = "The medication you entered was not recognised, so this check does not account for it. Check the spelling, or ask a pharmacist."
 }
 
 extension SafetyLine {
