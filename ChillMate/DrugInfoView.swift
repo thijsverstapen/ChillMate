@@ -165,6 +165,19 @@ private struct DrugReferenceSection: View {
                 .padding(.top, 2)
             }
 
+            if let redose = reference.redoseGuidance {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Before a second dose")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(tint)
+                    Text(redose)
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.top, 2)
+            }
+
             Text("Source: \(reference.source.name)")
                 .font(.caption2)
                 .foregroundStyle(Color.chillSecondary.opacity(0.85))

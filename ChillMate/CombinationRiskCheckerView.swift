@@ -348,6 +348,17 @@ private struct RiskPill: View {
 private struct RiskAssessmentPanel: View {
     let assessment: CombinationAssessment
 
+    /// The worst rating anything in this assessment carries.
+    ///
+    /// Used only to fire a haptic when it changes. Severity was carried entirely
+    /// by the colour of a capsule, which is no use in a dark room, at arm's
+    /// length, to anyone colour-blind, or to someone who is not looking at the
+    /// screen because they are looking at their friend. A distinct knock when the
+    /// answer turns critical reaches all four.
+    private var highestLevel: SubstanceInteraction.Level? {
+        assessment.interactionFindings.compactMap(\.level).max()
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             CareSectionTitle(title: String(localized: "Assessment"), symbol: "waveform.path.ecg")
@@ -396,6 +407,13 @@ private struct RiskAssessmentPanel: View {
         }
         .padding(16)
         .glassSurface(radius: 28, tint: .orange.opacity(0.10), interactive: true)
+        .sensoryFeedback(trigger: highestLevel) { _, level in
+            switch level {
+            case .critical: .warning
+            case .serious: .impact(weight: .medium)
+            default: nil
+            }
+        }
     }
 }
 
@@ -404,25 +422,59 @@ private struct RiskLevelRow: View {
     let level: RiskLevel
     let detail: String
 
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Text(level.label)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.white)
-                .frame(width: 72)
-                .padding(.vertical, 8)
-                .background(Capsule().fill(level.tint))
+    /// The badge was pinned to 72 points wide. "High-risk combination" does not
+    /// fit 72 points at the accessibility text sizes, and a fixed frame does not
+    /// grow, so the rating — the most important word in the row — was the first
+    /// thing to be clipped for the people who most need to read it.
+    ///
+    /// Width is now a floor rather than a ceiling, and past the accessibility
+    /// threshold the row stops being a row: the badge sits above the text instead
+    /// of squeezing it into a sliver of the screen.
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+    private var badge: some View {
+        Text(level.label)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(.white)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(minWidth: 72)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
+            .background(Capsule().fill(level.tint))
+    }
+
+    private var text: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    badge
+                    text
+                }
+            } else {
+                HStack(alignment: .top, spacing: 12) {
+                    badge
+                    text
+                }
             }
         }
+        // One element, stating the rating before the thing it rates. Read as three
+        // separate fragments, a swipe landed on a bare "Significant risk" with no
+        // way back to which risk it belonged to.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("\(title): \(level.label). \(detail)"))
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .glassSurface(radius: 20, tint: level.tint.opacity(0.08))

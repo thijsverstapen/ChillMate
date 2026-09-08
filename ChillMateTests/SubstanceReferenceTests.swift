@@ -112,6 +112,36 @@ struct SubstanceReferenceTests {
         }
     }
 
+    // MARK: Redosing
+
+    /// Redosing guidance exists where it is documented and is absent where it is
+    /// not. Absence is the correct answer for most of these, and a confident
+    /// sentence about cocaine redosing would be the app inventing one.
+    @Test("Redose guidance appears only where a source supports it", .tags(.safety))
+    func redoseGuidanceIsSourced() throws {
+        for substance in [Substance.ghb, .gbl, .mdma] {
+            let reference = try #require(substance.reference)
+            let guidance = try #require(reference.redoseGuidance,
+                                        "\(substance.rawValue) has published redose guidance and does not show it")
+            #expect(guidance.isEmpty == false)
+        }
+
+        // Not an oversight: nothing citable to say.
+        for substance in [Substance.cocaine, .ketamine, .cannabis, .poppers] {
+            #expect(substance.reference?.redoseGuidance == nil,
+                    "\(substance.rawValue) states a redose interval with no source behind it")
+        }
+    }
+
+    @Test("The substances with redose guidance name the source it came from", .tags(.safety))
+    func redoseGuidanceIsAttributed() throws {
+        for substance in [Substance.ghb, .gbl] {
+            let reference = try #require(substance.reference)
+            #expect(reference.source.name == "Drugs and Me",
+                    "\(substance.rawValue) shows redose guidance under the wrong attribution")
+        }
+    }
+
     // MARK: Formatting
 
     @Test("Ranges format without losing the unit", .tags(.safety))

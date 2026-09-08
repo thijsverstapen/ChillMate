@@ -76,6 +76,14 @@ struct SubstanceReference: Sendable {
 
     /// A note explaining why a substance carries no dose ladder, when it does not.
     let noDoseReason: String?
+
+    /// What is published about waiting before a second dose, where anything is.
+    ///
+    /// Nil is a deliberate answer, not an omission. Redosing guidance is well
+    /// documented for GHB and MDMA and thin for the rest, and CLAUDE.md's rule is
+    /// that new safety claims need a source. A confident sentence about cocaine
+    /// redosing would be this app inventing one.
+    let redoseGuidance: String?
 }
 
 extension SubstanceReference.Source {
@@ -83,6 +91,11 @@ extension SubstanceReference.Source {
     static let psychonautWiki = Self(
         name: "PsychonautWiki",
         url: URL(string: "https://psychonautwiki.org")
+    )
+
+    static let drugsAndMe = Self(
+        name: "Drugs and Me",
+        url: URL(string: "https://www.drugsand.me")
     )
 
     static let nhs = Self(
@@ -107,7 +120,8 @@ extension Substance {
                               light: 10...20, common: 20...30, strong: 30...40, heavyFrom: 40)],
                 timing: .init(onset: 2...5, peak: 30...90, total: 90...300),
                 source: .psychonautWiki,
-                noDoseReason: nil
+                noDoseReason: nil,
+                redoseGuidance: nil
             )
 
         case .cannabis:
@@ -120,7 +134,8 @@ extension Substance {
                 ],
                 timing: .init(onset: 0.1...10, peak: 15...45, total: 150...300),
                 source: .psychonautWiki,
-                noDoseReason: nil
+                noDoseReason: nil,
+                redoseGuidance: nil
             )
 
         case .mdma:
@@ -129,7 +144,8 @@ extension Substance {
                               light: 20...80, common: 80...120, strong: 120...150, heavyFrom: 150)],
                 timing: .init(onset: 30...45, peak: 90...150, total: 180...360),
                 source: .psychonautWiki,
-                noDoseReason: nil
+                noDoseReason: nil,
+                redoseGuidance: String(localized: "Give it 60 to 90 minutes before deciding anything. Eating beforehand delays the onset, which is what makes people take more too early.")
             )
 
         case .threeMMC:
@@ -142,7 +158,8 @@ extension Substance {
                 ],
                 timing: .init(onset: 5...10, peak: 60...90, total: 150...270),
                 source: .psychonautWiki,
-                noDoseReason: nil
+                noDoseReason: nil,
+                redoseGuidance: nil
             )
 
         case .ketamine:
@@ -155,7 +172,8 @@ extension Substance {
                 ],
                 timing: .init(onset: 1...3, peak: 15...45, total: 60...120),
                 source: .psychonautWiki,
-                noDoseReason: nil
+                noDoseReason: nil,
+                redoseGuidance: nil
             )
 
         case .ghb:
@@ -163,8 +181,9 @@ extension Substance {
                 doses: [.init(route: .oral, unit: .grams,
                               light: 0.5...1, common: 1...2.5, strong: 2.5...4, heavyFrom: 4)],
                 timing: .init(onset: 5...30, peak: 45...90, total: 90...150),
-                source: .psychonautWiki,
-                noDoseReason: nil
+                source: .drugsAndMe,
+                noDoseReason: nil,
+                redoseGuidance: String(localized: "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under.")
             )
 
         case .gbl:
@@ -172,8 +191,9 @@ extension Substance {
                 doses: [.init(route: .oral, unit: .millilitres,
                               light: 0.3...0.9, common: 0.9...1.5, strong: 1.5...3, heavyFrom: 3)],
                 timing: .init(onset: 3...10, peak: 30...45, total: 60...120),
-                source: .psychonautWiki,
-                noDoseReason: nil
+                source: .drugsAndMe,
+                noDoseReason: nil,
+                redoseGuidance: String(localized: "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under.")
             )
 
         case .cocaine:
@@ -182,7 +202,8 @@ extension Substance {
                               light: 10...30, common: 30...60, strong: 60...90, heavyFrom: 90)],
                 timing: .init(onset: 3...10, peak: 7.5...16, total: 10...90),
                 source: .psychonautWiki,
-                noDoseReason: nil
+                noDoseReason: nil,
+                redoseGuidance: nil
             )
 
         case .poppers:
@@ -190,7 +211,8 @@ extension Substance {
                 doses: [],
                 timing: .init(onset: 0.1...0.5, peak: 0.5...2, total: 2...5),
                 source: .psychonautWiki,
-                noDoseReason: String(localized: "Poppers are inhaled from the bottle, so there is no measured dose. Effects arrive within seconds and fade within minutes.")
+                noDoseReason: String(localized: "Poppers are inhaled from the bottle, so there is no measured dose. Effects arrive within seconds and fade within minutes."),
+                redoseGuidance: nil
             )
 
         case .viagra, .kamagra:
@@ -199,7 +221,8 @@ extension Substance {
                               light: 25...25, common: 50...50, strong: 100...100, heavyFrom: 100)],
                 timing: .init(onset: 30...60, peak: 60...120, total: 240...360),
                 source: .nhs,
-                noDoseReason: nil
+                noDoseReason: nil,
+                redoseGuidance: nil
             )
 
         case .psychedelics:
@@ -207,7 +230,8 @@ extension Substance {
                 doses: [],
                 timing: nil,
                 source: .psychonautWiki,
-                noDoseReason: String(localized: "Psychedelics covers substances with completely different scales, from micrograms to grams. Look up the specific one rather than trusting a shared figure.")
+                noDoseReason: String(localized: "Psychedelics covers substances with completely different scales, from micrograms to grams. Look up the specific one rather than trusting a shared figure."),
+                redoseGuidance: nil
             )
 
         case .unknown, .other:
