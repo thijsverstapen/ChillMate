@@ -98,6 +98,8 @@ struct EmergencyNetherlandsView: View {
     /// order, still direct children of the same container.
     @ViewBuilder
     private var emergencyNetherlandsViewContinued: some View {
+            UnresponsivePersonCard()
+
             VStack(alignment: .leading, spacing: 14) {
                 CareSectionTitle(title: String(localized: "Trusted contact"), symbol: "person.crop.circle.badge.checkmark")
 
@@ -471,5 +473,80 @@ private struct EmergencyCardLine: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+    }
+}
+
+
+/// What to do in the minutes before an ambulance arrives.
+///
+/// The screen could call for help and name a trusted contact, and then said
+/// nothing at all about the interval in between — which is the interval that
+/// decides the outcome. Someone face-down and snoring after a GHB dose does not
+/// need a phone number, they need to be turned on their side.
+///
+/// Sources: WHO opioid overdose fact sheet for the overdose triad and naloxone's
+/// action, and standard basic life support sequence. Fetched 8 September 2026.
+///
+/// Naloxone is included deliberately, and so is the sentence saying it does
+/// nothing to someone who has taken no opioids. That is the fact that makes it
+/// safe for a frightened bystander to use when they are not sure.
+private struct UnresponsivePersonCard: View {
+
+    private struct Step: Identifiable {
+        let id = UUID()
+        let symbol: String
+        let text: String
+    }
+
+    private var steps: [Step] {
+        [
+            Step(symbol: "hand.wave.fill",
+                 text: String(localized: "Try to wake them. Say their name loudly and squeeze a shoulder.")),
+            Step(symbol: "lungs.fill",
+                 text: String(localized: "Check whether they are breathing normally. Gasping or gurgling is not normal breathing.")),
+            Step(symbol: "phone.fill",
+                 text: String(localized: "If they do not wake, or are not breathing normally, call emergency services now.")),
+            Step(symbol: "arrow.turn.down.right",
+                 text: String(localized: "If they are breathing, turn them onto their side so they cannot choke, and tilt the head back.")),
+            Step(symbol: "heart.fill",
+                 text: String(localized: "If they are not breathing, start chest compressions and follow what the operator tells you.")),
+            Step(symbol: "eye.fill",
+                 text: String(localized: "Pinpoint pupils, unconsciousness, and slow breathing together point to opioids.")),
+            Step(symbol: "cross.vial.fill",
+                 text: String(localized: "Naloxone reverses an opioid overdose and does nothing to someone who has taken none, so it is safe to give if you have it and are unsure.")),
+            Step(symbol: "clock.fill",
+                 text: String(localized: "Stay with them until help arrives. People can stop breathing again after seeming to recover."))
+        ]
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CareSectionTitle(title: String(localized: "If someone is not responding"), symbol: "figure.fall")
+
+            Text("Tell the operator what was taken if you know. They are there to treat, not to report you.")
+                .font(.footnote)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(Array(steps.enumerated()), id: \.element.id) { index, step in
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: step.symbol)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundStyle(.red)
+                        .frame(width: 22)
+                        .accessibilityHidden(true)
+
+                    Text(step.text)
+                        .font(.callout)
+                        .foregroundStyle(Color.chillText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(Text("Step \(index + 1). \(step.text)"))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .glassSurface(radius: 28, tint: .red.opacity(0.10))
     }
 }
