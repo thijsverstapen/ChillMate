@@ -731,10 +731,37 @@ struct SettingsView: View {
         }
     }
 
+    /// Confirms the person holding the phone before anything moves all of the data
+    /// at once.
+    ///
+    /// The PIN and Face ID gate opening the app, and then four buttons in here
+    /// could export, import, restore or hand over the whole store without asking
+    /// again. An unlocked phone left on a table was one tap from a complete copy
+    /// of someone's drug use and sexual health history.
+    ///
+    /// Returns true when there is no lock configured at all: someone who has not
+    /// asked for a lock has not asked to be challenged, and a prompt they cannot
+    /// satisfy would just break export for them.
+    private func confirmIdentity(reason: String) async -> Bool {
+        guard requiresFaceID || requiresPIN else { return true }
+        do {
+            return try await AppAuthenticator.authenticate(reason: reason)
+        } catch {
+            await MainActor.run {
+                message = String(localized: "Could not confirm it is you, so nothing was moved.")
+            }
+            return false
+        }
+    }
+
     private func prepareEncryptedBackup() {
         isWorking = true
         message = nil
         Task {
+            guard await confirmIdentity(reason: String(localized: "Confirm it is you before preparing a backup")) else {
+                await MainActor.run { isWorking = false }
+                return
+            }
             do {
                 let data = try EncryptedBackupService.shared.encryptedBackupData(localContext: modelContext)
                 let formatter = ISO8601DateFormatter()
@@ -774,6 +801,10 @@ struct SettingsView: View {
         message = nil
 
         Task {
+            guard await confirmIdentity(reason: String(localized: "Confirm it is you before replacing your data")) else {
+                await MainActor.run { isWorking = false }
+                return
+            }
             do {
                 let canAccess = url.startAccessingSecurityScopedResource()
                 defer {
@@ -897,6 +928,10 @@ struct SettingsView: View {
         isWorking = true
         message = nil
         Task {
+            guard await confirmIdentity(reason: String(localized: "Confirm it is you before replacing your data")) else {
+                await MainActor.run { isWorking = false }
+                return
+            }
             do {
                 let summary = try ICloudBackupService.shared.restoreLatestBackup(into: modelContext)
                 await MainActor.run {
@@ -1004,6 +1039,10 @@ struct SettingsView: View {
         isWorking = true
         message = nil
         Task {
+            guard await confirmIdentity(reason: String(localized: "Confirm it is you before exporting your data")) else {
+                await MainActor.run { isWorking = false }
+                return
+            }
             do {
                 let entries = try modelContext.fetch(FetchDescriptor<NightEntry>(sortBy: [SortDescriptor(\.date)]))
                 var csv = "Date,StartDate,EndDate,HadSex,SkippedNight,Substances,PartnerCount,UsedCondom,WasPenetrated,SleptYet,SleepHours,Note\n"

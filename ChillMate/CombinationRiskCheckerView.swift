@@ -522,6 +522,19 @@ private struct RiskWarningLine: View {
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+        // The badge and the sentence were two elements, so VoiceOver read the
+        // severity as a stray phrase before an unrelated warning, and swiping
+        // through a long list lost track of which rating belonged to which line.
+        // Combining them states the rating and the warning as one thing, which is
+        // also the only way the severity reaches anyone who cannot see the colour
+        // of the capsule.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityDescription)
+    }
+
+    private var accessibilityDescription: String {
+        guard let level = finding.level else { return finding.text }
+        return "\(level.label): \(finding.text)"
     }
 }
 

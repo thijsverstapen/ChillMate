@@ -14253,6 +14253,90 @@
         }
       }
     },
+    "Confirm it is you before exporting your data": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestätige, dass du es bist, bevor deine Daten exportiert werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirma que eres tú antes de exportar tus datos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirme que c'est bien toi avant d'exporter tes données"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bevestig dat jij het bent voordat je je gegevens exporteert"
+          }
+        }
+      }
+    },
+    "Confirm it is you before preparing a backup": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestätige, dass du es bist, bevor ein Backup erstellt wird"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirma que eres tú antes de preparar una copia de seguridad"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirme que c'est bien toi avant de préparer une sauvegarde"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bevestig dat jij het bent voordat je een back-up maakt"
+          }
+        }
+      }
+    },
+    "Confirm it is you before replacing your data": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestätige, dass du es bist, bevor deine Daten ersetzt werden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirma que eres tú antes de reemplazar tus datos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirme que c'est bien toi avant de remplacer tes données"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bevestig dat jij het bent voordat je je gegevens vervangt"
+          }
+        }
+      }
+    },
     "Confirm you're 18 or older": {
       "localizations": {
         "de": {
@@ -14711,6 +14795,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kon bewaartermijn niet toepassen: %@"
+          }
+        }
+      }
+    },
+    "Could not confirm it is you, so nothing was moved.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es konnte nicht bestätigt werden, dass du es bist, daher wurde nichts verschoben."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido confirmar que eres tú, así que no se ha movido nada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de confirmer que c'est bien toi, rien n'a donc été déplacé."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kon niet bevestigen dat jij het bent, dus er is niets verplaatst."
           }
         }
       }
