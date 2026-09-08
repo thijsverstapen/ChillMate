@@ -17813,6 +17813,34 @@
         }
       }
     },
+    "Drug checking": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Substanzen testen lassen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Análisis de sustancias"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyse de produit"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Middelen laten testen"
+          }
+        }
+      }
+    },
     "Drug information & harm reduction": {
       "localizations": {
         "de": {
@@ -20655,6 +20683,34 @@
         }
       }
     },
+    "Find a testing service": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teststelle finden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar un servicio de análisis"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trouver un service d'analyse"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zoek een testlocatie"
+          }
+        }
+      }
+    },
     "Find local STI testing, PrEP, PEP, and sexual health services.": {
       "localizations": {
         "de": {
@@ -21802,6 +21858,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Duitsland"
+          }
+        }
+      }
+    },
+    "Get a substance tested before you take it. Strength and contents vary between batches, and testing is the only way to know what is in front of you.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lass eine Substanz testen, bevor du sie nimmst. Stärke und Zusammensetzung schwanken von Charge zu Charge, und Testen ist die einzige Möglichkeit zu wissen, was vor dir liegt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analiza una sustancia antes de tomarla. La pureza y la composición varían de un lote a otro, y analizarla es la única forma de saber qué tienes delante."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fais analyser un produit avant de le prendre. La teneur et la composition varient d'un lot à l'autre, et l'analyse est le seul moyen de savoir ce que tu as devant toi."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laat een middel testen voordat je het neemt. Sterkte en samenstelling verschillen per batch, en testen is de enige manier om te weten wat je voor je hebt."
           }
         }
       }
