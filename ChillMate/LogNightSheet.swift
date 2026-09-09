@@ -53,6 +53,9 @@ struct LogNightSheet: View {
 
     @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
 
+    /// Recent entries, only so the sheet can offer to repeat the last one.
+    @Query(ChillMateQueries.recentEntries) private var recentEntries: [NightEntry]
+
     @State private var startDate = Date.now
     @State private var endDate = Date.now.addingTimeInterval(60 * 60)
     @State private var saveHaptic = 0
@@ -323,6 +326,74 @@ struct LogNightSheet: View {
         locationMessage = nil
     }
 
+    /// The last tracked night that actually recorded something, if there is one.
+    private var lastTrackedEntry: NightEntry? {
+        recentEntries
+            .filter { !$0.skippedNight && !$0.substances.isEmpty }
+            .max { $0.date < $1.date }
+    }
+
+    /// Offers to fill the form from the last night, and only while the form is
+    /// still empty.
+    ///
+    /// Logging is the habit the rest of the app depends on — insights, streaks,
+    /// the risk checker's history all run on it — and it was a long form every
+    /// single time, even though most nights closely resemble the one before.
+    ///
+    /// It fills, it does not save. Writing an entry from one tap would put a night
+    /// in someone's history that they never confirmed, in an app whose whole
+    /// premise is that the record is theirs and accurate. The dates are
+    /// deliberately not copied either: this is tonight, not a duplicate of a
+    /// previous night.
+    @ViewBuilder
+    private var repeatLastCard: some View {
+        if mode == .tracked, selectedSubstances.isEmpty, let last = lastTrackedEntry {
+            Button {
+                fill(from: last)
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "arrow.counterclockwise.circle.fill")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(Color.chillPrimary)
+                        .accessibilityHidden(true)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Same as last time")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(Color.chillText)
+                        Text(last.substances.joined(separator: ", "))
+                            .font(.caption)
+                            .foregroundStyle(Color.chillSecondary)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    Spacer(minLength: 8)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(14)
+            }
+            .buttonStyle(ChillPlainButtonStyle())
+            .glassSurface(radius: 22, tint: Color.chillPrimary.opacity(0.08), interactive: true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Same as last time. Fills in \(last.substances.joined(separator: ", "))"))
+            .accessibilityHint(Text("Fills the form. Nothing is saved until you tap Save."))
+        }
+    }
+
+    /// Copies what a night was, never when it was.
+    private func fill(from entry: NightEntry) {
+        selectedSubstances = Set(entry.substances.compactMap(Substance.init(rawValue:)))
+        let unknownNames = entry.substances.filter { Substance(rawValue: $0) == nil }
+        if let first = unknownNames.first {
+            selectedSubstances.insert(.other)
+            otherSubstance = first
+        }
+        didInjectDrugs = !entry.injectionSubstances.isEmpty
+        injectedSubstances = entry.injectionSubstances
+        saveHaptic += 1
+    }
+
     /// Scrolling form, split out of a 161-line body.
     @ViewBuilder
     private var logForm: some View {
@@ -339,6 +410,8 @@ struct LogNightSheet: View {
                 .glassSurface(radius: 22, tint: .black.opacity(0.04), interactive: true)
                 .sensoryFeedback(.impact(weight: .medium), trigger: saveHaptic)
                 .disablesRootSwipeBack()
+
+                repeatLastCard
 
                 if mode == .tracked {
                     TimeFrameCard(startDate: $startDate, endDate: $endDate)
