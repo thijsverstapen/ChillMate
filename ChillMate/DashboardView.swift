@@ -317,6 +317,9 @@ struct DashboardView: View {
                 guard healthKitHRVReadEnabled else { return }
                 if let hrv = try? await HealthKitService.shared.latestHRV() {
                     lastKnownHRVms = hrv
+                    // The watch needs this too: paired with heart rate it is what
+                    // separates dancing from strain.
+                    WatchConnectivityService.shared.sendLatestHRV(hrv)
                 }
             }
             .task(id: healthKitHeartRateReadEnabled) {

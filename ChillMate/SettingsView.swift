@@ -199,7 +199,7 @@ struct SettingsView: View {
     }
 
     private var watchSettingsFingerprint: [Bool] {
-        [watchHydrationReminders, watchHeartRateWarnings, watchBreathingHaptics, watchDiscreetCheckIns, watchVisibleTimers]
+        [watchHydrationReminders, watchHeartRateWarnings, watchBreathingHaptics, watchDiscreetCheckIns, watchVisibleTimers, watchStressAndTemperatureDetection]
     }
 
     private var appVersionText: String {
@@ -1862,7 +1862,7 @@ private struct WatchCompanionSettingsCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("These settings prepare the iPhone side for Apple Watch features: hydration reminders, elevated heart-rate warnings, haptic breathing, discreet check-ins, timer visibility, and future stress/temperature signals.")
+            Text("These settings control the Apple Watch companion: hydration reminders, elevated heart-rate warnings, haptic breathing, discreet check-ins, timer visibility, and a strain warning that combines heart rate with heart-rate variability.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1872,7 +1872,7 @@ private struct WatchCompanionSettingsCard: View {
             SettingsToggleLine(title: String(localized: "Breathing haptics"), symbol: "lungs.fill", isOn: $breathingHaptics)
             SettingsToggleLine(title: String(localized: "Discreet haptic check-ins"), symbol: "applewatch.radiowaves.left.and.right", isOn: $discreetCheckIns)
             SettingsToggleLine(title: String(localized: "Visible timers and complications"), symbol: "timer", isOn: $visibleTimers)
-            SettingsToggleLine(title: String(localized: "Stress and temperature detection"), symbol: "thermometer.medium", isOn: $stressAndTemperatureDetection)
+            SettingsToggleLine(title: String(localized: "Strain warnings"), symbol: "thermometer.medium", isOn: $stressAndTemperatureDetection)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)

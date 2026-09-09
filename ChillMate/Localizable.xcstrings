@@ -47838,6 +47838,34 @@
         }
       }
     },
+    "Strain warnings": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belastungswarnungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avisos de sobrecarga"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alertes de surmenage"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waarschuwingen bij overbelasting"
+          }
+        }
+      }
+    },
     "Streak": {
       "localizations": {
         "de": {
@@ -50279,6 +50307,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deze gegevens houden je overzicht en timerschattingen persoonlijk."
+          }
+        }
+      }
+    },
+    "These settings control the Apple Watch companion: hydration reminders, elevated heart-rate warnings, haptic breathing, discreet check-ins, timer visibility, and a strain warning that combines heart rate with heart-rate variability.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Einstellungen steuern die Apple-Watch-App: Trinkerinnerungen, Warnungen bei erhöhtem Puls, haptische Atmung, diskrete Check-ins, Sichtbarkeit von Timern und eine Belastungswarnung, die Puls und Herzfrequenzvariabilität zusammen betrachtet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Estos ajustes controlan la app del Apple Watch: recordatorios de hidratación, avisos de frecuencia cardiaca elevada, respiración háptica, check-ins discretos, visibilidad de los temporizadores y un aviso de sobrecarga que combina la frecuencia cardiaca con su variabilidad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ces réglages contrôlent l'app Apple Watch : rappels d'hydratation, alertes de fréquence cardiaque élevée, respiration haptique, check-ins discrets, visibilité des minuteurs, et une alerte de surmenage qui combine fréquence cardiaque et variabilité."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze instellingen bepalen wat de Apple Watch-app doet: drinkherinneringen, waarschuwingen bij een verhoogde hartslag, ademhaling met haptiek, discrete check-ins, zichtbaarheid van timers, en een waarschuwing bij overbelasting die hartslag combineert met hartslagvariabiliteit."
           }
         }
       }

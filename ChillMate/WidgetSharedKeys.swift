@@ -54,16 +54,29 @@ enum WidgetSharedKey {
     static let watchVisibleTimers = "watchVisibleTimers"
     static let watchHeartRateWarnings = "watchHeartRateWarnings"
 
+    static let watchStrainDetection = "watchStressAndTemperatureDetection"
+
     /// Every watch setting the phone pushes, so the sender cannot omit one by
-    /// accident. `watchStressAndTemperatureDetection` is deliberately absent:
-    /// it is a toggle in Settings with no consumer on either side.
+    /// accident.
     static let watchSettingKeys = [
         watchHydrationReminders,
         watchBreathingHaptics,
         watchDiscreetCheckIns,
         watchVisibleTimers,
         watchHeartRateWarnings,
+        watchStrainDetection,
     ]
+
+    // MARK: Physiological strain, pushed from the phone
+
+    /// Heart-rate variability in milliseconds, and whether a reading exists.
+    ///
+    /// Paired with the heart rate the phone already relays. Neither number means
+    /// much alone: a high heart rate on its own is dancing. A high heart rate
+    /// with suppressed variability is the body under load, which is the signal
+    /// worth interrupting someone for.
+    static let hasHRV = "hasHRV"
+    static let latestHRVms = "latestHRVms"
 
     // MARK: Watch-local state
     //
