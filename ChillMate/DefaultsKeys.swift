@@ -156,6 +156,10 @@ enum DefaultsKey {
     static let onboardingSwipeHintShown = "onboardingSwipeHintShown"
     static let locationServicesChecked = "locationServicesChecked"
     static let lastSelectedTab = "lastSelectedTab"
+
+    /// Set by the Focus filter when a Focus the user has configured for going out
+    /// is active. Read by Home to lead with the during-session tools.
+    static let focusSessionMode = "focusSessionMode"
     static let lastBackgroundedAt = "lastBackgroundedAt"
     static let oneHandedControls = "oneHandedControls"
 

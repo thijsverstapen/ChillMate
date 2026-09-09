@@ -422,3 +422,39 @@ struct ChillMateShortcuts: AppShortcutsProvider {
         )
     }
 }
+
+/// Lets a Focus tell ChillMate the night has started.
+///
+/// The app already guesses the moment — before, during, after, patterns — from
+/// recent logs and the clock, and leads Home with whichever it lands on. That is
+/// a reasonable guess and still a guess. Someone who has set up a "Going out"
+/// Focus has stated it outright, and a stated fact should beat an inference.
+///
+/// Deliberately one switch and nothing else. A Focus filter that offered to hide
+/// data or change what is logged would be a privacy surface configured from
+/// outside the app's own lock, which is the wrong place for it. This only decides
+/// which group of tools Home leads with.
+struct ChillMateFocusFilter: SetFocusFilterIntent {
+    static let title: LocalizedStringResource = "ChillMate"
+    static var description: IntentDescription {
+        IntentDescription("Lead Home with the tools for the moment you're in.")
+    }
+
+    @Parameter(title: "Show during-session tools first", default: true)
+    var sessionMode: Bool
+
+    var displayRepresentation: DisplayRepresentation {
+        DisplayRepresentation(
+            title: sessionMode
+                ? "Lead with check-in timers and safe route home"
+                : "Use ChillMate's own guess"
+        )
+    }
+
+    func perform() async throws -> some IntentResult {
+        // Runs in the app's own process, so this is `UserDefaults.standard` and
+        // not the App Group suite the Control Center widgets have to use.
+        UserDefaults.standard.set(sessionMode, forKey: DefaultsKey.focusSessionMode)
+        return .result()
+    }
+}

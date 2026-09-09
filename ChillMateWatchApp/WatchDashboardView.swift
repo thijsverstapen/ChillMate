@@ -69,6 +69,13 @@ struct WatchDashboardView: View {
                         connectivity.logQuickSkip()
                         WKInterfaceDevice.current().play(.success)
                     }
+                    // Double tap is the one gesture that works with a drink in the
+                    // other hand, in a coat, without looking at the screen. Logging
+                    // a clear night is the right thing to put behind it: it is the
+                    // only action here that is always safe to repeat by accident,
+                    // because it guards on `quickSkipSentToday` and does nothing
+                    // the second time.
+                    .handGestureShortcut(.primaryAction, isEnabled: !connectivity.quickSkipSentToday)
 
                     NavigationLink {
                         SafetyScreen(connectivity: connectivity)

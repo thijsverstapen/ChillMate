@@ -375,9 +375,16 @@ struct DashboardView: View {
     }
 
     /// `CareToolGroup.homeGroups`, but with the current moment moved to the top.
+    ///
+    /// A Focus filter beats the app's own guess. The app infers the moment from
+    /// logs and the clock, which is a reasonable guess and still a guess; someone
+    /// who has told iOS they are going out has stated it outright, and a stated
+    /// fact should win over an inference.
     private var orderedToolGroups: [CareToolGroup] {
         let base = CareToolGroup.homeGroups
-        guard let lead = currentMoment?.page,
+        let focusLead: CareToolPage? = UserDefaults.standard.bool(forKey: DefaultsKey.focusSessionMode) ? .groupDuring : nil
+
+        guard let lead = focusLead ?? currentMoment?.page,
               let index = base.firstIndex(where: { $0.page == lead }) else {
             return base
         }
