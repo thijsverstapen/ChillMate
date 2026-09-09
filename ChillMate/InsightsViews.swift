@@ -87,9 +87,12 @@ private struct PrivateInsightsSections: View {
             TrendListCard(title: String(localized: "What led to it?"), emptyText: String(localized: "Add trigger tags in logs to build this map."), counts: ChillInsightCalculator.triggerCounts(entries: recentEntries), tint: Color.chillSecondaryBlue)
             TrendListCard(title: String(localized: "What changed?"), emptyText: String(localized: "When risky logs increase, reasons you tag will appear here."), counts: ChillInsightCalculator.changeReasonCounts(entries: recentEntries), tint: .orange)
             TrendListCard(title: String(localized: "Substances"), emptyText: String(localized: "No substances logged in the selected window."), counts: ChillInsightCalculator.substanceCounts(entries: recentEntries), tint: Color.chillPrimary)
+
             InsightSleepCorrelationCard(
                 substanceAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: true),
-                clearAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: false)
+                clearAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: false),
+                substanceNights: ChillInsightCalculator.sleptNightCount(entries: recentEntries, substanceNights: true),
+                clearNights: ChillInsightCalculator.sleptNightCount(entries: recentEntries, substanceNights: false)
             )
             PersonalBaselineCard(entries: recentEntries, timers: timers, windowDays: windowDays)
         }
@@ -182,6 +185,10 @@ private struct PersonalBaselineCard: View {
         return values.reduce(0, +) / Double(values.count)
     }
 
+    private func hours(_ value: Double) -> String {
+        "\(value.formatted(.number.precision(.fractionLength(1)))) h"
+    }
+
     private var lateTimers: Int {
         timers.filter { Calendar.current.component(.hour, from: $0.startedAt) >= 2 && Calendar.current.component(.hour, from: $0.startedAt) <= 6 }.count
     }
@@ -190,7 +197,7 @@ private struct PersonalBaselineCard: View {
         VStack(alignment: .leading, spacing: 10) {
             CareSectionTitle(title: String(localized: "Your baseline"), symbol: "person.text.rectangle.fill")
             InsightWindowCaption(days: windowDays)
-            InsightLine(title: String(localized: "Average logged sleep"), value: averageSleep == 0 ? "Not enough data" : "\(averageSleep.formatted(.number.precision(.fractionLength(1)))) h")
+            InsightLine(title: String(localized: "Average logged sleep"), value: averageSleep == 0 ? String(localized: "Not enough data") : hours(averageSleep))
             InsightLine(title: String(localized: "Late timer starts"), value: "\(lateTimers)")
             InsightLine(title: String(localized: "Memory gaps"), value: "\(entries.filter(\.reportedMemoryGap).count)")
             Text("Baseline means “usual for you,” not “good” or “bad.” The app uses this to show when something changes.")
@@ -379,6 +386,14 @@ extension ChillInsightCalculator {
     }
 
     /// Average recorded sleep after substance nights vs clear nights.
+    /// How many logged nights an average is drawn from, so a card can say when it
+    /// does not have enough to conclude anything.
+    static func sleptNightCount(entries: [NightEntry], substanceNights: Bool) -> Int {
+        entries.filter {
+            $0.sleptYet && $0.sleepHours > 0 && (substanceNights ? !$0.substances.isEmpty : $0.substances.isEmpty)
+        }.count
+    }
+
     static func averageSleep(entries: [NightEntry], substanceNights: Bool) -> Double? {
         let matching = entries.filter {
             $0.sleptYet && $0.sleepHours > 0 && (substanceNights ? !$0.substances.isEmpty : $0.substances.isEmpty)
@@ -469,6 +484,18 @@ private struct InsightHeatmapCard: View {
 private struct InsightSleepCorrelationCard: View {
     let substanceAvg: Double?
     let clearAvg: Double?
+    /// How many logged nights each average rests on.
+    let substanceNights: Int
+    let clearNights: Int
+
+    /// Three nights is not a pattern.
+    ///
+    /// Stating that is the finding, not a disclaimer: an app that draws a
+    /// confident conclusion from two entries teaches people to distrust the ones
+    /// it draws from two hundred.
+    private var hasEnoughToConclude: Bool {
+        substanceNights >= 3 && clearNights >= 3
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -477,7 +504,12 @@ private struct InsightSleepCorrelationCard: View {
             row(label: String(localized: "After substance nights"), hours: substanceAvg, tint: .orange)
             row(label: String(localized: "After clear nights"), hours: clearAvg, tint: Color.chillMint)
 
-            if let substanceAvg, let clearAvg, clearAvg - substanceAvg >= 0.5 {
+            if !hasEnoughToConclude {
+                Text("Based on \(substanceNights) substance nights and \(clearNights) clear ones. Three of each is the least this can say anything from.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if let substanceAvg, let clearAvg, clearAvg - substanceAvg >= 0.5 {
                 Text("You tend to sleep about \((clearAvg - substanceAvg).formatted(.number.precision(.fractionLength(0...1)))) hours more after a clear night.")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
