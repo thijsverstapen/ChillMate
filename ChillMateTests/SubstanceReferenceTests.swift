@@ -164,3 +164,76 @@ struct SubstanceReferenceTests {
         #expect(long.contains("180") == false, "A six-hour span is still being written in minutes: \(long)")
     }
 }
+
+/// Frequency is what tolerance actually tracks, and the only pattern these logs
+/// can see clearly without asking anyone to weigh anything.
+@Suite("Consecutive active weeks")
+struct ActiveWeeksTests {
+
+    private var calendar: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "UTC") ?? .gmt
+        return c
+    }
+
+    private func entry(daysAgo: Int, substances: [String], skipped: Bool = false, from now: Date) -> NightEntry {
+        NightEntry(
+            date: calendar.date(byAdding: .day, value: -daysAgo, to: now) ?? now,
+            hadSex: false,
+            skippedNight: skipped,
+            substances: substances
+        )
+    }
+
+    /// A fixed Wednesday, so the week arithmetic never straddles a boundary
+    /// differently depending on when the suite runs.
+    private var now: Date {
+        DateComponents(calendar: calendar, year: 2026, month: 6, day: 10, hour: 12).date ?? .now
+    }
+
+    @Test("No logs means no streak", .tags(.safety))
+    func emptyIsZero() {
+        #expect(ChillInsightCalculator.consecutiveActiveWeeks(entries: [], now: now, calendar: calendar) == 0)
+    }
+
+    @Test("Skipped nights do not count as use", .tags(.safety))
+    func skipsDoNotCount() {
+        let skip = entry(daysAgo: 1, substances: [], skipped: true, from: now)
+        #expect(ChillInsightCalculator.consecutiveActiveWeeks(entries: [skip], now: now, calendar: calendar) == 0)
+    }
+
+    @Test("Three consecutive weeks count as three", .tags(.safety))
+    func consecutiveWeeksCount() {
+        let entries = [0, 7, 14].map { entry(daysAgo: $0, substances: ["MDMA"], from: now) }
+        #expect(ChillInsightCalculator.consecutiveActiveWeeks(entries: entries, now: now, calendar: calendar) == 3)
+    }
+
+    @Test("A clear week ends the run", .tags(.safety))
+    func aClearWeekStops() {
+        // This week and last, then nothing, then one three weeks further back.
+        let entries = [0, 7, 28].map { entry(daysAgo: $0, substances: ["Alcohol"], from: now) }
+        #expect(ChillInsightCalculator.consecutiveActiveWeeks(entries: entries, now: now, calendar: calendar) == 2)
+    }
+
+    @Test("Two logs in one week are still one week", .tags(.safety))
+    func sameWeekCountsOnce() {
+        let entries = [0, 1].map { entry(daysAgo: $0, substances: ["Cocaine"], from: now) }
+        #expect(ChillInsightCalculator.consecutiveActiveWeeks(entries: entries, now: now, calendar: calendar) == 1)
+    }
+
+    /// A quiet Monday is not a broken streak: the current week may simply not
+    /// have happened yet, so the count starts from the last week that did.
+    @Test("A quiet current week does not zero last week's run", .tags(.safety))
+    func currentWeekMayBeEmpty() {
+        let entries = [8, 15].map { entry(daysAgo: $0, substances: ["Ketamine"], from: now) }
+        #expect(ChillInsightCalculator.consecutiveActiveWeeks(entries: entries, now: now, calendar: calendar) == 2)
+    }
+
+    @Test("The walk is bounded", .tags(.safety))
+    func doesNotRunAway() {
+        let entries = (0..<200).map { entry(daysAgo: $0 * 7, substances: ["GHB"], from: now) }
+        let weeks = ChillInsightCalculator.consecutiveActiveWeeks(entries: entries, now: now, calendar: calendar)
+        #expect(weeks <= 104, "The week walk is unbounded: \(weeks)")
+        #expect(weeks > 0)
+    }
+}

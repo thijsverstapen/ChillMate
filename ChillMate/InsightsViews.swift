@@ -189,6 +189,10 @@ private struct PersonalBaselineCard: View {
         "\(value.formatted(.number.precision(.fractionLength(1)))) h"
     }
 
+    private var activeWeeks: Int {
+        ChillInsightCalculator.consecutiveActiveWeeks(entries: entries)
+    }
+
     private var lateTimers: Int {
         timers.filter { Calendar.current.component(.hour, from: $0.startedAt) >= 2 && Calendar.current.component(.hour, from: $0.startedAt) <= 6 }.count
     }
@@ -198,6 +202,10 @@ private struct PersonalBaselineCard: View {
             CareSectionTitle(title: String(localized: "Your baseline"), symbol: "person.text.rectangle.fill")
             InsightWindowCaption(days: windowDays)
             InsightLine(title: String(localized: "Average logged sleep"), value: averageSleep == 0 ? String(localized: "Not enough data") : hours(averageSleep))
+            InsightLine(
+                title: String(localized: "Weeks in a row with use"),
+                value: activeWeeks == 0 ? String(localized: "None") : String(localized: "\(activeWeeks) weeks")
+            )
             InsightLine(title: String(localized: "Late timer starts"), value: "\(lateTimers)")
             InsightLine(title: String(localized: "Memory gaps"), value: "\(entries.filter(\.reportedMemoryGap).count)")
             Text("Baseline means “usual for you,” not “good” or “bad.” The app uses this to show when something changes.")
@@ -386,6 +394,41 @@ extension ChillInsightCalculator {
     }
 
     /// Average recorded sleep after substance nights vs clear nights.
+    /// Consecutive weeks, counting back from this one, that contain at least one
+    /// substance night.
+    ///
+    /// Frequency is the thing tolerance actually tracks, and it is the one pattern
+    /// these logs can see clearly without asking anyone to weigh anything. Counted
+    /// in weeks rather than nights because a weekend is the unit people plan in.
+    ///
+    /// Stops at the first clear week rather than counting totals: "four weekends
+    /// in a row" is a pattern someone can recognise about themselves, where "17
+    /// nights in 90 days" is a statistic about a stranger.
+    static func consecutiveActiveWeeks(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
+        let active = Set(entries.filter { !$0.skippedNight && !$0.substances.isEmpty }.compactMap {
+            calendar.dateInterval(of: .weekOfYear, for: $0.date)?.start
+        })
+        guard !active.isEmpty else { return 0 }
+
+        guard var week = calendar.dateInterval(of: .weekOfYear, for: now)?.start else { return 0 }
+        // This week may not have happened yet; start from the most recent week
+        // that did, so a clear Monday does not read as a broken streak.
+        if !active.contains(week) {
+            guard let previous = calendar.date(byAdding: .weekOfYear, value: -1, to: week) else { return 0 }
+            week = previous
+        }
+
+        var count = 0
+        // Bounded so a corrupt date cannot spin here; two years of weeks is well
+        // past anything the 1,000-row query can hold.
+        while active.contains(week), count < 104 {
+            count += 1
+            guard let previous = calendar.date(byAdding: .weekOfYear, value: -1, to: week) else { break }
+            week = previous
+        }
+        return count
+    }
+
     /// How many logged nights an average is drawn from, so a card can say when it
     /// does not have enough to conclude anything.
     static func sleptNightCount(entries: [NightEntry], substanceNights: Bool) -> Int {
