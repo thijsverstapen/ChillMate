@@ -102,3 +102,41 @@ struct SupportDirectoryTests {
         }
     }
 }
+
+/// The phone and the watch have to agree on the spelling of every setting they
+/// exchange.
+///
+/// They used to be bare literals at both ends, in two targets that cannot see
+/// each other, so renaming one side left both compiling and the watch silently
+/// falling back to its defaults with no error anywhere.
+@Suite("Watch settings transport")
+struct WatchSettingsKeyTests {
+
+    @Test("Every pushed setting key is registered and unique", .tags(.safety))
+    func keysAreRegisteredAndUnique() {
+        let keys = WidgetSharedKey.watchSettingKeys
+        #expect(keys.isEmpty == false)
+        #expect(Set(keys).count == keys.count, "A setting key is listed twice: \(keys)")
+        for key in keys {
+            #expect(key.isEmpty == false)
+            #expect(key.hasPrefix("watch"), "\(key) does not look like a watch setting key")
+        }
+    }
+
+    /// The registry is what the sender iterates, so anything absent from it is
+    /// never transmitted. `watchStressAndTemperatureDetection` is absent on
+    /// purpose: it is a Settings toggle with no consumer on either side, and
+    /// adding it to transport would only make the dead end harder to see.
+    @Test("The registry matches what the watch actually reads", .tags(.safety))
+    func registryCoversTheWatchsReads() {
+        let expected = Set([
+            "watchHydrationReminders",
+            "watchBreathingHaptics",
+            "watchDiscreetCheckIns",
+            "watchVisibleTimers",
+            "watchHeartRateWarnings",
+        ])
+        #expect(Set(WidgetSharedKey.watchSettingKeys) == expected,
+                "The pushed settings drifted from what the watch reads: \(WidgetSharedKey.watchSettingKeys)")
+    }
+}

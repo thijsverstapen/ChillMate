@@ -72,13 +72,9 @@ final class WatchConnectivityService: NSObject {
         // preserves that until the user changes them (plain `bool(forKey:)`
         // would report false for an unset key).
         func flag(_ key: String) -> Bool { d.object(forKey: key) as? Bool ?? true }
-        push([
-            "watchHydrationReminders": flag("watchHydrationReminders"),
-            "watchBreathingHaptics": flag("watchBreathingHaptics"),
-            "watchDiscreetCheckIns": flag("watchDiscreetCheckIns"),
-            "watchVisibleTimers": flag("watchVisibleTimers"),
-            "watchHeartRateWarnings": flag("watchHeartRateWarnings")
-        ])
+        // Built from the registry rather than listed here, so a key cannot be
+        // spelled one way at this end and another way on the watch.
+        push(Dictionary(uniqueKeysWithValues: WidgetSharedKey.watchSettingKeys.map { ($0, flag($0)) }))
     }
 
     func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool) {

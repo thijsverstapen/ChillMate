@@ -758,11 +758,11 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
             latestBPM = value ? (context["latestBPM"] as? Double) : nil
         }
 
-        if let value = context["watchHydrationReminders"] as? Bool { hydrationRemindersEnabled = value }
-        if let value = context["watchHeartRateWarnings"] as? Bool { heartRateWarningsEnabled = value }
-        if let value = context["watchBreathingHaptics"] as? Bool { breathingHapticsEnabled = value }
-        if let value = context["watchDiscreetCheckIns"] as? Bool { discreetCheckInsEnabled = value }
-        if let value = context["watchVisibleTimers"] as? Bool { visibleTimersEnabled = value }
+        if let value = context[WidgetSharedKey.watchHydrationReminders] as? Bool { hydrationRemindersEnabled = value }
+        if let value = context[WidgetSharedKey.watchHeartRateWarnings] as? Bool { heartRateWarningsEnabled = value }
+        if let value = context[WidgetSharedKey.watchBreathingHaptics] as? Bool { breathingHapticsEnabled = value }
+        if let value = context[WidgetSharedKey.watchDiscreetCheckIns] as? Bool { discreetCheckInsEnabled = value }
+        if let value = context[WidgetSharedKey.watchVisibleTimers] as? Bool { visibleTimersEnabled = value }
 
         publishWidgetSnapshot()
     }

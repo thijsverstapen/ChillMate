@@ -40,6 +40,31 @@ enum WidgetSharedKey {
     /// no error anywhere.
     static let hydrationLogDate = "lastHydrationLogDate"
 
+    // MARK: Watch settings, pushed from the phone in the application context
+    //
+    // These were bare string literals at both ends: spelled once in
+    // `WatchConnectivityService.sendSettings()` and again in the watch's
+    // `applyContext`. Renaming either side left both compiling and the watch
+    // silently falling back to its defaults, which is the exact failure this file
+    // was created to stop and which its own header describes.
+
+    static let watchHydrationReminders = "watchHydrationReminders"
+    static let watchBreathingHaptics = "watchBreathingHaptics"
+    static let watchDiscreetCheckIns = "watchDiscreetCheckIns"
+    static let watchVisibleTimers = "watchVisibleTimers"
+    static let watchHeartRateWarnings = "watchHeartRateWarnings"
+
+    /// Every watch setting the phone pushes, so the sender cannot omit one by
+    /// accident. `watchStressAndTemperatureDetection` is deliberately absent:
+    /// it is a toggle in Settings with no consumer on either side.
+    static let watchSettingKeys = [
+        watchHydrationReminders,
+        watchBreathingHaptics,
+        watchDiscreetCheckIns,
+        watchVisibleTimers,
+        watchHeartRateWarnings,
+    ]
+
     // MARK: Watch-local state
     //
     // These live in the watch's own `UserDefaults.standard`, NOT in the shared suite
