@@ -2271,6 +2271,8 @@ private struct ProfilePermissionsPage: View {
                         action: {
                             weeklyDigestEnabled.toggle()
                             if weeklyDigestEnabled {
+                                // Placeholder figures. Home reschedules with the real streak and score
+                                // the next time it recomputes metrics, which is on its next appearance.
                                 NotificationService.shared.scheduleWeeklySummary(streak: 0, score: 0)
                             } else {
                                 NotificationService.shared.clearWeeklySummary()

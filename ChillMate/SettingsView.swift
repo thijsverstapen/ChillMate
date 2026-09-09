@@ -247,6 +247,8 @@ struct SettingsView: View {
             }
             .onChange(of: weeklyDigestEnabled) { _, isOn in
                 if isOn {
+                    // Placeholder figures. Home reschedules with the real streak and score
+                    // the next time it recomputes metrics, which is on its next appearance.
                     NotificationService.shared.scheduleWeeklySummary(streak: 0, score: 0)
                 } else {
                     NotificationService.shared.clearWeeklySummary()

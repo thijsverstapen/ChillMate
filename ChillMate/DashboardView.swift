@@ -8,6 +8,7 @@ struct DashboardView: View {
     @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
     @AppStorage(DefaultsKey.lastKnownHRVms) private var lastKnownHRVms: Double = 0
     @AppStorage(DefaultsKey.lastKnownRestingBPM) private var lastKnownRestingBPM: Double = 0
+    @AppStorage(DefaultsKey.weeklyDigestEnabled) private var weeklyDigestEnabled = false
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.reductionGoalSessions) private var reductionGoalSessions = 0
@@ -433,6 +434,22 @@ struct DashboardView: View {
             dailyScore: metrics.dailyScore.displayValue,
             dailyScoreActive: metrics.dailyScore.isActive
         )
+
+        // The weekly digest is a repeating calendar notification whose body is
+        // baked in when it is scheduled, and both places that scheduled it passed
+        // streak: 0, score: 0. So it fired every Sunday, forever, telling someone
+        // on a forty-day streak that they were at zero days — in an app whose
+        // whole point is that the streak is worth something.
+        //
+        // Rescheduling here, wherever the dashboard has just recomputed the real
+        // figures, is the same trigger the widget and the watch already use, so
+        // the digest can never drift from what the app is showing.
+        if weeklyDigestEnabled {
+            NotificationService.shared.scheduleWeeklySummary(
+                streak: metrics.recoveryStreakDays,
+                score: metrics.dailyScore.displayValue
+            )
+        }
     }
 
     private func quickSkip() {

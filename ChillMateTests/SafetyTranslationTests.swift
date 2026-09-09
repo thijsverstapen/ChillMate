@@ -156,3 +156,63 @@ struct SafetyTranslationTests {
         return try #require(NSDictionary(contentsOfFile: path) as? [String: String])
     }
 }
+
+/// Counted strings have to use the catalog's plural rules, not a Swift ternary.
+///
+/// `%lld days` was a plain string with a `streak == 1 ?` branch in Swift choosing
+/// between it and a separate "1 day". That bakes the English rule into all five
+/// languages, and the rules are not the same: French takes the singular at zero,
+/// so a hand-rolled rule writes "0 jours". English had no catalog entry at all,
+/// so it fell through to the key and the widget said "1 days".
+@Suite("Counted strings")
+struct PluralFormTests {
+
+    /// The singular the catalog should produce at one, per language.
+    static func singular(for language: AppLanguage) -> String {
+        switch language {
+        case .english: "1 day"
+        case .dutch: "1 dag"
+        case .german: "1 Tag"
+        case .french: "1 jour"
+        case .spanish: "1 día"
+        }
+    }
+
+    static func plural(for language: AppLanguage) -> String {
+        switch language {
+        case .english: "5 days"
+        case .dutch: "5 dagen"
+        case .german: "5 Tage"
+        case .french: "5 jours"
+        case .spanish: "5 días"
+        }
+    }
+
+    @Test("One day is singular in every language", .tags(.safety), arguments: AppLanguage.allCases)
+    func oneIsSingular(language: AppLanguage) throws {
+        let bundle = try #require(SafetyLine.bundle(for: language))
+        let format = bundle.localizedString(forKey: "%lld days", value: nil, table: nil)
+        let rendered = String(format: format, locale: Locale(identifier: language.rawValue), 1)
+        #expect(rendered == Self.singular(for: language),
+                "\(language.rawValue) renders one day as \"\(rendered)\"")
+    }
+
+    @Test("Five days is plural in every language", .tags(.safety), arguments: AppLanguage.allCases)
+    func manyIsPlural(language: AppLanguage) throws {
+        let bundle = try #require(SafetyLine.bundle(for: language))
+        let format = bundle.localizedString(forKey: "%lld days", value: nil, table: nil)
+        let rendered = String(format: format, locale: Locale(identifier: language.rawValue), 5)
+        #expect(rendered == Self.plural(for: language),
+                "\(language.rawValue) renders five days as \"\(rendered)\"")
+    }
+
+    /// French is the reason the Swift ternary had to go: it treats zero as
+    /// singular, and an `== 1` check does not.
+    @Test("French takes the singular at zero", .tags(.safety))
+    func frenchZeroIsSingular() throws {
+        let bundle = try #require(SafetyLine.bundle(for: .french))
+        let format = bundle.localizedString(forKey: "%lld days", value: nil, table: nil)
+        let rendered = String(format: format, locale: Locale(identifier: "fr"), 0)
+        #expect(rendered == "0 jour", "French renders zero days as \"\(rendered)\"")
+    }
+}

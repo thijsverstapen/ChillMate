@@ -700,7 +700,11 @@ final class NotificationService {
     func scheduleWeeklySummary(streak: Int, score: Int) {
         clearWeeklySummary()
         let scoreText = score > 0 ? String(localized: ", score \(score)") : ""
-        let streakText = streak == 1 ? String(localized: "1 day") : String(localized: "\(streak) days")
+        // No `== 1` ternary. Plural rules are not the same in all five languages —
+        // French takes the singular at zero, so a hand-rolled English rule writes
+        // "0 jours" — and the catalog already expresses this properly for eleven
+        // other counted strings.
+        let streakText = String(localized: "\(streak) days")
         let content = notificationContent(
             title: String(localized: "Your week in ChillMate"),
             body: String(localized: "You're at \(streakText) without logged substance use\(scoreText). Check in when ready."),
