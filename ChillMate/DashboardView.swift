@@ -7,6 +7,7 @@ struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
     @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
     @AppStorage(DefaultsKey.lastKnownHRVms) private var lastKnownHRVms: Double = 0
+    @AppStorage(DefaultsKey.lastKnownRestingBPM) private var lastKnownRestingBPM: Double = 0
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.reductionGoalSessions) private var reductionGoalSessions = 0
@@ -64,7 +65,8 @@ struct DashboardView: View {
             entryCount: entries.count,
             contentVersion: entries.reduce(into: 0) { $0 &+= $1.contentVersion },
             profileCount: profiles.count,
-            hrv: lastKnownHRVms
+            hrv: lastKnownHRVms,
+            restingBPM: lastKnownRestingBPM
         )
     }
 
@@ -75,7 +77,8 @@ struct DashboardView: View {
             entries: entries,
             profiles: profiles,
             calendar: calendar,
-            latestHRVms: lastKnownHRVms
+            latestHRVms: lastKnownHRVms,
+            latestRestingBPM: lastKnownRestingBPM
         )
     }
 
@@ -84,6 +87,7 @@ struct DashboardView: View {
         let contentVersion: Int
         let profileCount: Int
         let hrv: Double
+        let restingBPM: Double
     }
 
     @ViewBuilder
@@ -279,7 +283,8 @@ struct DashboardView: View {
                     entries: entries,
                     profiles: profiles,
                     calendar: calendar,
-                    latestHRVms: lastKnownHRVms
+                    latestHRVms: lastKnownHRVms,
+                    latestRestingBPM: lastKnownRestingBPM
                 )
             }
             .onAppear {
@@ -311,6 +316,13 @@ struct DashboardView: View {
                 guard healthKitHRVReadEnabled else { return }
                 if let hrv = try? await HealthKitService.shared.latestHRV() {
                     lastKnownHRVms = hrv
+                }
+            }
+            .task(id: healthKitHeartRateReadEnabled) {
+                // The resting read has existed since 4.3.0 and had no caller.
+                guard healthKitHeartRateReadEnabled else { return }
+                if let resting = try? await HealthKitService.shared.latestRestingHeartRate() {
+                    lastKnownRestingBPM = resting
                 }
             }
             .task(id: healthKitHeartRateReadEnabled) {
@@ -510,7 +522,7 @@ private struct DashboardMetrics {
         return healthWarningCount > 3 || (dailyScore.isActive && dailyScore.value < 30) || recentSessionsWithSubstances >= 10
     }
 
-    init(entries: [NightEntry], profiles: [UserProfile], calendar: Calendar, latestHRVms: Double = 0) {
+    init(entries: [NightEntry], profiles: [UserProfile], calendar: Calendar, latestHRVms: Double = 0, latestRestingBPM: Double = 0) {
         let cutoffDate = calendar.date(byAdding: .month, value: -3, to: .now) ?? .now
         var trackedCount = 0
         var skippedCount = 0
@@ -594,7 +606,7 @@ private struct DashboardMetrics {
             recoveryStreakDays = max(0, calendar.dateComponents([.day], from: startDay, to: today).day ?? 0)
         }
 
-        dailyScore = DailyRecoveryScore(entries: entries, recoveryStreakDays: recoveryStreakDays, calendar: calendar, latestHRVms: latestHRVms)
+        dailyScore = DailyRecoveryScore(entries: entries, recoveryStreakDays: recoveryStreakDays, calendar: calendar, latestHRVms: latestHRVms, latestRestingBPM: latestRestingBPM)
     }
 }
 
@@ -1378,7 +1390,18 @@ private struct DailyRecoveryScore {
     /// called it once per entry and then `substancePoints` called it twice more on
     /// the latest row, so a several-hundred-entry store did thousands of redundant
     /// sorts per dashboard render.
-    init(entries: [NightEntry], recoveryStreakDays: Int, calendar: Calendar, latestHRVms: Double = 0) {
+    /// `latestRestingBPM` is shown, not scored.
+    ///
+    /// 4.3.0 added the HealthKit read for resting heart rate and respiratory rate
+    /// and then consumed neither: `latestRestingHeartRate()` had no caller
+    /// anywhere in the app. The release notes said the app reads them as recovery
+    /// signals, and it read them into nothing.
+    ///
+    /// It joins the factor list rather than the arithmetic on purpose. Folding a
+    /// new term into the score would silently move every existing user's number
+    /// with no explanation, and what a raised resting heart rate means the morning
+    /// after is context a person can read, not a coefficient.
+    init(entries: [NightEntry], recoveryStreakDays: Int, calendar: Calendar, latestHRVms: Double = 0, latestRestingBPM: Double = 0) {
         let latest = entries.first { !$0.skippedNight }
         // Read once and pass down, rather than re-reading the getter.
         let latestSubstances = latest?.substances ?? []
@@ -1406,7 +1429,9 @@ private struct DailyRecoveryScore {
                 Factor(name: String(localized: "Substances"), caption: String(localized: "no substance use logged")),
                 Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
                 Factor(name: String(localized: "Symptoms"), caption: String(localized: "starts after activation")),
-                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
+                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available"),
+            Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available")),
+                Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available"))
             ]
             return
         }
@@ -1436,7 +1461,8 @@ private struct DailyRecoveryScore {
             Factor(name: String(localized: "Anxiety"), caption: Self.anxietyCaption(latest, symptoms: latestSymptoms ?? [])),
             Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
             Factor(name: String(localized: "Symptoms"), caption: (latestSymptoms ?? []).isEmpty ? "none" : "\((latestSymptoms ?? []).count) selected"),
-            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
+            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available"),
+            Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available"))
         ]
     }
 

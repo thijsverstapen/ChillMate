@@ -160,6 +160,10 @@ enum DefaultsKey {
     /// Set by the Focus filter when a Focus the user has configured for going out
     /// is active. Read by Home to lead with the during-session tools.
     static let focusSessionMode = "focusSessionMode"
+
+    /// Most recent resting heart rate read from HealthKit, cached so the recovery
+    /// card has a figure before the async read returns.
+    static let lastKnownRestingBPM = "lastKnownRestingBPM"
     static let lastBackgroundedAt = "lastBackgroundedAt"
     static let oneHandedControls = "oneHandedControls"
 
