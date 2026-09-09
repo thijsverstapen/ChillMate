@@ -10186,6 +10186,34 @@
         }
       }
     },
+    "Call emergency": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notruf wählen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Llamar a emergencias"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appeler les secours"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bel het alarmnummer"
+          }
+        }
+      }
+    },
     "Call emergency services %@": {
       "localizations": {
         "de": {
@@ -10245,6 +10273,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bel hulpdiensten 112"
+          }
+        }
+      }
+    },
+    "Call for help": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hilfe rufen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedir ayuda"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appeler à l'aide"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bel om hulp"
           }
         }
       }
@@ -13655,6 +13711,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sluiten"
+          }
+        }
+      }
+    },
+    "Close app": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App schließen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar la app"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermer l'app"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App sluiten"
           }
         }
       }
@@ -18755,6 +18839,34 @@
         }
       }
     },
+    "Emergency": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notfall"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emergencia"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urgence"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noodgeval"
+          }
+        }
+      }
+    },
     "Emergency Information": {
       "localizations": {
         "de": {
@@ -23727,6 +23839,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Verborgen terwijl je scherm wordt opgenomen"
+          }
+        }
+      }
+    },
+    "Hide": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausblenden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ocultar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masquer"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbergen"
           }
         }
       }
@@ -36533,6 +36673,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Jezelf doseren is een teken van zelfvertrouwen, niet van angst."
+          }
+        }
+      }
+    },
+    "Panic": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panik"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pánico"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panique"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paniek"
           }
         }
       }

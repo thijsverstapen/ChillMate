@@ -144,6 +144,15 @@ struct DashboardView: View {
             }
             .buttonStyle(ChillPlainButtonStyle())
             .accessibilityLabel("Panic close app")
+            // Voice Control matches what is written, and this control has no
+            // visible text at all — it is an icon. Without spoken alternatives the
+            // only way to trigger it by voice is the exact phrase "Panic close
+            // app", which nobody says. These are what someone would actually say.
+            .accessibilityInputLabels([
+                String(localized: "Panic"),
+                String(localized: "Hide"),
+                String(localized: "Close app")
+            ])
             .accessibilityIdentifier(AccessibilityID.panicButton)
             .sensoryFeedback(trigger: isPrivacyScreenActive) { _, active in active ? .impact(weight: .heavy) : nil }
         }

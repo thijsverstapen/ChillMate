@@ -55,6 +55,15 @@ struct EmergencyNetherlandsView: View {
                                     .frame(maxWidth: .infinity)
                             }
                             .buttonStyle(ChillPillButtonStyle(prominent: true, tint: .red))
+                            // The visible label is "Call 112", so by default that
+                            // number is the only phrase that works. Someone who
+                            // does not know their local emergency number, or
+                            // cannot recall it, needs a word instead.
+                            .accessibilityInputLabels([
+                                String(localized: "Call emergency"),
+                                String(localized: "Emergency"),
+                                String(localized: "Call for help")
+                            ])
 
                             Button {
                                 isEditingEmergencyInfo = true
