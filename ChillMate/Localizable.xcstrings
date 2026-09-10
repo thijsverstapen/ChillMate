@@ -40984,6 +40984,100 @@
         }
       }
     },
+    "Recovery streak of %lld days. Tap to open your calendar.": {
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Erholungsserie von %lld Tag. Tippe, um deinen Kalender zu öffnen."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Erholungsserie von %lld Tagen. Tippe, um deinen Kalender zu öffnen."
+                }
+              }
+            }
+          }
+        },
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Recovery streak of %lld day. Tap to open your calendar."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Recovery streak of %lld days. Tap to open your calendar."
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Racha de recuperación de %lld día. Toca para abrir tu calendario."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Racha de recuperación de %lld días. Toca para abrir tu calendario."
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Série de récupération de %lld jour. Touche pour ouvrir ton calendrier."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Série de récupération de %lld jours. Touche pour ouvrir ton calendrier."
+                }
+              }
+            }
+          }
+        },
+        "nl": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Herstelreeks van %lld dag. Tik om je agenda te openen."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Herstelreeks van %lld dagen. Tik om je agenda te openen."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Reduce ChillMate animations": {
       "localizations": {
         "de": {

@@ -2270,13 +2270,19 @@ private struct MetricsGrid: View {
                 Button(action: openRecoveryStreak) {
                     StatTile(
                         value: "\(recoveryStreakDays)",
+                        // A `== 1` ternary, deliberately. Xcode rejects a plural
+                        // variation whose value does not print the number
+                        // ("Plural variation requires referencing the number in the
+                        // string ... use separate top-level strings"), and this unit
+                        // sits beside a number the tile already draws. Separate
+                        // strings picked in code is the sanctioned form here.
                         unit: recoveryStreakDays == 1 ? String(localized: "day") : String(localized: "days"),
                         label: String(localized: "Recovery streak"),
                         showsChevron: false
                     )
                 }
                 .buttonStyle(ChillPlainButtonStyle())
-                .accessibilityLabel(Text("Recovery streak \(recoveryStreakDays) days. Tap to open your calendar."))
+                .accessibilityLabel(Text("Recovery streak of \(recoveryStreakDays) days. Tap to open your calendar."))
 
                 Button { isShowingFactors = true } label: {
                     StatTile(
@@ -2354,11 +2360,22 @@ private struct StatTile: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
+                // `value` is a number when the score is active and an emoji when it
+                // is not, and the two want different treatment. Monospaced digits
+                // and a numeric content transition are meaningless on an emoji, and
+                // at the accessibility text sizes the glyph grew past the space the
+                // row could give it, which the audit reports as clipped text.
+                //
+                // A numeric content transition animates between digits and has
+                // nothing to animate on an emoji, so it applies only to numbers.
+                // The scale factor is what stops the clipping.
                 Text(value)
                     .chillScaledFont(size: 26, weight: .bold, relativeTo: .title, design: .rounded)
                     .foregroundStyle(Color.chillText)
                     .monospacedDigit()
-                    .contentTransition(.numericText())
+                    .contentTransition(value.allSatisfy(\.isNumber) ? .numericText() : .identity)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                 if let unit {
                     Text(unit)
                         .font(.subheadline.weight(.bold))
@@ -2371,11 +2388,19 @@ private struct StatTile: View {
                         .foregroundStyle(Color.chillTertiary)
                 }
             }
+            // One line at 80% is not enough room for "Log to activate" once the
+            // text size grows, so it truncated — which the accessibility audit
+            // reports as clipped text, and which on this tile hides the only
+            // instruction telling someone how to switch the score on.
+            //
+            // Two lines and a little more shrink. The tiles sit side by side, so
+            // the taller one sets the row height and they stay aligned.
             Text(label)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
@@ -2491,16 +2516,24 @@ private struct MetricCard: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.70)
 
+                // Both of these carry sentences whose length varies with the
+                // language and with what the card is reporting, and a hard
+                // one-line limit truncates them rather than wrapping. The audit
+                // reports that as clipped text; on this card it is the line that
+                // says what the number means.
                 Text(title)
                     .font(.caption.weight(.bold))
                     .foregroundStyle(Color.chillText.opacity(0.90))
-                    .lineLimit(1)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.75)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(caption)
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.80)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.75)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
