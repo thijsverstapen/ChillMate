@@ -696,7 +696,7 @@
 			files = (
 				829A0F926B88BDF40A69C412 /* ChillMateUITests.swift in Sources */,
 				96D7A1948BD120EE618F4EEF /* SnapshotHelper.swift in Sources */,
-			);
+);
 		};
 		99275D7D2FEBB39200789D3C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;

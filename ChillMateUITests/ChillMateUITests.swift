@@ -319,6 +319,46 @@ final class ChillMateUITests: XCTestCase {
     ///
     /// It previously wrapped every step in `if ... .exists`, so it passed
     /// unconditionally even when it captured nothing at all.
+    /// Runs Apple's own accessibility audit over each tab.
+    ///
+    /// Lives here rather than in a class of its own because the audit has to get
+    /// past onboarding first, and `ensureProfileExists` is what knows how. The
+    /// first version of this was a separate file that assumed the tab bar would
+    /// simply be there; on a clean simulator it never is, so the test skipped
+    /// itself every run and reported nothing.
+    ///
+    /// Contrast and element-description checks are excluded for now: the glass
+    /// surfaces in `LiquidGlass.swift` report contrast against a translucent
+    /// backdrop the audit cannot resolve, and decorative brand marks report as
+    /// unlabelled. Both would bury the findings that matter. Narrow this as those
+    /// two are dealt with.
+    func testEachTabPassesTheAccessibilityAudit() throws {
+        try ensureProfileExists()
+        let app = launchedApp()
+
+        guard app.tabBars.buttons["tab.home"].waitForExistence(timeout: 30) else {
+            XCTFail("Never reached the tab bar, so nothing was audited.")
+            return
+        }
+
+        // Literals, not `AccessibilityID`: that type is in the app target and a UI
+        // test runs out of process, so it cannot see it. Every other query in this
+        // file spells them out for the same reason.
+        for identifier in ["tab.home", "tab.history", "tab.more"] {
+            let tab = app.tabBars.buttons[identifier]
+            guard tab.waitForExistence(timeout: 10) else { continue }
+            tab.tap()
+
+            XCTContext.runActivity(named: "Accessibility audit: \(identifier)") { _ in
+                do {
+                    try app.performAccessibilityAudit(for: [.dynamicType, .hitRegion, .trait, .textClipped])
+                } catch {
+                    XCTFail("\(identifier) failed the accessibility audit: \(error)")
+                }
+            }
+        }
+    }
+
     func testScreenshots() throws {
         try XCTSkipUnless(
             ProcessInfo.processInfo.environment["FASTLANE_SNAPSHOT"] == "YES",

@@ -160,7 +160,7 @@ jobs:
             -only-testing:ChillMateUITests/ChillMateUITests/testLaunchesInEveryLanguage \
             -only-testing:ChillMateUITests/ChillMateUITests/testEachTabOpens \
             -only-testing:ChillMateUITests/ChillMateUITests/testLogSheetOpens \
-            -only-testing:ChillMateUITests/AccessibilityAuditTests \
+            -only-testing:ChillMateUITests/ChillMateUITests/testEachTabPassesTheAccessibilityAudit \
             -retry-tests-on-failure \
             -test-iterations 2 \
             -parallel-testing-enabled NO \
