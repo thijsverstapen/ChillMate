@@ -30,6 +30,35 @@
       },
       "comment": "Insights pattern: most common substance pairing"
     },
+    "%1$@ g alcohol · %2$@ UK units": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ g Alkohol · %2$@ UK-Units"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ g de alcohol · %2$@ unidades UK"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ g d’alcool · %2$@ unités UK"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ g alcohol · %2$@ Britse units"
+          }
+        }
+      },
+      "comment": "Alcohol serving figures"
+    },
     "%1$@ is your most logged day, %2$lld of %3$lld nights.": {
       "localizations": {
         "de": {
@@ -4811,6 +4840,35 @@
         }
       }
     },
+    "A standard glass is 10 g of pure alcohol across most of Europe, and a UK unit is 8 g. The first three below are the reference servings those definitions are built on. The last two are what a bar actually pours.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Standardglas sind in weiten Teilen Europas 10 g reiner Alkohol, eine britische Unit 8 g. Die ersten drei unten sind die Referenzmengen, auf denen diese Definitionen beruhen. Die letzten beiden sind das, was eine Bar tatsächlich einschenkt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una copa estándar son 10 g de alcohol puro en la mayor parte de Europa, y una unidad británica 8 g. Las tres primeras de abajo son las raciones de referencia en las que se basan esas definiciones. Las dos últimas son lo que sirve un bar de verdad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un verre standard, c’est 10 g d’alcool pur dans la majeure partie de l’Europe, et une unité britannique 8 g. Les trois premiers ci-dessous sont les portions de référence sur lesquelles ces définitions reposent. Les deux derniers, c’est ce qu’un bar sert réellement."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een standaardglas is in het grootste deel van Europa 10 g pure alcohol, een Britse unit is 8 g. De eerste drie hieronder zijn de referentiematen waarop die definities rusten. De laatste twee zijn wat een kroeg echt inschenkt."
+          }
+        }
+      },
+      "comment": "Alcohol units explanation"
+    },
     "A steadier you is being built in moments like this.": {
       "localizations": {
         "de": {
@@ -7130,6 +7188,35 @@
         }
       }
     },
+    "Alcohol spreads through the water in your body, so the same glass reaches a higher concentration in a smaller person, and on average in women, whose bodies hold a lower proportion of water at the same weight. ChillMate does not turn that into a number for you: how drunk you are also depends on food, sleep, timing and medication, and a figure that looked precise would be acted on as though it were.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol verteilt sich über das Wasser im Körper, also erreicht dasselbe Glas bei einer kleineren Person eine höhere Konzentration, und im Schnitt auch bei Frauen, deren Körper bei gleichem Gewicht einen geringeren Wasseranteil hat. ChillMate macht daraus keine Zahl: wie betrunken du bist, hängt auch von Essen, Schlaf, Timing und Medikamenten ab, und ein präzise wirkender Wert würde auch so behandelt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El alcohol se reparte por el agua del cuerpo, así que la misma copa alcanza una concentración más alta en una persona más pequeña, y de media en las mujeres, cuyo cuerpo tiene una proporción de agua menor con el mismo peso. ChillMate no lo convierte en un número: lo borracho que estés depende también de la comida, el sueño, los tiempos y la medicación, y una cifra que pareciera precisa se usaría como tal."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’alcool se répartit dans l’eau du corps, donc le même verre atteint une concentration plus élevée chez une personne plus petite, et en moyenne chez les femmes, dont le corps contient une proportion d’eau plus faible à poids égal. ChillMate n’en fait pas un chiffre : ton état dépend aussi de ce que tu as mangé, de ton sommeil, du moment et de tes médicaments, et un nombre qui aurait l’air précis serait utilisé comme tel."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alcohol verspreidt zich door het water in je lichaam, dus hetzelfde glas komt bij een kleiner iemand hoger uit, en gemiddeld ook bij vrouwen, van wie het lichaam bij hetzelfde gewicht een lager percentage water bevat. ChillMate maakt daar geen getal van: hoe dronken je bent hangt ook af van eten, slaap, timing en medicatie, en een cijfer dat precies leek zou ook zo gebruikt worden."
+          }
+        }
+      },
+      "comment": "Alcohol body-size and sex information"
+    },
     "Alerts and devices": {
       "extractionState": "manual",
       "localizations": {
@@ -9403,6 +9490,35 @@
           }
         }
       }
+    },
+    "Beer, 250 ml at 5%": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bier, 250 ml mit 5%"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerveza, 250 ml al 5%"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bière, 250 ml à 5%"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bier, 250 ml van 5%"
+          }
+        }
+      },
+      "comment": "Reference serving"
     },
     "Before a second dose": {
       "localizations": {
@@ -30079,6 +30195,35 @@
         }
       }
     },
+    "Large glass of wine, 250 ml at 13%": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Großes Glas Wein, 250 ml mit 13%"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copa grande de vino, 250 ml al 13%"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grand verre de vin, 250 ml à 13%"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Groot glas wijn, 250 ml van 13%"
+          }
+        }
+      },
+      "comment": "Reference serving"
+    },
     "Last backup %@, on %@.": {
       "extractionState": "manual",
       "localizations": {
@@ -50692,6 +50837,35 @@
         }
       }
     },
+    "Sources: NHS on calculating units, Trimbos on the standard glass. The Gezondheidsraad's position since June 2026 is that there is no safe lower limit.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quellen: NHS zur Berechnung von Units, Trimbos zum Standardglas. Der Gezondheidsraad vertritt seit Juni 2026 die Position, dass es keine sichere Untergrenze gibt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuentes: el NHS sobre el cálculo de unidades y Trimbos sobre la copa estándar. Desde junio de 2026, la postura del Gezondheidsraad es que no existe un límite inferior seguro."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sources : le NHS sur le calcul des unités, Trimbos sur le verre standard. Depuis juin 2026, la position du Gezondheidsraad est qu’il n’existe pas de seuil bas sans risque."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bronnen: NHS over het berekenen van units, Trimbos over het standaardglas. Het standpunt van de Gezondheidsraad is sinds juni 2026 dat er geen veilige ondergrens is."
+          }
+        }
+      },
+      "comment": "Alcohol units sources"
+    },
     "Spain": {
       "localizations": {
         "de": {
@@ -50719,6 +50893,35 @@
           }
         }
       }
+    },
+    "Spirits, 35 ml at 35%": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spirituose, 35 ml mit 35%"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licor, 35 ml al 35%"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiritueux, 35 ml à 35%"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sterke drank, 35 ml van 35%"
+          }
+        }
+      },
+      "comment": "Reference serving"
     },
     "Sponsor a feature": {
       "localizations": {
@@ -51973,6 +52176,35 @@
           }
         }
       }
+    },
+    "Strong beer, 330 ml at 8%": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starkbier, 330 ml mit 8%"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerveza fuerte, 330 ml al 8%"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bière forte, 330 ml à 8%"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sterk bier, 330 ml van 8%"
+          }
+        }
+      },
+      "comment": "Reference serving"
     },
     "Strong emotional shifts": {
       "localizations": {
@@ -54010,6 +54242,35 @@
           }
         }
       }
+    },
+    "The same drink is not the same dose": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dasselbe Glas ist nicht dieselbe Dosis"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La misma copa no es la misma dosis"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le même verre n’est pas la même dose"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hetzelfde glas is niet dezelfde dosis"
+          }
+        }
+      },
+      "comment": "Alcohol body-size section title"
     },
     "The smallest act of self-care still counts as care.": {
       "localizations": {
@@ -58996,6 +59257,35 @@
         }
       }
     },
+    "What counts as one drink": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was als ein Glas zählt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qué cuenta como una copa"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce qui compte pour un verre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat telt als één glas"
+          }
+        }
+      },
+      "comment": "Alcohol units section title"
+    },
     "What did you eat? Optional": {
       "localizations": {
         "de": {
@@ -59811,6 +60101,35 @@
           }
         }
       }
+    },
+    "Wine, 100 ml at 12%": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wein, 100 ml mit 12%"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vino, 100 ml al 12%"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vin, 100 ml à 12%"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wijn, 100 ml van 12%"
+          }
+        }
+      },
+      "comment": "Reference serving"
     },
     "Woke briefly, was confused or combative, then went under again": {
       "localizations": {

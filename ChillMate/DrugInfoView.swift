@@ -49,6 +49,10 @@ struct DrugInfoView: View {
                                     DrugReferenceSection(reference: reference, tint: substance.tint)
                                 }
 
+                                if substance == .alcohol {
+                                    AlcoholUnitsSection()
+                                }
+
                                 DrugInfoMiniSection(title: String(localized: "Main risks"), rows: substance.mainRisks, tint: substance.tint)
                                 DrugInfoMiniSection(title: String(localized: "Mixing risks"), rows: substance.mixingRisks, tint: .orange)
                                 DrugInfoMiniSection(title: String(localized: "Seek help now if"), rows: substance.seekHelpSigns, tint: .red)
@@ -208,5 +212,71 @@ private struct DoseRow: View {
                 .foregroundStyle(isWarning ? Color.chillIconOrange : Color.chillText)
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+
+/// What a drink is worth in the units national guidelines are written in.
+///
+/// Alcohol is the one substance here where the dose is measured in the ordinary
+/// course of a night and nobody notices they are doing it. A dose ladder in
+/// milligrams is no use for it; a glass of wine is.
+///
+/// It counts what went in the glass and stops there. There is no blood-alcohol
+/// estimate and there should not be: that depends on body water, food, time and
+/// liver function, none of which the app can see, and a number presented as
+/// impairment gets acted on by somebody deciding whether to drive.
+private struct AlcoholUnitsSection: View {
+
+    private func figures(for serving: AlcoholUnits.Serving) -> String {
+        let grams = serving.grams.formatted(.number.precision(.fractionLength(0)))
+        let units = serving.ukUnits.formatted(.number.precision(.fractionLength(0...1)))
+        return String(localized: "\(grams) g alcohol · \(units) UK units")
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("What counts as one drink")
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.orange)
+
+            Text("A standard glass is 10 g of pure alcohol across most of Europe, and a UK unit is 8 g. The first three below are the reference servings those definitions are built on. The last two are what a bar actually pours.")
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(AlcoholUnits.referenceServings) { serving in
+                HStack(alignment: .firstTextBaseline) {
+                    Text(serving.name)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillText)
+                    Spacer(minLength: 8)
+                    Text(figures(for: serving))
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .monospacedDigit()
+                }
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityElement(children: .combine)
+            }
+
+            Text("The same drink is not the same dose")
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(.orange)
+                .padding(.top, 4)
+
+            Text("Alcohol spreads through the water in your body, so the same glass reaches a higher concentration in a smaller person, and on average in women, whose bodies hold a lower proportion of water at the same weight. ChillMate does not turn that into a number for you: how drunk you are also depends on food, sleep, timing and medication, and a figure that looked precise would be acted on as though it were.")
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text("Sources: NHS on calculating units, Trimbos on the standard glass. The Gezondheidsraad's position since June 2026 is that there is no safe lower limit.")
+                .font(.caption2)
+                .foregroundStyle(Color.chillSecondary.opacity(0.85))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .glassSurface(radius: 18, tint: .orange.opacity(0.07))
     }
 }
