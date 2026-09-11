@@ -115,6 +115,23 @@ children, and guards against a sync race. Follow its shape.
 6. **The watch and the widgets read the same container.** A schema change is not done
    until they build against it.
 
+## The backup key
+
+One 32-byte random key, minted on first use, held in the Keychain under
+`kSecAttrAccessibleWhenUnlockedThisDeviceOnly`, used with AES-GCM. No passphrase,
+no derivation from user input, no rotation. `EncryptedBackupKeychain` carries the
+full lifecycle in its doc comment.
+
+Two consequences that are easy to forget and expensive to rediscover:
+
+- **`ThisDeviceOnly` keeps the key out of iCloud Keychain**, so an encrypted
+  backup can only be opened by the device that made it. The iCloud Drive file
+  survives deleting the app or wiping and restoring *this* phone; it does not
+  carry history to a *new* phone. Making it portable means a passphrase, which
+  means a key a person can forget. That is a product decision.
+- **Deleting the app destroys the key**, and with it every backup ever written,
+  including the ones sitting in iCloud Drive.
+
 ## Releasing
 
 `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` appear ten times each in

@@ -290,6 +290,45 @@ enum EncryptedBackupError: LocalizedError {
 }
 
 @MainActor
+/// Where the backup key lives, and for how long.
+///
+/// The whole lifecycle, written down because the consequences are not obvious
+/// from the call sites and one of them is user-visible.
+///
+/// **Minting.** One 32-byte key from `SecRandomCopyBytes`, made the first time
+/// anything is encrypted and never rotated. There is no passphrase and nothing
+/// is derived from user input, so there is no password to forget and no
+/// weak-passphrase attack to worry about.
+///
+/// **Storage.** The system Keychain, under
+/// `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`. Two things follow from that
+/// attribute and both are deliberate:
+///
+/// * The key is unreadable while the device is locked, so a backup cannot be
+///   written or read from the background on a locked phone.
+/// * `ThisDeviceOnly` excludes it from iCloud Keychain, so the key never leaves
+///   this device and no copy of it exists anywhere else. That is the property
+///   that lets ChillMate describe itself as holding nothing.
+///
+/// **Use.** AES-GCM via CryptoKit, sealing the encoded archive. The same key
+/// encrypts the on-device recovery snapshot and any file written to iCloud
+/// Drive.
+///
+/// **The consequence worth knowing.** Because the key is device-only, an
+/// encrypted backup can only be opened by the device that made it. A file in
+/// iCloud Drive protects the data against deleting the app or wiping the phone
+/// and restoring it; it does not move your history to a *new* phone, because the
+/// key does not go with it. Nothing in the UI promises that it does, but nothing
+/// warns that it does not either, and someone setting up a new phone would
+/// reasonably assume otherwise. Making it portable means introducing a
+/// passphrase, which means a key derived from something a person can forget —
+/// that is a product decision, not a refactor.
+///
+/// **End of life.** The key is destroyed with the Keychain item, which happens
+/// when the app is deleted. Deleting the app therefore makes every existing
+/// encrypted backup permanently unreadable, including the ones in iCloud Drive.
+/// `deleteOnDeviceRecoverySnapshot()` removes the snapshot but deliberately
+/// leaves the key, so a snapshot taken afterwards is still readable.
 private final class EncryptedBackupKeychain {
     static let shared = EncryptedBackupKeychain()
 
