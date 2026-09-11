@@ -23,7 +23,6 @@ struct DashboardView: View {
 
     @State private var isShowingLogSheet = false
     @State private var isShowingCalendar = false
-    @State private var isPrivacyScreenActive = false
     @State private var hydrationLoggedToday = false
     @State private var quickSkipHaptic = 0
     @Binding var careNavPath: [CareToolPage]
@@ -127,34 +126,12 @@ struct DashboardView: View {
         }
     }
 
+    /// The panic control now lives in `PanicHideControl.swift` and is on all three
+    /// tabs. It was only ever here.
     @ToolbarContentBuilder
     private var panicToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            Button(role: .destructive) {
-                Task {
-                    _ = try? EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext)
-                }
-                isPrivacyScreenActive = true
-            } label: {
-                Image(systemName: "xmark.octagon.fill")
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(.red)
-                    .frame(width: 36, height: 36)
-                    .glassSurface(radius: 18, tint: .white.opacity(0.34), interactive: true)
-            }
-            .buttonStyle(ChillPlainButtonStyle())
-            .accessibilityLabel("Panic close app")
-            // Voice Control matches what is written, and this control has no
-            // visible text at all — it is an icon. Without spoken alternatives the
-            // only way to trigger it by voice is the exact phrase "Panic close
-            // app", which nobody says. These are what someone would actually say.
-            .accessibilityInputLabels([
-                String(localized: "Panic"),
-                String(localized: "Hide"),
-                String(localized: "Close app")
-            ])
-            .accessibilityIdentifier(AccessibilityID.panicButton)
-            .sensoryFeedback(trigger: isPrivacyScreenActive) { _, active in active ? .impact(weight: .heavy) : nil }
+            PanicHideButton()
         }
     }
 
@@ -359,8 +336,7 @@ struct DashboardView: View {
             }
             .modifier(DashboardCovers(
                 isShowingLogSheet: $isShowingLogSheet,
-                isShowingCalendar: $isShowingCalendar,
-                isPrivacyScreenActive: $isPrivacyScreenActive
+                isShowingCalendar: $isShowingCalendar
             ))
             .sensoryFeedback(.success, trigger: quickSkipHaptic)
         }
@@ -509,11 +485,10 @@ private struct WatchRelayObservers: ViewModifier {
     }
 }
 
-/// The dashboard's three full-screen covers.
+/// The dashboard's full-screen covers.
 private struct DashboardCovers: ViewModifier {
     @Binding var isShowingLogSheet: Bool
     @Binding var isShowingCalendar: Bool
-    @Binding var isPrivacyScreenActive: Bool
 
     func body(content: Content) -> some View {
         content
@@ -523,9 +498,7 @@ private struct DashboardCovers: ViewModifier {
             .fullScreenCover(isPresented: $isShowingCalendar) {
                 CalendarOverviewView()
             }
-            .fullScreenCover(isPresented: $isPrivacyScreenActive) {
-                PrivacyShieldView(dismiss: { isPrivacyScreenActive = false })
-            }
+
     }
 }
 

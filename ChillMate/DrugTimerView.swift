@@ -368,6 +368,13 @@ private struct TimerPeopleManager: View {
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel(Text("Remove \(person)"))
+                            // The written label carries a name, so what a Voice
+                            // Control user has to say changes with the data. A
+                            // fixed alternative is the only reliable one.
+                            .accessibilityInputLabels([
+                                String(localized: "Remove"),
+                                String(localized: "Delete")
+                            ])
                         }
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillText)

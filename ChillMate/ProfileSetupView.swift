@@ -560,6 +560,9 @@ private struct MoreHubView: View {
             .scrollDismissesKeyboard(.interactively)
         }
         .endEditingOnTap()
+        // More hides its navigation bar, so the panic control goes in the corner
+        // rather than in a toolbar that is not there.
+        .panicHideOverlay()
         .toolbar(.hidden, for: .navigationBar)
         .navigationDestination(for: MoreHubPage.self) { page in
             moreHubDestination(page)

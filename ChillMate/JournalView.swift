@@ -98,6 +98,13 @@ struct JournalView: View {
                                 .disabled(mode == .editing)
                                 .opacity(mode == .editing ? 0.4 : 1)
                                 .accessibilityLabel("Open month calendar")
+                                // Voice Control matches written text, and there is
+                                // none here. "Open month calendar" is sayable but
+                                // nobody says it; "Calendar" is what they say.
+                                .accessibilityInputLabels([
+                                    String(localized: "Calendar"),
+                                    String(localized: "Month")
+                                ])
 
                                 JournalStatusPill(mode: mode)
                             }
@@ -321,6 +328,9 @@ struct HistoryTabView: View {
                     }
                 }
             }
+            // History is a screen with more on it worth not being seen than the
+            // dashboard has, and the panic control was not here.
+            .panicHideToolbar()
         }
     }
 }

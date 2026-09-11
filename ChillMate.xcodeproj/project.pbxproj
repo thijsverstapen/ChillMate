@@ -96,6 +96,7 @@
 		AAB10000000000000000001E /* SubstanceReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001E /* SubstanceReference.swift */; };
 		AAB10000000000000000001F /* InteractionChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001F /* InteractionChart.swift */; };
 		AAB100000000000000000020 /* CombinationAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000020 /* CombinationAssessment.swift */; };
+		AAB100000000000000000021 /* PanicHideControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000021 /* PanicHideControl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -260,6 +261,7 @@
 		AAF10000000000000000001E /* SubstanceReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstanceReference.swift; sourceTree = "<group>"; };
 		AAF10000000000000000001F /* InteractionChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionChart.swift; sourceTree = "<group>"; };
 		AAF100000000000000000020 /* CombinationAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinationAssessment.swift; sourceTree = "<group>"; };
+		AAF100000000000000000021 /* PanicHideControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanicHideControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -350,6 +352,7 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF100000000000000000021 /* PanicHideControl.swift */,
 				AAF100000000000000000020 /* CombinationAssessment.swift */,
 				AAF10000000000000000001F /* InteractionChart.swift */,
 				AAF10000000000000000001E /* SubstanceReference.swift */,
@@ -718,6 +721,7 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000021 /* PanicHideControl.swift in Sources */,
 				AAB100000000000000000020 /* CombinationAssessment.swift in Sources */,
 				AAB10000000000000000001F /* InteractionChart.swift in Sources */,
 				AAB10000000000000000001E /* SubstanceReference.swift in Sources */,
