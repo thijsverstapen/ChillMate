@@ -242,6 +242,7 @@ enum LocalizedEnumStrings {
         String(localized: "Meth"),
         String(localized: "6 h"),
         String(localized: "Accessibility"),
+        String(localized: "Siri & Shortcuts"),
         String(localized: "Account data"),
         String(localized: "Adaptive"),
         String(localized: "Alcohol"),

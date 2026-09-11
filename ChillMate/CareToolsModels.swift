@@ -235,7 +235,7 @@ enum CareToolCatalog {
         case .groupBefore, .groupDuring, .groupAfter, .groupPatterns:
             // Groups describe themselves via CareToolGroup; fall back gracefully.
             return CareToolGroup.homeGroups.first { $0.page == page }?.cardDefinition
-                ?? CareToolDefinition(page: page, title: page.rawValue, subtitle: "", symbol: "square.grid.2x2.fill", tint: Color.chillPrimary)
+                ?? CareToolDefinition(page: page, title: page.localizedDisplayName, subtitle: "", symbol: "square.grid.2x2.fill", tint: Color.chillPrimary)
         }
     }
 }

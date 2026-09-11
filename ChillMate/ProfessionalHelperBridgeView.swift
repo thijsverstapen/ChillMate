@@ -14,7 +14,7 @@ struct ProfessionalHelperBridgeView: View {
     @State private var pdfURL: URL?
 
     private var summary: String {
-        HelperSummaryBuilder.summary(
+        HelperSummary.text(
             profile: profiles.first,
             entries: entries,
             timers: timers,
@@ -118,62 +118,5 @@ enum HealthSummaryPDF {
         } catch {
             return nil
         }
-    }
-}
-
-private enum HelperSummaryBuilder {
-    static func summary(
-        profile: UserProfile?,
-        entries: [NightEntry],
-        timers: [DrugDoseTimerRecord],
-        stiTests: [STDTestRecord],
-        riskChecks: [RiskCheckRecord],
-        now: Date = .now
-    ) -> String {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -90, to: now) ?? .distantPast
-        let recentEntries = entries.filter { $0.date >= cutoff }
-        let recentTimers = timers.filter { $0.startedAt >= cutoff }
-        let risky = recentEntries.filter { !$0.skippedNight && $0.hadSex && !$0.substances.isEmpty }
-        let memoryGaps = recentEntries.filter(\.reportedMemoryGap)
-        // Windowed like every other figure under the "Past 90 days" heading. These
-        // two were counted over the whole array, so they reported an all-time total
-        // under a 90 day label, and the array itself is a limited fetch, so the
-        // number silently stopped moving once the user passed that many tests.
-        // A clinician reads this sheet and has no way to see either problem.
-        let recentTests = stiTests.filter { $0.testDate >= cutoff }
-        let positiveTests = recentTests.filter(\.hasPositiveResult)
-        let substances = ChillInsightCalculator.substanceCounts(entries: recentEntries).prefix(6).map { "\($0.label) (\($0.count))" }.joined(separator: ", ")
-        let triggers = ChillInsightCalculator.triggerCounts(entries: recentEntries).prefix(6).map { "\($0.label) (\($0.count))" }.joined(separator: ", ")
-        let medication = profile?.medications.map { "\($0.name) \($0.timingSummary)" }.joined(separator: "; ") ?? "Not set"
-
-        return """
-        ChillMate private helper summary
-        Generated: \(now.formatted(date: .abbreviated, time: .shortened))
-
-        Profile
-        Name: \(profile?.name.isEmpty == false ? profile!.name : String(localized: "Not set"))
-        Age: \(profile?.calculatedAge.description ?? "Not set")
-        Sex: \(profile?.sex ?? "Not set")
-        PrEP: \(profile?.isOnPrEP == true ? "Yes, \(profile?.prepSchedule ?? "")" : "No / not set")
-        Medication: \(medication.isEmpty ? "Not set" : medication)
-
-        Past 90 days
-        Chills logged: \(recentEntries.filter { !$0.skippedNight }.count)
-        Logs with sex + substances: \(risky.count)
-        Check-in records: \(recentTimers.count)
-        Continued-after-pause records: \(recentTimers.filter { $0.redoseDecision == RedoseDecision.redosed.rawValue }.count)
-        Memory gaps reported: \(memoryGaps.count)
-        STI tests saved: \(recentTests.count)
-        Positive STI tests: \(positiveTests.count)
-
-        Patterns
-        Substances: \(substances.isEmpty ? "Not enough data" : substances)
-        Triggers: \(triggers.isEmpty ? "Not enough data" : triggers)
-
-        Talking points
-        - I want help understanding my patterns without judgment.
-        - I want to discuss sleep, substances, sex, consent, medication interactions, PrEP/PEP/STI care, or recovery goals.
-        - I understand this export is self-reported app data and not a diagnosis.
-        """
     }
 }

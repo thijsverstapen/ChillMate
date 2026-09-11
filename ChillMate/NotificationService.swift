@@ -1030,6 +1030,41 @@ final class NotificationService {
 
     private static let pepIdentifiers = ["chillmate.pep.morning", "chillmate.pep.afternoon"]
 
+    /// One reminder, at the moment somebody said they would be home.
+    ///
+    /// The Live Activity turns orange on its own at that time, which is enough if
+    /// the phone is in a hand. This is for the phone in a pocket. It is a single
+    /// notification and not an escalating chain on purpose: the app does not
+    /// message anybody by itself, here or anywhere, and a reminder that kept
+    /// arriving would train people to dismiss it.
+    func scheduleSafeRouteCheck(expectedArrival: Date) {
+        clearSafeRouteCheck()
+
+        let interval = expectedArrival.timeIntervalSinceNow
+        // A journey already over needs no reminder, and UNTimeIntervalNotification
+        // refuses an interval below one second anyway.
+        guard interval > 60 else { return }
+
+        let content = notificationContent(
+            title: String(localized: "Are you home?"),
+            body: String(localized: "You said you would be back around now. Open ChillMate to mark it, or to send your location to your trusted contact."),
+            discreetTitle: String(localized: "ChillMate"),
+            discreetBody: String(localized: "A private check-in is waiting for you."),
+            destination: .safeRoute,
+            interruptionLevel: .timeSensitive
+        )
+
+        center.add(UNNotificationRequest(
+            identifier: SafeRouteReminder.identifier,
+            content: content,
+            trigger: UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: false)
+        ))
+    }
+
+    func clearSafeRouteCheck() {
+        center.removePendingNotificationRequests(withIdentifiers: [SafeRouteReminder.identifier])
+    }
+
     func clearPEPWindowReminders() {
         center.removePendingNotificationRequests(withIdentifiers: Self.pepIdentifiers)
     }

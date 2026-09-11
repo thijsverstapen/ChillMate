@@ -158,6 +158,58 @@ struct OpenRiskCheckerIntent: AppIntent {
     }
 }
 
+// MARK: - Open Panic Support
+
+/// The one that matters most and was missing.
+///
+/// Panic support has been reachable from a Control Centre button since 4.x, and
+/// from nothing you can say out loud. A person who cannot work a screen — too
+/// high, hands shaking, phone in a pocket in a dark room — can still say a
+/// sentence, and this is the sentence. The phrases are deliberately blunt and
+/// deliberately several: nobody in that state is going to remember the exact one.
+struct OpenPanicSupportIntent: AppIntent {
+    static let title: LocalizedStringResource = "Open panic support"
+    static let description = IntentDescription("Opens breathing, grounding, and emergency contacts in ChillMate.")
+    static let openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        await MainActor.run {
+            UserDefaults.standard.set(NotificationDestination.panic.rawValue, forKey: DefaultsKey.pendingAppDestination)
+        }
+        return .result()
+    }
+}
+
+// MARK: - Open Journal
+
+struct OpenJournalIntent: AppIntent {
+    static let title: LocalizedStringResource = "Open journal"
+    static let description = IntentDescription("Opens the private journal in ChillMate.")
+    static let openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        await MainActor.run {
+            UserDefaults.standard.set(NotificationDestination.journal.rawValue, forKey: DefaultsKey.pendingAppDestination)
+        }
+        return .result()
+    }
+}
+
+// MARK: - Open Safer Session Plan
+
+struct OpenSaferPlanIntent: AppIntent {
+    static let title: LocalizedStringResource = "Open safer session plan"
+    static let description = IntentDescription("Opens the safer session plan in ChillMate.")
+    static let openAppWhenRun = true
+
+    func perform() async throws -> some IntentResult {
+        await MainActor.run {
+            UserDefaults.standard.set(NotificationDestination.saferPlan.rawValue, forKey: DefaultsKey.pendingAppDestination)
+        }
+        return .result()
+    }
+}
+
 // MARK: - Substance as an intent parameter
 
 /// Lets Siri and Shortcuts pass a substance into an intent, which is what turns
@@ -258,6 +310,10 @@ struct StartDoseTimerIntent: AppIntent {
             context.saveChanges()
             DrugTimerLiveActivityController.start(for: timer)
             context.saveChanges()
+            // A timer started here used to reach the Live Activity and nothing
+            // else, so the watch and the widgets went on saying nothing was
+            // running. Same broadcast the app's own start button makes.
+            ActiveDoseTimer.broadcast(from: context)
             return (timer.id, timer.startedAt, timer.endsAt)
         }
 
@@ -323,7 +379,35 @@ struct LogSubstanceIntent: AppIntent {
 // MARK: - Shortcuts Provider
 
 struct ChillMateShortcuts: AppShortcutsProvider {
+
+    /// The tile ChillMate gets in the Shortcuts gallery. Teal, to match the app's
+    /// own accent — the default is assigned arbitrarily and makes the app look
+    /// like it was never configured.
+    static let shortcutTileColor = ShortcutTileColor.teal
+
+    /// Apple allows ten and refuses to build the target at eleven, so this list is
+    /// a budget rather than a catalogue. Everything cut from it is still a
+    /// Shortcuts action — any `AppIntent` is — and only loses its ready-made
+    /// spoken phrase. What earns a slot is being useful *without* opening the app,
+    /// or being the thing you reach for when you cannot work a screen. Three
+    /// entries that only opened a screen another shortcut already reaches more
+    /// directly gave up theirs: the log sheet to `LogSubstanceIntent`, the timer
+    /// list to `StartDoseTimerIntent`, and the journal to nothing in particular.
     static var appShortcuts: [AppShortcut] {
+        // Panic support leads. Ordering here decides what Spotlight and the
+        // Shortcuts gallery show first, and the first row should be the one
+        // somebody needs when they cannot scroll.
+        AppShortcut(
+            intent: OpenPanicSupportIntent(),
+            phrases: [
+                "Help me with \(.applicationName)",
+                "Open panic support in \(.applicationName)",
+                "\(.applicationName) help",
+                "I need to calm down with \(.applicationName)"
+            ],
+            shortTitle: "Panic support",
+            systemImageName: "cross.case.fill"
+        )
         AppShortcut(
             intent: LogHydrationIntent(),
             phrases: [
@@ -353,25 +437,6 @@ struct ChillMateShortcuts: AppShortcutsProvider {
             ],
             shortTitle: "Safe route home",
             systemImageName: "location.fill"
-        )
-        AppShortcut(
-            intent: OpenLogSheetIntent(),
-            phrases: [
-                "Log a Chill in \(.applicationName)",
-                "Start a log in \(.applicationName)",
-                "Record a session in \(.applicationName)"
-            ],
-            shortTitle: "Log a Chill",
-            systemImageName: "plus.circle.fill"
-        )
-        AppShortcut(
-            intent: OpenTimersIntent(),
-            phrases: [
-                "Open timers in \(.applicationName)",
-                "Show my check-in timers in \(.applicationName)"
-            ],
-            shortTitle: "Check-in timers",
-            systemImageName: "timer"
         )
         AppShortcut(
             intent: OpenEmergencyIntent(),
@@ -421,6 +486,15 @@ struct ChillMateShortcuts: AppShortcutsProvider {
             ],
             shortTitle: "Risk checker",
             systemImageName: "exclamationmark.shield.fill"
+        )
+        AppShortcut(
+            intent: OpenSaferPlanIntent(),
+            phrases: [
+                "Open my safer session plan in \(.applicationName)",
+                "Plan a night with \(.applicationName)"
+            ],
+            shortTitle: "Safer session plan",
+            systemImageName: "checklist"
         )
     }
 }

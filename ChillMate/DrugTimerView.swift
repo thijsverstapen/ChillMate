@@ -266,8 +266,7 @@ struct DrugTimerView: View {
     }
 
     private func syncTimersToWatch() {
-        let all = modelContext.fetchLogging(FetchDescriptor<DrugDoseTimerRecord>())
-        WatchConnectivityService.shared.sendActiveTimers(all)
+        ActiveDoseTimer.broadcast(from: modelContext)
     }
 
     private func addTrackedPerson() {
@@ -577,9 +576,7 @@ private struct DrugTimerCard: View {
                     NotificationService.shared.clearRedoseNudge(id: timer.id)
                     modelContext.delete(timer)
                     modelContext.saveChanges()
-                    WatchConnectivityService.shared.sendActiveTimers(
-                        modelContext.fetchLogging(FetchDescriptor<DrugDoseTimerRecord>())
-                    )
+                    ActiveDoseTimer.broadcast(from: modelContext)
                 } label: {
                     Image(systemName: "trash.fill")
                 }

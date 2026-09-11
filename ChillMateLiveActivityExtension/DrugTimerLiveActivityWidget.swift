@@ -70,7 +70,9 @@ struct LogWaterControl: ControlWidget {
 struct ChillMateLiveActivityBundle: WidgetBundle {
     var body: some Widget {
         DrugTimerLiveActivityWidget()
+        SafeRouteLiveActivityWidget()
         ChillMateWidgetDescriptor()
+        DoseTimerWidget()
         PanicSupportControl()
         LogWaterControl()
     }

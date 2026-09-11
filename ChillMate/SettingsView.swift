@@ -39,6 +39,7 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
     case accessibility = "Accessibility"
     case appearance = "Appearance"
     case watch = "Apple Watch"
+    case shortcuts = "Siri & Shortcuts"
     case goals = "Reduction goals"
     case quality = "Safety review"
     case account = "Account data"
@@ -48,7 +49,7 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
     var group: SettingsGroup {
         switch self {
         case .privacy, .privacyDashboard, .permissions: .security
-        case .notifications, .watch: .alerts
+        case .notifications, .watch, .shortcuts: .alerts
         case .appearance, .accessibility: .presentation
         case .iCloud, .account: .data
         case .goals, .quality: .review
@@ -73,6 +74,8 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
             "paintpalette.fill"
         case .watch:
             "applewatch"
+        case .shortcuts:
+            "mic.fill"
         case .goals:
             "chart.line.downtrend.xyaxis"
         case .quality:
@@ -100,6 +103,8 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
             String(localized: "Adaptive background and photos")
         case .watch:
             String(localized: "Companion preferences")
+        case .shortcuts:
+            String(localized: "Voice actions and the Shortcuts gallery")
         case .goals:
             String(localized: "Max sessions per month and reduction tracking")
         case .quality:
@@ -423,7 +428,7 @@ struct SettingsView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     PageHeader(
-                        title: page.rawValue,
+                        title: page.localizedDisplayName,
                         subtitle: page.subtitle,
                         symbol: page.symbol,
                         tint: Color.chillPrimary
@@ -544,6 +549,9 @@ struct SettingsView: View {
                             visibleTimers: $watchVisibleTimers,
                             stressAndTemperatureDetection: $watchStressAndTemperatureDetection
                         )
+
+                    case .shortcuts:
+                        SiriShortcutsCard()
 
                     case .quality:
                         ClinicalReviewSettingsCard()
@@ -725,7 +733,7 @@ struct SettingsView: View {
                 try await HealthKitService.shared.requestAuthorization(scopes: [scope])
                 await MainActor.run {
                     setHealthScope(scope, enabled: true)
-                    message = "\(scope.rawValue) is enabled."
+                    message = String(localized: "\(scope.localizedDisplayName) is enabled.")
                     isWorking = false
                 }
             } catch {

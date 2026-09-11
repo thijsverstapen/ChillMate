@@ -17,10 +17,15 @@ target that should compile the file.
 Resources (.xcstrings, assets) go through the app's Resources phase instead;
 pass --resource for those.
 
+A file is filed under one group, which is what resolves its path on disk, and
+compiled into any number of targets. Those are separate choices: --group says
+where the file lives, --target says who builds it.
+
 Usage:  scripts/add_source_files.py Foo.swift Bar.swift
         scripts/add_source_files.py --target app --target liveactivity Shared.swift
+        scripts/add_source_files.py --group liveactivity --target liveactivity Widget.swift
         scripts/add_source_files.py --resource InfoPlist.xcstrings
-        (paths are relative to the ChillMate/ source directory)
+        (filenames are relative to the group's own directory, ChillMate/ by default)
 """
 import re
 import sys
@@ -33,8 +38,17 @@ PBXPROJ = Path(__file__).resolve().parent.parent / "ChillMate.xcodeproj" / "proj
 BUILD_ID_PREFIX = "AAB1"
 FILE_ID_PREFIX = "AAF1"
 
-APP_GROUP_ID = "A11B00000000000000000020"        # /* ChillMate */ PBXGroup
 APP_RESOURCES_PHASE_ID = "A11B00000000000000000025"  # app target's Resources phase
+
+# The PBXGroup a file is filed under, which is also what resolves its path: each
+# group carries `path = <directory>` and the file reference is relative to it. A
+# file added to the wrong group builds against a path that does not exist.
+GROUPS = {
+    "app": ("A11B00000000000000000020", "ChillMate"),
+    "liveactivity": ("E66F00000000000000000020", "ChillMateLiveActivityExtension"),
+    "watch": ("F88B00000000000000000020", "ChillMateWatchApp"),
+    "uitests": ("FB13991735BCF9331F9CEB34", "ChillMateUITests"),
+}
 
 # Every target's Sources phase, keyed by the name you pass to --target. Read off
 # the PBXNativeTarget buildPhases lists; ChillMateTests is absent because it is a
@@ -78,7 +92,7 @@ def existing_file_id(text, filename):
     return match.group(1) if match else None
 
 
-def ensure_file_reference(text, filename):
+def ensure_file_reference(text, filename, group="app"):
     """Register the file itself (reference + group membership) exactly once."""
     file_id = existing_file_id(text, filename)
     if file_id is not None:
@@ -107,13 +121,17 @@ def ensure_file_reference(text, filename):
         1,
     )
 
+    group_id, group_name = GROUPS.get(group, (None, None))
+    if group_id is None:
+        raise SystemExit(f"unknown group {group!r}; pick from {', '.join(GROUPS)}")
+
     group_re = re.compile(
-        r"(\t\t" + APP_GROUP_ID + r" /\* ChillMate \*/ = \{.*?children = \(\n)",
+        r"(\t\t" + group_id + r" /\* " + group_name + r" \*/ = \{.*?children = \(\n)",
         re.S,
     )
     text, n = group_re.subn(rf"\1\t\t\t\t{file_id} /* {filename} */,\n", text, count=1)
     if n != 1:
-        raise SystemExit(f"could not locate app group {APP_GROUP_ID}")
+        raise SystemExit(f"could not locate group {group_name} ({group_id})")
 
     return text, file_id
 
@@ -163,8 +181,8 @@ def ensure_membership(text, filename, file_id, phase_id, phase_name, target_labe
     return text
 
 
-def add_file(text, filename, resource=False, targets=("app",)):
-    text, file_id = ensure_file_reference(text, filename)
+def add_file(text, filename, resource=False, targets=("app",), group="app"):
+    text, file_id = ensure_file_reference(text, filename, group=group)
 
     if resource:
         return ensure_membership(
@@ -185,19 +203,27 @@ def main(argv):
     resource = "--resource" in argv
     targets = []
     names = []
-    expecting_target = False
+    group = "app"
+    expecting = None
     for arg in argv:
-        if expecting_target:
+        if expecting == "target":
             targets.append(arg)
-            expecting_target = False
+            expecting = None
+        elif expecting == "group":
+            group = arg
+            expecting = None
         elif arg == "--target":
-            expecting_target = True
+            expecting = "target"
+        elif arg == "--group":
+            expecting = "group"
         elif arg.startswith("--target="):
             targets.append(arg.split("=", 1)[1])
+        elif arg.startswith("--group="):
+            group = arg.split("=", 1)[1]
         elif not arg.startswith("--"):
             names.append(arg)
-    if expecting_target:
-        raise SystemExit("--target needs a target name")
+    if expecting is not None:
+        raise SystemExit(f"--{expecting} needs a value")
     if not names:
         raise SystemExit(__doc__)
     if not PBXPROJ.is_file():
@@ -206,7 +232,7 @@ def main(argv):
     original = PBXPROJ.read_text()
     text = original
     for name in names:
-        text = add_file(text, name, resource=resource, targets=targets or ("app",))
+        text = add_file(text, name, resource=resource, targets=targets or ("app",), group=group)
 
     # Every file was already registered, so leave the project's mtime alone
     # rather than rewriting it byte for byte and dirtying the working tree.

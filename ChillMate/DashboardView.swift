@@ -1893,7 +1893,7 @@ private struct WhatChangedPatternCard: View {
                 VStack(spacing: 8) {
                     ForEach(reasonCounts.prefix(5), id: \.reason) { item in
                         HStack {
-                            Text(item.reason.rawValue)
+                            Text(item.reason.localizedDisplayName)
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(Color.chillText)
                             Spacer()

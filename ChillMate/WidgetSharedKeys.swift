@@ -90,6 +90,17 @@ enum WidgetSharedKey {
     static let watchQuickSkipDay = "watchQuickSkipDay"
     static let watchEmergencyNumber = "watchEmergencyNumber"
 
+    // MARK: Written by the phone app, read by the Lock Screen dose widget
+    //
+    // Separate from the `watchTimer*` keys above, which the *watch* writes for its
+    // own complication. Sharing them would mean a phone with no paired watch
+    // showing nothing, and a paired watch overwriting the phone's own state.
+
+    static let doseTimerSubstance = "doseTimerSubstance"
+    static let doseTimerStart = "doseTimerStart"
+    static let doseTimerEnd = "doseTimerEnd"
+    static let doseTimerComedownEnd = "doseTimerComedownEnd"
+
     // MARK: Written by the Control Center controls, read by the phone app
 
     /// Where the app should navigate on next foreground. A control runs in the
@@ -104,6 +115,89 @@ enum WidgetSharedKey {
     /// The shared suite, or nil when the App Group is unavailable.
     static var suite: UserDefaults? {
         UserDefaults(suiteName: suiteName)
+    }
+}
+
+
+/// The one dose the Lock Screen is showing, as it crosses from the app into the
+/// widget extension.
+///
+/// Four bare keys with a shape agreed at both ends is exactly the drift this file
+/// exists to prevent, so the shape lives here too and neither end spells a key.
+///
+/// `comedownEndsAt` is the reason this is not just the check-in timer. The timer
+/// is a wellbeing reminder the user picked the length of; the comedown window is
+/// what the sources publish, and it routinely outlives the timer by a day. A
+/// Lock Screen that goes blank when the reminder ends would be answering the
+/// easier question.
+struct DoseTimerSnapshot: Equatable, Sendable {
+    let substanceName: String
+    let startedAt: Date
+    let endsAt: Date
+
+    /// When every published figure for this dose has elapsed, where the sources
+    /// publish one. Nil is normal: it means nobody publishes an after-effects
+    /// window for this substance, not that there is nothing after the timer.
+    let comedownEndsAt: Date?
+
+    /// The last moment this dose is worth a place on the Lock Screen.
+    var lastMoment: Date {
+        max(endsAt, comedownEndsAt ?? endsAt)
+    }
+
+    func isWorthShowing(at now: Date) -> Bool {
+        now < lastMoment
+    }
+
+    /// Whether the check-in window has run out while the published window has not.
+    func isInComedown(at now: Date) -> Bool {
+        now >= endsAt && now < lastMoment
+    }
+
+    /// Reads the snapshot, or nil when there is none or it has expired.
+    ///
+    /// Expiry is checked on read rather than cleaned up on a schedule, because
+    /// nothing wakes the app to do the cleaning. A stale write left behind by a
+    /// force-quit must not become a Lock Screen that insists a dose from Tuesday
+    /// is still running.
+    static func read(from defaults: UserDefaults? = WidgetSharedKey.suite, now: Date = .now) -> DoseTimerSnapshot? {
+        guard let defaults else { return nil }
+        let name = defaults.string(forKey: WidgetSharedKey.doseTimerSubstance) ?? ""
+        let start = defaults.double(forKey: WidgetSharedKey.doseTimerStart)
+        let end = defaults.double(forKey: WidgetSharedKey.doseTimerEnd)
+        guard !name.isEmpty, start > 0, end > 0 else { return nil }
+
+        let comedown = defaults.double(forKey: WidgetSharedKey.doseTimerComedownEnd)
+        let snapshot = DoseTimerSnapshot(
+            substanceName: name,
+            startedAt: Date(timeIntervalSince1970: start),
+            endsAt: Date(timeIntervalSince1970: end),
+            comedownEndsAt: comedown > 0 ? Date(timeIntervalSince1970: comedown) : nil
+        )
+        return snapshot.isWorthShowing(at: now) ? snapshot : nil
+    }
+
+    /// Writes the snapshot, or clears it when there is nothing to show.
+    static func write(_ snapshot: DoseTimerSnapshot?, to defaults: UserDefaults? = WidgetSharedKey.suite) {
+        guard let defaults else { return }
+        guard let snapshot else {
+            for key in [
+                WidgetSharedKey.doseTimerSubstance,
+                WidgetSharedKey.doseTimerStart,
+                WidgetSharedKey.doseTimerEnd,
+                WidgetSharedKey.doseTimerComedownEnd
+            ] {
+                defaults.removeObject(forKey: key)
+            }
+            return
+        }
+        defaults.set(snapshot.substanceName, forKey: WidgetSharedKey.doseTimerSubstance)
+        defaults.set(snapshot.startedAt.timeIntervalSince1970, forKey: WidgetSharedKey.doseTimerStart)
+        defaults.set(snapshot.endsAt.timeIntervalSince1970, forKey: WidgetSharedKey.doseTimerEnd)
+        defaults.set(
+            snapshot.comedownEndsAt?.timeIntervalSince1970 ?? 0,
+            forKey: WidgetSharedKey.doseTimerComedownEnd
+        )
     }
 }
 

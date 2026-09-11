@@ -1030,7 +1030,7 @@ private struct TriggerMapCard: View {
             FlowLayout(spacing: 8) {
                 ForEach(ChillTrigger.allCases) { trigger in
                     SelectableTextChip(
-                        title: trigger.rawValue,
+                        title: trigger.localizedDisplayName,
                         isSelected: selectedTriggers.contains(trigger),
                         tint: Color.chillMint
                     ) {
@@ -1066,7 +1066,7 @@ private struct WhatChangedInputCard: View {
                 FlowLayout(spacing: 8) {
                     ForEach(ChangeReason.allCases) { reason in
                         SelectableTextChip(
-                            title: reason.rawValue,
+                            title: reason.localizedDisplayName,
                             isSelected: selectedReasons.contains(reason),
                             tint: Color.chillSecondaryBlue
                         ) {
