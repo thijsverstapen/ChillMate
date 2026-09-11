@@ -3762,15 +3762,9 @@ private struct ProfileEditView: View {
 
                         ProfileSetupPickerRow(title: String(localized: "Country"), systemImage: "mappin.and.ellipse") {
                             Picker("Country", selection: $country) {
-                                Text("Netherlands").tag("Netherlands")
-                                Text("Belgium").tag("Belgium")
-                                Text("Germany").tag("Germany")
-                                Text("United Kingdom").tag("United Kingdom")
-                                Text("Ireland").tag("Ireland")
-                                Text("France").tag("France")
-                                Text("Spain").tag("Spain")
-                                Text("United States").tag("United States")
-                                Text("Australia").tag("Australia")
+                                ForEach(EmergencyContactInfo.selectableCountries, id: \.self) { name in
+                                    Text(LocalizedStringKey(name)).tag(name)
+                                }
                                 Text("Other").tag("Other")
                             }
                         }

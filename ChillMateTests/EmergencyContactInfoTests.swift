@@ -89,3 +89,58 @@ struct EmergencyContactInfoTests {
         return defaults
     }
 }
+
+/// The countries added in 5.0.0, and the property that has to hold for all of
+/// them.
+///
+/// An emergency number is the one piece of content in this app where being wrong
+/// is immediately dangerous, so every entry was checked against a published list
+/// rather than written from memory, and the countries whose routing depends on
+/// the service or the network were deliberately left out. They fall through to
+/// 112 and to the manual override.
+@Suite("Emergency numbers for every offered country")
+struct EmergencyCountryCoverageTests {
+
+    @Test("Every country in the picker resolves to a dialable number", .tags(.safety),
+          arguments: EmergencyContactInfo.selectableCountries)
+    func everyOfferedCountryResolves(country: String) {
+        let number = EmergencyContactInfo.number(forCountry: country)
+        #expect(number.isEmpty == false, "\(country) has no number")
+        let digitsOnly = number.allSatisfy(\.isNumber)
+        #expect(digitsOnly, "\(country) resolves to \"\(number)\", which is not dialable")
+
+        let dialable = EmergencyContactInfo.dialDigits(number)
+        #expect(dialable == number, "\(country) loses characters when dialled: \"\(dialable)\"")
+    }
+
+    @Test("The numbers added in 5.0.0 are the ones that were checked", .tags(.safety), arguments: [
+        ("Austria", "112"), ("Switzerland", "112"), ("Luxembourg", "112"),
+        ("Portugal", "112"), ("Italy", "112"), ("Sweden", "112"),
+        ("Denmark", "112"), ("Norway", "112"), ("Poland", "112"),
+        ("Canada", "911"), ("Mexico", "911"), ("Argentina", "911"),
+    ])
+    func newCountriesMatchTheSource(country: String, expected: String) {
+        #expect(EmergencyContactInfo.number(forCountry: country) == expected)
+    }
+
+    /// The three that do not have one unambiguous number are not offered, and must
+    /// not quietly acquire a guessed one.
+    @Test("Countries with contested routing are not offered", .tags(.safety),
+          arguments: ["Colombia", "Chile", "South Africa"])
+    func contestedCountriesAreNotOffered(country: String) {
+        #expect(EmergencyContactInfo.selectableCountries.contains(country) == false,
+                "\(country) was added without resolving how it actually routes")
+    }
+
+    @Test("An unknown country still gives something that connects", .tags(.safety))
+    func unknownCountryFallsBackTo112() {
+        #expect(EmergencyContactInfo.number(forCountry: "Other") == "112")
+        #expect(EmergencyContactInfo.number(forCountry: "Narnia") == "112")
+    }
+
+    @Test("No country is listed twice")
+    func noDuplicates() {
+        let countries = EmergencyContactInfo.selectableCountries
+        #expect(Set(countries).count == countries.count)
+    }
+}

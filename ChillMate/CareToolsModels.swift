@@ -28,12 +28,39 @@ enum EmergencyContactInfo {
     static func number(forCountry country: String) -> String {
         switch country {
         case "United Kingdom": return "999"
-        case "United States": return "911"
         case "Australia": return "000"
-        case "Netherlands", "Belgium", "Germany", "Ireland", "France", "Spain": return "112"
+
+        // Verified against Wikipedia's list of emergency telephone numbers,
+        // 11 September 2026. Only countries with one unambiguous number are
+        // listed. Colombia, Chile and South Africa each route differently
+        // depending on the service and the network, and guessing on their behalf
+        // would be worse than the manual override they fall back to.
+        case "United States", "Canada", "Mexico", "Argentina": return "911"
+
+        case "Netherlands", "Belgium", "Germany", "Ireland", "France", "Spain",
+             "Austria", "Switzerland", "Luxembourg", "Portugal", "Italy",
+             "Sweden", "Denmark", "Norway", "Poland": return "112"
+
         default: return "112"
         }
     }
+
+    /// The countries the picker offers, in the order it offers them.
+    ///
+    /// Ordered by where ChillMate is actually used rather than alphabetically: the
+    /// five languages it ships in first, then the rest of the countries whose
+    /// number is unambiguous. "Other" is added by the picker and falls through to
+    /// 112, which connects on GSM networks in most of the world.
+    ///
+    /// Anyone whose country is not here, or whose country routes differently by
+    /// service, sets a number by hand in Settings — which is also the right answer
+    /// for someone travelling.
+    static let selectableCountries = [
+        "Netherlands", "Belgium", "Germany", "France", "Spain",
+        "United Kingdom", "Ireland", "Austria", "Switzerland", "Luxembourg",
+        "Portugal", "Italy", "Sweden", "Denmark", "Norway", "Poland",
+        "United States", "Canada", "Mexico", "Argentina", "Australia",
+    ]
 
     /// The user's manual override, trimmed; empty when they have not set one.
     static func override(in defaults: UserDefaults = .standard) -> String {
