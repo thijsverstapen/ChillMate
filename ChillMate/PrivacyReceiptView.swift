@@ -117,8 +117,7 @@ private struct PrivacyReceiptRow: View {
                 Text(detail)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.82)
+                    .chillLineLimit(2, scale: 0.82)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

@@ -119,8 +119,7 @@ private struct WeeklyReflectionMetric: View {
                 Text(title)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.7)
+                    .chillLineLimit(2, scale: 0.7)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)

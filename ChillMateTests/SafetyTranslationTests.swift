@@ -192,7 +192,7 @@ struct PluralFormTests {
     func oneIsSingular(language: AppLanguage) throws {
         let bundle = try #require(SafetyLine.bundle(for: language))
         let format = bundle.localizedString(forKey: "%lld days", value: nil, table: nil)
-        let rendered = String(format: format, locale: Locale(identifier: language.rawValue), 1)
+        let rendered = unsafe String(format: format, locale: Locale(identifier: language.rawValue), 1)
         #expect(rendered == Self.singular(for: language),
                 "\(language.rawValue) renders one day as \"\(rendered)\"")
     }
@@ -201,7 +201,7 @@ struct PluralFormTests {
     func manyIsPlural(language: AppLanguage) throws {
         let bundle = try #require(SafetyLine.bundle(for: language))
         let format = bundle.localizedString(forKey: "%lld days", value: nil, table: nil)
-        let rendered = String(format: format, locale: Locale(identifier: language.rawValue), 5)
+        let rendered = unsafe String(format: format, locale: Locale(identifier: language.rawValue), 5)
         #expect(rendered == Self.plural(for: language),
                 "\(language.rawValue) renders five days as \"\(rendered)\"")
     }
@@ -212,7 +212,7 @@ struct PluralFormTests {
     func frenchZeroIsSingular() throws {
         let bundle = try #require(SafetyLine.bundle(for: .french))
         let format = bundle.localizedString(forKey: "%lld days", value: nil, table: nil)
-        let rendered = String(format: format, locale: Locale(identifier: "fr"), 0)
+        let rendered = unsafe String(format: format, locale: Locale(identifier: "fr"), 0)
         #expect(rendered == "0 jour", "French renders zero days as \"\(rendered)\"")
     }
 }

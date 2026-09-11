@@ -233,8 +233,7 @@ private struct AftercareEntryCard: View {
                     } label: {
                         Text(symptom.localizedDisplayName)
                             .font(.caption.weight(.bold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.75)
+                            .chillLineLimit(1, scale: 0.75)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
                     }

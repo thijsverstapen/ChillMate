@@ -1477,6 +1477,83 @@
         }
       }
     },
+    "%lld warnings": {
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Warnung"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Warnungen"
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld advertencia"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld advertencias"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld avertissement"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld avertissements"
+                }
+              }
+            }
+          }
+        },
+        "nl": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld waarschuwing"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld waarschuwingen"
+                }
+              }
+            }
+          }
+        }
+      },
+      "comment": "History risk check card: warning count"
+    },
     "%lld weeks": {
       "comment": "Consecutive weeks containing substance use. Plural rules differ by language.",
       "localizations": {
@@ -2306,6 +2383,35 @@
         }
       }
     },
+    "3-MMC masks the sedation, so you feel more in control than you are, and the benzo is still working long after the stimulant has gone. That gap is where people redose on both without meaning to.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3-MMC überdeckt die Sedierung, also fühlst du dich kontrollierter, als du bist, und das Benzo wirkt noch lange, nachdem das Stimulans weg ist. In dieser Lücke dosieren Leute beides nach, ohne es zu wollen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El 3-MMC enmascara la sedación, así que te sientes más en control de lo que estás, y la benzo sigue actuando mucho después de que el estimulante se haya ido. En ese hueco es donde la gente repite dosis de ambos sin querer."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le 3-MMC masque la sédation, donc tu te sens plus maître de toi que tu ne l’es, et la benzo agit encore longtemps après la disparition du stimulant. C’est dans cet écart que les gens reprennent des deux sans le vouloir."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3-MMC maskeert de sufheid, dus je voelt je meer in controle dan je bent, en de benzo werkt nog lang door nadat het stimulerende middel weg is. In dat gat herdoseren mensen op allebei zonder het te willen."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + 3-MMC"
+    },
     "30 days": {
       "localizations": {
         "de": {
@@ -2746,6 +2852,35 @@
           }
         }
       }
+    },
+    "A benzodiazepine will flatten a difficult trip, which is why people carry one. It is still sedation on board, so it counts towards the total if anything else depressant follows, and it will blur what you remember of the night.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Benzodiazepin flacht einen schwierigen Trip ab, deshalb haben Leute eines dabei. Es ist trotzdem Sedierung im Körper, zählt also mit, wenn noch etwas Dämpfendes folgt, und es verwischt, woran du dich von der Nacht erinnerst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una benzodiacepina aplana un viaje difícil, y por eso la gente lleva una encima. Sigue siendo sedación en el cuerpo, así que cuenta en el total si después viene algo más depresor, y difuminará lo que recuerdes de la noche."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une benzodiazépine aplatit un trip difficile, c’est pour ça que les gens en ont sur eux. Cela reste de la sédation dans le corps : elle compte dans le total si autre chose de dépresseur suit, et elle brouillera ce que tu retiendras de la nuit."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een benzodiazepine vlakt een moeilijke trip af, en daarom hebben mensen er een op zak. Het blijft verdoving in je lijf, dus het telt mee als er nog iets verdovends volgt, en het vervaagt wat je je van de nacht herinnert."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + psychedelics"
     },
     "A boundary held gently is still a boundary held.": {
       "localizations": {
@@ -6566,6 +6701,35 @@
         }
       }
     },
+    "Alcohol and ketamine together bring a very high risk of vomiting and of going under. Being sick while too out of it to sit up is the danger, not the disorientation. Keep someone sober nearby and put anyone who cannot be woken on their side.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alkohol und Ketamin zusammen bringen ein sehr hohes Risiko für Erbrechen und Bewusstlosigkeit. Die Gefahr ist, sich zu übergeben, während man zu weggetreten ist, um sich aufzusetzen — nicht die Desorientierung. Halte jemanden Nüchternen in der Nähe und bring jeden, der nicht aufwacht, in die stabile Seitenlage."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El alcohol y la ketamina juntos conllevan un riesgo muy alto de vómitos y de perder la consciencia. El peligro es vomitar estando demasiado ido para incorporarse, no la desorientación. Ten cerca a alguien sobrio y pon de lado a quien no puedas despertar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’alcool et la kétamine ensemble présentent un risque très élevé de vomissements et de perte de connaissance. Le danger, c’est de vomir en étant trop parti pour s’asseoir, pas la désorientation. Garde quelqu’un de sobre à proximité et mets sur le côté toute personne que tu ne peux pas réveiller."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alcohol en ketamine samen geven een heel hoog risico op braken en op onderuitgaan. Misselijk worden terwijl je te ver heen bent om rechtop te zitten is het gevaar, niet de desoriëntatie. Houd iemand nuchter in de buurt en leg wie niet wakker te krijgen is op de zij."
+          }
+        }
+      },
+      "comment": "Interaction warning: alcohol + ketamine (raised to critical in 5.0.0)"
+    },
     "Alcohol and ketamine together combine depressant effects and can cause deeper disorientation and breathing problems.": {
       "localizations": {
         "de": {
@@ -8926,6 +9090,151 @@
         }
       }
     },
+    "Benzodiazepines": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepine"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiacepinas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazépines"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepinen"
+          }
+        }
+      },
+      "comment": "Substance display name"
+    },
+    "Benzodiazepines and GHB strengthen each other strongly and unpredictably, and unconsciousness can arrive with almost no warning. Someone who cannot be woken needs the recovery position and emergency services, not sleep.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepine und GHB verstärken sich gegenseitig stark und unvorhersehbar, und die Bewusstlosigkeit kann fast ohne Vorwarnung kommen. Wer nicht aufwacht, braucht die stabile Seitenlage und den Notruf, keinen Schlaf."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las benzodiacepinas y el GHB se potencian con fuerza y de forma impredecible, y la inconsciencia puede llegar casi sin aviso. Quien no se despierta necesita la posición lateral de seguridad y emergencias, no dormir."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les benzodiazépines et le GHB se renforcent fortement et de façon imprévisible, et la perte de connaissance peut survenir presque sans prévenir. Quelqu’un qu’on ne peut pas réveiller a besoin de la position latérale de sécurité et des secours, pas de sommeil."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepinen en GHB versterken elkaar sterk en onvoorspelbaar, en bewusteloosheid kan vrijwel zonder waarschuwing komen. Wie niet wakker te krijgen is, heeft de stabiele zijligging en 112 nodig, geen slaap."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + GHB"
+    },
+    "Benzodiazepines and alcohol strengthen each other strongly and unpredictably, and can take someone under very fast. Blacking out is near certain and choking on vomit is the real danger. If someone cannot be woken, put them on their side and call emergency services.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepine und Alkohol verstärken sich gegenseitig stark und unvorhersehbar und können jemanden sehr schnell ausknocken. Ein Blackout ist fast sicher, und das Ersticken an Erbrochenem ist die eigentliche Gefahr. Wenn jemand nicht aufwacht, bring ihn in die stabile Seitenlage und ruf den Notruf."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las benzodiacepinas y el alcohol se potencian con fuerza y de forma impredecible, y pueden dejar a alguien inconsciente muy rápido. La laguna mental es casi segura y atragantarse con el vómito es el peligro real. Si no puedes despertar a alguien, ponlo de lado y llama a emergencias."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les benzodiazépines et l’alcool se renforcent fortement et de façon imprévisible, et peuvent faire perdre connaissance très vite. Le trou de mémoire est quasi certain et l’étouffement par vomissement est le vrai danger. Si tu ne peux pas réveiller quelqu’un, mets-le sur le côté et appelle les secours."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepinen en alcohol versterken elkaar sterk en onvoorspelbaar, en kunnen iemand heel snel onder krijgen. Een black-out is bijna zeker en stikken in braaksel is het echte gevaar. Als iemand niet wakker te krijgen is, leg die persoon op de zij en bel 112."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + alcohol"
+    },
+    "Benzodiazepines can lower blood pressure and poppers drop it sharply on top of that. The result is a head rush that turns into fainting, and a benzo makes you slower to notice it coming. Sit down before you use poppers.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepine können den Blutdruck senken, und Poppers lassen ihn obendrein scharf abfallen. Das Ergebnis ist ein Kick, der in Ohnmacht übergeht, und ein Benzo macht dich langsamer darin, das kommen zu spüren. Setz dich hin, bevor du Poppers nimmst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las benzodiacepinas pueden bajar la tensión y los poppers la hacen caer bruscamente encima. El resultado es un subidón que acaba en desmayo, y una benzo te vuelve más lento para notarlo llegar. Siéntate antes de usar poppers."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les benzodiazépines peuvent faire baisser la tension et les poppers la font chuter brutalement par-dessus. Le résultat, c’est un coup de chaud qui tourne au malaise, et une benzo te rend plus lent à le sentir venir. Assieds-toi avant de prendre des poppers."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepinen kunnen je bloeddruk verlagen en poppers laten hem daar bovenop scherp zakken. Het resultaat is een head rush die overgaat in flauwvallen, en een benzo maakt je trager om dat aan te voelen komen. Ga zitten voordat je poppers gebruikt."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + poppers"
+    },
+    "Benzodiazepines covers drugs whose doses differ by a factor of twenty or more, and whose effects last anywhere from a few hours to well into the next day. Look up the specific one you have, and treat any pill of unknown origin as unknown strength.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepine umfasst Mittel, deren Dosen sich um den Faktor zwanzig oder mehr unterscheiden und deren Wirkung von wenigen Stunden bis weit in den nächsten Tag reicht. Schlag nach, welches du genau hast, und behandle jede Pille unbekannter Herkunft als unbekannte Stärke."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Benzodiacepinas» abarca fármacos cuyas dosis difieren en un factor de veinte o más y cuyos efectos duran desde unas horas hasta bien entrado el día siguiente. Busca cuál tienes exactamente y trata cualquier pastilla de origen desconocido como de potencia desconocida."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Benzodiazépines » couvre des médicaments dont les doses varient d’un facteur vingt ou plus, et dont les effets durent de quelques heures à une bonne partie du lendemain. Cherche celui que tu as précisément, et traite toute pilule d’origine inconnue comme une puissance inconnue."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benzodiazepinen omvat middelen waarvan de doses een factor twintig of meer verschillen, en waarvan de werking varieert van een paar uur tot ver in de volgende dag. Zoek op welke je precies hebt, en behandel elke pil van onbekende herkomst als onbekende sterkte."
+          }
+        }
+      },
+      "comment": "Benzodiazepines: why no dose ladder is given"
+    },
     "Bereavement": {
       "localizations": {
         "de": {
@@ -9324,6 +9633,64 @@
         }
       }
     },
+    "Both can lower blood pressure, and Kamagra is often sold at an unverified strength. Stand up slowly, and remember the benzo will blunt your sense of how faint you actually feel.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide können den Blutdruck senken, und Kamagra wird oft in ungeprüfter Stärke verkauft. Steh langsam auf und denk daran, dass das Benzo dein Gespür dafür dämpft, wie schwach dir tatsächlich ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambos pueden bajar la tensión, y la Kamagra suele venderse con una concentración sin verificar. Levántate despacio y recuerda que la benzo amortiguará tu percepción de lo débil que estás en realidad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les deux peuvent faire baisser la tension, et le Kamagra est souvent vendu à un dosage non vérifié. Lève-toi lentement, et souviens-toi que la benzo atténuera ta perception de ton propre malaise."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allebei kunnen ze de bloeddruk verlagen, en Kamagra wordt vaak verkocht in een niet-gecontroleerde sterkte. Sta langzaam op, en onthoud dat de benzo je gevoel afvlakt voor hoe slap je eigenlijk bent."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + Kamagra"
+    },
+    "Both can lower blood pressure, so expect dizziness and stand up slowly. The benzo also makes it harder to tell lightheadedness from the sedation itself.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide können den Blutdruck senken, rechne also mit Schwindel und steh langsam auf. Das Benzo macht es außerdem schwerer, Benommenheit von der Sedierung selbst zu unterscheiden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambos pueden bajar la tensión, así que espera mareos y levántate despacio. La benzo además hace más difícil distinguir el aturdimiento de la propia sedación."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les deux peuvent faire baisser la tension : attends-toi à des vertiges et lève-toi lentement. La benzo rend aussi plus difficile de distinguer l’étourdissement de la sédation elle-même."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allebei kunnen ze de bloeddruk verlagen, dus reken op duizeligheid en sta langzaam op. De benzo maakt het ook lastiger om licht in je hoofd te onderscheiden van de sufheid zelf."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + Viagra"
+    },
     "Both cloud coordination and awareness. Together you are much more likely to fall, lose track of where you are, or vomit while too out of it to sit up. Stay seated and stay with someone.": {
       "extractionState": "manual",
       "localizations": {
@@ -9533,6 +9900,93 @@
           }
         }
       }
+    },
+    "Both make you unsteady and sedated, and together that can tip into losing consciousness at higher doses than you expect. Stay seated, stay with someone, and remember that vomiting while out of it is the danger.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide machen dich wackelig und benommen, und zusammen kann das bei Dosen umkippen, mit denen du nicht rechnest. Bleib sitzen, bleib bei jemandem, und denk daran: Erbrechen im Weggetretensein ist die Gefahr."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambas te dejan inestable y sedado, y juntas pueden llevar a perder la consciencia con dosis menores de las que esperas. Quédate sentado, quédate con alguien y recuerda que vomitar estando ido es el peligro."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les deux te rendent instable et sédaté, et ensemble cela peut basculer vers la perte de connaissance à des doses plus faibles que prévu. Reste assis, reste avec quelqu’un, et souviens-toi que vomir quand tu es parti est le danger."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allebei maken je onvast en suf, en samen kan dat omslaan in bewusteloosheid bij lagere doses dan je verwacht. Blijf zitten, blijf bij iemand, en onthoud dat braken terwijl je weg bent het gevaar is."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + ketamine"
+    },
+    "Both push serotonin hard, and together they carry a real risk of serotonin syndrome: a climbing temperature, a racing heart, stiff or twitching muscles, confusion. A stimulant also deepens the damage MDMA does. Overheating and a rigid, agitated state need emergency help, not water and a sit-down.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide treiben Serotonin stark hoch, und zusammen bergen sie ein echtes Risiko für ein Serotoninsyndrom: steigende Temperatur, rasendes Herz, steife oder zuckende Muskeln, Verwirrtheit. Ein Stimulans verstärkt außerdem den Schaden, den MDMA anrichtet. Überhitzung und ein steifer, aufgeregter Zustand brauchen Notfallhilfe, nicht Wasser und eine Pause."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambas empujan la serotonina con fuerza y juntas suponen un riesgo real de síndrome serotoninérgico: temperatura que sube, corazón acelerado, músculos rígidos o con sacudidas, confusión. Un estimulante además agrava el daño que hace la MDMA. El sobrecalentamiento y un estado rígido y agitado necesitan ayuda de emergencia, no agua y sentarse un rato."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les deux poussent fort sur la sérotonine, et ensemble ils présentent un vrai risque de syndrome sérotoninergique : température qui grimpe, cœur qui s’emballe, muscles raides ou qui tressautent, confusion. Un stimulant aggrave aussi les dégâts causés par la MDMA. Une surchauffe et un état rigide et agité demandent des secours, pas de l’eau et une pause assise."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allebei duwen ze serotonine hard omhoog, en samen geven ze een reëel risico op het serotoninesyndroom: een oplopende temperatuur, een razend hart, stijve of trekkende spieren, verwardheid. Een stimulerend middel verergert ook de schade die MDMA aanricht. Oververhitting en een stijve, opgewonden toestand hebben spoedhulp nodig, geen water en even zitten."
+          }
+        }
+      },
+      "comment": "Interaction warning: MDMA + 3-MMC (raised to critical in 5.0.0)"
+    },
+    "Both sedate, and together that is heavier than either alone: more drowsiness, worse coordination, bigger gaps in memory. Not usually dangerous on its own, but it stacks badly with anything else that slows breathing.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide sedieren, und zusammen ist das schwerer als jedes für sich: mehr Schläfrigkeit, schlechtere Koordination, größere Erinnerungslücken. Für sich genommen meist nicht gefährlich, aber es stapelt sich übel mit allem anderen, das die Atmung verlangsamt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambos sedan, y juntos pesan más que cada uno por separado: más somnolencia, peor coordinación, lagunas de memoria mayores. No suele ser peligroso por sí solo, pero se acumula mal con cualquier cosa que frene la respiración."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les deux sédatent, et ensemble c’est plus lourd que chacun seul : plus de somnolence, moins de coordination, des trous de mémoire plus grands. Rarement dangereux en soi, mais cela se cumule mal avec tout ce qui ralentit la respiration."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allebei werken ze verdovend, en samen is dat zwaarder dan elk apart: meer sufheid, slechtere coördinatie, grotere gaten in je geheugen. Op zichzelf meestal niet gevaarlijk, maar het stapelt slecht met alles wat de ademhaling vertraagt."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + cannabis"
     },
     "Both top and bottom recorded": {
       "localizations": {
@@ -9855,6 +10309,35 @@
           }
         }
       }
+    },
+    "Breathing is slow or shallow, or has stopped": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Atmung ist langsam oder flach oder hat ausgesetzt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La respiración es lenta o superficial, o se ha detenido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La respiration est lente, superficielle ou s’est arrêtée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De ademhaling is traag of oppervlakkig, of gestopt"
+          }
+        }
+      },
+      "comment": "Benzodiazepine emergency sign"
     },
     "Breathing is slow, shallow, or has stopped": {
       "localizations": {
@@ -10751,6 +11234,35 @@
           }
         }
       }
+    },
+    "Cannot be woken, or only briefly and not properly": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ist nicht aufzuwecken, oder nur kurz und nicht richtig"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede despertar, o solo un momento y no del todo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible à réveiller, ou seulement brièvement et pas vraiment"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Is niet wakker te krijgen, of maar heel even en niet echt"
+          }
+        }
+      },
+      "comment": "Benzodiazepine emergency sign"
     },
     "Cannot move and is being sick": {
       "localizations": {
@@ -13967,6 +14479,35 @@
           }
         }
       }
+    },
+    "Comes up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setzt ein"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sube"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monte"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komt op"
+          }
+        }
+      },
+      "comment": "Risk checker timing: onset"
     },
     "Comfort is not the same as safety. You get to choose safety.": {
       "localizations": {
@@ -18549,6 +19090,35 @@
         }
       }
     },
+    "Each hides the other. Cocaine masks how sedated the benzo is making you, so it is easy to take more of both, and when the cocaine fades the full benzo dose is still there. Neither cancels the other out — they just make each other harder to judge.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide verdecken einander. Kokain überdeckt, wie sediert dich das Benzo macht, also nimmt man leicht von beidem mehr, und wenn das Kokain nachlässt, ist die volle Benzo-Dosis noch da. Sie heben sich nicht auf — sie machen sich nur gegenseitig schwerer einschätzbar."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada uno esconde al otro. La cocaína enmascara lo sedado que te tiene la benzo, así que es fácil tomar más de ambos, y cuando la cocaína baja la dosis entera de benzo sigue ahí. Ninguno anula al otro: solo hacen que el otro sea más difícil de juzgar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chacun masque l’autre. La cocaïne cache à quel point la benzo te sédate, donc on prend facilement plus des deux, et quand la cocaïne retombe la dose entière de benzo est toujours là. Aucun n’annule l’autre — ils se rendent juste plus difficiles à juger."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ze verbergen elkaar. Cocaïne maskeert hoe suf de benzo je maakt, dus neem je makkelijk meer van allebei, en als de cocaïne wegebt is de volle benzodosis er nog. Ze heffen elkaar niet op — ze maken elkaar alleen moeilijker in te schatten."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + cocaine"
+    },
     "Earlier log reminder": {
       "comment": "A label that describes a reminder.",
       "isCommentAutoGenerated": true,
@@ -20857,6 +21427,35 @@
         }
       }
     },
+    "Figures are commonly reported ranges, not a promise. Anything taken on a full stomach, snorted rather than swallowed, or of unknown strength will not follow them.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Zahlen sind häufig berichtete Bandbreiten, kein Versprechen. Was auf vollen Magen genommen, gesnieft statt geschluckt oder von unbekannter Stärke ist, hält sich nicht daran."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las cifras son rangos que se reportan con frecuencia, no una promesa. Lo que se toma con el estómago lleno, esnifado en vez de tragado, o de potencia desconocida no las cumplirá."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ces chiffres sont des fourchettes couramment rapportées, pas une promesse. Ce qui est pris l’estomac plein, sniffé plutôt qu’avalé, ou d’une puissance inconnue ne les suivra pas."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De cijfers zijn veelgenoemde bandbreedtes, geen belofte. Wat je op een volle maag neemt, snuift in plaats van slikt, of van onbekende sterkte is, volgt ze niet."
+          }
+        }
+      },
+      "comment": "Risk checker timing card caveat"
+    },
     "File": {
       "comment": "A button that imports a backup.",
       "isCommentAutoGenerated": true,
@@ -21491,6 +22090,64 @@
         }
       }
     },
+    "GBL becomes GHB in the body, and with a benzodiazepine the two strengthen each other unpredictably. People go under fast and are easily mistaken for asleep. Put anyone unresponsive on their side and call emergency services.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GBL wird im Körper zu GHB, und zusammen mit einem Benzodiazepin verstärken sich beide unvorhersehbar. Leute gehen schnell weg und wirken dann schlafend. Bring jemanden, der nicht reagiert, in die stabile Seitenlage und ruf den Notruf."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El GBL se convierte en GHB en el cuerpo y, con una benzodiacepina, ambos se potencian de forma impredecible. La gente cae rápido y es fácil confundirlo con estar dormido. Pon de lado a quien no responda y llama a emergencias."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le GBL devient du GHB dans le corps, et avec une benzodiazépine les deux se renforcent de façon imprévisible. On perd connaissance vite, et cela passe facilement pour du sommeil. Mets toute personne qui ne réagit pas sur le côté et appelle les secours."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GBL wordt in het lichaam GHB, en samen met een benzodiazepine versterken ze elkaar onvoorspelbaar. Mensen gaan snel onderuit en lijken dan al gauw te slapen. Leg iemand die niet reageert op de zij en bel 112."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + GBL"
+    },
+    "GBL becomes GHB in the body, and with ketamine both your balance and your ability to notice trouble go. Vomiting while unable to sit up is how this combination kills. Stay with someone sober and put anyone unresponsive on their side.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GBL wird im Körper zu GHB, und mit Ketamin gehen dir sowohl das Gleichgewicht als auch die Fähigkeit verloren, Probleme zu bemerken. Erbrechen, während man sich nicht aufsetzen kann, ist der Weg, auf dem diese Kombination tötet. Bleib bei jemandem Nüchternem und bring jeden, der nicht reagiert, in die stabile Seitenlage."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El GBL se convierte en GHB en el cuerpo y, con ketamina, pierdes tanto el equilibrio como la capacidad de notar que algo va mal. Vomitar sin poder incorporarse es como mata esta combinación. Quédate con alguien sobrio y pon de lado a quien no responda."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le GBL devient du GHB dans le corps, et avec la kétamine tu perds à la fois l’équilibre et la capacité de repérer un problème. Vomir sans pouvoir s’asseoir, c’est ainsi que cette combinaison tue. Reste avec quelqu’un de sobre et mets toute personne qui ne réagit pas sur le côté."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GBL wordt in het lichaam GHB, en met ketamine verlies je zowel je balans als je vermogen om problemen op te merken. Braken terwijl je niet rechtop kunt zitten is hoe deze combinatie dodelijk wordt. Blijf bij iemand die nuchter is en leg wie niet reageert op de zij."
+          }
+        }
+      },
+      "comment": "Interaction warning: GBL + ketamine (raised to critical in 5.0.0)"
+    },
     "GBL becomes GHB in the body. Cannabis adds sedation and suppresses the nausea that would normally warn you a dose is too high, so an overshoot can arrive without warning.": {
       "extractionState": "manual",
       "localizations": {
@@ -21728,6 +22385,35 @@
           }
         }
       }
+    },
+    "GHB and ketamine both take your balance and both bring on vomiting, and together they can put you under. Someone who is sick while too out of it to sit up can choke. If you use both, stay with someone who is not using, and put anyone unresponsive on their side.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GHB und Ketamin nehmen dir beide das Gleichgewicht und lösen beide Erbrechen aus, und zusammen können sie dich wegdrücken. Wer sich übergibt und zu weggetreten ist, um sich aufzusetzen, kann ersticken. Wenn du beides nimmst, bleib bei jemandem, der nichts nimmt, und bring jeden, der nicht reagiert, in die stabile Seitenlage."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El GHB y la ketamina te quitan el equilibrio y ambos provocan vómitos, y juntos pueden dejarte inconsciente. Quien vomita estando demasiado ido para incorporarse puede atragantarse. Si tomas ambos, quédate con alguien que no consuma y pon de lado a quien no responda."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le GHB et la kétamine te font tous les deux perdre l’équilibre et provoquent tous les deux des vomissements, et ensemble ils peuvent te faire perdre connaissance. Quelqu’un qui vomit alors qu’il est trop parti pour s’asseoir peut s’étouffer. Si tu prends les deux, reste avec quelqu’un qui ne consomme pas, et mets toute personne qui ne réagit pas sur le côté."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GHB en ketamine nemen allebei je balans af en wekken allebei braken op, en samen kunnen ze je onder krijgen. Wie misselijk wordt terwijl die te ver heen is om rechtop te zitten, kan stikken. Gebruik je allebei, blijf dan bij iemand die niet gebruikt en leg wie niet reageert op de zij."
+          }
+        }
+      },
+      "comment": "Interaction warning: GHB + ketamine (raised to critical in 5.0.0)"
     },
     "GHB and ketamine combine depressant and dissociative effects. This increases the risk of losing the ability to respond to problems around you.": {
       "localizations": {
@@ -27953,6 +28639,35 @@
         }
       }
     },
+    "Lasts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dauert"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dura"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dure"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duurt"
+          }
+        }
+      },
+      "comment": "Risk checker timing: total duration"
+    },
     "Late timer starts": {
       "localizations": {
         "de": {
@@ -28556,6 +29271,35 @@
           }
         }
       }
+    },
+    "Lips or fingertips look blue or grey": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lippen oder Fingerspitzen sehen blau oder grau aus"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los labios o las yemas de los dedos se ven azules o grises"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les lèvres ou le bout des doigts sont bleus ou gris"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lippen of vingertoppen zien blauw of grijs"
+          }
+        }
+      },
+      "comment": "Benzodiazepine emergency sign"
     },
     "Liquid purple": {
       "localizations": {
@@ -30130,6 +30874,64 @@
         }
       }
     },
+    "Matches TripSit’s chart for a closely related substance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stimmt mit TripSits Tabelle für einen nah verwandten Stoff überein"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coincide con la tabla de TripSit para una sustancia muy relacionada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Correspond au tableau de TripSit pour une substance proche"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komt overeen met TripSits kaart voor een nauw verwante stof"
+          }
+        }
+      },
+      "comment": "Per-row source attribution where the pair was read against a near neighbour"
+    },
+    "Matches TripSit’s combination chart": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stimmt mit TripSits Kombinationstabelle überein"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coincide con la tabla de combinaciones de TripSit"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Correspond au tableau des combinaisons de TripSit"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komt overeen met de combinatiekaart van TripSit"
+          }
+        }
+      },
+      "comment": "Per-row source attribution in the risk checker"
+    },
     "Max sessions per month and reduction tracking": {
       "localizations": {
         "de": {
@@ -31338,6 +32140,35 @@
         }
       }
     },
+    "Most overdoses are a second dose taken before the first arrived. Give it the onset time before you decide anything.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die meisten Überdosierungen sind eine zweite Dosis, genommen bevor die erste da war. Gib ihr die Anflutzeit, bevor du irgendetwas entscheidest."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La mayoría de las sobredosis son una segunda dosis tomada antes de que llegara la primera. Deja pasar el tiempo de subida antes de decidir nada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La plupart des surdoses sont une deuxième dose prise avant que la première ne soit arrivée. Laisse passer le temps de montée avant de décider quoi que ce soit."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De meeste overdoses zijn een tweede dosis die genomen is voordat de eerste er was. Geef het de opkomsttijd voordat je iets beslist."
+          }
+        }
+      },
+      "comment": "Risk checker timing card lead line"
+    },
     "Multiple stimulants can stack heart strain, anxiety, and overheating.": {
       "localizations": {
         "de": {
@@ -32351,6 +33182,35 @@
           }
         }
       }
+    },
+    "No chart can tell you a combination is safe. A missing entry means nobody has rated it, not that nothing happens.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Tabelle kann dir sagen, dass eine Kombination sicher ist. Ein fehlender Eintrag heißt, dass niemand sie bewertet hat — nicht, dass nichts passiert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguna tabla puede decirte que una combinación es segura. Una entrada que falta significa que nadie la ha valorado, no que no pase nada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun tableau ne peut te dire qu’une combinaison est sûre. Une entrée absente signifie que personne ne l’a évaluée, pas qu’il ne se passe rien."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen enkele kaart kan zeggen dat een combinatie veilig is. Een ontbrekende regel betekent dat niemand hem heeft beoordeeld, niet dat er niets gebeurt."
+          }
+        }
+      },
+      "comment": "Risk checker source footer caveat"
     },
     "No condom, not penetrated": {
       "extractionState": "manual",
@@ -33630,6 +34490,35 @@
         }
       }
     },
+    "No warnings were returned. That is not the same as safe.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es kamen keine Warnungen zurück. Das ist nicht dasselbe wie sicher."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se devolvió ninguna advertencia. Eso no es lo mismo que seguro."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun avertissement n’est ressorti. Ce n’est pas la même chose que sûr."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Er kwamen geen waarschuwingen terug. Dat is niet hetzelfde als veilig."
+          }
+        }
+      },
+      "comment": "History risk check card when the check produced nothing"
+    },
     "Non-binary": {
       "localizations": {
         "de": {
@@ -33926,6 +34815,35 @@
           }
         }
       }
+    },
+    "Not on TripSit’s chart": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht in TripSits Tabelle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No está en la tabla de TripSit"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Absent du tableau de TripSit"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Staat niet op TripSits kaart"
+          }
+        }
+      },
+      "comment": "Per-row source attribution where the chart has no entry"
     },
     "Not set": {
       "localizations": {
@@ -35269,6 +36187,35 @@
           }
         }
       }
+    },
+    "Open TripSit’s chart": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TripSits Tabelle öffnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir la tabla de TripSit"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir le tableau de TripSit"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open TripSits kaart"
+          }
+        }
+      },
+      "comment": "Link to the source chart"
     },
     "Open calendar for recovery streak": {
       "comment": "A button that opens a calendar app.",
@@ -37168,6 +38115,35 @@
           }
         }
       }
+    },
+    "Peaks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Höhepunkt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pico"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pic"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Piek"
+          }
+        }
+      },
+      "comment": "Risk checker timing: peak"
     },
     "Pending": {
       "localizations": {
@@ -40147,6 +41123,64 @@
         }
       }
     },
+    "Rated higher here than on TripSit’s chart": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier höher eingestuft als in TripSits Tabelle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calificado más alto aquí que en la tabla de TripSit"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évalué plus haut ici que sur le tableau de TripSit"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hier hoger ingeschat dan op TripSits kaart"
+          }
+        }
+      },
+      "comment": "Per-row source attribution where ChillMate is deliberately more cautious"
+    },
+    "Ratings are checked against TripSit’s drug combination chart. Where ChillMate rates something higher, the row says so.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Einstufungen werden mit TripSits Drogen-Kombinationstabelle abgeglichen. Wo ChillMate höher einstuft, steht das in der Zeile."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las valoraciones se contrastan con la tabla de combinaciones de drogas de TripSit. Cuando ChillMate valora algo más alto, la fila lo indica."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les évaluations sont comparées au tableau des combinaisons de drogues de TripSit. Quand ChillMate évalue plus haut, la ligne le précise."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De inschattingen worden vergeleken met de drugscombinatiekaart van TripSit. Waar ChillMate iets hoger inschat, staat dat bij de regel."
+          }
+        }
+      },
+      "comment": "Risk checker source footer"
+    },
     "Re-lock when returning from the background.": {
       "comment": "A description of the auto-lock feature.",
       "isCommentAutoGenerated": true,
@@ -42501,6 +43535,35 @@
         }
       }
     },
+    "Risk checks": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risiko-Checks"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comprobaciones de riesgo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérifications de risque"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risicochecks"
+          }
+        }
+      },
+      "comment": "History day detail section title"
+    },
     "Risk trend": {
       "localizations": {
         "de": {
@@ -44252,6 +45315,35 @@
           }
         }
       }
+    },
+    "Sedatives that differ enormously between compounds: some are gone in a few hours, others are still working the next day. The danger is rarely the benzo on its own — it is stacking it with alcohol, GHB/GBL or another depressant.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beruhigungsmittel, die sich enorm unterscheiden: manche sind nach ein paar Stunden weg, andere wirken am nächsten Tag noch. Die Gefahr ist selten das Benzo allein — sie liegt im Stapeln mit Alkohol, GHB/GBL oder einem anderen Dämpfer."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sedantes que varían enormemente entre compuestos: algunos desaparecen en unas horas y otros siguen actuando al día siguiente. El peligro rara vez es la benzo sola: es acumularla con alcohol, GHB/GBL u otro depresor."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des sédatifs qui varient énormément d’un composé à l’autre : certains disparaissent en quelques heures, d’autres agissent encore le lendemain. Le danger vient rarement de la benzo seule — il vient du cumul avec l’alcool, le GHB/GBL ou un autre dépresseur."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalmerende middelen die enorm van elkaar verschillen: sommige zijn na een paar uur weg, andere werken de volgende dag nog door. Het gevaar is zelden de benzo alleen — het is het stapelen met alcohol, GHB/GBL of een ander verdovend middel."
+          }
+        }
+      },
+      "comment": "Benzodiazepines information summary"
     },
     "See Chills, sleep, substances, and aftercare in one private overview. After your first log, the app's mood gently follows your wellbeing score.": {
       "extractionState": "stale",
@@ -50060,6 +51152,35 @@
         }
       }
     },
+    "The benzo blunts the MDMA and MDMA hides the sedation, which mostly means you can misjudge both. Taking a benzo to sleep afterwards is common; taking one during is how people lose the thread of what they have had.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Benzo dämpft das MDMA und MDMA verdeckt die Sedierung, was vor allem heißt, dass du beides falsch einschätzt. Ein Benzo zum Einschlafen danach ist verbreitet; eines währenddessen ist der Weg, auf dem Leute den Überblick verlieren, was sie intus haben."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La benzo apaga la MDMA y la MDMA esconde la sedación, lo que sobre todo significa que juzgas mal ambas. Tomar una benzo para dormir después es habitual; tomarla durante es como la gente pierde la cuenta de lo que lleva encima."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La benzo émousse la MDMA et la MDMA cache la sédation, ce qui veut surtout dire que tu juges mal les deux. Prendre une benzo pour dormir après est courant ; en prendre une pendant, c’est comme ça qu’on perd le fil de ce qu’on a pris."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De benzo vlakt de MDMA af en MDMA verbergt de sufheid, wat vooral betekent dat je allebei verkeerd inschat. Een benzo nemen om daarna te slapen is gebruikelijk; er een nemen tijdens is hoe mensen het overzicht verliezen over wat ze op hebben."
+          }
+        }
+      },
+      "comment": "Interaction warning: benzodiazepines + MDMA"
+    },
     "The brave thing tonight might be the boring thing.": {
       "localizations": {
         "de": {
@@ -54527,6 +55648,35 @@
           }
         }
       }
+    },
+    "Was taken with alcohol, GHB/GBL or another sedative": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wurde mit Alkohol, GHB/GBL oder einem anderen Beruhigungsmittel genommen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se ha tomado con alcohol, GHB/GBL u otro sedante"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A été pris avec de l’alcool, du GHB/GBL ou un autre sédatif"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Is genomen met alcohol, GHB/GBL of een ander kalmerend middel"
+          }
+        }
+      },
+      "comment": "Benzodiazepine emergency sign"
     },
     "Was there a moment where you needed support sooner?": {
       "localizations": {
@@ -61971,6 +63121,35 @@
         }
       }
     },
+    "journal entry": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tagebucheintrag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "entrada del diario"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "note de journal"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dagboeknotitie"
+          }
+        }
+      },
+      "comment": "Calendar day cell VoiceOver label fragment"
+    },
     "ketamine or other dissociatives, stress, sleep loss, or feeling unsafe": {
       "localizations": {
         "de": {
@@ -62175,6 +63354,35 @@
         }
       }
     },
+    "nothing logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nichts erfasst"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nada registrado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "rien d’enregistré"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "niets gelogd"
+          }
+        }
+      },
+      "comment": "Calendar day cell VoiceOver label fragment for an empty day"
+    },
     "recovering": {
       "localizations": {
         "de": {
@@ -62322,6 +63530,35 @@
           }
         }
       }
+    },
+    "skipped night": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ausgelassene Nacht"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "noche omitida"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nuit sautée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "overgeslagen nacht"
+          }
+        }
+      },
+      "comment": "Calendar day cell VoiceOver label fragment"
     },
     "sleep deprivation, dehydration, low food intake, or a long stimulant window": {
       "localizations": {
@@ -62562,6 +63799,35 @@
           }
         }
       }
+    },
+    "substances logged": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Substanzen erfasst"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sustancias registradas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "substances enregistrées"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "middelen gelogd"
+          }
+        }
+      },
+      "comment": "Calendar day cell VoiceOver label fragment"
     },
     "tags across logs": {
       "localizations": {

@@ -360,6 +360,14 @@ final class ChillMateUITests: XCTestCase {
         // Literals, not `AccessibilityID`: that type is in the app target and a UI
         // test runs out of process, so it cannot see it. Every other query in this
         // file spells them out for the same reason.
+        // Collected rather than thrown, one entry per finding, because the
+        // throwing form stops at the first one. Finding them one per run meant a
+        // full rebuild between each, and the Home tab alone had seven — which is
+        // most of why this pass was slow enough to be worth reporting on. The
+        // handler returns true to say the issue is accounted for here, so the
+        // audit carries on through the rest of the screen and the rest of the tabs.
+        var findings: [String] = []
+
         for identifier in ["tab.home", "tab.history", "tab.more"] {
             let tab = app.tabBars.buttons[identifier]
             guard tab.waitForExistence(timeout: 10) else { continue }
@@ -367,12 +375,21 @@ final class ChillMateUITests: XCTestCase {
 
             XCTContext.runActivity(named: "Accessibility audit: \(identifier)") { _ in
                 do {
-                    try app.performAccessibilityAudit(for: [.dynamicType, .hitRegion, .trait])
+                    try app.performAccessibilityAudit(for: [.dynamicType, .hitRegion, .trait]) { issue in
+                        let element = issue.element?.description ?? "unidentified element"
+                        findings.append("\(identifier): \(issue.compactDescription) — \(element)")
+                        return true
+                    }
                 } catch {
-                    XCTFail("\(identifier) failed the accessibility audit: \(error)")
+                    findings.append("\(identifier): the audit itself failed — \(error)")
                 }
             }
         }
+
+        XCTAssertTrue(
+            findings.isEmpty,
+            "\(findings.count) accessibility finding(s):\n" + findings.joined(separator: "\n")
+        )
     }
 
     func testScreenshots() throws {

@@ -587,8 +587,7 @@ private struct MoreHubView: View {
                     Text(page.subtitle)
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.74)
+                        .chillLineLimit(1, scale: 0.74)
                 }
 
                 Spacer(minLength: 0)
@@ -2085,8 +2084,7 @@ private struct SetupWizardFooter: View {
                     Button(action: onBack) {
                         Label("Back", systemImage: "chevron.left")
                             .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .chillLineLimit(1, scale: 0.8)
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(ChillPillButtonStyle(prominent: false))
@@ -2098,8 +2096,7 @@ private struct SetupWizardFooter: View {
                         systemImage: isLast ? "person.crop.circle.badge.checkmark" : "arrow.right.circle.fill"
                     )
                     .font(.headline)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .chillLineLimit(1, scale: 0.8)
                     .frame(maxWidth: .infinity)
                 }
                 .disabled(!canAdvance)
@@ -2431,8 +2428,7 @@ struct ProfileSetupBackupImportCard: View {
                         }
                         Label("iCloud", systemImage: "icloud.and.arrow.down.fill")
                             .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .chillLineLimit(1, scale: 0.8)
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -2446,8 +2442,7 @@ struct ProfileSetupBackupImportCard: View {
                         }
                         Label("File", systemImage: "square.and.arrow.down.fill")
                             .font(.headline)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .chillLineLimit(1, scale: 0.8)
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -3607,8 +3602,7 @@ private struct IntroHeroScene: View {
                         Text(moment.title)
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(.white)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
+                            .chillLineLimit(1, scale: 0.7)
 
                         Spacer(minLength: 6)
 
@@ -3661,8 +3655,7 @@ private struct IntroHeroScene: View {
                  ? String(localized: "The moment you’re in rises to the top")
                  : String(localized: "Tap the one you’re in right now"))
                 .chillScaledFont(size: 11, weight: .semibold, relativeTo: .caption2)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
+                .chillLineLimit(1, scale: 0.75)
         }
         .foregroundStyle(.white.opacity(0.66))
     }
@@ -3836,8 +3829,7 @@ private struct BetaNoticeLine: View {
             Text(text)
                 .font(.caption.weight(.heavy))
                 .foregroundStyle(.white.opacity(0.86))
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
+                .chillLineLimit(2, scale: 0.7)
                 .fixedSize(horizontal: false, vertical: true)
         }
         // A fixed 202pt width with a one-line limit clipped this at the larger

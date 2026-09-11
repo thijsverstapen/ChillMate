@@ -987,8 +987,7 @@ private struct SubstanceChip: View {
                     .font(.caption.weight(.bold))
                 Text(substance.localizedDisplayName)
                     .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
+                    .chillLineLimit(1, scale: 0.78)
             }
             .foregroundStyle(Color.chillText)
             .frame(maxWidth: .infinity, minHeight: 42)

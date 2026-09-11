@@ -1647,8 +1647,7 @@ private struct ICloudBackupCard: View {
                         }
                     }
                     .font(.headline)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+                    .chillLineLimit(1, scale: 0.75)
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(ChillPillButtonStyle(prominent: true))
@@ -1657,8 +1656,7 @@ private struct ICloudBackupCard: View {
                 Button(action: restore) {
                     Label("Restore", systemImage: "icloud.and.arrow.down.fill")
                         .font(.headline)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+                        .chillLineLimit(1, scale: 0.75)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(ChillPillButtonStyle(prominent: false))
