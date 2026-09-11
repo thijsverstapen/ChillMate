@@ -5,8 +5,15 @@
   <link href="https://thijsverstapen.github.io/ChillMate/changelog/feed.xml" rel="self" />
   <link href="https://thijsverstapen.github.io/ChillMate/changelog/" />
   <id>https://thijsverstapen.github.io/ChillMate/changelog/</id>
-  <updated>2026-08-11T12:00:00Z</updated>
+  <updated>2026-09-11T12:00:00Z</updated>
   <author><name>Thijs Verstappen</name></author>
+  <entry>
+    <title>ChillMate 5.0.0: Two substances it could not name, and ratings you can check</title>
+    <link href="https://thijsverstapen.github.io/ChillMate/changelog/#v5-0-0" />
+    <id>tag:thijsverstapen.github.io,2026-09-11:chillmate-5.0.0</id>
+    <updated>2026-09-11T12:00:00Z</updated>
+    <summary>Benzodiazepines and methamphetamine can now be logged and checked. Until now there was no way to tell ChillMate about either, so GHB with a benzo returned no warning at all. Twenty-five new rated combinations between them. Every combination is now compared with TripSit&#x27;s published drug combination chart, and each warning says how it compares. That comparison found four ChillMate was rating too low: GHB, GBL and alcohol each with ketamine, and MDMA with 3-MMC, are all at the highest severity now. The risk checker shows when each thing you selected comes up, peaks and finishes, leading with onset, because most overdoses are a second dose taken before the first arrived. Timings are now per route. A cannabis edible takes twenty to sixty minutes, not the under-ten of smoking, and the app had been showing the wrong figures. Forty-nine lines of drug information had been appearing in English whichever language you chose. Every main risk and mixing risk, for every substance, is translated now. Twenty-seven labels used to cut themselves in half at the larger accessibility text sizes, and the half that went was the half that said what the number meant. Calendar days read out properly to VoiceOver, and the week now starts on the day your region starts it. Fixed: the weekly digest told everyone they were on a zero-day streak, the widget said &quot;1 days&quot;, the watch&#x27;s stress setting was connected to nothing, and resting heart rate was read from Apple Health and then ignored.</summary>
+  </entry>
   <entry>
     <title>ChillMate 4.2.1: Fixes, and one that mattered</title>
     <link href="https://thijsverstapen.github.io/ChillMate/changelog/#v4-2-1" />

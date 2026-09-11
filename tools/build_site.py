@@ -1630,6 +1630,16 @@ def build_privacy_nl():
 
 
 RELEASES = [
+    ("5.0.0", "500", "2026-09-11", "September 2026", "Two substances it could not name, and ratings you can check", [
+        "Benzodiazepines and methamphetamine can now be logged and checked. Until now there was no way to tell ChillMate about either, so GHB with a benzo returned no warning at all. Twenty-five new rated combinations between them.",
+        "Every combination is now compared with TripSit's published drug combination chart, and each warning says how it compares. That comparison found four ChillMate was rating too low: GHB, GBL and alcohol each with ketamine, and MDMA with 3-MMC, are all at the highest severity now.",
+        "The risk checker shows when each thing you selected comes up, peaks and finishes, leading with onset, because most overdoses are a second dose taken before the first arrived.",
+        "Timings are now per route. A cannabis edible takes twenty to sixty minutes, not the under-ten of smoking, and the app had been showing the wrong figures.",
+        "Forty-nine lines of drug information had been appearing in English whichever language you chose. Every main risk and mixing risk, for every substance, is translated now.",
+        "Twenty-seven labels used to cut themselves in half at the larger accessibility text sizes, and the half that went was the half that said what the number meant.",
+        "Calendar days read out properly to VoiceOver, and the week now starts on the day your region starts it.",
+        "Fixed: the weekly digest told everyone they were on a zero-day streak, the widget said \"1 days\", the watch's stress setting was connected to nothing, and resting heart rate was read from Apple Health and then ignored.",
+    ]),
     ("4.2.1", "422", "2026-08-11", "August 2026", "Fixes, and one that mattered", [
         "Fixed a crash on opening the app after upgrading from 4.2.0, caused by two schema versions sharing a checksum.",
         "Choosing a language inside the app no longer drops your region, so dates, numbers and 24-hour time stay right.",
