@@ -79,6 +79,13 @@ private struct PrivateInsightsSections: View {
     var body: some View {
         Group {
             InsightMetricGrid(entries: recentEntries, timers: timers, journals: journals, windowDays: windowDays)
+            // Placed directly under the counts because it is the answer to the
+            // question the counts raise and do not answer: sixteen what, when,
+            // and is that more than last month?
+            //
+            // Given the unwindowed list on purpose — the comparison needs the
+            // window before this one.
+            NightPatternsCard(patterns: NightPatterns(entries: entries, windowDays: windowDays))
             InsightMilestoneCard(
                 currentStreak: ChillInsightCalculator.recoveryStreakDays(entries: entries),
                 longestStreak: ChillInsightCalculator.longestClearStreak(entries: entries)
@@ -575,5 +582,96 @@ private struct InsightSleepCorrelationCard: View {
                 .font(.subheadline.weight(.bold).monospacedDigit())
                 .foregroundStyle(Color.chillSecondary)
         }
+    }
+}
+
+
+/// What the logs say about shape rather than volume.
+///
+/// Descriptive only: a busiest weekday, a direction against the previous window,
+/// and the pairing that comes up most. Nothing here infers anything about the
+/// person, and nothing is presented as good or bad — the same framing
+/// `PersonalBaselineCard` sets a few cards further down.
+///
+/// Shows nothing at all below `NightPatterns.minimumNights`. A single Saturday is
+/// not a pattern, and dressing one up as a finding is exactly what would make
+/// this screen untrustworthy.
+private struct NightPatternsCard: View {
+    let patterns: NightPatterns
+
+    private var weekdayName: String? {
+        guard let busiest = patterns.busiest else { return nil }
+        let symbols = Calendar.current.standaloneWeekdaySymbols
+        let index = busiest.weekday - 1
+        return symbols.indices.contains(index) ? symbols[index] : nil
+    }
+
+    var body: some View {
+        if patterns.hasAnythingToSay {
+            VStack(alignment: .leading, spacing: 12) {
+                CareSectionTitle(title: String(localized: "Patterns"), symbol: "chart.dots.scatter")
+
+                if let busiest = patterns.busiest, let weekdayName {
+                    NightPatternLine(
+                        symbol: "calendar",
+                        text: String(localized: "\(weekdayName) is your most logged day, \(busiest.count) of \(patterns.loggedNights) nights."),
+                        tint: Color.chillSecondaryBlue
+                    )
+                }
+
+                if let change = patterns.change, !change.isFlat {
+                    NightPatternLine(
+                        symbol: change.difference > 0 ? "arrow.up.right" : "arrow.down.right",
+                        text: change.difference > 0
+                            ? String(localized: "\(change.current) logged nights, up from \(change.previous) in the period before.")
+                            : String(localized: "\(change.current) logged nights, down from \(change.previous) in the period before."),
+                        tint: change.difference > 0 ? .orange : Color.chillMint
+                    )
+                }
+
+                if let pairing = patterns.pairing {
+                    NightPatternLine(
+                        symbol: "link",
+                        text: String(localized: "\(pairing.first) and \(pairing.second) appear together most often, on \(pairing.nights) nights."),
+                        tint: Color.chillPrimary
+                    )
+                }
+
+                Text("These describe what you logged. They are not a judgement, and they are not advice.")
+                    .font(.caption2)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.07))
+        }
+    }
+}
+
+
+/// One observation in the patterns card: a symbol, a sentence, and room for the
+/// sentence to wrap, which the title/value shape of `InsightLine` does not have.
+private struct NightPatternLine: View {
+    let symbol: String
+    let text: String
+    let tint: Color
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: symbol)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(tint)
+                .frame(width: 22)
+                .accessibilityHidden(true)
+
+            Text(text)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(Color.chillText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
     }
 }
