@@ -51,9 +51,34 @@ EMAIL = "chillmate@icloud.com"
 # with a price in dollars and a button that will not install anything for them.
 APP_ID = "6774212606"
 APP_STORE_URL = f"https://apps.apple.com/app/id{APP_ID}"
-VERSION = "4.2.1"
-BUILD = "422"
-UPDATED = "2026-08-11"
+
+
+def _shipping_version():
+    """The version and build, read out of the project rather than typed here.
+
+    They were typed here, and they went stale: the whole public site advertised
+    4.2.1 while 5.0.0 was in the project, including the privacy page's claim
+    about which build it had been checked against. A number a person has to
+    remember to change in two places is a number that will be wrong in one.
+
+    `MARKETING_VERSION` appears ten times in project.pbxproj and
+    `CURRENT_PROJECT_VERSION` ten more. They are supposed to agree, so reading
+    them all and refusing to continue when they disagree turns building the site
+    into a check on the release as well.
+    """
+    project = (ROOT / "ChillMate.xcodeproj" / "project.pbxproj").read_text()
+    versions = set(re.findall(r"MARKETING_VERSION = ([0-9A-Za-z.]+);", project))
+    builds = set(re.findall(r"CURRENT_PROJECT_VERSION = ([0-9]+);", project))
+    if len(versions) != 1:
+        raise SystemExit(f"project.pbxproj disagrees with itself about MARKETING_VERSION: {sorted(versions)}")
+    if len(builds) != 1:
+        raise SystemExit(f"project.pbxproj disagrees with itself about CURRENT_PROJECT_VERSION: {sorted(builds)}")
+    return versions.pop(), builds.pop()
+
+
+VERSION, BUILD = _shipping_version()
+# Replaced below, once RELEASES exists, with the date of the newest release.
+UPDATED = ""
 
 
 # --------------------------------------------------------------------------
@@ -1630,7 +1655,7 @@ def build_privacy_nl():
 
 
 RELEASES = [
-    ("5.0.0", "500", "2026-09-11", "September 2026", "Two substances it could not name, and ratings you can check", [
+    ("5.0.0", "500", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [
         "Benzodiazepines and methamphetamine can now be logged and checked. Until now there was no way to tell ChillMate about either, so GHB with a benzo returned no warning at all. Twenty-five new rated combinations between them.",
         "Every combination is now compared with TripSit's published drug combination chart, and each warning says how it compares. That comparison found four ChillMate was rating too low: GHB, GBL and alcohol each with ketamine, and MDMA with 3-MMC, are all at the highest severity now.",
         "The risk checker shows when each thing you selected comes up, peaks and finishes, leading with onset, because most overdoses are a second dose taken before the first arrived.",
@@ -1639,6 +1664,15 @@ RELEASES = [
         "Twenty-seven labels used to cut themselves in half at the larger accessibility text sizes, and the half that went was the half that said what the number meant.",
         "Calendar days read out properly to VoiceOver, and the week now starts on the day your region starts it.",
         "Fixed: the weekly digest told everyone they were on a zero-day streak, the widget said \"1 days\", the watch's stress setting was connected to nothing, and resting heart rate was read from Apple Health and then ignored.",
+        "Every timing figure described the part of a night you are awake for. The published after-effects window is in the app now: MDMA is 12 to 48 hours on top of a 3 to 6 hour total, and a swallowed cannabis dose lingers 6 to 12 hours where a smoked one lingers 45 minutes. Cocaine gets no window, because PsychonautWiki publishes none, and the card says so rather than filling the gap.",
+        "A Lock Screen widget for the running dose, which outlives the Live Activity and keeps saying which half of the curve you are in.",
+        "A check-in for the way home: say roughly how long you will be, and it sits on your Lock Screen with one button on it. It carries no destination, because that screen is readable by whoever is standing next to you, and it never messages anybody by itself.",
+        "Panic support can be asked for out loud now, and leads the Shortcuts gallery. There is a settings page that shows the phrases and adds them in one tap.",
+        "Setup can be skipped from the first screen. Being eighteen and reading what the app does not claim to do are the only two things that cannot wait; everything else can be filled in later, and nothing is locked behind it.",
+        "At 2am Home leads with the tools for being out rather than a checklist for getting ready. It had been treating everything before four in the morning as \"before\".",
+        "The first-launch animation can be tapped away, and is skipped entirely if you have asked your phone for less motion.",
+        "The summary you hand to a GP now speaks your language rather than English, and reports the combination checks it was already being given and quietly dropping.",
+        "More things that had been shipping in English whatever you chose: the PrEP reminders, the duration inside the safer-plan reminder, four confirmations during setup, the default text of the message that goes to your trusted contact, the Focus filter in iOS Settings, and six pickers whose translations were sitting in the catalog unused.",
     ]),
     ("4.2.1", "422", "2026-08-11", "August 2026", "Fixes, and one that mattered", [
         "Fixed a crash on opening the app after upgrading from 4.2.0, caused by two schema versions sharing a checksum.",
@@ -1766,6 +1800,10 @@ def build_checker(lang):
 """, ident="checker")
     out += footer(lang, depth)
     return out, canonical
+
+
+# The newest release's date, so "last updated" cannot drift from what shipped.
+UPDATED = RELEASES[0][2]
 
 
 def build_changelog():

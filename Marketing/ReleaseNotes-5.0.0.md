@@ -2,7 +2,7 @@
 
 ## English (en-US / en-GB)
 
-ChillMate 5.0.0. Two substances it could not name before, every risk rating checked against a published source, and drug information that finally speaks your language.
+ChillMate 5.0.0. Two substances it could not name before, every risk rating checked against a published source, the day after that it never mentioned, and drug information that finally speaks your language.
 
 TWO THINGS IT COULD NOT SEE
 • Benzodiazepines can now be logged and checked. Until now there was no way to tell ChillMate you had taken one, so GHB with a benzo returned no warning at all.
@@ -34,6 +34,26 @@ READABLE AT ANY TEXT SIZE
 SPEAKING YOUR LANGUAGE
 • Forty-nine lines of drug information have been appearing in English no matter which language you chose. Every main risk and every mixing risk, for every substance. They are translated now.
 • The calendar's day-of-week headers were English too, and the week always started on Monday. Both follow your region now.
+• The PrEP reminders were in English. So was the time left inside the safer-plan reminder, which left the sentence around it half translated.
+• So were four confirmations during setup, the default text of the message that goes to your trusted contact, and the ChillMate switch in iOS Settings under Focus.
+• Six pickers had their translations sitting unused, so triggers, reasons and the settings pages showed English words that had been translated all along.
+• The summary you hand to a GP is in your language now, and includes the combination checks it was already being given and quietly dropping.
+
+THE DAY AFTER
+• Every timing figure in the app described the part of a night you are awake for. The published after-effects window is in there now: MDMA runs 12 to 48 hours on top of a 3 to 6 hour total, and PsychonautWiki reports the low tends to skip a day, which is why people do not connect it to the night.
+• A swallowed cannabis dose lingers 6 to 12 hours where a smoked one lingers 45 minutes, so these figures are per route too.
+• Cocaine gets no window, because none is published for it. What is published is craving and compulsive redosing arriving as the effects fade, and the app says that rather than inventing hours.
+• A running check-in timer shows which phase you are in, and keeps showing it after the timer itself has ended.
+
+WITHOUT UNLOCKING
+• A Lock Screen widget for the running dose. The Live Activity is better while it lasts and it does not last; this outlives it.
+• A check-in for the way home. Say roughly how long you will be, and it sits on your Lock Screen with one button on it. If that time passes without you closing it, it says so. It carries no destination, because that screen is readable by whoever is standing next to you, and it never messages anybody by itself.
+• Panic support can be asked for out loud. It leads the Shortcuts gallery now, and a new settings page shows the phrases and adds them in one tap.
+
+STRAIGHT IN
+• Setup can be skipped from the first screen. Being eighteen and reading what ChillMate does not claim to do are the only two things that cannot wait. Everything else waits on the profile screen, and nothing in the app is locked behind it.
+• The first-launch animation can be tapped away, and is skipped entirely if you have asked your phone for less motion.
+• At 2am Home leads with the tools for being out. It had been treating everything before four in the morning as getting ready.
 
 FIXED
 • The weekly digest told everyone they were on a zero-day streak and a zero score. It reports your real figures.
@@ -53,7 +73,7 @@ ALSO
 
 ## Nederlands (nl-NL)
 
-ChillMate 5.0.0. Twee middelen die de app eerder niet kon noemen, elke risico-inschatting vergeleken met een gepubliceerde bron, en drugsinformatie die eindelijk jouw taal spreekt.
+ChillMate 5.0.0. Twee middelen die de app eerder niet kon noemen, elke risico-inschatting vergeleken met een gepubliceerde bron, de dag erna waar het nooit over begon, en drugsinformatie die eindelijk jouw taal spreekt.
 
 TWEE DINGEN DIE DE APP NIET ZAG
 • Benzodiazepinen kun je nu loggen en checken. Tot nu toe kon je ChillMate niet vertellen dat je er een had genomen, dus GHB met een benzo gaf helemaal geen waarschuwing.
@@ -85,6 +105,26 @@ LEESBAAR BIJ ELKE TEKSTGROOTTE
 IN JOUW TAAL
 • Negenenveertig regels drugsinformatie verschenen in het Engels, welke taal je ook koos. Elk hoofdrisico en elk mengrisico, voor elk middel. Ze zijn nu vertaald.
 • De dagkoppen van de kalender stonden ook in het Engels, en de week begon altijd op maandag. Allebei volgen nu jouw regio.
+• De PrEP-herinneringen waren in het Engels. Net als de resterende tijd in de herinnering voor je sessieplan, waardoor die zin half vertaald was.
+• Net als vier bevestigingen tijdens het instellen, de standaardtekst van het bericht naar je vertrouwenspersoon, en de ChillMate-schakelaar in iOS-instellingen bij Focus.
+• Zes keuzelijsten lieten Engelse woorden zien die allang vertaald waren.
+• De samenvatting die je aan je huisarts geeft is nu in jouw taal, en bevat de combinatiechecks die er al aan werden doorgegeven en stilletjes werden weggegooid.
+
+DE DAG ERNA
+• Elk tijdcijfer in de app beschreef het deel van de nacht dat je wakker bent. Het gepubliceerde venster voor naeffecten staat er nu bij: MDMA loopt 12 tot 48 uur bovenop een totaal van 3 tot 6 uur, en PsychonautWiki meldt dat de dip vaak een dag overslaat, en daarom leggen mensen het verband niet.
+• Een geslikte dosis cannabis blijft 6 tot 12 uur hangen waar een gerookte 45 minuten blijft hangen, dus ook hier is het per toedieningsvorm.
+• Cocaïne krijgt geen venster, omdat er geen gepubliceerd is. Wat er wel staat is craving en dwangmatig bijnemen zodra de werking wegebt, en dat zegt de app in plaats van uren te verzinnen.
+• Een lopende check-in-timer laat zien in welke fase je zit, en blijft dat laten zien nadat de timer zelf is afgelopen.
+
+ZONDER TE ONTGRENDELEN
+• Een widget op je toegangsscherm voor de lopende dosis. De Live Activity is beter zolang die er is, en die is er niet lang; deze blijft.
+• Een check-in voor de weg naar huis. Zeg ongeveer hoe lang je onderweg bent en het staat op je toegangsscherm met één knop erop. Gaat die tijd voorbij zonder dat je hem afsluit, dan zegt het dat. Er staat geen bestemming in, want dat scherm kan iedereen naast je lezen, en er wordt nooit uit zichzelf iemand gewaarschuwd.
+• Om paniekhulp kun je nu hardop vragen. Het staat vooraan in de Opdrachten-galerij, en een nieuwe instellingenpagina laat de zinnen zien en zet ze in één tik klaar.
+
+METEEN NAAR BINNEN
+• Het instellen kan vanaf het eerste scherm worden overgeslagen. Achttien zijn en lezen wat ChillMate niet beweert te zijn, zijn de enige twee dingen die niet kunnen wachten. De rest wacht op je profielscherm, en er zit niets in de app achter slot en grendel.
+• De animatie bij de eerste start kun je wegtikken, en die wordt helemaal overgeslagen als je je telefoon om minder beweging hebt gevraagd.
+• Om 2 uur 's nachts begint Home met de tools voor onderweg zijn. Alles vóór vier uur 's ochtends werd behandeld alsof je je nog aan het klaarmaken was.
 
 OPGELOST
 • Het weekoverzicht vertelde iedereen dat ze op nul dagen en nul punten stonden. Het geeft nu je echte cijfers.
@@ -104,7 +144,7 @@ VERDER
 
 ## Deutsch (de-DE)
 
-ChillMate 5.0.0. Zwei Substanzen, die die App vorher nicht benennen konnte, jede Risikoeinstufung gegen eine veröffentlichte Quelle geprüft, und Drogeninformationen, die endlich deine Sprache sprechen.
+ChillMate 5.0.0. Zwei Substanzen, die die App vorher nicht benennen konnte, jede Risikoeinstufung gegen eine veröffentlichte Quelle geprüft, der Tag danach, von dem nie die Rede war, und Drogeninformationen, die endlich deine Sprache sprechen.
 
 ZWEI DINGE, DIE DIE APP NICHT SAH
 • Benzodiazepine lassen sich jetzt erfassen und prüfen. Bisher konntest du ChillMate gar nicht sagen, dass du eines genommen hast, also gab GHB mit einem Benzo überhaupt keine Warnung.
@@ -136,6 +176,26 @@ LESBAR IN JEDER TEXTGRÖSSE
 IN DEINER SPRACHE
 • Neunundvierzig Zeilen Drogeninformation erschienen auf Englisch, welche Sprache du auch gewählt hast. Jedes Hauptrisiko und jedes Mischrisiko, für jede Substanz. Sie sind jetzt übersetzt.
 • Die Wochentagsköpfe im Kalender waren ebenfalls englisch, und die Woche begann immer am Montag. Beides folgt jetzt deiner Region.
+• Die PrEP-Erinnerungen waren auf Englisch. Genauso die Restzeit in der Erinnerung zum Sessionplan, wodurch der Satz drumherum halb übersetzt war.
+• Genauso vier Bestätigungen während der Einrichtung, der Standardtext der Nachricht an deine Vertrauensperson und der ChillMate-Schalter in den iOS-Einstellungen unter Fokus.
+• Sechs Auswahllisten zeigten englische Wörter, die längst übersetzt waren.
+• Die Zusammenfassung für deine Ärztin ist jetzt in deiner Sprache und enthält die Kombinationschecks, die ihr schon übergeben und stillschweigend verworfen wurden.
+
+DER TAG DANACH
+• Jede Zeitangabe in der App beschrieb den Teil der Nacht, in dem du wach bist. Das veröffentlichte Fenster für Nachwirkungen steht jetzt dabei: MDMA läuft 12 bis 48 Stunden zusätzlich zu einer Gesamtdauer von 3 bis 6 Stunden, und PsychonautWiki berichtet, dass das Tief oft einen Tag überspringt. Genau deshalb stellen die meisten keinen Zusammenhang her.
+• Eine geschluckte Cannabisdosis wirkt 6 bis 12 Stunden nach, eine gerauchte 45 Minuten, also auch hier pro Einnahmeform.
+• Kokain bekommt kein Fenster, weil keines veröffentlicht ist. Veröffentlicht ist Verlangen und zwanghaftes Nachlegen, sobald die Wirkung nachlässt, und das sagt die App, statt Stunden zu erfinden.
+• Ein laufender Check-in-Timer zeigt, in welcher Phase du bist, und zeigt es weiter, nachdem der Timer selbst abgelaufen ist.
+
+OHNE ENTSPERREN
+• Ein Sperrbildschirm-Widget für die laufende Dosis. Die Live Activity ist besser, solange es sie gibt, und es gibt sie nicht lange; das hier bleibt.
+• Ein Check-in für den Heimweg. Sag ungefähr, wie lange du unterwegs bist, und es liegt auf deinem Sperrbildschirm mit einer Taste darauf. Vergeht diese Zeit, ohne dass du es beendest, sagt es das. Es enthält kein Ziel, denn diesen Bildschirm kann jeder neben dir lesen, und es schreibt von sich aus niemandem.
+• Nach Panikhilfe kannst du jetzt laut fragen. Sie steht vorne in der Kurzbefehle-Galerie, und eine neue Einstellungsseite zeigt die Sätze und richtet sie mit einem Tippen ein.
+
+DIREKT REIN
+• Die Einrichtung lässt sich ab dem ersten Bildschirm überspringen. Achtzehn sein und lesen, was ChillMate nicht zu sein behauptet, sind die einzigen zwei Dinge, die nicht warten können. Alles andere wartet auf der Profilseite, und nichts in der App ist dahinter weggesperrt.
+• Die Animation beim ersten Start lässt sich wegtippen und wird ganz übersprungen, wenn du dein Telefon um weniger Bewegung gebeten hast.
+• Um 2 Uhr nachts beginnt Home mit den Tools fürs Unterwegssein. Alles vor vier Uhr morgens wurde behandelt, als würdest du dich noch fertig machen.
 
 BEHOBEN
 • Die Wochenübersicht teilte allen mit, sie stünden bei null Tagen und null Punkten. Sie zeigt jetzt deine echten Zahlen.
@@ -155,7 +215,7 @@ AUSSERDEM
 
 ## Français (fr-FR)
 
-ChillMate 5.0.0. Deux substances que l'app ne pouvait pas nommer, chaque évaluation de risque vérifiée contre une source publiée, et des informations sur les drogues qui parlent enfin ta langue.
+ChillMate 5.0.0. Deux substances que l'app ne pouvait pas nommer, chaque évaluation de risque vérifiée contre une source publiée, le lendemain dont elle ne parlait jamais, et des informations sur les drogues qui parlent enfin ta langue.
 
 DEUX CHOSES QU'ELLE NE VOYAIT PAS
 • Les benzodiazépines peuvent maintenant être enregistrées et vérifiées. Jusqu'ici tu ne pouvais pas dire à ChillMate que tu en avais pris une, donc le GHB avec une benzo ne renvoyait aucun avertissement.
@@ -187,6 +247,26 @@ LISIBLE À TOUTE TAILLE DE TEXTE
 DANS TA LANGUE
 • Quarante-neuf lignes d'information sur les drogues s'affichaient en anglais quelle que soit la langue choisie. Chaque risque principal et chaque risque de mélange, pour chaque substance. Elles sont traduites.
 • Les en-têtes de jours du calendrier étaient aussi en anglais, et la semaine commençait toujours le lundi. Les deux suivent ta région désormais.
+• Les rappels de PrEP étaient en anglais. Le temps restant dans le rappel du plan de session aussi, ce qui laissait la phrase à moitié traduite.
+• Quatre confirmations pendant la configuration aussi, le texte par défaut du message envoyé à ta personne de confiance, et le réglage ChillMate dans Réglages iOS, Concentration.
+• Six sélecteurs affichaient des mots anglais qui étaient traduits depuis longtemps.
+• Le résumé que tu remets à un médecin est maintenant dans ta langue, et contient les vérifications de combinaisons qu'on lui transmettait déjà et qu'il jetait en silence.
+
+LE LENDEMAIN
+• Chaque durée dans l'app décrivait la partie de la nuit où tu es réveillé. La fenêtre publiée des effets résiduels y est maintenant : la MDMA court de 12 à 48 heures en plus d'un total de 3 à 6 heures, et PsychonautWiki rapporte que le creux saute souvent un jour, ce qui explique pourquoi on ne fait pas le lien.
+• Une dose de cannabis avalée traîne 6 à 12 heures là où une dose fumée traîne 45 minutes, donc ici aussi c'est par voie d'administration.
+• La cocaïne n'a pas de fenêtre, parce qu'aucune n'est publiée. Ce qui est publié, c'est le craving et la reprise compulsive dès que les effets retombent, et l'app le dit plutôt que d'inventer des heures.
+• Un minuteur de check-in en cours montre dans quelle phase tu es, et continue de le montrer une fois le minuteur terminé.
+
+SANS DÉVERROUILLER
+• Un widget d'écran verrouillé pour la dose en cours. La Live Activity est meilleure tant qu'elle dure, et elle ne dure pas ; celui-ci reste.
+• Un check-in pour le trajet de retour. Dis à peu près combien de temps tu en as, et il s'installe sur ton écran verrouillé avec un seul bouton. Si ce délai passe sans que tu l'aies clôturé, il le dit. Il ne contient aucune destination, parce que cet écran est lisible par qui se tient à côté de toi, et il n'envoie jamais de message tout seul.
+• L'aide en cas de panique peut se demander à voix haute. Elle ouvre la galerie Raccourcis, et une nouvelle page de réglages montre les phrases et les ajoute en une fois.
+
+ENTRER DIRECTEMENT
+• La configuration peut être passée dès le premier écran. Avoir dix-huit ans et lire ce que ChillMate ne prétend pas être sont les deux seules choses qui ne peuvent pas attendre. Le reste attend sur l'écran du profil, et rien dans l'app n'est verrouillé derrière.
+• L'animation du premier lancement se referme d'une touche, et elle est entièrement passée si tu as demandé moins de mouvement à ton téléphone.
+• À 2 h du matin, l'accueil commence par les outils pour être dehors. Tout ce qui précédait quatre heures du matin était traité comme une préparation.
 
 CORRIGÉ
 • Le récapitulatif hebdomadaire annonçait à tout le monde une série de zéro jour et un score de zéro. Il donne tes vrais chiffres.
@@ -206,7 +286,7 @@ AUSSI
 
 ## Español (es-ES)
 
-ChillMate 5.0.0. Dos sustancias que la app no podía nombrar, cada valoración de riesgo contrastada con una fuente publicada, e información sobre drogas que por fin habla tu idioma.
+ChillMate 5.0.0. Dos sustancias que la app no podía nombrar, cada valoración de riesgo contrastada con una fuente publicada, el día después del que nunca hablaba, e información sobre drogas que por fin habla tu idioma.
 
 DOS COSAS QUE NO VEÍA
 • Las benzodiacepinas ya se pueden registrar y comprobar. Hasta ahora no había forma de decirle a ChillMate que habías tomado una, así que el GHB con una benzo no devolvía ninguna advertencia.
@@ -238,6 +318,26 @@ LEGIBLE A CUALQUIER TAMAÑO DE TEXTO
 EN TU IDIOMA
 • Cuarenta y nueve líneas de información sobre drogas aparecían en inglés eligieras el idioma que eligieras. Cada riesgo principal y cada riesgo de mezcla, de cada sustancia. Ya están traducidas.
 • Las cabeceras de los días del calendario también estaban en inglés, y la semana empezaba siempre en lunes. Ambas siguen ahora tu región.
+• Los recordatorios de PrEP estaban en inglés. También el tiempo restante dentro del recordatorio del plan de sesión, lo que dejaba la frase a medio traducir.
+• También cuatro confirmaciones durante la configuración, el texto por defecto del mensaje que va a tu persona de confianza, y el ajuste de ChillMate en Ajustes de iOS, Concentración.
+• Seis selectores mostraban palabras en inglés que llevaban traducidas desde siempre.
+• El resumen que le das a tu médico ya está en tu idioma, e incluye las comprobaciones de combinaciones que ya se le pasaban y que descartaba en silencio.
+
+EL DÍA DESPUÉS
+• Cada cifra de tiempo de la app describía la parte de la noche en la que estás despierto. La ventana publicada de efectos residuales ya está ahí: la MDMA va de 12 a 48 horas por encima de un total de 3 a 6 horas, y PsychonautWiki describe que el bajón suele saltarse un día, que es justo por lo que la gente no lo relaciona.
+• Una dosis de cannabis tragada se queda de 6 a 12 horas donde una fumada se queda 45 minutos, así que aquí también es por vía.
+• La cocaína no tiene ventana, porque no hay ninguna publicada. Lo que sí está publicado es el craving y el consumo compulsivo en cuanto bajan los efectos, y la app lo dice en lugar de inventarse horas.
+• Un temporizador de check-in en marcha muestra en qué fase estás, y lo sigue mostrando después de que el propio temporizador termine.
+
+SIN DESBLOQUEAR
+• Un widget de pantalla bloqueada para la dosis en marcha. La Live Activity es mejor mientras dura, y no dura; este se queda.
+• Un check-in para la vuelta a casa. Di más o menos cuánto vas a tardar y se queda en tu pantalla bloqueada con un solo botón. Si pasa ese tiempo sin que lo cierres, te lo dice. No lleva ningún destino, porque esa pantalla la puede leer quien esté a tu lado, y nunca avisa a nadie por su cuenta.
+• El apoyo ante el pánico se puede pedir en voz alta. Encabeza la galería de Atajos, y una nueva página de ajustes enseña las frases y las añade de un toque.
+
+DIRECTO DENTRO
+• La configuración se puede omitir desde la primera pantalla. Tener dieciocho años y leer lo que ChillMate no dice ser son las dos únicas cosas que no pueden esperar. Lo demás espera en la pantalla de perfil, y no hay nada en la app bloqueado detrás.
+• La animación del primer arranque se puede quitar con un toque, y se omite del todo si le has pedido a tu teléfono menos movimiento.
+• A las 2 de la madrugada, Inicio empieza con las herramientas para estar fuera. Todo lo anterior a las cuatro de la mañana se trataba como preparación.
 
 ARREGLADO
 • El resumen semanal le decía a todo el mundo que llevaba una racha de cero días y cero puntos. Ahora da tus cifras reales.
