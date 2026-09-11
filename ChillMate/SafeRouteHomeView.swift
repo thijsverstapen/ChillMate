@@ -111,7 +111,8 @@ struct SafeRouteHomeView: View {
                 await MainActor.run {
                     currentLocation = location
                     isFetchingLocation = false
-                    openSMS(body: "\(trustedContactMessage)\n\nMy location: https://maps.apple.com/?ll=\(location.latitude),\(location.longitude)")
+                    let link = "https://maps.apple.com/?ll=\(location.latitude),\(location.longitude)"
+                    openSMS(body: String(localized: "\(trustedContactMessage)\n\nMy location: \(link)"))
                 }
             } catch {
                 await MainActor.run {

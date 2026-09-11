@@ -26,7 +26,7 @@ struct SecurityHealthCheckView: View {
                 DashboardBackdrop()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        PageHeader(title: String(localized: "Security check"), subtitle: "\(checks.filter(\.isOn).count) of \(checks.count) protections are on. Turn on the ones that match how private you want ChillMate to be.", symbol: "checkmark.shield.fill", tint: Color.chillMint)
+                        PageHeader(title: String(localized: "Security check"), subtitle: String(localized: "\(checks.filter(\.isOn).count) of \(checks.count) protections are on. Turn on the ones that match how private you want ChillMate to be."), symbol: "checkmark.shield.fill", tint: Color.chillMint)
                         VStack(spacing: 10) { ForEach(checks) { SecurityCheckRow(item: $0) } }
                     }
                     .padding(20)

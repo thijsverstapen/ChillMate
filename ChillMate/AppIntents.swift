@@ -51,7 +51,7 @@ struct LogHydrationIntent: AppIntent {
             HydrationLog.markLoggedNow()
             NotificationCenter.default.post(name: .watchDidLogHydration, object: nil)
         }
-        return .result(value: "Hydration logged in ChillMate.")
+        return .result(value: String(localized: "Hydration logged in ChillMate."))
     }
 }
 

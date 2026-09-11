@@ -1,6 +1,35 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%1$@\n\nMy location: %2$@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@\n\nMein Standort: %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@\n\nMi ubicación: %2$@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@\n\nMa position : %2$@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@\n\nMijn locatie: %2$@"
+          }
+        }
+      },
+      "comment": "SOS message with a location link"
+    },
     "%1$@ and %2$@ appear together most often, on %3$lld nights.": {
       "localizations": {
         "de": {
@@ -29,6 +58,35 @@
         }
       },
       "comment": "Insights pattern: most common substance pairing"
+    },
+    "%1$@ check-in is %2$@ through. Check water, food, body temperature, support, and whether you still feel safe.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Check-in für %1$@ ist zu %2$@ durch. Achte auf Wasser, Essen, Körpertemperatur, Unterstützung und darauf, ob du dich noch sicher fühlst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El control de %1$@ va por el %2$@. Revisa el agua, la comida, la temperatura corporal, el apoyo y si sigues sintiéndote seguro."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le point de contrôle pour %1$@ en est à %2$@. Vérifie l’eau, la nourriture, la température corporelle, le soutien, et si tu te sens toujours en sécurité."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De check-in voor %1$@ is %2$@ onderweg. Let op water, eten, lichaamstemperatuur, steun, en of je je nog veilig voelt."
+          }
+        }
+      },
+      "comment": "Safety autopilot: session progress"
     },
     "%1$@ g alcohol · %2$@ UK units": {
       "localizations": {
@@ -88,6 +146,35 @@
       },
       "comment": "Insights pattern: busiest weekday"
     },
+    "%1$@ was logged at %2$@. Check-in progress: %3$@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ wurde um %2$@ erfasst. Check-in-Fortschritt: %3$@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ se registró a las %2$@. Progreso del control: %3$@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ a été enregistré à %2$@. Progression du point de contrôle : %3$@."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ is gelogd om %2$@. Voortgang check-in: %3$@."
+          }
+        }
+      },
+      "comment": "Craving delay: what is already running"
+    },
     "%1$lld logged nights, down from %2$lld in the period before.": {
       "localizations": {
         "de": {
@@ -145,6 +232,35 @@
         }
       },
       "comment": "Insights pattern: window comparison, higher"
+    },
+    "%1$lld of %2$lld protections are on. Turn on the ones that match how private you want ChillMate to be.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld von %2$lld Schutzfunktionen sind an. Schalte die ein, die dazu passen, wie privat ChillMate für dich sein soll."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld de %2$lld protecciones están activadas. Activa las que encajen con lo privado que quieras que sea ChillMate."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld protections sur %2$lld sont activées. Active celles qui correspondent au niveau de confidentialité que tu veux."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld van de %2$lld beschermingen staan aan. Zet de opties aan die passen bij hoe privé je ChillMate wilt hebben."
+          }
+        }
+      },
+      "comment": "Security check subtitle"
     },
     "%@": {
       "comment": "A dialog message for the user to try again. The argument is the string “Pick two different substances.”.",
@@ -1313,6 +1429,83 @@
           }
         }
       }
+    },
+    "%lld pictures": {
+      "localizations": {
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Bild"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Bilder"
+                }
+              }
+            }
+          }
+        },
+        "es": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld foto"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld fotos"
+                }
+              }
+            }
+          }
+        },
+        "fr": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld photo"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld photos"
+                }
+              }
+            }
+          }
+        },
+        "nl": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld foto"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld foto's"
+                }
+              }
+            }
+          }
+        }
+      },
+      "comment": "Number of photos attached to an entry"
     },
     "%lld plans": {
       "comment": "Restore summary fragment: number of safer session plans",
@@ -8113,6 +8306,35 @@
         }
       }
     },
+    "Apple Health sync is off.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Apple-Health-Synchronisierung ist aus."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sincronización con Apple Salud está desactivada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La synchronisation Apple Santé est désactivée."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisatie met Apple Health staat uit."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
+    },
     "Apple HealthKit HIG": {
       "localizations": {
         "de": {
@@ -13009,6 +13231,35 @@
         }
       }
     },
+    "Check-in is active": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check-in läuft"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El control está activo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le point de contrôle est actif"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check-in loopt"
+          }
+        }
+      },
+      "comment": "Safety autopilot action title"
+    },
     "Check-in phrase": {
       "localizations": {
         "de": {
@@ -13936,6 +14187,35 @@
           }
         }
       }
+    },
+    "ChillMate can read and write only the Health categories you allowed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate liest und schreibt nur die Health-Kategorien, die du erlaubt hast."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate solo lee y escribe las categorías de Salud que has permitido."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate ne lit et n’écrit que les catégories Santé que tu as autorisées."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChillMate leest en schrijft alleen de Health-categorieën die je hebt toegestaan."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
     },
     "ChillMate could not delete everything: %@": {
       "extractionState": "manual",
@@ -21258,6 +21538,35 @@
         }
       }
     },
+    "Encrypted backup files can be saved to iCloud Drive.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verschlüsselte Backup-Dateien können in iCloud Drive gesichert werden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los archivos de copia de seguridad cifrados pueden guardarse en iCloud Drive."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les fichiers de sauvegarde chiffrés peuvent être enregistrés sur iCloud Drive."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Versleutelde back-upbestanden kunnen naar iCloud Drive worden opgeslagen."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
+    },
     "Encrypted backup prepared.": {
       "localizations": {
         "de": {
@@ -22531,6 +22840,35 @@
           }
         }
       }
+    },
+    "Face ID: %1$@. PIN: %2$@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID: %1$@. PIN: %2$@."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID: %1$@. PIN: %2$@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID : %1$@. Code : %2$@."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face ID: %1$@. Pincode: %2$@."
+          }
+        }
+      },
+      "comment": "Privacy receipt: lock status"
     },
     "Fainting, or a sudden severe headache": {
       "localizations": {
@@ -27017,6 +27355,35 @@
         }
       }
     },
+    "Hydration logged in ChillMate.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wasser in ChillMate erfasst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hidratación registrada en ChillMate."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hydratation enregistrée dans ChillMate."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Water gelogd in ChillMate."
+          }
+        }
+      },
+      "comment": "Siri confirmation"
+    },
     "Hydration reminders": {
       "localizations": {
         "de": {
@@ -29096,6 +29463,35 @@
           }
         }
       }
+    },
+    "It has been less than 72 hours since a log that may include HIV exposure. Contact a sexual-health service, your doctor, an out-of-hours clinic, or a hospital now. About %lld hours remain.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es ist weniger als 72 Stunden her, dass etwas erfasst wurde, das eine HIV-Exposition sein könnte. Wende dich jetzt an eine STI-Ambulanz, deine Ärztin, einen Bereitschaftsdienst oder ein Krankenhaus. Es bleiben noch etwa %lld Stunden."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Han pasado menos de 72 horas desde un registro que puede implicar exposición al VIH. Contacta ya con un centro de salud sexual, tu médico, un servicio de urgencias o un hospital. Quedan unas %lld horas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moins de 72 heures se sont écoulées depuis une entrée pouvant correspondre à une exposition au VIH. Contacte maintenant un centre de santé sexuelle, ton médecin, une permanence ou un hôpital. Il reste environ %lld heures."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het is minder dan 72 uur geleden dat je iets logde dat op hiv-blootstelling kan wijzen. Neem nu contact op met een soa-poli, je huisarts, de huisartsenpost of een ziekenhuis. Er resteren ongeveer %lld uur."
+          }
+        }
+      },
+      "comment": "Safety autopilot: PEP window is open"
     },
     "It is okay if today was only about getting through it.": {
       "localizations": {
@@ -37397,6 +37793,93 @@
           }
         }
       }
+    },
+    "Notifications are off.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitteilungen sind aus."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las notificaciones están desactivadas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notifications sont désactivées."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meldingen staan uit."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
+    },
+    "Notifications are on, showing full wording on the lock screen.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitteilungen sind an und zeigen den vollen Text auf dem Sperrbildschirm."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las notificaciones están activadas y muestran el texto completo en la pantalla de bloqueo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notifications sont activées et affichent le texte complet sur l’écran verrouillé."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meldingen staan aan en tonen de volledige tekst op het toegangsscherm."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
+    },
+    "Notifications are on, with discreet lock-screen wording.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitteilungen sind an, mit diskreter Formulierung auf dem Sperrbildschirm."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las notificaciones están activadas, con texto discreto en la pantalla de bloqueo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les notifications sont activées, avec un libellé discret sur l’écran verrouillé."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meldingen staan aan, met discrete tekst op het toegangsscherm."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
     },
     "Now": {
       "comment": "A label that indicates that the moment is currently happening.",
@@ -46062,6 +46545,35 @@
         }
       }
     },
+    "Risky logs increased from %1$lld to %2$lld. Look at stress, loneliness, money, housing, conflict, boredom, or breakup patterns.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riskante Einträge stiegen von %1$lld auf %2$lld. Schau auf Stress, Einsamkeit, Geld, Wohnsituation, Konflikte, Langeweile oder Trennungsmuster."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los registros de riesgo pasaron de %1$lld a %2$lld. Mira el estrés, la soledad, el dinero, la vivienda, los conflictos, el aburrimiento o los patrones tras una ruptura."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les entrées à risque sont passées de %1$lld à %2$lld. Regarde du côté du stress, de la solitude, de l’argent, du logement, des conflits, de l’ennui ou d’une rupture."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risicovolle logs stegen van %1$lld naar %2$lld. Kijk naar stress, eenzaamheid, geld, woonsituatie, conflict, verveling of patronen rond een breuk."
+          }
+        }
+      },
+      "comment": "Safety autopilot: risky log trend"
+    },
     "Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist.": {
       "localizations": {
         "de": {
@@ -52437,6 +52949,64 @@
         }
       },
       "comment": "Drug information: risk line"
+    },
+    "Strong iPhone file protection is available, but off in settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starker Dateischutz ist verfügbar, in den Einstellungen aber aus."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La protección fuerte de archivos está disponible, pero desactivada en los ajustes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La protection renforcée des fichiers est disponible, mais désactivée dans les réglages."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sterke bestandsbeveiliging is beschikbaar, maar staat uit in de instellingen."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
+    },
+    "Strong iPhone file protection is on.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starker iPhone-Dateischutz ist an."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La protección fuerte de archivos del iPhone está activada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La protection renforcée des fichiers iPhone est activée."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sterke bestandsbeveiliging van de iPhone staat aan."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
     },
     "Strong streak. Your body is building real recovery.": {
       "localizations": {
@@ -66336,6 +66906,35 @@
         }
       }
     },
+    "iCloud backup is off. Local encrypted recovery stays on this iPhone.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das iCloud-Backup ist aus. Die lokale verschlüsselte Wiederherstellung bleibt auf diesem iPhone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La copia en iCloud está desactivada. La recuperación cifrada local se queda en este iPhone."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La sauvegarde iCloud est désactivée. La récupération chiffrée locale reste sur cet iPhone."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud-back-up staat uit. Lokaal versleuteld herstel blijft op deze iPhone."
+          }
+        }
+      },
+      "comment": "Privacy receipt row"
+    },
     "iCloud backup is on. ChillMate saves encrypted backup files to your iCloud Drive.": {
       "localizations": {
         "de": {
@@ -66891,6 +67490,64 @@
         }
       },
       "comment": "Calendar day cell VoiceOver label fragment for an empty day"
+    },
+    "off": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aus"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "desactivado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "désactivé"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "uit"
+          }
+        }
+      },
+      "comment": "Privacy receipt: a protection is disabled"
+    },
+    "on": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "an"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "activado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "activé"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aan"
+          }
+        }
+      },
+      "comment": "Privacy receipt: a protection is enabled"
     },
     "recovering": {
       "localizations": {

@@ -137,6 +137,50 @@ LITERAL_PATTERNS = [
 UNICODE_ESCAPE = re.compile(r"\\u\{([0-9A-Fa-f]+)\}")
 
 
+FORMAT_SPECIFIER = re.compile(r"%(?:\d+\$)?(?:@|lld|ld|d|f|\.\d+f)")
+
+
+def strip_interpolations(text):
+    """Replace every `\\(...)` with a placeholder, counting brackets.
+
+    A regex cannot do this: real interpolations nest several levels deep, as in
+    `\\(hours.formatted(.number.precision(.fractionLength(0...1))))`, and a pattern
+    that only handles one level leaves a tail of stray brackets behind and makes
+    every such string look like it is missing from the catalog.
+    """
+    out = []
+    index = 0
+    while index < len(text):
+        if text.startswith("\\(", index):
+            depth = 0
+            cursor = index + 1
+            while cursor < len(text):
+                if text[cursor] == "(":
+                    depth += 1
+                elif text[cursor] == ")":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                cursor += 1
+            out.append("\x00")
+            index = cursor + 1
+        else:
+            out.append(text[index])
+            index += 1
+    return "".join(out)
+
+
+def interpolation_shape(text):
+    """A string reduced to its literal parts, with every placeholder blanked.
+
+    `"Started a \\(hours) hour timer"` and `"Started a %lld hour timer"` reduce to
+    the same thing, which is what lets a source literal be matched against the
+    catalog key Xcode extracted from it without having to infer the argument's
+    type from the source.
+    """
+    return FORMAT_SPECIFIER.sub("\x00", strip_interpolations(swift_literal_value(text)))
+
+
 def swift_literal_value(raw):
     """The runtime string for a Swift literal, which is what Xcode uses as the key.
 
@@ -165,21 +209,42 @@ def check_sources(directory, catalog_path):
 
     keys = set(json.loads(catalog_path.read_text()).get("strings", {}))
     absent = {}
+    # Every catalog key reduced to its literal parts, so an interpolated source
+    # literal can be matched against it without knowing the argument types.
+    shapes = {interpolation_shape(key) for key in keys}
+
     checked = 0
     for source in sorted((ROOT / directory).glob("*.swift")):
         text = source.read_text()
         for pattern in LITERAL_PATTERNS:
             for match in pattern.finditer(text):
                 raw = match.group(1)
-                # Interpolation resolves to the %lld / %@ key Xcode extracts, which
-                # cannot be derived from the source text, so it is left to the
-                # specifier check above.
-                if "\\(" in raw or not raw.strip():
+                if not raw.strip():
                     continue
                 checked += 1
+                line = text[:match.start()].count("\n") + 1
+
+                if "\\(" in raw:
+                    # Nothing but placeholders and punctuation: no words to
+                    # translate, the same rule `needs_no_translation` applies on
+                    # the catalog side.
+                    if not re.sub(r"[\s\W\x00]+", "", interpolation_shape(raw)):
+                        continue
+                    # Interpolation becomes a %@ / %lld key at extraction, and the
+                    # source text cannot say which. So the literal parts are
+                    # matched instead: a catalog key whose non-specifier text is
+                    # identical is the same string.
+                    #
+                    # This used to be skipped entirely, which left every
+                    # interpolated string ungated. Eight of them had been shipping
+                    # in English, including the line telling somebody their PEP
+                    # window was still open.
+                    if interpolation_shape(raw) not in shapes:
+                        absent.setdefault(swift_literal_value(raw), f"{source.name}:{line}")
+                    continue
+
                 key = swift_literal_value(raw)
                 if key not in keys:
-                    line = text[:match.start()].count("\n") + 1
                     absent.setdefault(key, f"{source.name}:{line}")
 
     for key, where in list(absent.items())[:10]:
