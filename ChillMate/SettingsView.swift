@@ -114,6 +114,8 @@ private enum SettingsSectionPage: String, CaseIterable, Identifiable {
 struct SettingsView: View {
     @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
     @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
+    @State private var isShowingDuressSetup = false
+    @State private var hasDuressPIN = LocalSecurityService.hasDuressPIN()
     @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
     @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
     @AppStorage(DefaultsKey.healthKitSexualActivityWriteEnabled) private var healthKitSexualActivityWriteEnabled = false
@@ -446,6 +448,21 @@ struct SettingsView: View {
                             }
                         )
 
+                        // Only offered once there is a real PIN to be distinct
+                        // from. Without one there is nothing for a second PIN to
+                        // mean.
+                        if requiresPIN {
+                            DuressPINCard(
+                                isEnabled: hasDuressPIN,
+                                setPIN: { isShowingDuressSetup = true },
+                                turnOff: {
+                                    LocalSecurityService.clearDuressPIN()
+                                    hasDuressPIN = false
+                                    message = String(localized: "Second PIN removed.")
+                                }
+                            )
+                        }
+
                         SettingsToggleCard(
                             title: String(localized: "Extra app security"),
                             caption: String(localized: "Locks your private files even when the app is closed. Useful if your phone is ever lost or stolen."),
@@ -609,6 +626,13 @@ struct SettingsView: View {
                 LocalSecurityService.savePINToKeychain(pin: newPIN)
                 requiresPIN = true
                 message = String(localized: "PIN lock is on.")
+            }
+        }
+        .fullScreenCover(isPresented: $isShowingDuressSetup) {
+            PINSetupView(isChangingExistingPIN: hasDuressPIN, isDuress: true) { newPIN in
+                LocalSecurityService.saveDuressPIN(newPIN)
+                hasDuressPIN = true
+                message = String(localized: "Second PIN is set.")
             }
         }
         .fileImporter(
@@ -1733,10 +1757,37 @@ private struct PINSetupView: View {
     @State private var isShowingDiscardWarning = false
 
     let isChangingExistingPIN: Bool
+    /// Setting the second PIN rather than the real one. Changes the copy, and adds
+    /// the one rule the real PIN does not have.
+    var isDuress: Bool = false
     let save: (String) -> Void
 
     private var canSave: Bool {
-        LocalSecurityService.isValidPIN(pin) && pin == confirmPIN
+        guard LocalSecurityService.isValidPIN(pin), pin == confirmPIN else { return false }
+        // A second PIN identical to the first could never be entered, and setting
+        // one would leave somebody believing they had protection they do not.
+        return isDuress ? LocalSecurityService.isAcceptableDuressPIN(pin) : true
+    }
+
+    private var titleText: String {
+        if isDuress {
+            return isChangingExistingPIN
+                ? String(localized: "Change your second PIN")
+                : String(localized: "Set a second PIN")
+        }
+        return isChangingExistingPIN ? String(localized: "Change your PIN") : String(localized: "Set a PIN")
+    }
+
+    private var explanationText: String {
+        isDuress
+            ? String(localized: "Use 4-8 numbers, different from your real PIN. Entering this one unlocks the app exactly as normal, but opens it empty. Nothing is deleted: your real PIN brings everything back.")
+            : String(localized: "Use 4-8 numbers. This PIN unlocks the app on this device and works alongside Face ID.")
+    }
+
+    private var duressWarning: String? {
+        guard isDuress, LocalSecurityService.isValidPIN(pin), pin == confirmPIN,
+              !LocalSecurityService.isAcceptableDuressPIN(pin) else { return nil }
+        return String(localized: "That is your real PIN. The second one has to be different.")
     }
 
     private var hasInput: Bool {
@@ -1759,15 +1810,22 @@ private struct PINSetupView: View {
                             .glassSurface(radius: 36, tint: Color.chillPrimary.opacity(0.16))
                             .disablesRootSwipeBack()
 
-                        Text(isChangingExistingPIN ? String(localized: "Change your PIN") : String(localized: "Set a PIN"))
+                        Text(titleText)
                             .font(.largeTitle.bold())
                             .foregroundStyle(Color.chillText)
 
-                        Text("Use 4-8 numbers. This PIN unlocks the app on this device and works alongside Face ID.")
+                        Text(explanationText)
                             .font(.callout)
                             .lineSpacing(3)
                             .foregroundStyle(Color.chillSecondary)
                             .fixedSize(horizontal: false, vertical: true)
+
+                        if let duressWarning {
+                            Label(duressWarning, systemImage: "exclamationmark.triangle.fill")
+                                .font(.footnote.weight(.semibold))
+                                .foregroundStyle(.orange)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
                     .padding(22)
                     .glassSurface(radius: 34, tint: .black.opacity(0.04), interactive: true)
@@ -2459,5 +2517,46 @@ private enum AccountDataDeletion {
         }
 
         try context.save()
+    }
+}
+
+/// Turns the second PIN on and off.
+///
+/// Sits under the real PIN card and only appears once there is a real PIN, because
+/// a second PIN has nothing to be distinct from otherwise.
+///
+/// The copy avoids the word "panic" deliberately. Somebody scrolling this screen
+/// with a person beside them should not be looking at a row that announces what it
+/// is for.
+private struct DuressPINCard: View {
+    let isEnabled: Bool
+    let setPIN: () -> Void
+    let turnOff: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(String(localized: "Second PIN"), systemImage: "lock.square.stack")
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+
+            Text("A second PIN that opens the app with nothing in it. It unlocks exactly like your real one, with no warning and nothing on screen to say which you used. Your data is untouched and your real PIN brings it straight back.")
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            HStack(spacing: 10) {
+                Button(isEnabled ? String(localized: "Change") : String(localized: "Set up"), action: setPIN)
+                    .buttonStyle(ChillPillButtonStyle(prominent: !isEnabled))
+
+                if isEnabled {
+                    Button(String(localized: "Turn off"), role: .destructive, action: turnOff)
+                        .buttonStyle(ChillPillButtonStyle())
+                }
+            }
+            .font(.subheadline.weight(.semibold))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .glassSurface(radius: 26, tint: Color.chillPrimary.opacity(0.07))
     }
 }

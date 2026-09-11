@@ -14,6 +14,10 @@ struct ChillMateApp: App {
     @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
     @Environment(\.scenePhase) private var scenePhase
 
+    /// Rebuilds the whole tree when duress mode changes. See
+    /// `LocalSecurityService.saveDuressPIN`.
+    @AppStorage(DefaultsKey.duressModeActive) private var duressMode = false
+
     var body: some Scene {
         WindowGroup {
             // Single onboarding path: AppLockView → AppHomeView.
@@ -22,6 +26,10 @@ struct ChillMateApp: App {
             AppLockView {
                 AppHomeView()
             }
+            // Keyed on duress mode so unlocking with the duress PIN rebuilds the
+            // tree against the empty store, and the real PIN rebuilds it back.
+            // Without the key SwiftUI keeps the container it was handed at launch.
+            .id(duressMode)
             .modelContainer(ChillMateModelContainer.container())
             .preferredColorScheme(.dark)
             // Dates, numbers and measurements follow the chosen language right away.

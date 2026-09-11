@@ -28,6 +28,11 @@ import Foundation
 enum DefaultsKey {
     // MARK: Lock & privacy
     static let requiresFaceID = "requiresFaceID"
+    /// True while the app is showing the decoy store a duress PIN opens.
+    ///
+    /// Cleared by an unlock with the real PIN, which is the only thing that clears
+    /// it. See `LocalSecurityService.saveDuressPIN`.
+    static let duressModeActive = "duressModeActive"
     static let requiresPIN = "requiresPIN"
     static let autoLockMinutes = "autoLockMinutes"
     static let localEncryptionEnabled = "localEncryptionEnabled"

@@ -4532,6 +4532,35 @@
         }
       }
     },
+    "A second PIN that opens the app with nothing in it. It unlocks exactly like your real one, with no warning and nothing on screen to say which you used. Your data is untouched and your real PIN brings it straight back.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine zweite PIN, die die App leer öffnet. Sie entsperrt genau wie deine echte, ohne Warnung und ohne dass auf dem Bildschirm steht, welche du benutzt hast. Deine Daten bleiben unangetastet, und deine echte PIN holt sie sofort zurück."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un segundo PIN que abre la app sin nada dentro. Desbloquea exactamente igual que el real, sin aviso y sin nada en pantalla que indique cuál has usado. Tus datos quedan intactos y tu PIN real los devuelve al instante."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un deuxième code qui ouvre l’app sans rien dedans. Il déverrouille exactement comme le vrai, sans avertissement et sans rien à l’écran qui indique lequel tu as utilisé. Tes données restent intactes et ton vrai code les ramène aussitôt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een tweede pincode die de app opent met niets erin. Hij ontgrendelt precies als je echte, zonder waarschuwing en zonder dat op het scherm te zien is welke je gebruikte. Je gegevens blijven ongemoeid en je echte pincode haalt ze meteen terug."
+          }
+        }
+      },
+      "comment": "Duress PIN card explanation"
+    },
     "A short plan helps: ending time, transport, medication check, substance limits, condoms/lube, emergency contact, and boundaries.": {
       "localizations": {
         "de": {
@@ -12557,6 +12586,35 @@
           }
         }
       }
+    },
+    "Change your second PIN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zweite PIN ändern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar tu segundo PIN"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifier ton deuxième code"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweede pincode wijzigen"
+          }
+        }
+      },
+      "comment": "Duress PIN setup title, existing"
     },
     "Changes save automatically.": {
       "localizations": {
@@ -47546,6 +47604,93 @@
         }
       }
     },
+    "Second PIN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zweite PIN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Segundo PIN"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deuxième code"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweede pincode"
+          }
+        }
+      },
+      "comment": "Duress PIN card title"
+    },
+    "Second PIN is set.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zweite PIN ist gesetzt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Segundo PIN configurado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deuxième code enregistré."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweede pincode is ingesteld."
+          }
+        }
+      },
+      "comment": "Confirmation after setting the duress PIN"
+    },
+    "Second PIN removed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zweite PIN entfernt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Segundo PIN eliminado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deuxième code supprimé."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweede pincode verwijderd."
+          }
+        }
+      },
+      "comment": "Confirmation after turning the duress PIN off"
+    },
     "Second substance": {
       "extractionState": "manual",
       "localizations": {
@@ -48344,6 +48489,35 @@
         }
       }
     },
+    "Set a second PIN": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zweite PIN festlegen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configura un segundo PIN"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Définir un deuxième code"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stel een tweede pincode in"
+          }
+        }
+      },
+      "comment": "Duress PIN setup title, new"
+    },
     "Set private wellbeing reminders after a substance-related log. This is for reflection and support, not dosing advice or a safety approval.": {
       "localizations": {
         "de": {
@@ -48427,6 +48601,35 @@
           }
         }
       }
+    },
+    "Set up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einrichten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configurar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configurer"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instellen"
+          }
+        }
+      },
+      "comment": "Button to configure the second PIN"
     },
     "Set up my profile": {
       "localizations": {
@@ -53850,6 +54053,35 @@
         }
       }
     },
+    "That is your real PIN. The second one has to be different.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das ist deine echte PIN. Die zweite muss eine andere sein."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese es tu PIN real. El segundo tiene que ser distinto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C’est ton vrai code. Le deuxième doit être différent."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dat is je echte pincode. De tweede moet anders zijn."
+          }
+        }
+      },
+      "comment": "Duress PIN validation warning"
+    },
     "The app can help organize notes for a conversation, but it cannot replace that conversation.": {
       "localizations": {
         "de": {
@@ -56879,6 +57111,35 @@
         }
       }
     },
+    "Turn off": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausschalten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactiver"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uitzetten"
+          }
+        }
+      },
+      "comment": "Button to remove the second PIN"
+    },
     "Turn off PIN": {
       "localizations": {
         "de": {
@@ -57641,6 +57902,35 @@
           }
         }
       }
+    },
+    "Use 4-8 numbers, different from your real PIN. Entering this one unlocks the app exactly as normal, but opens it empty. Nothing is deleted: your real PIN brings everything back.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nutze 4-8 Ziffern, andere als bei deiner echten PIN. Diese entsperrt die App genau wie sonst, öffnet sie aber leer. Es wird nichts gelöscht: mit deiner echten PIN ist alles wieder da."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa de 4 a 8 números, distintos de tu PIN real. Este desbloquea la app exactamente igual, pero la abre vacía. No se borra nada: tu PIN real lo devuelve todo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilise 4 à 8 chiffres, différents de ton vrai code. Celui-ci déverrouille l’app exactement comme d’habitude, mais l’ouvre vide. Rien n’est supprimé : ton vrai code ramène tout."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gebruik 4-8 cijfers, anders dan je echte pincode. Deze ontgrendelt de app precies zoals normaal, maar opent hem leeg. Er wordt niets verwijderd: met je echte pincode staat alles er weer."
+          }
+        }
+      },
+      "comment": "Duress PIN setup explanation"
     },
     "Use 4-8 numbers. This PIN unlocks the app on this device and works alongside Face ID.": {
       "comment": "A description of the PIN setup process.",

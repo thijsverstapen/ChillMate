@@ -16,6 +16,14 @@ enum ChillMateModelContainer {
             return testContainer
         }
 
+        // Duress mode shows an empty store rather than hiding a full one. The real
+        // data is untouched on disk — nothing is deleted, and the next unlock with
+        // the real PIN brings it all back. See `LocalSecurityService.saveDuressPIN`
+        // for why destroying anything here would be the wrong answer.
+        if LocalSecurityService.isInDuressMode, let decoy = try? makeDuressContainer() {
+            return decoy
+        }
+
         do {
             return try resolvedContainer()
         } catch {
@@ -109,6 +117,19 @@ enum ChillMateModelContainer {
         LocalSecurityService.applyFileProtection()
         recoveryContainer = container
         return container
+    }
+
+    /// A store with nothing in it, kept separate from the recovery container so
+    /// that falling back for one reason cannot be mistaken for the other.
+    ///
+    /// Not cached: leaving duress mode must not leave a populated decoy behind for
+    /// the next time, and a fresh empty container each time is what makes anything
+    /// logged under duress evaporate.
+    @MainActor
+    private static func makeDuressContainer() throws -> ModelContainer {
+        let schema = appSchema
+        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        return try ModelContainer(for: schema, configurations: [configuration])
     }
 
     private static var appSchema: Schema {
