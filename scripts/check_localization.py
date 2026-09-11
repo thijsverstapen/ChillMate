@@ -421,6 +421,97 @@ def check_raw_value_rendering(directory):
     return findings
 
 
+# Every user-facing string in the notification service funnels through one
+# builder, `notificationContent`, so the file has an invariant the rest of the app
+# does not: any English sentence in it is notification copy and must be localized.
+#
+# Nothing else could have caught what this does. The PrEP reminders passed their
+# title and body as bare strings inside a tuple array, never reaching a call site
+# any pattern was watching, so a medication reminder arrived in English in all
+# five languages. The safer-plan reminder was worse for being half right: the
+# sentence was translated and the duration interpolated into it was not, so Dutch
+# readers were told their plan ends "over 30 minutes".
+NOTIFICATION_SERVICE = "ChillMate/NotificationService.swift"
+
+# The only bare literals the file may contain: identifier fragments written by
+# builds before 5.0.0, kept so those reminders can still be cancelled. They are
+# historical facts, not text anybody reads.
+NOTIFICATION_LITERAL_EXEMPTIONS = {"1 hour", "30 minutes", "10 minutes"}
+
+
+# A bare literal assigned to something that gets displayed.
+#
+# This is the shape no call-site pattern can see: the string never passes through
+# `Text`, `Label` or `String(localized:)` — it is put in a `@State` variable and
+# rendered somewhere else entirely. Sixteen strings were shipping in English this
+# way, including four confirmations in first-run setup, the failure message when
+# deleting an account does not finish, and the default text of the message that
+# goes to a trusted contact when somebody asks for help.
+#
+# The suffix list is what makes it precise rather than noisy: a name ending in
+# Message, Title, Status and so on is a name for something a person reads.
+DISPLAY_ASSIGNMENT = re.compile(
+    r"\b[A-Za-z_][A-Za-z0-9_]*"
+    r"(?:[Mm]essage|[Ss]tatus|[Cc]aption|[Ss]ummary|[Tt]itle|[Bb]ody|[Dd]etail|[Hh]int|[Ee]rror|[Ll]abel)"
+    r"\s*=\s*(?=\")"
+)
+
+# The UserDefaults registry, where the literals are key names rather than text.
+DISPLAY_ASSIGNMENT_EXEMPT_FILES = {"DefaultsKeys.swift"}
+
+
+def check_display_assignments(directory):
+    """No bare literal may be assigned to something a person reads."""
+    findings = []
+    for source in sorted((ROOT / directory).glob("*.swift")):
+        if source.name in DISPLAY_ASSIGNMENT_EXEMPT_FILES:
+            continue
+        text = source.read_text()
+        for match in DISPLAY_ASSIGNMENT.finditer(text):
+            raw = scan_literal(text, match.end())
+            # A literal with no words in it is punctuation or a key, not copy.
+            if " " not in raw or not re.sub(r"[\s\W\x00]+", "", interpolation_shape(raw)):
+                continue
+            line = text[:match.start()].count("\n") + 1
+            findings.append(
+                f"{directory}/*.swift: {source.name}:{line} {raw[:60]!r} is displayed "
+                "but assigned as a bare literal; wrap it in String(localized:)"
+            )
+    return findings
+
+
+def check_notification_copy():
+    """No bare English sentence in the notification service."""
+    source = ROOT / NOTIFICATION_SERVICE
+    if not source.exists():
+        return []
+
+    text = source.read_text()
+    findings = []
+    index = 0
+    while index < len(text):
+        if text.startswith("//", index):
+            newline = text.find("\n", index)
+            index = len(text) if newline < 0 else newline
+            continue
+        if text[index] == '"':
+            raw = scan_literal(text, index)
+            end = skip_string(text, index)
+            before = text[max(0, index - 60):index]
+            localized = re.search(r"String\(\s*localized:\s*$", before)
+            if (not localized and " " in raw and re.search(r"[a-z]", raw)
+                    and raw not in NOTIFICATION_LITERAL_EXEMPTIONS):
+                line = text[:index].count("\n") + 1
+                findings.append(
+                    f"{NOTIFICATION_SERVICE}:{line} {raw[:60]!r} is notification copy "
+                    "outside String(localized:)"
+                )
+            index = end
+            continue
+        index += 1
+    return findings
+
+
 def check_sources(directory, catalog_path):
     """Every localized literal in source must exist as a catalog key.
 
@@ -506,6 +597,9 @@ for catalog_path in CATALOGS:
 for source_directory, source_catalog in SOURCE_CATALOGS:
     check_sources(source_directory, source_catalog)
     failures.extend(check_raw_value_rendering(source_directory))
+    failures.extend(check_display_assignments(source_directory))
+
+failures.extend(check_notification_copy())
 
 if failures:
     print("\nLocalization check failed:")

@@ -392,6 +392,78 @@ final class ChillMateUITests: XCTestCase {
         )
     }
 
+    /// Panic support has to be one tap from wherever somebody happens to be.
+    ///
+    /// It is on all three tabs deliberately — a person who needs it is not going
+    /// to navigate to the tab where it lives — and a control that is present on
+    /// one tab and quietly missing on another is exactly the kind of regression
+    /// nobody notices until it matters.
+    func testPanicControlIsReachableFromEveryTab() throws {
+        try ensureProfileExists()
+
+        let app = launchedApp()
+        XCTAssertTrue(app.tabBars.buttons["tab.home"].waitForExistence(timeout: 30))
+
+        for identifier in ["tab.home", "tab.history", "tab.more"] {
+            app.tabBars.buttons[identifier].tap()
+            let panic = app.buttons["home.panic"]
+            XCTAssertTrue(
+                panic.waitForExistence(timeout: 10),
+                "The panic control is missing on \(identifier)"
+            )
+            XCTAssertTrue(panic.isHittable, "The panic control is present but not tappable on \(identifier)")
+        }
+    }
+
+    /// Cancelling the log sheet has to leave nothing behind.
+    ///
+    /// The sheet is where a night gets recorded, and a cancel that silently saved
+    /// would put substance use in someone's history that they explicitly chose
+    /// not to record.
+    func testLogSheetCancelsWithoutSaving() throws {
+        try ensureProfileExists()
+
+        let app = launchedApp()
+        XCTAssertTrue(app.tabBars.buttons["tab.home"].waitForExistence(timeout: 30))
+        app.tabBars.buttons["tab.home"].tap()
+
+        let add = app.buttons["home.logChill"]
+        guard scrollIntoView(add, in: app) else {
+            XCTFail("The log button never came into view on Home")
+            return
+        }
+        add.tap()
+
+        let cancel = app.buttons["log.cancel"]
+        XCTAssertTrue(cancel.waitForExistence(timeout: 15), "The log sheet never opened")
+        cancel.tap()
+
+        // Back on Home, with the app still standing.
+        XCTAssertTrue(
+            app.buttons["home.logChill"].waitForExistence(timeout: 15),
+            "Cancelling the log sheet did not return to Home"
+        )
+        XCTAssertEqual(app.state, .runningForeground, "App crashed cancelling the log sheet")
+    }
+
+    /// The daily score is the first thing on Home and the only number on it.
+    /// VoiceOver has to be able to say what it is, not read out a bare integer.
+    func testDailyScoreIsAnnounced() throws {
+        try ensureProfileExists()
+
+        let app = launchedApp()
+        XCTAssertTrue(app.tabBars.buttons["tab.home"].waitForExistence(timeout: 30))
+
+        let pill = app.otherElements["home.dailyScore"].firstMatch
+        let button = app.buttons["home.dailyScore"].firstMatch
+        let element = pill.exists ? pill : button
+        XCTAssertTrue(element.waitForExistence(timeout: 15), "The daily score is missing from Home")
+        XCTAssertFalse(
+            element.label.trimmingCharacters(in: .whitespaces).isEmpty,
+            "The daily score has no accessibility label"
+        )
+    }
+
     func testScreenshots() throws {
         try XCTSkipUnless(
             ProcessInfo.processInfo.environment["FASTLANE_SNAPSHOT"] == "YES",

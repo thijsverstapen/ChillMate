@@ -111,6 +111,20 @@
 		AAB10000000000000000002D /* SafeRouteLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000002B /* SafeRouteLiveActivityController.swift */; };
 		AAB10000000000000000002E /* SafeRouteLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000002C /* SafeRouteLiveActivityWidget.swift */; };
 		AAB10000000000000000002F /* HelperSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000002D /* HelperSummary.swift */; };
+		AAB100000000000000000030 /* AppShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000002E /* AppShell.swift */; };
+		AAB100000000000000000031 /* SupportDeveloperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000002F /* SupportDeveloperView.swift */; };
+		AAB100000000000000000032 /* OnboardingIntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000030 /* OnboardingIntroView.swift */; };
+		AAB100000000000000000033 /* ProfileSetupComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000031 /* ProfileSetupComponents.swift */; };
+		AAB100000000000000000034 /* CalendarOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000032 /* CalendarOverview.swift */; };
+		AAB100000000000000000035 /* ProfileOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000033 /* ProfileOverview.swift */; };
+		AAB100000000000000000036 /* PrivacyShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000034 /* PrivacyShieldView.swift */; };
+		AAB100000000000000000037 /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000035 /* FlowLayout.swift */; };
+		AAB100000000000000000038 /* SettingsCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000036 /* SettingsCards.swift */; };
+		AAB100000000000000000039 /* SettingsAccountData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000037 /* SettingsAccountData.swift */; };
+		AAB10000000000000000003A /* DailyAffirmations.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000038 /* DailyAffirmations.swift */; };
+		AAB10000000000000000003B /* BackupPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000039 /* BackupPayload.swift */; };
+		AAB10000000000000000003C /* SessionCheckInSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003A /* SessionCheckInSchedule.swift */; };
+		AAB10000000000000000003D /* NightMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003B /* NightMode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -288,6 +302,20 @@
 		AAF10000000000000000002B /* SafeRouteLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeRouteLiveActivityController.swift; sourceTree = "<group>"; };
 		AAF10000000000000000002C /* SafeRouteLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeRouteLiveActivityWidget.swift; sourceTree = "<group>"; };
 		AAF10000000000000000002D /* HelperSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperSummary.swift; sourceTree = "<group>"; };
+		AAF10000000000000000002E /* AppShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShell.swift; sourceTree = "<group>"; };
+		AAF10000000000000000002F /* SupportDeveloperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportDeveloperView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000030 /* OnboardingIntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingIntroView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000031 /* ProfileSetupComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupComponents.swift; sourceTree = "<group>"; };
+		AAF100000000000000000032 /* CalendarOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarOverview.swift; sourceTree = "<group>"; };
+		AAF100000000000000000033 /* ProfileOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileOverview.swift; sourceTree = "<group>"; };
+		AAF100000000000000000034 /* PrivacyShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyShieldView.swift; sourceTree = "<group>"; };
+		AAF100000000000000000035 /* FlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlowLayout.swift; sourceTree = "<group>"; };
+		AAF100000000000000000036 /* SettingsCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsCards.swift; sourceTree = "<group>"; };
+		AAF100000000000000000037 /* SettingsAccountData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAccountData.swift; sourceTree = "<group>"; };
+		AAF100000000000000000038 /* DailyAffirmations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAffirmations.swift; sourceTree = "<group>"; };
+		AAF100000000000000000039 /* BackupPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupPayload.swift; sourceTree = "<group>"; };
+		AAF10000000000000000003A /* SessionCheckInSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCheckInSchedule.swift; sourceTree = "<group>"; };
+		AAF10000000000000000003B /* NightMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightMode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -378,6 +406,20 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF10000000000000000003B /* NightMode.swift */,
+				AAF10000000000000000003A /* SessionCheckInSchedule.swift */,
+				AAF100000000000000000039 /* BackupPayload.swift */,
+				AAF100000000000000000038 /* DailyAffirmations.swift */,
+				AAF100000000000000000037 /* SettingsAccountData.swift */,
+				AAF100000000000000000036 /* SettingsCards.swift */,
+				AAF100000000000000000035 /* FlowLayout.swift */,
+				AAF100000000000000000034 /* PrivacyShieldView.swift */,
+				AAF100000000000000000033 /* ProfileOverview.swift */,
+				AAF100000000000000000032 /* CalendarOverview.swift */,
+				AAF100000000000000000031 /* ProfileSetupComponents.swift */,
+				AAF100000000000000000030 /* OnboardingIntroView.swift */,
+				AAF10000000000000000002F /* SupportDeveloperView.swift */,
+				AAF10000000000000000002E /* AppShell.swift */,
 				AAF10000000000000000002D /* HelperSummary.swift */,
 				AAF10000000000000000002B /* SafeRouteLiveActivityController.swift */,
 				AAF10000000000000000002A /* SafeRouteArrivedIntent.swift */,
@@ -759,6 +801,20 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB10000000000000000003D /* NightMode.swift in Sources */,
+				AAB10000000000000000003C /* SessionCheckInSchedule.swift in Sources */,
+				AAB10000000000000000003B /* BackupPayload.swift in Sources */,
+				AAB10000000000000000003A /* DailyAffirmations.swift in Sources */,
+				AAB100000000000000000039 /* SettingsAccountData.swift in Sources */,
+				AAB100000000000000000038 /* SettingsCards.swift in Sources */,
+				AAB100000000000000000037 /* FlowLayout.swift in Sources */,
+				AAB100000000000000000036 /* PrivacyShieldView.swift in Sources */,
+				AAB100000000000000000035 /* ProfileOverview.swift in Sources */,
+				AAB100000000000000000034 /* CalendarOverview.swift in Sources */,
+				AAB100000000000000000033 /* ProfileSetupComponents.swift in Sources */,
+				AAB100000000000000000032 /* OnboardingIntroView.swift in Sources */,
+				AAB100000000000000000031 /* SupportDeveloperView.swift in Sources */,
+				AAB100000000000000000030 /* AppShell.swift in Sources */,
 				AAB10000000000000000002F /* HelperSummary.swift in Sources */,
 				AAB10000000000000000002D /* SafeRouteLiveActivityController.swift in Sources */,
 				AAB10000000000000000002B /* SafeRouteArrivedIntent.swift in Sources */,

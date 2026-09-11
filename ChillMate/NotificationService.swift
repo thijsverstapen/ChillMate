@@ -337,7 +337,7 @@ final class NotificationService {
     }
 
     func scheduleDailyAffirmations() {
-        scheduleDailyAffirmations(using: Self.affirmationMessagePool)
+        scheduleDailyAffirmations(using: DailyAffirmations.messages)
     }
 
     /// Reschedules the weekly affirmations, first trying to generate fresh ones
@@ -348,10 +348,10 @@ final class NotificationService {
         var pool = await OnDeviceAffirmationService.generateAffirmations(count: 7, languageCode: languageCode) ?? []
         if pool.count < 3 {
             // Not enough trustworthy on-device output: use the curated pool.
-            pool = Self.affirmationMessagePool
+            pool = DailyAffirmations.messages
         } else if pool.count < 7 {
             // Top up so all seven slots have distinct-enough text.
-            pool += Self.affirmationMessagePool
+            pool += DailyAffirmations.messages
         }
         scheduleDailyAffirmations(using: pool)
     }
@@ -367,7 +367,7 @@ final class NotificationService {
             let message = pool[messageIndex]
 
             let content = notificationContent(
-                title: Self.affirmationTitles[index % Self.affirmationTitles.count],
+                title: DailyAffirmations.titles[index % DailyAffirmations.titles.count],
                 body: message,
                 discreetBody: String(localized: "A private note is waiting for you."),
                 destination: .home
@@ -387,256 +387,6 @@ final class NotificationService {
         }
     }
 
-    private static var affirmationTitles: [String] { [
-        String(localized: "A quiet note from ChillMate"),
-        String(localized: "Just checking in"),
-        String(localized: "One thing worth noticing today"),
-        String(localized: "Something small that counts"),
-        String(localized: "A moment for yourself"),
-        String(localized: "Today's reminder"),
-        String(localized: "You're doing better than you think")
-    ] }
-
-    private static var affirmationMessagePool: [String] { [
-        String(localized: "Every choice that protects your body is worth something, even the small ones."),
-        String(localized: "A day without logged use is still a day that moved you forward."),
-        String(localized: "You don't have to have it all figured out. Steady is enough."),
-        String(localized: "Rest is not the same as giving up. It is part of how you recover."),
-        String(localized: "Skipping a session is not missing out. It is choosing future you."),
-        String(localized: "You can be proud of choices that no one else will ever see."),
-        String(localized: "Your recovery streak is built one decision at a time, not all at once."),
-        String(localized: "Checking in with yourself takes courage. You are doing that."),
-        String(localized: "Nothing about today has to be perfect. Just real is already a lot."),
-        String(localized: "The things you protect about yourself quietly. They matter."),
-        String(localized: "Noticing patterns is harder than ignoring them. You are doing the harder thing."),
-        String(localized: "There is no version of care that is too small to count."),
-        String(localized: "You are allowed to move slowly. Slow is still moving."),
-        String(localized: "The fact that you are thinking about your health at all. That is not nothing."),
-        String(localized: "One honest log, one water refill, one text to someone you trust. That is a full day."),
-        String(localized: "Recovery does not need an audience. Private progress still counts."),
-        String(localized: "Being kind to your body is not always comfortable. You are doing it anyway."),
-        String(localized: "Today you made it to this notification. Something in you is still paying attention."),
-        String(localized: "It is okay to have complicated feelings about where you are right now."),
-        String(localized: "What you are building with these logs is a kind of self-respect."),
-        String(localized: "You have gotten through harder days than this one."),
-        String(localized: "The streak is yours. No one can see it but you, and it is real."),
-        String(localized: "You are not just tracking habits. You are learning what you need."),
-        String(localized: "Substances change the picture. A clear day gives you back the full view."),
-        String(localized: "Sometimes the healthiest thing is just not making it worse today."),
-        String(localized: "You are worth checking in on, even when nothing is urgent."),
-        String(localized: "There is no perfect way to do this. There is only what you actually do."),
-        String(localized: "Your body remembers every kind decision you make, even the ones you forget."),
-        String(localized: "Small steps still count as steps."),
-        String(localized: "You showed up for yourself today, and that matters."),
-        String(localized: "One calm breath can change the next few minutes."),
-        String(localized: "Your pace is allowed to be your own."),
-        String(localized: "Progress is not always loud. Quiet days count too."),
-        String(localized: "You are allowed to rest without earning it first."),
-        String(localized: "Choosing water right now is a kind thing to do for yourself."),
-        String(localized: "You don't have to explain your boundaries to anyone."),
-        String(localized: "A gentle no is still a complete sentence."),
-        String(localized: "Tomorrow-you will be glad you paused tonight."),
-        String(localized: "You are more than your hardest day."),
-        String(localized: "Taking care of yourself in private is still real care."),
-        String(localized: "You can start over at any hour, not just in the morning."),
-        String(localized: "The fact that you opened this app means part of you is hoping."),
-        String(localized: "Feeling tired is information, not a failure."),
-        String(localized: "You are allowed to change your mind about tonight."),
-        String(localized: "Slowing down is a skill, and you are practicing it."),
-        String(localized: "Your worth does not drop when a streak does."),
-        String(localized: "One kind choice tends to make the next one easier."),
-        String(localized: "You can be gentle with yourself and still take this seriously."),
-        String(localized: "Rest now so the next decision comes from a clearer place."),
-        String(localized: "You are learning your own patterns, and that is power."),
-        String(localized: "Asking for help is a strong move, not a weak one."),
-        String(localized: "A quiet night is allowed to just be a quiet night."),
-        String(localized: "You do not have to carry today alone."),
-        String(localized: "Drinking water and eating something counts as looking after yourself."),
-        String(localized: "Your body is doing its best to keep up with you. Help it where you can."),
-        String(localized: "You can hold pride and regret at the same time. Both are honest."),
-        String(localized: "The version of you that rests is still the real you."),
-        String(localized: "Checking the time before deciding is a quietly powerful habit."),
-        String(localized: "You are allowed to leave early."),
-        String(localized: "Comfort is not the same as safety. You get to choose safety."),
-        String(localized: "One steadier night can shift a whole week."),
-        String(localized: "You don't owe anyone an explanation for protecting yourself."),
-        String(localized: "Noticing you need a break is already taking the break seriously."),
-        String(localized: "Your future self is shaped by small choices like this one."),
-        String(localized: "It is okay if today was only about getting through it."),
-        String(localized: "You can be proud of a boundary you almost didn't hold."),
-        String(localized: "Some progress only you will ever see, and that is enough."),
-        String(localized: "You are allowed to want both connection and safety."),
-        String(localized: "A pause is not a step back. It is part of moving well."),
-        String(localized: "Your honesty with yourself is worth more than a perfect record."),
-        String(localized: "Eating something gentle is a small act of self-respect."),
-        String(localized: "You can be kind to the version of you that struggled last night."),
-        String(localized: "There is no deadline on feeling better."),
-        String(localized: "You are allowed to take up space and ask for what you need."),
-        String(localized: "The calm you build now stays with you later."),
-        String(localized: "Choosing rest over one more hour is a real choice."),
-        String(localized: "You don't have to be okay to be worth caring for."),
-        String(localized: "Each clear-headed morning is something you gave yourself."),
-        String(localized: "You can set a boundary and still care about someone."),
-        String(localized: "Letting the urge pass is a skill you are building."),
-        String(localized: "Your body keeps the receipts of every kind choice."),
-        String(localized: "A softer inner voice makes hard days a little lighter."),
-        String(localized: "You are allowed to protect your sleep like it matters, because it does."),
-        String(localized: "Coming back after a rough stretch takes real courage."),
-        String(localized: "You can choose differently next time without hating this time."),
-        String(localized: "Your limits are not a problem to fix. They are information to respect."),
-        String(localized: "Today's small care is tomorrow's steadier ground."),
-        String(localized: "You are not behind. You are on your own timeline."),
-        String(localized: "One honest check-in is worth more than a perfect plan."),
-        String(localized: "You can be tired and still be doing well."),
-        String(localized: "Taking it slow tonight is a gift to the morning."),
-        String(localized: "You deserve the same patience you would give a friend."),
-        String(localized: "A clear day is not boring. It is yours to feel fully."),
-        String(localized: "You can stop at enough, even when more is offered."),
-        String(localized: "Protecting your peace is allowed, even when it disappoints someone."),
-        String(localized: "The quiet choices add up to a life you can live with."),
-        String(localized: "You are allowed to feel proud of staying in tonight."),
-        String(localized: "Whatever today held, you are still here, and that counts."),
-        String(localized: "You can love your community and still need a night off from it."),
-        String(localized: "Hydration is not boring. It is how tomorrow feels survivable."),
-        String(localized: "Choosing to log honestly is choosing to know yourself."),
-        String(localized: "The pause button is always available to you."),
-        String(localized: "You are allowed to want a softer kind of fun."),
-        String(localized: "Resting your body is not the same as falling behind."),
-        String(localized: "You can be the friend who leaves early and still be a good friend."),
-        String(localized: "Naming what you feel takes the edge off carrying it."),
-        String(localized: "A glass of water is a small promise you keep to yourself."),
-        String(localized: "You can be gentle about a night that did not go to plan."),
-        String(localized: "Slowing the night down is rarely something you regret in the morning."),
-        String(localized: "Your calm is worth protecting, even in a loud room."),
-        String(localized: "You are allowed to check in with yourself without a reason."),
-        String(localized: "Tonight does not have to look like last weekend."),
-        String(localized: "One honest sentence to a friend can lighten a heavy night."),
-        String(localized: "You can hold space for joy and still keep yourself safe."),
-        String(localized: "The kindest thing might be an early night."),
-        String(localized: "You are allowed to outgrow what used to feel normal."),
-        String(localized: "Eating before, not just after, is a quiet form of care."),
-        String(localized: "You can choose people who make leaving easy."),
-        String(localized: "Your body will thank you for the water you drink tonight."),
-        String(localized: "A boundary you keep tonight teaches you that you can."),
-        String(localized: "Feeling unsure is a fine reason to wait."),
-        String(localized: "You are not too much for asking for what keeps you safe."),
-        String(localized: "Recovery is less a straight line and more a series of returns."),
-        String(localized: "You can be proud of the help you reached for."),
-        String(localized: "Cooling down and catching your breath is doing something."),
-        String(localized: "The morning is easier when you are kind to tonight."),
-        String(localized: "You are allowed to keep some of your life just for you."),
-        String(localized: "A check-in is not a test you can fail."),
-        String(localized: "You can want closeness and still keep your limits."),
-        String(localized: "Rest is productive in its own quiet way."),
-        String(localized: "You are allowed to be a work in progress."),
-        String(localized: "Pacing yourself is a sign of self-trust, not fear."),
-        String(localized: "You can put your phone down and let the urge get bored."),
-        String(localized: "Every time you choose water over more, your body notices."),
-        String(localized: "You are allowed to feel good about an ordinary night."),
-        String(localized: "A plan you can actually follow beats a perfect one you cannot."),
-        String(localized: "You can be honest in your logs without being harsh with yourself."),
-        String(localized: "Leaving room to stop early is a kind of wisdom."),
-        String(localized: "You are allowed to need more sleep than you used to."),
-        String(localized: "A steadier you is being built in moments like this."),
-        String(localized: "You can care about tomorrow and still enjoy tonight."),
-        String(localized: "Checking on a friend is also a way of checking on yourself."),
-        String(localized: "Your nervous system likes slow, steady, and safe."),
-        String(localized: "You are allowed to say this is enough for me tonight."),
-        String(localized: "The fact that you are pausing means you are listening to yourself."),
-        String(localized: "A calm body makes clearer choices."),
-        String(localized: "You can be tender with the parts of you that are still healing."),
-        String(localized: "Drinking water now is a vote for an easier morning."),
-        String(localized: "You are allowed to protect your weekend self from your Friday-night self."),
-        String(localized: "One steady breath is a place to start again."),
-        String(localized: "Coming home safe is the whole goal tonight."),
-        String(localized: "You can be both careful and free."),
-        String(localized: "The smallest act of self-care still counts as care."),
-        String(localized: "You are allowed to be the calm one tonight."),
-        String(localized: "Letting yourself rest is letting yourself recover."),
-        String(localized: "You can change the story for tonight at any point."),
-        String(localized: "A boundary is a gift you give your future self."),
-        String(localized: "You are allowed to feel proud without anyone clapping."),
-        String(localized: "Checking the time, the dose plan, and the way home is just good care."),
-        String(localized: "You can be soft with yourself and still be strong."),
-        String(localized: "Your worth is not measured by how the night goes."),
-        String(localized: "Taking a breather is not quitting."),
-        String(localized: "You are allowed to want to remember your night clearly."),
-        String(localized: "A clear head tomorrow is something you can choose tonight."),
-        String(localized: "You can ask someone to stay close without explaining everything."),
-        String(localized: "Rest is part of the plan, not a break from it."),
-        String(localized: "You are allowed to be proud of one good decision."),
-        String(localized: "Whatever you can manage today is allowed to be enough."),
-        String(localized: "You are allowed to take the night at half speed."),
-        String(localized: "Being honest about a hard night is its own kind of strength."),
-        String(localized: "You can be proud of the line you did not cross."),
-        String(localized: "Your body has carried you this far. Treat it like an ally."),
-        String(localized: "Slowing down does not mean you are missing the moment."),
-        String(localized: "You are allowed to want safety more than approval."),
-        String(localized: "A short rest can save a long recovery."),
-        String(localized: "You can leave a situation that stops feeling right."),
-        String(localized: "The most caring choice is sometimes the quiet one."),
-        String(localized: "You are allowed to put yourself first tonight."),
-        String(localized: "One glass of water, one deep breath, one honest moment. Start there."),
-        String(localized: "Your limits make your yes mean something."),
-        String(localized: "You can be gentle with a craving without obeying it."),
-        String(localized: "Coming back to yourself is always possible."),
-        String(localized: "You are allowed to feel proud of a calm night."),
-        String(localized: "Tending to your sleep is tending to your whole self."),
-        String(localized: "You can let tonight be smaller than you planned."),
-        String(localized: "A pause gives your future self a chance to weigh in."),
-        String(localized: "You are not weak for needing rest. You are human."),
-        String(localized: "Your steadiness is built from nights exactly like this."),
-        String(localized: "You can choose comfort that does not cost you tomorrow."),
-        String(localized: "Checking in is a way of staying on your own side."),
-        String(localized: "You are allowed to keep something good going by stopping in time."),
-        String(localized: "A clear morning is a gift you can still choose to give yourself."),
-        String(localized: "You can be kind to yourself and accountable at once."),
-        String(localized: "Your needs are not too much to take seriously."),
-        String(localized: "The brave thing tonight might be the boring thing."),
-        String(localized: "You are allowed to rest before you are completely out of energy."),
-        String(localized: "One safer choice makes room for the next one."),
-        String(localized: "You can hold your boundaries gently and firmly."),
-        String(localized: "Slowing your breathing tells your body it is safe."),
-        String(localized: "You are allowed to want less tonight than last time."),
-        String(localized: "A night you remember is a night that stays yours."),
-        String(localized: "You can ask for water, a seat, or a quiet corner. All allowed."),
-        String(localized: "Your recovery is not cancelled by one hard day."),
-        String(localized: "You are allowed to be proud of getting home safe."),
-        String(localized: "The smallest pause can interrupt the biggest momentum."),
-        String(localized: "You can be tired of pushing and still be doing fine."),
-        String(localized: "Your future self is listening to the choice you make now."),
-        String(localized: "You are allowed to choose the version of tonight that you can rest after."),
-        String(localized: "Caring for your body is never a waste of a night."),
-        String(localized: "You can be soft and still keep your word to yourself."),
-        String(localized: "A calm exit is a skill worth being proud of."),
-        String(localized: "You are allowed to feel relief when you choose to stop."),
-        String(localized: "One steady decision can quiet a noisy night."),
-        String(localized: "Your worth was never on the line tonight."),
-        String(localized: "You can come back to the plan even after stepping away from it."),
-        String(localized: "Being gentle with yourself is part of taking this seriously."),
-        String(localized: "You are allowed to want both rest and connection, in that order tonight."),
-        String(localized: "A check-in now can save a harder conversation later."),
-        String(localized: "Your body keeps going because of small kindnesses like water and rest."),
-        String(localized: "You can be proud of choosing the quieter path."),
-        String(localized: "The way you treat yourself tonight echoes into tomorrow."),
-        String(localized: "You are allowed to stop reading the room and listen to yourself."),
-        String(localized: "A slower night still counts as a night well spent."),
-        String(localized: "You can let go of how tonight was supposed to look."),
-        String(localized: "Your honesty here is building trust with yourself."),
-        String(localized: "You are allowed to take care of yourself without a crisis."),
-        String(localized: "One good breath is enough to begin again."),
-        String(localized: "You can be the person who looks out for you."),
-        String(localized: "A boundary held gently is still a boundary held."),
-        String(localized: "You are allowed to feel okay about an early goodnight."),
-        String(localized: "Your steadiness today makes tomorrow lighter."),
-        String(localized: "You can pause without explaining the pause."),
-        String(localized: "Choosing rest is choosing yourself."),
-        String(localized: "You are allowed to let this be a soft landing."),
-        String(localized: "Small honest choices are quietly changing your story."),
-        String(localized: "You can be proud of every clear-headed hour."),
-        String(localized: "Your care for yourself counts even when no one sees it."),
-        String(localized: "However tonight goes, you are allowed to be gentle with yourself tomorrow."),
-    ] }
 
     func clearDailyAffirmations() {
         center.removePendingNotificationRequests(withIdentifiers: affirmationIdentifiers)
@@ -787,17 +537,15 @@ final class NotificationService {
     }
 
     func scheduleSaferPlanReminders(planID: UUID, endingAt endingDate: Date) {
-        let reminders: [(TimeInterval, String)] = [
-            (60 * 60, "1 hour"),
-            (30 * 60, "30 minutes"),
-            (10 * 60, "10 minutes")
-        ]
-
-        let identifiers = reminders.map { "chillmate.safeplan.\(planID.uuidString).\($0.1)" }
+        // Identifiers are built from the number of seconds, never from the words.
+        // An identifier that changed with the reader's language would leave a
+        // scheduled reminder that nothing could cancel.
+        let identifiers = SaferPlanReminderSchedule.offsets.map { "chillmate.safeplan.\(planID.uuidString).\(Int($0))" }
+            + SaferPlanReminderSchedule.legacyLabels.map { "chillmate.safeplan.\(planID.uuidString).\($0)" }
             + ["chillmate.safeplan.\(planID.uuidString).ended"]
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
 
-        for (offset, label) in reminders {
+        for offset in SaferPlanReminderSchedule.offsets {
             let reminderDate = endingDate.addingTimeInterval(-offset)
             guard reminderDate > .now else {
                 continue
@@ -805,7 +553,7 @@ final class NotificationService {
 
             let content = notificationContent(
                 title: String(localized: "Plan ending soon"),
-                body: String(localized: "Your safer session plan ends in \(label). Check water, transport, and your limits now."),
+                body: String(localized: "Your safer session plan ends in \(SaferPlanReminderSchedule.durationLabel(offset)). Check water, transport, and your limits now."),
                 discreetBody: String(localized: "Your private plan has a timing reminder."),
                 destination: .saferPlan,
                 categoryIdentifier: "CHECKIN",
@@ -813,7 +561,7 @@ final class NotificationService {
             )
 
             let request = UNNotificationRequest(
-                identifier: "chillmate.safeplan.\(planID.uuidString).\(label)",
+                identifier: "chillmate.safeplan.\(planID.uuidString).\(Int(offset))",
                 content: content,
                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval(for: reminderDate), repeats: false)
             )
@@ -825,10 +573,19 @@ final class NotificationService {
 
     func schedulePrepReminders(planID: UUID, plannedSexAt plannedDate: Date) {
         let firstDoseDate = plannedDate.addingTimeInterval(-2 * 60 * 60)
+        // These were bare Swift strings, so every one of these reminders arrived in
+        // English whatever language the app was in — a medication reminder, which
+        // is the last category that should be guessing at the reader.
         let reminders: [(Date, String, String)] = [
-            (firstDoseDate, "PrEP reminder", "If around-sex PrEP is prescribed for you, follow the schedule your clinician gave you."),
-            (firstDoseDate.addingTimeInterval(24 * 60 * 60), "PrEP follow-up", "Follow your prescribed PrEP follow-up instructions at the planned time."),
-            (firstDoseDate.addingTimeInterval(48 * 60 * 60), "PrEP follow-up", "Use your prescribed PrEP plan. Contact a clinician or sexual-health service if you are unsure.")
+            (firstDoseDate,
+             String(localized: "PrEP reminder"),
+             String(localized: "If around-sex PrEP is prescribed for you, follow the schedule your clinician gave you.")),
+            (firstDoseDate.addingTimeInterval(24 * 60 * 60),
+             String(localized: "PrEP follow-up"),
+             String(localized: "Follow your prescribed PrEP follow-up instructions at the planned time.")),
+            (firstDoseDate.addingTimeInterval(48 * 60 * 60),
+             String(localized: "PrEP follow-up"),
+             String(localized: "Use your prescribed PrEP plan. Contact a clinician or sexual-health service if you are unsure."))
         ]
 
         let identifiers = reminders.indices.map { "chillmate.prep.\(planID.uuidString).\($0)" }
@@ -861,16 +618,10 @@ final class NotificationService {
         let category = safetyMode ? "SAFETY_CHECKIN" : "CHECKIN"
         let level: UNNotificationInterruptionLevel = safetyMode ? .active : .passive
 
-        let firstDate = max(Date.now, startDate).addingTimeInterval(90 * 60)
-        guard firstDate < endDate else {
-            return
-        }
+        let dates = SessionCheckInSchedule.checkInDates(startsAt: startDate, endsAt: endDate)
+        guard !dates.isEmpty else { return }
 
-        var date = firstDate
-        var index = 0
-        let maxCheckIns = 48
-
-        while date < endDate, index < maxCheckIns {
+        for (index, date) in dates.enumerated() {
             let content = notificationContent(
                 title: safetyMode ? String(localized: "Safety check-in") : String(localized: "Gentle safety check"),
                 body: checkInMessages[index % checkInMessages.count],
@@ -886,14 +637,11 @@ final class NotificationService {
                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval(for: date), repeats: false)
             )
             center.add(request)
-
-            date = date.addingTimeInterval(90 * 60)
-            index += 1
         }
 
         // Escalation: an explicit, more assertive prompt at the planned session end
         // that routes straight to help if the person hasn't checked in.
-        if safetyMode, index < maxCheckIns {
+        if safetyMode, SessionCheckInSchedule.hasRoomForEscalation(after: dates.count) {
             let endContent = notificationContent(
                 title: String(localized: "Are you okay?"),
                 body: String(localized: "Your session timer has ended. Tap Get help to reach your trusted contact or emergency services, or I'm safe to dismiss."),
@@ -903,7 +651,7 @@ final class NotificationService {
                 interruptionLevel: .timeSensitive
             )
             let endRequest = UNNotificationRequest(
-                identifier: sessionCheckInIdentifier(id: id, index: index),
+                identifier: sessionCheckInIdentifier(id: id, index: dates.count),
                 content: endContent,
                 trigger: UNTimeIntervalNotificationTrigger(timeInterval: triggerInterval(for: endDate), repeats: false)
             )

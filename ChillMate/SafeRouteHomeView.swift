@@ -7,7 +7,7 @@ import UIKit
 struct SafeRouteHomeView: View {
     @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
-    @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
+    @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = TrustedContactDefaults.message
     @State private var destination = ""
     @State private var selectedRouteMode: RouteTransportMode = .transit
     @State private var routeSuggestions: [RouteSuggestion] = []

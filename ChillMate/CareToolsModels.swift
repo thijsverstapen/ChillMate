@@ -240,6 +240,21 @@ enum CareToolCatalog {
     }
 }
 
+/// What goes to a trusted contact when somebody asks for help.
+///
+/// The text was an English literal repeated as the `@AppStorage` default in
+/// three separate files, which meant a Dutch user's request for help left the
+/// phone in English — to a Dutch contact, who may not read it, in the one
+/// message in the app where being understood is the entire point.
+///
+/// Computed rather than stored: `String(localized:)` resolves against the
+/// bundle at read time, and all three declarations have to agree.
+enum TrustedContactDefaults {
+    static var message: String {
+        String(localized: "Please come get me, I’m not okay at this moment.")
+    }
+}
+
 enum CombinationTiming: String, CaseIterable, Identifiable {
     case sameSession = "Same session"
     case withinSixHours = "6 h"

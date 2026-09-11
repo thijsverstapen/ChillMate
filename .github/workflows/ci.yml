@@ -133,6 +133,7 @@ jobs:
               -scheme "$SCHEME" \
               -destination "$DESTINATION" \
               -only-testing:ChillMateTests \
+              -skip-testing:ChillMateTests/PerformanceTests \
               -testLanguage "$lang" \
               -resultBundlePath "TestResults/UnitTests-$lang.xcresult" \
               CODE_SIGNING_ALLOWED=NO \
@@ -140,6 +141,24 @@ jobs:
             echo "::endgroup::"
           done
           exit $status
+
+      # Once, not five times: these measure arithmetic, and arithmetic has no
+      # language. They are ceilings with an order of magnitude of headroom rather
+      # than benchmarks — a shared runner is slower and noisier than any laptop,
+      # and a budget tight enough to be interesting here would fail on load.
+      # What they catch is the shape of regression that is invisible on six test
+      # entries and unusable on three years of real ones.
+      - name: Performance and memory budgets
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -scheme "$SCHEME" \
+            -destination "$DESTINATION" \
+            -only-testing:ChillMateTests/PerformanceTests \
+            -testLanguage en \
+            -resultBundlePath TestResults/Performance.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcbeautify
 
       # Advisory, not a gate. These four tests drive a real simulator through
       # first-run onboarding by tapping labelled controls, which on a shared

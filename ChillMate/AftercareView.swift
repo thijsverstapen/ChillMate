@@ -203,7 +203,7 @@ private struct AftercareEntryCard: View {
                     NotificationService.shared.schedulePositiveSleepNotification(hours: hours)
                 }
 
-                sleepImportMessage = "Apple Health sleep: \(hours.formatted(.number.precision(.fractionLength(0...1)))) h."
+                sleepImportMessage = String(localized: "Apple Health sleep: \(hours.formatted(.number.precision(.fractionLength(0...1)))) h.")
             } catch {
                 sleepImportMessage = error.localizedDescription
             }

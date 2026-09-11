@@ -8,7 +8,7 @@ struct EmergencyNetherlandsView: View {
 
     @AppStorage(DefaultsKey.trustedContactName) private var trustedContactName = ""
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
-    @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
+    @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = TrustedContactDefaults.message
     @AppStorage(DefaultsKey.localEmergencyNumber) private var localEmergencyNumber = ""
     @AppStorage(DefaultsKey.localHealthcareContact) private var localHealthcareContact = ""
     @AppStorage(DefaultsKey.country) private var country = "Netherlands"
@@ -204,7 +204,7 @@ struct EmergencyNetherlandsView: View {
                 let location = try await LocationLookupService.shared.currentLoggedLocation()
                 await MainActor.run {
                     openMessageComposer(location: location)
-                    locationMessage = "Prepared iMessage with your current location."
+                    locationMessage = String(localized: "Prepared iMessage with your current location.")
                     isFetchingLocation = false
                 }
             } catch {
