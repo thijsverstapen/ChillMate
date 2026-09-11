@@ -805,7 +805,7 @@ final class NotificationService {
 
             let content = notificationContent(
                 title: String(localized: "Plan ending soon"),
-                body: "Your safer session plan ends in \(label). Check water, transport, and your limits now.",
+                body: String(localized: "Your safer session plan ends in \(label). Check water, transport, and your limits now."),
                 discreetBody: String(localized: "Your private plan has a timing reminder."),
                 destination: .saferPlan,
                 categoryIdentifier: "CHECKIN",
@@ -983,31 +983,26 @@ final class NotificationService {
         center.add(request)
     }
 
+    /// Remind someone their PEP window is open, inside the window.
+    ///
+    /// This used to put both reminders at 9am and 3pm *tomorrow*, whatever the
+    /// deadline was. PEP runs 72 hours from exposure, so a window closing tonight
+    /// or first thing tomorrow got two reminders that fire after it has shut —
+    /// the second one saying "You still have time to speak with a clinician",
+    /// which by then is false. `PEPReminderSchedule` picks times that are
+    /// actually inside the window.
     func schedulePEPWindowReminders(entry: NightEntry) {
         clearPEPWindowReminders()
-        guard entry.pepDeadline > .now else { return }
+
+        let dates = PEPReminderSchedule.reminderDates(deadline: entry.pepDeadline)
+        guard !dates.isEmpty else { return }
 
         let calendar = Calendar.current
-        let tomorrow = calendar.date(byAdding: .day, value: 1, to: .now) ?? .now
-
-        // Morning reminder at 9am
-        let morningComponents = calendar.dateComponents([.year, .month, .day], from: tomorrow)
-        var morning = DateComponents()
-        morning.year = morningComponents.year
-        morning.month = morningComponents.month
-        morning.day = morningComponents.day
-        morning.hour = 9
-        morning.minute = 0
-
-        // Afternoon reminder at 3pm
-        var afternoon = morning
-        afternoon.hour = 15
-
         let deadlineString = entry.pepDeadline.formatted(date: .abbreviated, time: .shortened)
 
         let morningContent = notificationContent(
             title: String(localized: "PEP time window is open"),
-            body: "A recent log may indicate a risk. Contact a doctor or sexual health clinic today. Window closes \(deadlineString).",
+            body: String(localized: "A recent log may indicate a risk. Contact a doctor or sexual health clinic today. Window closes \(deadlineString)."),
             discreetTitle: String(localized: "ChillMate"),
             discreetBody: String(localized: "A private health reminder is waiting for you."),
             destination: .emergency,
@@ -1015,27 +1010,28 @@ final class NotificationService {
         )
         let morningContent2 = notificationContent(
             title: String(localized: "PEP window still open"),
-            body: "You still have time to speak with a clinician before \(deadlineString). Don't wait longer than needed.",
+            body: String(localized: "You still have time to speak with a clinician before \(deadlineString). Do not wait longer than needed."),
             discreetTitle: String(localized: "ChillMate"),
             discreetBody: String(localized: "A private health follow-up is available."),
             destination: .emergency,
             interruptionLevel: .timeSensitive
         )
 
-        center.add(UNNotificationRequest(
-            identifier: "chillmate.pep.morning",
-            content: morningContent,
-            trigger: UNCalendarNotificationTrigger(dateMatching: morning, repeats: false)
-        ))
-        center.add(UNNotificationRequest(
-            identifier: "chillmate.pep.afternoon",
-            content: morningContent2,
-            trigger: UNCalendarNotificationTrigger(dateMatching: afternoon, repeats: false)
-        ))
+        let contents = [morningContent, morningContent2]
+        for (index, date) in dates.enumerated() {
+            let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+            center.add(UNNotificationRequest(
+                identifier: Self.pepIdentifiers[index],
+                content: contents[min(index, contents.count - 1)],
+                trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            ))
+        }
     }
 
+    private static let pepIdentifiers = ["chillmate.pep.morning", "chillmate.pep.afternoon"]
+
     func clearPEPWindowReminders() {
-        center.removePendingNotificationRequests(withIdentifiers: ["chillmate.pep.morning", "chillmate.pep.afternoon"])
+        center.removePendingNotificationRequests(withIdentifiers: Self.pepIdentifiers)
     }
 
     func clearScheduledNotifications() {
@@ -1104,5 +1100,74 @@ enum HealthWarning {
 
     static func shouldWarn(entries: [NightEntry]) -> Bool {
         recentRiskCount(entries: entries) > 3
+    }
+}
+
+/// When to remind someone that their PEP window is still open.
+///
+/// Post-exposure prophylaxis has to start within 72 hours of exposure and works
+/// better the sooner it starts, so a reminder is only worth anything if it lands
+/// while there is still time to act on it.
+///
+/// The previous version scheduled both reminders at 9am and 3pm *tomorrow*,
+/// regardless of when the window actually closed. For an exposure late in the
+/// window — which is exactly when someone is most likely to need reminding — both
+/// notifications arrived after it had shut, and the second one said "You still
+/// have time to speak with a clinician". That is worse than sending nothing.
+///
+/// Pure and injectable so it can be tested without a notification centre.
+enum PEPReminderSchedule {
+
+    /// Times of day a reminder is worth sending: mid-morning and mid-afternoon,
+    /// when a clinic is open and the day is not yet gone.
+    static let preferredHours = [9, 15]
+
+    /// The most reminders to send. Two was the existing behaviour and remains
+    /// right: this is urgent, not something to nag about.
+    static let maximumReminders = 2
+
+    /// A reminder any closer than this to now is not worth the interruption.
+    static let minimumLeadTime: TimeInterval = 15 * 60
+
+    /// Reminder times strictly between now and the deadline.
+    ///
+    /// - Returns: up to `maximumReminders` dates, earliest first, every one of
+    ///   them after `now` and before `deadline`. Empty when the window has closed
+    ///   or is about to.
+    static func reminderDates(
+        deadline: Date,
+        now: Date = .now,
+        calendar: Calendar = .current
+    ) -> [Date] {
+        guard deadline > now.addingTimeInterval(minimumLeadTime) else { return [] }
+
+        var candidates: [Date] = []
+        var day = calendar.startOfDay(for: now)
+        let lastDay = calendar.startOfDay(for: deadline)
+
+        while day <= lastDay {
+            for hour in preferredHours {
+                if let slot = calendar.date(bySettingHour: hour, minute: 0, second: 0, of: day) {
+                    candidates.append(slot)
+                }
+            }
+            guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
+            day = next
+        }
+
+        let usable = candidates
+            .filter { $0 > now.addingTimeInterval(minimumLeadTime) && $0 < deadline }
+            .sorted()
+
+        if !usable.isEmpty {
+            return Array(usable.prefix(maximumReminders))
+        }
+
+        // The window closes before the next clinic-hours slot. Send one reminder
+        // partway through what is left rather than nothing at all: a short window
+        // is the case where a reminder matters most, and it is the case the old
+        // code handled worst.
+        let midpoint = now.addingTimeInterval(deadline.timeIntervalSince(now) / 2)
+        return midpoint > now.addingTimeInterval(minimumLeadTime) ? [midpoint] : []
     }
 }

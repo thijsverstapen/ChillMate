@@ -647,10 +647,8 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         super.init()
         rolloverIfNeeded()
         hydrationCount = defaults.integer(forKey: hydrationCountKey)
-        quickSkipSentToday = defaults.integer(forKey: quickSkipDayKey) == Self.todayKey
-        if let stored = defaults.string(forKey: emergencyNumberKey), !stored.isEmpty {
-            emergencyNumber = stored
-        }
+        quickSkipSentToday = !WatchLogic.isAvailableToday(lastSentDay: defaults.integer(forKey: quickSkipDayKey))
+        emergencyNumber = WatchLogic.emergencyNumber(stored: defaults.string(forKey: emergencyNumberKey))
         activate()
     }
 
@@ -663,7 +661,7 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     // MARK: Local day rollover
 
     private static var todayKey: Int {
-        Int(Calendar.current.startOfDay(for: .now).timeIntervalSinceReferenceDate / 86_400)
+        WatchLogic.dayKey(for: .now)
     }
 
     private func rolloverIfNeeded() {
@@ -758,9 +756,10 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         if let value = context["dailyScoreActive"] as? Bool { dailyScoreActive = value }
         if let value = context["trustedContactName"] as? String { trustedContactName = value }
         if let value = context["trustedContactPhone"] as? String { trustedContactPhone = value }
-        if let value = context["emergencyNumber"] as? String, !value.isEmpty {
-            emergencyNumber = value
-            defaults.set(value, forKey: emergencyNumberKey)
+        if let value = context["emergencyNumber"] as? String,
+           !value.trimmingCharacters(in: .whitespaces).isEmpty {
+            emergencyNumber = WatchLogic.emergencyNumber(stored: nil, relayed: value)
+            defaults.set(emergencyNumber, forKey: emergencyNumberKey)
         }
 
         if let value = context["hasBPM"] as? Bool {

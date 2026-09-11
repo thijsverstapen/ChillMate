@@ -106,3 +106,57 @@ enum WidgetSharedKey {
         UserDefaults(suiteName: suiteName)
     }
 }
+
+/// The two decisions the watch makes on its own, pulled out of
+/// `WatchConnectivityReceiver` so they can be tested.
+///
+/// The watch app is its own target with no test bundle, and standing one up means
+/// a watchOS runner in CI for the sake of two rules. These are the two rules —
+/// both pure, both consequential — and this file is already a member of every
+/// target, so they can be exercised from `ChillMateTests` instead.
+///
+/// The alternative was leaving the emergency number untested, which is the last
+/// thing in the app that should be.
+enum WatchLogic {
+
+    /// Which number the watch should dial.
+    ///
+    /// The order matters and the empty check is the point. The phone relays the
+    /// user's real emergency number over `applicationContext`, and the watch keeps
+    /// the last one so a cold launch out of range still dials correctly. Falling
+    /// back to 112 is right for the Netherlands, Belgium, Germany, France and
+    /// Spain and reaches nobody in the United States or Australia, so a stored
+    /// value must win over the default — and a *blank* stored value must not,
+    /// because an empty string dials nothing at all.
+    ///
+    /// - Parameters:
+    ///   - stored: what the watch last persisted, if anything.
+    ///   - relayed: a number arriving from the phone in this update, if any.
+    /// - Returns: the number to dial, never empty.
+    static func emergencyNumber(stored: String?, relayed: String? = nil) -> String {
+        if let relayed, !relayed.trimmingCharacters(in: .whitespaces).isEmpty {
+            return relayed
+        }
+        if let stored, !stored.trimmingCharacters(in: .whitespaces).isEmpty {
+            return stored
+        }
+        return "112"
+    }
+
+    /// The day a piece of once-a-day watch state belongs to.
+    ///
+    /// Whole days since the reference date, in the watch's own calendar. Hydration
+    /// counts and the quick-skip flag both reset when this changes.
+    static func dayKey(for date: Date, calendar: Calendar = .current) -> Int {
+        Int(calendar.startOfDay(for: date).timeIntervalSinceReferenceDate / 86_400)
+    }
+
+    /// Whether a once-a-day action is still available.
+    ///
+    /// Quick skip sends one event per day. `lastSentDay` is 0 on a watch that has
+    /// never sent one, which must not collide with a real day key — it cannot,
+    /// because day zero is 1 January 2001.
+    static func isAvailableToday(lastSentDay: Int, now: Date = .now, calendar: Calendar = .current) -> Bool {
+        lastSentDay != dayKey(for: now, calendar: calendar)
+    }
+}
