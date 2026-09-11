@@ -705,8 +705,7 @@ private struct DailyScoreStatusPill: View {
             Text("Daily score")
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(Color.chillText)
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
+                .chillLineLimit(2, scale: 0.7)
                 .fixedSize(horizontal: false, vertical: true)
 
             Text(score.isActive ? score.label : String(localized: "Log a Chill to activate your daily score"))
@@ -818,7 +817,11 @@ private struct CalendarMonthData {
 
         if let firstDay = monthDays.first {
             let weekday = calendar.component(.weekday, from: firstDay)
-            leadingBlankCount = (weekday + 5) % 7
+            // Was `(weekday + 5) % 7`, which hardcodes Monday as the first day of
+            // the week. That is right for the Netherlands, Germany and France and
+            // wrong wherever the calendar starts on Sunday or Saturday — the whole
+            // month would be shifted by a day against its own column headers.
+            leadingBlankCount = (weekday - calendar.firstWeekday + 7) % 7
         } else {
             leadingBlankCount = 0
         }
@@ -904,10 +907,22 @@ struct CalendarOverviewView: View {
     @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
     @Query(ChillMateQueries.recentJournalEntries) private var journalEntries: [JournalEntry]
     @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
+    @Query(ChillMateQueries.recentRiskChecks) private var riskChecks: [RiskCheckRecord]
     @State private var displayedMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: .now)) ?? .now
     @State private var selectedDay = Calendar.current.startOfDay(for: .now)
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
+
+    /// The weekday headers, in the order this calendar actually starts the week.
+    ///
+    /// `shortWeekdaySymbols` is always Sunday-first, so it is rotated by
+    /// `firstWeekday`, which is 1-based.
+    private var localizedWeekdaySymbols: [String] {
+        let calendar = Calendar.current
+        let symbols = calendar.shortWeekdaySymbols
+        let start = calendar.firstWeekday - 1
+        return Array(symbols[start...] + symbols[..<start])
+    }
     private let calendar = Calendar.current
     let showsBackButton: Bool
 
@@ -961,6 +976,14 @@ struct CalendarOverviewView: View {
         let selectedKey = calendar.startOfDay(for: selectedDay)
         let selectedEntries = data.entriesByDay[selectedKey] ?? []
         let selectedJournalEntries = data.journalEntriesByDay[selectedKey] ?? []
+        // Linked by id where the night was already logged when the check was run,
+        // and by date where it was not — a check made on the way out, before
+        // anything is written down, still belongs to that night.
+        let selectedEntryIDs = Set(selectedEntries.map(\.id))
+        let selectedRiskChecks = riskChecks.filter { check in
+            if let linked = check.nightEntryID { return selectedEntryIDs.contains(linked) }
+            return calendar.isDate(check.createdAt, inSameDayAs: selectedDay)
+        }
 
         ZStack {
             DashboardBackdrop()
@@ -1007,11 +1030,16 @@ struct CalendarOverviewView: View {
                         }
 
                         LazyVGrid(columns: columns, spacing: 8) {
-                            ForEach(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], id: \.self) { label in
+                            // These were the English literals "Mon" ... "Sun", which
+                            // reached every non-English user untranslated and in an
+                            // order the locale may not use. The calendar already
+                            // knows both, so ask it.
+                            ForEach(Array(localizedWeekdaySymbols.enumerated()), id: \.offset) { _, label in
                                 Text(label)
                                     .font(.caption.weight(.bold))
                                     .foregroundStyle(Color.chillSecondary)
                                     .frame(maxWidth: .infinity)
+                                    .accessibilityHidden(true)
                             }
 
                             ForEach(0..<data.leadingBlankCount, id: \.self) { _ in
@@ -1031,6 +1059,17 @@ struct CalendarOverviewView: View {
                             }
                         }
                     }
+                    // Seven columns cannot be made wide enough for accessibility-size
+                    // text: a two-digit day at AX5 needs more width than a seventh of
+                    // the screen, and the audit rightly reported all 24 cells as
+                    // clipped. Widening is not available and dropping columns would
+                    // stop it being a calendar, so growth is capped here instead.
+                    //
+                    // This is only defensible because the grid is a picker rather than
+                    // the content: everything a day contains is written out in full,
+                    // at full size, in the detail below it, and each cell now says the
+                    // whole date and what is logged on it to VoiceOver.
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     .padding(16)
                     .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
 
@@ -1054,6 +1093,20 @@ struct CalendarOverviewView: View {
 
                                 ForEach(selectedJournalEntries) { entry in
                                     CalendarJournalCard(entry: entry)
+                                }
+                            }
+                        }
+
+                        // A risk check used to be findable only in a flat list on
+                        // the risk checker screen, which is the one place you are
+                        // not looking when you want to remember what you checked
+                        // before a particular night.
+                        if !selectedRiskChecks.isEmpty {
+                            VStack(alignment: .leading, spacing: 10) {
+                                SectionTitle(title: String(localized: "Risk checks"), symbol: "exclamationmark.shield.fill")
+
+                                ForEach(selectedRiskChecks) { check in
+                                    CalendarRiskCheckCard(record: check)
                                 }
                             }
                         }
@@ -1183,6 +1236,35 @@ private struct CalendarDayCell: View {
             )
         }
         .buttonStyle(ChillPlainButtonStyle())
+        // Without this a cell read out as a bare number — "28", with no month, no
+        // year, and nothing at all about the coloured dots, which are the only
+        // thing that distinguishes one day from another here. The whole point of
+        // the grid is invisible to VoiceOver until the dots are put into words.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private var accessibilityLabel: Text {
+        var parts = [day.formatted(.dateTime.weekday(.wide).day().month(.wide))]
+
+        if summary.trackedCount > 0 {
+            parts.append(String(localized: "\(summary.trackedCount) logged"))
+        }
+        if summary.hasSkipped {
+            parts.append(String(localized: "skipped night"))
+        }
+        if summary.hasSubstances {
+            parts.append(String(localized: "substances logged"))
+        }
+        if summary.hasJournal {
+            parts.append(String(localized: "journal entry"))
+        }
+        if parts.count == 1 {
+            parts.append(String(localized: "nothing logged"))
+        }
+
+        return Text(parts.joined(separator: ", "))
     }
 }
 
@@ -1352,8 +1434,7 @@ private struct RecoveryStreakBadge: View {
                             Text(displayText)
                                 .chillScaledFont(size: 30, weight: .bold, relativeTo: .title)
                                 .foregroundStyle(Color.chillText)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.72)
+                                .chillLineLimit(1, scale: 0.72)
 
                             Text(String(localized: "without logged substance use"))
                                 .font(.caption.weight(.semibold))
@@ -2068,8 +2149,7 @@ private struct TodayFocusCard: View {
                     Text(action.title)
                         .font(.headline.weight(.bold))
                         .foregroundStyle(Color.chillText)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.7)
+                        .chillLineLimit(2, scale: 0.7)
                         .fixedSize(horizontal: false, vertical: true)
 
                     Text(action.detail)
@@ -2420,8 +2500,7 @@ private struct StatTile: View {
                     .foregroundStyle(Color.chillText)
                     .monospacedDigit()
                     .contentTransition(isNumeric ? .numericText() : .identity)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
+                    .chillLineLimit(1, scale: 0.6)
                     .accessibilityHidden(!isNumeric)
                 if let unit {
                     Text(unit)
@@ -2445,8 +2524,7 @@ private struct StatTile: View {
             Text(label)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
+                .chillLineLimit(2, scale: 0.7)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -2569,8 +2647,7 @@ private struct MetricCard: View {
                     .chillScaledFont(size: 22, weight: .black, relativeTo: .title2, design: .rounded)
                     .monospacedDigit()
                     .foregroundStyle(Color.chillText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.70)
+                    .chillLineLimit(1, scale: 0.70)
 
                 // Both of these carry sentences whose length varies with the
                 // language and with what the card is reporting, and a hard
@@ -2580,15 +2657,13 @@ private struct MetricCard: View {
                 Text(title)
                     .font(.caption.weight(.bold))
                     .foregroundStyle(Color.chillText.opacity(0.90))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.75)
+                    .chillLineLimit(2, scale: 0.75)
                     .fixedSize(horizontal: false, vertical: true)
 
                 Text(caption)
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.75)
+                    .chillLineLimit(2, scale: 0.75)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -4114,5 +4189,49 @@ struct PrivacyShieldView: View {
         .accessibilityLabel(Text("Show unlock"))
         .statusBarHidden(true)
         .persistentSystemOverlays(.hidden)
+    }
+}
+
+/// A saved risk check, shown on the night it was run for.
+///
+/// Deliberately a summary rather than the full record: the substances, the time,
+/// and how many warnings came back. Tapping through to the risk checker is where
+/// the detail lives, and reproducing it here would mean two places to keep the
+/// same safety text correct.
+private struct CalendarRiskCheckCard: View {
+    let record: RiskCheckRecord
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(record.substanceNames.isEmpty
+                     ? String(localized: "Medication only")
+                     : record.substanceNames.joined(separator: ", "))
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(Color.chillText)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Spacer(minLength: 8)
+
+                Text(record.createdAt.formatted(date: .omitted, time: .shortened))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+            }
+
+            if record.warnings.isEmpty {
+                Text("No warnings were returned. That is not the same as safe.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Text("\(record.warnings.count) warnings")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.orange)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .glassSurface(radius: 18, tint: .orange.opacity(0.08))
+        .accessibilityElement(children: .combine)
     }
 }
