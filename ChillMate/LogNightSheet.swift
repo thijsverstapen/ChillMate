@@ -922,6 +922,10 @@ private struct SubstancePicker: View {
                             .buttonStyle(ChillPlainButtonStyle())
                             .foregroundStyle(Color.chillMint)
                             .accessibilityLabel(String(localized: "Add injected substance"))
+                .accessibilityInputLabels([
+                    String(localized: "Add"),
+                    String(localized: "Add injected substance")
+                ])
                         }
 
                         if injectedSubstances.isEmpty {

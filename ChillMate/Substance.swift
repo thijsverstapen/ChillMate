@@ -30,6 +30,57 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
 
     var id: String { rawValue }
 
+    /// What people actually call this, so it can be found by the name they use.
+    ///
+    /// Nobody types "Methamphetamine" into a search box at two in the morning, and
+    /// nobody calls GHB anything but G. These are matched alongside the display
+    /// name, lower-cased and accent-insensitively, so the picker finds a substance
+    /// from a street name, an abbreviation, or a brand.
+    ///
+    /// Deliberately not localized. Street names do not translate — a Dutch user
+    /// says "ket" and "G" too — and a translated alias list would be a list of
+    /// guesses rather than a list of names anyone uses. The display name is
+    /// translated and is matched as well, so searching in your own language works
+    /// through that.
+    var aliases: [String] {
+        switch self {
+        case .cannabis: ["weed", "wiet", "hash", "hasj", "blow", "joint", "thc", "marijuana", "green"]
+        case .alcohol: ["booze", "drink", "drinks", "beer", "bier", "wine", "wijn", "spirits"]
+        case .mdma: ["xtc", "ecstasy", "e", "md", "mandy", "molly", "pills", "pillen"]
+        case .threeMMC: ["3-mmc", "3 mmc", "3mmc", "poes", "mmc", "cathinone"]
+        case .ketamine: ["k", "ket", "keta", "special k"]
+        case .ghb: ["g", "gee", "liquid ecstasy", "ghb"]
+        case .gbl: ["gbl", "g", "wheel cleaner"]
+        case .cocaine: ["coke", "coca", "charlie", "snow", "sneeuw", "blow", "c"]
+        case .poppers: ["rush", "amyl", "nitrite", "nitrites", "alkyl nitrite"]
+        case .kamagra: ["kamagra", "generic viagra", "blue", "jelly"]
+        case .viagra: ["sildenafil", "blue pill", "blauwe pil", "erection pill"]
+        case .psychedelics: ["lsd", "acid", "trip", "shrooms", "mushrooms", "paddo", "paddos",
+                             "psilocybin", "dmt", "2c-b", "mescaline"]
+        case .benzodiazepines: ["benzo", "benzos", "xanax", "alprazolam", "valium", "diazepam",
+                                "oxazepam", "temazepam", "lorazepam", "clonazepam", "bars"]
+        case .methamphetamine: ["meth", "tina", "t", "crystal", "crystal meth", "ice",
+                                "methamphetamine", "chrystal"]
+        case .unknown: ["unknown", "unsure", "something else"]
+        case .other: ["other", "misc"]
+        }
+    }
+
+    /// Whether this substance answers to `query`.
+    ///
+    /// Matches the localized display name and every alias, case- and
+    /// accent-insensitively, on a prefix or a contained run — so "ket" finds
+    /// ketamine and "mmc" finds 3-MMC.
+    func matches(_ query: String) -> Bool {
+        let needle = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !needle.isEmpty else { return true }
+
+        let options: String.CompareOptions = [.caseInsensitive, .diacriticInsensitive]
+        if localizedDisplayName.range(of: needle, options: options) != nil { return true }
+        if rawValue.range(of: needle, options: options) != nil { return true }
+        return aliases.contains { $0.range(of: needle, options: options) != nil }
+    }
+
     /// The key this substance is filed under in `InteractionChart`.
     ///
     /// Deliberately not `rawValue`: the raw values are display names that have

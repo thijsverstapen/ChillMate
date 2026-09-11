@@ -15,7 +15,16 @@ struct CombinationRiskCheckerView: View {
     @State private var medicationTakenAt = Date.now
     @State private var medicationEffectHours = 8.0
     @State private var timing: CombinationTiming = .sameSession
+    @State private var substanceSearch = ""
     @State private var isShowingDiscardWarning = false
+
+    /// The grid's contents: everything selectable that answers to the search, plus
+    /// anything already selected so a filter cannot hide a choice you have made.
+    private var matchingSubstances: [Substance] {
+        let selectable = Substance.allCases.filter { $0 != .unknown && $0 != .other }
+        guard !substanceSearch.trimmingCharacters(in: .whitespaces).isEmpty else { return selectable }
+        return selectable.filter { $0.matches(substanceSearch) || selectedSubstances.contains($0) }
+    }
 
     private var assessment: CombinationAssessment {
         CombinationAssessment(
@@ -194,8 +203,46 @@ struct CombinationRiskCheckerView: View {
             VStack(alignment: .leading, spacing: 14) {
                 CareSectionTitle(title: String(localized: "Substances"), symbol: "square.grid.2x2.fill")
 
+                // Fourteen chips is enough to scan past what you are looking for,
+                // and two of them arrived in 5.0.0. The field matches street names
+                // as well as display names, because "ket" and "G" are what people
+                // type — see `Substance.aliases`.
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .accessibilityHidden(true)
+
+                    TextField("Search substances", text: $substanceSearch)
+                        .textFieldStyle(.plain)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                        .foregroundStyle(Color.chillText)
+
+                    if !substanceSearch.isEmpty {
+                        Button {
+                            substanceSearch = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(Color.chillSecondary)
+                        }
+                        .buttonStyle(ChillPlainButtonStyle())
+                        .accessibilityLabel(String(localized: "Clear search"))
+                        .accessibilityInputLabels([String(localized: "Clear")])
+                    }
+                }
+                .padding(12)
+                .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
+
+                if matchingSubstances.isEmpty {
+                    Text("Nothing matches that. It may still be worth checking the two you do know.")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 118), spacing: 10)], spacing: 10) {
-                    ForEach(Substance.allCases.filter { $0 != .unknown && $0 != .other }) { substance in
+                    ForEach(matchingSubstances) { substance in
                         Button {
                             toggle(substance)
                         } label: {
