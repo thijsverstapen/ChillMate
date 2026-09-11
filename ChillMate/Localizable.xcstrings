@@ -36469,6 +36469,35 @@
         }
       }
     },
+    "Nothing logged this month.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Monat nichts erfasst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada registrado este mes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien d’enregistré ce mois-ci."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze maand niets gelogd."
+          }
+        }
+      },
+      "comment": "History calendar, accessibility text sizes: empty month"
+    },
     "Nothing selected is a known breathing depressant, though amount and other medication still matter.": {
       "extractionState": "manual",
       "localizations": {

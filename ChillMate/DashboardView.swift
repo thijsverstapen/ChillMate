@@ -913,6 +913,51 @@ struct CalendarOverviewView: View {
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    /// The month as a list rather than a grid, for the accessibility text sizes.
+    ///
+    /// A seven-column grid cannot be made to work at those sizes. A two-digit day
+    /// at AX5 needs more width than a seventh of the screen, widening is not
+    /// available, and dropping columns stops it being a calendar. Capping the
+    /// growth was the first thing tried and it is precisely wrong: Apple's audit
+    /// resizes the app and checks that text grows, so a cap is reported as
+    /// "Dynamic Type font sizes are partially unsupported" — it turned 24 findings
+    /// into 38 by dragging the weekday headers in with it.
+    ///
+    /// So the grid gives way to a list, which is what the reader needed at that
+    /// size anyway: the days that actually hold something, each on its own line,
+    /// with room for the date to be written out properly. The grid's job here is
+    /// picking a day, and a list picks a day perfectly well.
+    @ViewBuilder
+    private func accessibleMonthList(_ data: CalendarMonthData) -> some View {
+        let logged = data.monthDays.filter { day in
+            let summary = data.daySummaries[calendar.startOfDay(for: day)] ?? .empty
+            return summary.trackedCount > 0 || summary.hasSkipped
+                || summary.hasSubstances || summary.hasJournal
+        }
+
+        if logged.isEmpty {
+            EmptyGlassState(text: String(localized: "Nothing logged this month."))
+        } else {
+            VStack(spacing: 8) {
+                ForEach(logged, id: \.self) { day in
+                    let summary = data.daySummaries[calendar.startOfDay(for: day)] ?? .empty
+                    Button {
+                        selectedDay = day
+                    } label: {
+                        CalendarDayRow(
+                            day: day,
+                            summary: summary,
+                            isSelected: calendar.isDate(day, inSameDayAs: selectedDay)
+                        )
+                    }
+                    .buttonStyle(ChillPlainButtonStyle())
+                }
+            }
+        }
+    }
+
     /// The weekday headers, in the order this calendar actually starts the week.
     ///
     /// `shortWeekdaySymbols` is always Sunday-first, so it is rotated by
@@ -1029,47 +1074,40 @@ struct CalendarOverviewView: View {
                             .accessibilityLabel(String(localized: "Next month"))
                         }
 
-                        LazyVGrid(columns: columns, spacing: 8) {
-                            // These were the English literals "Mon" ... "Sun", which
-                            // reached every non-English user untranslated and in an
-                            // order the locale may not use. The calendar already
-                            // knows both, so ask it.
-                            ForEach(Array(localizedWeekdaySymbols.enumerated()), id: \.offset) { _, label in
-                                Text(label)
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(Color.chillSecondary)
-                                    .frame(maxWidth: .infinity)
-                                    .accessibilityHidden(true)
-                            }
+                        if dynamicTypeSize.isAccessibilitySize {
+                            accessibleMonthList(data)
+                        } else {
+                            LazyVGrid(columns: columns, spacing: 8) {
+                                // These were the English literals "Mon" ... "Sun",
+                                // which reached every non-English user untranslated
+                                // and in an order the locale may not use. The
+                                // calendar already knows both, so ask it.
+                                ForEach(Array(localizedWeekdaySymbols.enumerated()), id: \.offset) { _, label in
+                                    Text(label)
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(Color.chillSecondary)
+                                        .frame(maxWidth: .infinity)
+                                        .accessibilityHidden(true)
+                                }
 
-                            ForEach(0..<data.leadingBlankCount, id: \.self) { _ in
-                                Color.clear
-                                    .frame(height: 48)
-                            }
+                                ForEach(0..<data.leadingBlankCount, id: \.self) { _ in
+                                    Color.clear
+                                        .frame(height: 48)
+                                }
 
-                            ForEach(data.monthDays, id: \.self) { day in
-                                let dayKey = calendar.startOfDay(for: day)
-                                CalendarDayCell(
-                                    day: day,
-                                    summary: data.daySummaries[dayKey] ?? .empty,
-                                    isSelected: calendar.isDate(day, inSameDayAs: selectedDay)
-                                ) {
-                                    selectedDay = day
+                                ForEach(data.monthDays, id: \.self) { day in
+                                    let dayKey = calendar.startOfDay(for: day)
+                                    CalendarDayCell(
+                                        day: day,
+                                        summary: data.daySummaries[dayKey] ?? .empty,
+                                        isSelected: calendar.isDate(day, inSameDayAs: selectedDay)
+                                    ) {
+                                        selectedDay = day
+                                    }
                                 }
                             }
                         }
                     }
-                    // Seven columns cannot be made wide enough for accessibility-size
-                    // text: a two-digit day at AX5 needs more width than a seventh of
-                    // the screen, and the audit rightly reported all 24 cells as
-                    // clipped. Widening is not available and dropping columns would
-                    // stop it being a calendar, so growth is capped here instead.
-                    //
-                    // This is only defensible because the grid is a picker rather than
-                    // the content: everything a day contains is written out in full,
-                    // at full size, in the detail below it, and each cell now says the
-                    // whole date and what is logged on it to VoiceOver.
-                    .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                     .padding(16)
                     .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
 
@@ -1265,6 +1303,52 @@ private struct CalendarDayCell: View {
         }
 
         return Text(parts.joined(separator: ", "))
+    }
+}
+
+/// One day of the month, written out, for the accessibility text sizes.
+///
+/// The grid cell it replaces had to fit a number into a seventh of the screen.
+/// This has the whole width, so the date can be spelled out and the dots can be
+/// words — which is what they always were to VoiceOver, and there is no reason
+/// they should not be words on screen too at a size someone chose because
+/// reading is hard.
+private struct CalendarDayRow: View {
+    let day: Date
+    let summary: CalendarDaySummary
+    let isSelected: Bool
+
+    private var marks: [String] {
+        var parts: [String] = []
+        if summary.trackedCount > 0 { parts.append(String(localized: "\(summary.trackedCount) logged")) }
+        if summary.hasSkipped { parts.append(String(localized: "skipped night")) }
+        if summary.hasSubstances { parts.append(String(localized: "substances logged")) }
+        if summary.hasJournal { parts.append(String(localized: "journal entry")) }
+        return parts
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(day.formatted(.dateTime.weekday(.wide).day().month(.wide)))
+                .font(.headline)
+                .foregroundStyle(isSelected ? .white : Color.chillText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if !marks.isEmpty {
+                Text(marks.joined(separator: ", "))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(isSelected ? .white.opacity(0.85) : Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(
+            isSelected ? Color.chillPrimary : Color.chillAccentTeal.opacity(0.10),
+            in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
 
