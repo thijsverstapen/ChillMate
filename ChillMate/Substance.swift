@@ -15,10 +15,41 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
     case kamagra = "Kamagra"
     case viagra = "Viagra"
     case psychedelics = "Psychedelics"
+    // Added in 5.0.0. Until then the app could not represent a benzodiazepine at
+    // all, so someone logging GHB and a benzo together — which TripSit's chart
+    // rates as dangerous, and which is a common way to come down — got no warning
+    // of any kind. A new case is additive for SwiftData, which stores these as
+    // raw strings.
+    case benzodiazepines = "Benzodiazepines"
     case unknown = "Unknown"
     case other = "Other"
 
     var id: String { rawValue }
+
+    /// The key this substance is filed under in `InteractionChart`.
+    ///
+    /// Deliberately not `rawValue`: the raw values are display names that have
+    /// changed before ("3MMC" was once "3-MMC"), and a rename there must not
+    /// silently detach a row from the source that corroborates it.
+    var chartKey: String {
+        switch self {
+        case .cannabis: "cannabis"
+        case .alcohol: "alcohol"
+        case .mdma: "mdma"
+        case .threeMMC: "threeMMC"
+        case .ketamine: "ketamine"
+        case .ghb: "ghb"
+        case .gbl: "gbl"
+        case .cocaine: "cocaine"
+        case .poppers: "poppers"
+        case .kamagra: "kamagra"
+        case .viagra: "viagra"
+        case .psychedelics: "psychedelics"
+        case .benzodiazepines: "benzodiazepines"
+        case .unknown: "unknown"
+        case .other: "other"
+        }
+    }
 
     var symbolName: String {
         switch self {
@@ -44,6 +75,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
             "cross.vial.fill"
         case .psychedelics:
             "circle.hexagongrid.fill"
+        case .benzodiazepines:
+            "pills.fill"
         case .unknown:
             "questionmark.circle.fill"
         case .other:
@@ -77,6 +110,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
             .indigo
         case .psychedelics:
             .indigo
+        case .benzodiazepines:
+            .purple
         case .unknown:
             .gray
         case .other:
@@ -106,6 +141,12 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
             4...6
         case .psychedelics:
             6...12
+        // Wider than most entries here on purpose. "Benzodiazepines" is a class,
+        // not a substance: midazolam is done in a couple of hours and diazepam is
+        // still working the next day. A window that covered only the short-acting
+        // ones would tell someone they were clear when they were not.
+        case .benzodiazepines:
+            4...12
         case .unknown, .other:
             1...4
         }
@@ -157,6 +198,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
             String(localized: "Sildenafil for erections. Avoid with poppers or nitrates because blood pressure can drop dangerously.")
         case .psychedelics:
             String(localized: "Can strongly change perception and emotions. Setting, support, and mental state matter.")
+        case .benzodiazepines:
+            String(localized: "Sedatives that differ enormously between compounds: some are gone in a few hours, others are still working the next day. The danger is rarely the benzo on its own — it is stacking it with alcohol, GHB/GBL or another depressant.")
         case .unknown:
             String(localized: "Unknown substances are harder to predict. Avoid mixing and seek help if something feels wrong.")
         case .other:
@@ -186,6 +229,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
             ["Blood pressure effects", "Headache or dizziness", "Dangerous with poppers or nitrates"]
         case .psychedelics:
             ["Strong emotional shifts", "Panic or confusion", "Long duration and setting sensitivity"]
+        case .benzodiazepines:
+            ["Breathing risk when stacked with other depressants", "Memory gaps and blackouts", "Dependence builds fast with regular use"]
         case .unknown:
             ["Unknown strength", "Unknown contents", "Higher risk when mixed"]
         case .other:
@@ -294,6 +339,18 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
                 String(localized: "At risk of harming themselves or cannot be kept safe")
             ]
 
+        // NHS medicines guidance on diazepam names slower, shallower breathing as
+        // the serious sign and says to treat an extra dose as an emergency. The
+        // rest is the same depressant picture as alcohol and GHB, which is the
+        // situation a benzo is almost always in when this app is open.
+        case .benzodiazepines:
+            [
+                String(localized: "Breathing is slow or shallow, or has stopped"),
+                String(localized: "Cannot be woken, or only briefly and not properly"),
+                String(localized: "Was taken with alcohol, GHB/GBL or another sedative"),
+                String(localized: "Lips or fingertips look blue or grey")
+            ]
+
         case .unknown, .other:
             [
                 String(localized: "Chest pain, seizure, fainting, or cannot be woken"),
@@ -395,6 +452,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
                 return URL(string: "https://www.apotheek.nl/medicijnen/sildenafil")
             case .psychedelics:
                 return URL(string: "https://www.drugsinfo.nl/lsd")
+            case .benzodiazepines:
+                return URL(string: "https://www.drugsinfo.nl/benzodiazepines")
             case .unknown, .other:
                 return nil
             }

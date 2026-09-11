@@ -94,6 +94,8 @@
 		F88B00000000000000000005 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000016 /* Localizable.xcstrings */; };
 		F99C00000000000000000002 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F99C00000000000000000001 /* Localizable.xcstrings */; };
 		AAB10000000000000000001E /* SubstanceReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001E /* SubstanceReference.swift */; };
+		AAB10000000000000000001F /* InteractionChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001F /* InteractionChart.swift */; };
+		AAB100000000000000000020 /* CombinationAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000020 /* CombinationAssessment.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -256,6 +258,8 @@
 		F88B00000000000000000016 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F99C00000000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		AAF10000000000000000001E /* SubstanceReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstanceReference.swift; sourceTree = "<group>"; };
+		AAF10000000000000000001F /* InteractionChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionChart.swift; sourceTree = "<group>"; };
+		AAF100000000000000000020 /* CombinationAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinationAssessment.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -346,6 +350,8 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF100000000000000000020 /* CombinationAssessment.swift */,
+				AAF10000000000000000001F /* InteractionChart.swift */,
 				AAF10000000000000000001E /* SubstanceReference.swift */,
 				AAF1000000000000000000F0 /* WidgetSharedKeys.swift */,
 				AAF10000000000000000001D /* DelayedAction.swift */,
@@ -712,6 +718,8 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000020 /* CombinationAssessment.swift in Sources */,
+				AAB10000000000000000001F /* InteractionChart.swift in Sources */,
 				AAB10000000000000000001E /* SubstanceReference.swift in Sources */,
 				AAB1000000000000000000F1 /* WidgetSharedKeys.swift in Sources */,
 				AAB10000000000000000001D /* DelayedAction.swift in Sources */,

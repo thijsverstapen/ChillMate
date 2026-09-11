@@ -42,6 +42,69 @@ struct SubstanceInteraction {
     let warning: String
 }
 
+extension SubstanceInteraction {
+    /// How far this row's severity is corroborated by a published source.
+    ///
+    /// The wording of every warning on this screen is ChillMate's own. What this
+    /// records is narrower, and checkable: how the *rating* compares with
+    /// TripSit's drug combination chart, which is the reference most
+    /// harm-reduction services work from.
+    ///
+    /// It is derived rather than stored, from a generated copy of the chart in
+    /// `InteractionChart`, so it cannot be asserted by hand for a row that was
+    /// never actually checked. `InteractionChartTests` re-runs the comparison
+    /// over the whole table.
+    enum Corroboration: Sendable {
+        /// The chart rates this pair at the same level.
+        case matchesChart
+        /// The chart rates it at the same level, but the pair had to be read
+        /// against a near neighbour: 3-MMC against mephedrone, or the
+        /// psychedelics group against the most severe of LSD and mushrooms.
+        case matchesChartApproximately
+        /// ChillMate rates it above the chart, deliberately. Being more cautious
+        /// than the source is allowed; being less cautious is what
+        /// `InteractionChartTests` refuses.
+        case ratedAboveChart
+        /// The chart has no entry for this pair. True of everything involving
+        /// poppers, Viagra or Kamagra, which it does not cover at all.
+        case notOnChart
+    }
+
+    var corroboration: Corroboration {
+        guard let entry = InteractionChart.entry(for: substances) else { return .notOnChart }
+        let chart = InteractionChart.Grading(rawValue: level.rawValue)
+        if chart == entry.grading {
+            return entry.isApproximate ? .matchesChartApproximately : .matchesChart
+        }
+        return .ratedAboveChart
+    }
+}
+
+extension SubstanceInteraction.Corroboration {
+    /// One short line under the warning, saying where the rating comes from.
+    var label: String {
+        switch self {
+        case .matchesChart:
+            String(localized: "Matches TripSit’s combination chart")
+        case .matchesChartApproximately:
+            String(localized: "Matches TripSit’s chart for a closely related substance")
+        case .ratedAboveChart:
+            String(localized: "Rated higher here than on TripSit’s chart")
+        case .notOnChart:
+            String(localized: "Not on TripSit’s chart")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .matchesChart: "checkmark.seal.fill"
+        case .matchesChartApproximately: "checkmark.seal"
+        case .ratedAboveChart: "arrow.up.circle"
+        case .notOnChart: "questionmark.circle"
+        }
+    }
+}
+
 extension SubstanceInteraction: Identifiable {
     /// Stable identity derived from the combination itself, so rows keep their
     /// identity across re-evaluations even though the warning text is re-localized
@@ -82,20 +145,26 @@ enum SubstanceInteractionChecker {
             level: .critical,
             warning: String(localized: "Poppers and Viagra together can cause a dangerous blood pressure drop. This is a high-risk combination. Avoid it.")
         ),
+        // Raised from serious to critical in 5.0.0. TripSit's chart rates all
+        // three of these as dangerous, and the reason it gives is specific:
+        // both substances cause ataxia and vomiting, and someone who goes under
+        // while unable to sit up is at severe risk of aspirating. ChillMate was
+        // rating them one step lower, which is the one direction that is never
+        // defensible. `InteractionChartTests` now refuses it.
         SubstanceInteraction(
             substances: [.ghb, .ketamine],
-            level: .serious,
-            warning: String(localized: "GHB and ketamine combine depressant and dissociative effects. This increases the risk of losing the ability to respond to problems around you.")
+            level: .critical,
+            warning: String(localized: "GHB and ketamine both take your balance and both bring on vomiting, and together they can put you under. Someone who is sick while too out of it to sit up can choke. If you use both, stay with someone who is not using, and put anyone unresponsive on their side.")
         ),
         SubstanceInteraction(
             substances: [.gbl, .ketamine],
-            level: .serious,
-            warning: String(localized: "GBL and ketamine together carry a higher risk of losing control and difficulty getting help.")
+            level: .critical,
+            warning: String(localized: "GBL becomes GHB in the body, and with ketamine both your balance and your ability to notice trouble go. Vomiting while unable to sit up is how this combination kills. Stay with someone sober and put anyone unresponsive on their side.")
         ),
         SubstanceInteraction(
             substances: [.alcohol, .ketamine],
-            level: .serious,
-            warning: String(localized: "Alcohol and ketamine together combine depressant effects and can cause deeper disorientation and breathing problems.")
+            level: .critical,
+            warning: String(localized: "Alcohol and ketamine together bring a very high risk of vomiting and of going under. Being sick while too out of it to sit up is the danger, not the disorientation. Keep someone sober nearby and put anyone who cannot be woken on their side.")
         ),
         SubstanceInteraction(
             substances: [.cocaine, .mdma],
@@ -109,8 +178,8 @@ enum SubstanceInteractionChecker {
         ),
         SubstanceInteraction(
             substances: [.mdma, .threeMMC],
-            level: .serious,
-            warning: String(localized: "MDMA and 3-MMC together increase stimulant and serotonergic load. The combination raises heart rate, temperature, and the chance of a difficult crash.")
+            level: .critical,
+            warning: String(localized: "Both push serotonin hard, and together they carry a real risk of serotonin syndrome: a climbing temperature, a racing heart, stiff or twitching muscles, confusion. A stimulant also deepens the damage MDMA does. Overheating and a rigid, agitated state need emergency help, not water and a sit-down.")
         ),
         SubstanceInteraction(
             substances: [.ghb, .cocaine],
@@ -411,6 +480,83 @@ enum SubstanceInteractionChecker {
             level: .caution,
             warning: String(localized: "Kamagra is often an unverified dose, and the racing heart it can cause is easily mistaken for trip anxiety, or the other way round.")
         ),
+
+        // MARK: Benzodiazepines
+        //
+        // New in 5.0.0 along with the substance itself. All four ratings are the
+        // ones TripSit's combination chart gives, and the wording follows the
+        // chart's own notes: strong unpredictable potentiation, unconsciousness
+        // arriving fast, and aspiration as the thing that actually kills.
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .alcohol],
+            level: .critical,
+            warning: String(localized: "Benzodiazepines and alcohol strengthen each other strongly and unpredictably, and can take someone under very fast. Blacking out is near certain and choking on vomit is the real danger. If someone cannot be woken, put them on their side and call emergency services.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .ghb],
+            level: .critical,
+            warning: String(localized: "Benzodiazepines and GHB strengthen each other strongly and unpredictably, and unconsciousness can arrive with almost no warning. Someone who cannot be woken needs the recovery position and emergency services, not sleep.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .gbl],
+            level: .critical,
+            warning: String(localized: "GBL becomes GHB in the body, and with a benzodiazepine the two strengthen each other unpredictably. People go under fast and are easily mistaken for asleep. Put anyone unresponsive on their side and call emergency services.")
+        ),
+        // The stimulant pairs. TripSit rates these low risk because the two sides
+        // cancel each other's *effects* — which is exactly the mechanism that
+        // makes them worth a row here. A stimulant hides how sedated you are, and
+        // when it fades the benzo has not gone anywhere. This is the same masking
+        // the table already documents for GHB with stimulants.
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .cocaine],
+            level: .caution,
+            warning: String(localized: "Each hides the other. Cocaine masks how sedated the benzo is making you, so it is easy to take more of both, and when the cocaine fades the full benzo dose is still there. Neither cancels the other out — they just make each other harder to judge.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .threeMMC],
+            level: .caution,
+            warning: String(localized: "3-MMC masks the sedation, so you feel more in control than you are, and the benzo is still working long after the stimulant has gone. That gap is where people redose on both without meaning to.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .mdma],
+            level: .caution,
+            warning: String(localized: "The benzo blunts the MDMA and MDMA hides the sedation, which mostly means you can misjudge both. Taking a benzo to sleep afterwards is common; taking one during is how people lose the thread of what they have had.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .cannabis],
+            level: .caution,
+            warning: String(localized: "Both sedate, and together that is heavier than either alone: more drowsiness, worse coordination, bigger gaps in memory. Not usually dangerous on its own, but it stacks badly with anything else that slows breathing.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .psychedelics],
+            level: .caution,
+            warning: String(localized: "A benzodiazepine will flatten a difficult trip, which is why people carry one. It is still sedation on board, so it counts towards the total if anything else depressant follows, and it will blur what you remember of the night.")
+        ),
+
+        // Benzodiazepines with the blood-pressure group. Not on TripSit's chart —
+        // it covers none of these three — so the rating rests on low blood
+        // pressure being a listed effect of diazepam in NHS medicines guidance,
+        // on top of what poppers and sildenafil already do.
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .poppers],
+            level: .caution,
+            warning: String(localized: "Benzodiazepines can lower blood pressure and poppers drop it sharply on top of that. The result is a head rush that turns into fainting, and a benzo makes you slower to notice it coming. Sit down before you use poppers.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .viagra],
+            level: .caution,
+            warning: String(localized: "Both can lower blood pressure, so expect dizziness and stand up slowly. The benzo also makes it harder to tell lightheadedness from the sedation itself.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .kamagra],
+            level: .caution,
+            warning: String(localized: "Both can lower blood pressure, and Kamagra is often sold at an unverified strength. Stand up slowly, and remember the benzo will blunt your sense of how faint you actually feel.")
+        ),
+        SubstanceInteraction(
+            substances: [.benzodiazepines, .ketamine],
+            level: .caution,
+            warning: String(localized: "Both make you unsteady and sedated, and together that can tip into losing consciousness at higher doses than you expect. Stay seated, stay with someone, and remember that vomiting while out of it is the danger.")
+        ),
     ]}
 
     /// Warnings for the selected set, most severe first.
@@ -456,11 +602,55 @@ struct SubstanceInteractionCard: View {
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Color.chillText.opacity(0.85))
                             .fixedSize(horizontal: false, vertical: true)
+
+                        // Where the rating comes from, per row. Without it every
+                        // warning carries the same apparent authority, and they do
+                        // not all rest on the same thing: some match a published
+                        // chart, some sit deliberately above it, and the ones
+                        // involving poppers or sildenafil are not on it at all.
+                        Label(interaction.corroboration.label, systemImage: interaction.corroboration.symbol)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(Color.chillSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.top, 2)
                     }
                 }
                 .padding(12)
                 .background(interaction.level.color.opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .accessibilityElement(children: .combine)
             }
+
+            InteractionSourceFooter()
         }
+    }
+}
+
+/// Names the source the ratings above are checked against, and links to it.
+///
+/// The screen used to assert severities with no attribution at all, which is a
+/// lot of authority to take on for content a user may act on at four in the
+/// morning. Saying whose chart it is also gives someone a way to go and read the
+/// full entry, which is always longer than what fits here.
+struct InteractionSourceFooter: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Ratings are checked against TripSit’s drug combination chart. Where ChillMate rates something higher, the row says so.")
+                .font(.caption2)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Link(destination: URL(string: "https://combo.tripsit.me")!) {
+                Label("Open TripSit’s chart", systemImage: "arrow.up.right.square")
+                    .font(.caption2.weight(.bold))
+            }
+            .foregroundStyle(Color.chillPrimary)
+
+            Text("No chart can tell you a combination is safe. A missing entry means nobody has rated it, not that nothing happens.")
+                .font(.caption2)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 4)
     }
 }

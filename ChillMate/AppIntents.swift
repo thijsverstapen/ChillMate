@@ -186,6 +186,7 @@ extension Substance: AppEnum {
         .kamagra: DisplayRepresentation(title: "Kamagra"),
         .viagra: DisplayRepresentation(title: "Viagra"),
         .psychedelics: DisplayRepresentation(title: "Psychedelics"),
+        .benzodiazepines: DisplayRepresentation(title: "Benzodiazepines"),
         .unknown: DisplayRepresentation(title: "Unknown"),
         .other: DisplayRepresentation(title: "Other")
     ]

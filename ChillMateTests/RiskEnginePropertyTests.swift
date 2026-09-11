@@ -101,10 +101,15 @@ struct RiskEnginePropertyTests {
             guard let before else { continue }
 
             for extra in Self.selectable where !combo.contains(extra) {
-                let after = assessment(combo.union([extra])).interactionFindings.compactMap(\.level).max()
-                let resolved = try? #require(after)
-                #expect((resolved ?? .caution) >= before,
-                        "\(combo.map(\.rawValue).sorted()) rated \(before), and adding \(extra.rawValue) lowered it to \(String(describing: after))")
+                // Two distinct failures, kept apart: the rating dropping, and every
+                // rated finding vanishing. `#require` collapsed them into one and
+                // warned that it was redundant besides.
+                guard let after = assessment(combo.union([extra])).interactionFindings.compactMap(\.level).max() else {
+                    Issue.record("\(combo.map(\.rawValue).sorted()) rated \(before), and adding \(extra.rawValue) left no rated finding at all")
+                    continue
+                }
+                #expect(after >= before,
+                        "\(combo.map(\.rawValue).sorted()) rated \(before), and adding \(extra.rawValue) lowered it to \(after)")
             }
         }
     }

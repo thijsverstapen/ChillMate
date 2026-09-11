@@ -24,7 +24,18 @@ struct SubstanceInteractionCheckerTests {
         (Set<Substance>([.poppers, .viagra]), SubstanceInteraction.Level.critical),
         (Set<Substance>([.poppers, .kamagra]), SubstanceInteraction.Level.critical),
         (Set<Substance>([.cocaine, .mdma]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.alcohol, .ketamine]), SubstanceInteraction.Level.serious),
+        // Raised in 5.0.0 to match TripSit's chart, which rates all three of the
+        // ketamine-plus-depressant pairs as dangerous for the same stated reason:
+        // ataxia and vomiting together, with aspiration as the thing that kills.
+        (Set<Substance>([.alcohol, .ketamine]), SubstanceInteraction.Level.critical),
+        (Set<Substance>([.ghb, .ketamine]), SubstanceInteraction.Level.critical),
+        (Set<Substance>([.gbl, .ketamine]), SubstanceInteraction.Level.critical),
+        // Also raised: the chart rates MDMA with mephedrone dangerous on serotonin
+        // syndrome, and 3-MMC is read against mephedrone.
+        (Set<Substance>([.mdma, .threeMMC]), SubstanceInteraction.Level.critical),
+        // New in 5.0.0 with the substance.
+        (Set<Substance>([.benzodiazepines, .alcohol]), SubstanceInteraction.Level.critical),
+        (Set<Substance>([.benzodiazepines, .ghb]), SubstanceInteraction.Level.critical),
         (Set<Substance>([.ghb, .cocaine]), SubstanceInteraction.Level.caution),
     ])
     func pairProducesExpectedLevel(combo: Set<Substance>, expected: SubstanceInteraction.Level) throws {

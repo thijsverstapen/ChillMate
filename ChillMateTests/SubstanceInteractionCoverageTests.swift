@@ -142,7 +142,9 @@ struct RiskCheckerScreenTests {
     @Test("Alcohol with ketamine no longer reports that nothing matched", .tags(.safety))
     func alcoholWithKetamineReachesTheScreen() throws {
         // Traced by hand before the fix: this pair matched no branch of the preset
-        // chain and so hit the fallback, while the table rated it serious.
+        // chain and so hit the fallback, while the table rated it. It is rated
+        // critical now — the chart calls the aspiration risk dangerous, and this
+        // app had it a step lower.
         let findings = assessment([.alcohol, .ketamine]).interactionFindings
 
         #expect(findings.contains { $0.level == nil } == false,
@@ -156,7 +158,8 @@ struct RiskCheckerScreenTests {
             findings.first { $0.text == curated.warning },
             "The depressant risk never reaches the user: \(findings.map(\.text))"
         )
-        #expect(match.level == .serious)
+        // Raised from serious to critical in 5.0.0, to match TripSit's chart.
+        #expect(match.level == .critical)
     }
 
     @Test("Pairs the table rates but the preset chain misses now show on screen", .tags(.safety), arguments: [

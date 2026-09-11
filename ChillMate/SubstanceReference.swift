@@ -234,6 +234,20 @@ extension Substance {
                 redoseGuidance: nil
             )
 
+        // No dose ladder, for the same reason as psychedelics and more sharply:
+        // a common dose of alprazolam is 0.25 mg and a common dose of diazepam is
+        // 5 to 10 mg, so any single figure across the class would be wrong by a
+        // factor of twenty for somebody. The timing is left out too — half-lives
+        // here run from a couple of hours to more than a day.
+        case .benzodiazepines:
+            SubstanceReference(
+                doses: [],
+                timing: nil,
+                source: .nhs,
+                noDoseReason: String(localized: "Benzodiazepines covers drugs whose doses differ by a factor of twenty or more, and whose effects last anywhere from a few hours to well into the next day. Look up the specific one you have, and treat any pill of unknown origin as unknown strength."),
+                redoseGuidance: nil
+            )
+
         case .unknown, .other:
             nil
         }
