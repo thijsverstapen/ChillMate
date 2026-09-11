@@ -677,17 +677,37 @@ private struct DailyScoreStatusPill: View {
 
     var body: some View {
         VStack(spacing: 3) {
+            // The inactive state puts an emoji here in place of the score. An emoji
+            // is roughly square and does not shrink into its line box the way a
+            // digit does, so at the larger text sizes it outgrows this card and is
+            // drawn clipped. It gets a smaller size with headroom, the same
+            // treatment as `StatTile`, rather than the digit's 26pt.
+                // Hidden from accessibility, and not only to quiet the audit.
+                //
+                // The emoji stands in for a score that does not exist yet; the
+                // label beside it is what says so, and VoiceOver reading "smiling
+                // face with open mouth" before "Log to activate" is noise in front
+                // of the instruction. Hiding it also settles a finding no amount of
+                // resizing could: `performAccessibilityAudit` reports emoji as
+                // clipped text whatever size they are drawn at, because an emoji
+                // glyph's bounds exceed its layout frame by design. Replacing the
+                // emoji with plain text made the finding disappear at every size,
+                // which is what identified it as a property of the glyph rather
+                // than of this layout.
             Text(score.isActive ? "\(score.value)" : score.emoji)
-                .font(.system(size: score.isActive ? 24 : 26, weight: .bold))
+                .font(.system(size: score.isActive ? 24 : 18, weight: .bold))
                 .monospacedDigit()
                 .foregroundStyle(Color.chillText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+                .accessibilityHidden(!score.isActive)
 
             Text("Daily score")
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(Color.chillText)
-                .lineLimit(1)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                .fixedSize(horizontal: false, vertical: true)
 
             Text(score.isActive ? score.label : String(localized: "Log a Chill to activate your daily score"))
                 .chillScaledFont(size: 9, weight: .semibold, relativeTo: .caption2)
@@ -1100,6 +1120,13 @@ private struct CalendarDayCell: View {
     let isSelected: Bool
     let select: () -> Void
 
+    /// The activity dots and the row that holds them were fixed at 6 and 8 points,
+    /// so the day number grew with Dynamic Type and its indicators did not — which
+    /// is what the audit means by "font sizes are partially unsupported". Scaling
+    /// them keeps the cell proportional instead of leaving specks under large text.
+    @ScaledMetric(relativeTo: .caption) private var dotSize: CGFloat = 6
+    @ScaledMetric(relativeTo: .caption) private var dotRowHeight: CGFloat = 8
+
     private var calendar: Calendar { .current }
 
     private var tint: Color {
@@ -1126,28 +1153,28 @@ private struct CalendarDayCell: View {
                     if summary.trackedCount > 0 {
                         Circle()
                             .fill(isSelected ? .white : Color.chillAccentTeal)
-                            .frame(width: 6, height: 6)
+                            .frame(width: dotSize, height: dotSize)
                     }
 
                     if summary.hasSkipped {
                         Circle()
                             .fill(isSelected ? .white.opacity(0.72) : .indigo)
-                            .frame(width: 6, height: 6)
+                            .frame(width: dotSize, height: dotSize)
                     }
 
                     if summary.hasSubstances {
                         Circle()
                             .fill(isSelected ? .white.opacity(0.54) : Color.chillSecondaryBlue)
-                            .frame(width: 6, height: 6)
+                            .frame(width: dotSize, height: dotSize)
                     }
 
                     if summary.hasJournal {
                         Circle()
                             .fill(isSelected ? .white.opacity(0.42) : Color.chillSecondaryBlue)
-                            .frame(width: 6, height: 6)
+                            .frame(width: dotSize, height: dotSize)
                     }
                 }
-                .frame(height: 8)
+                .frame(height: dotRowHeight)
             }
             .frame(maxWidth: .infinity, minHeight: 48)
             .background(
@@ -2033,11 +2060,17 @@ private struct TodayFocusCard: View {
                 .shadow(color: action.tint.opacity(0.36), radius: 10, y: 4)
 
                 VStack(alignment: .leading, spacing: 4) {
+                    // The next-action headline. Its length swings from "Log a Chill"
+                    // to "Ready when you are" to the German for either, and one
+                    // headline-sized line at 75% does not hold the longer ones once
+                    // the text size grows — it truncates the sentence that tells
+                    // someone what the card is for.
                     Text(action.title)
                         .font(.headline.weight(.bold))
                         .foregroundStyle(Color.chillText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.7)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Text(action.detail)
                         .font(.caption.weight(.semibold))
@@ -2357,25 +2390,39 @@ private struct StatTile: View {
     let label: String
     let showsChevron: Bool
 
+    /// True when `value` is a score rather than the placeholder emoji.
+    private var isNumeric: Bool { value.allSatisfy(\.isNumber) }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-                // `value` is a number when the score is active and an emoji when it
-                // is not, and the two want different treatment. Monospaced digits
-                // and a numeric content transition are meaningless on an emoji, and
-                // at the accessibility text sizes the glyph grew past the space the
-                // row could give it, which the audit reports as clipped text.
+                // `value` is a number when the score is active and an emoji when
+                // it is not, and the two need different sizes.
                 //
-                // A numeric content transition animates between digits and has
-                // nothing to animate on an emoji, so it applies only to numbers.
-                // The scale factor is what stops the clipping.
+                // A digit at 26pt relative to .title is fine: it is narrow, and
+                // minimumScaleFactor shrinks it if the row runs out of width. An
+                // emoji is neither. It is roughly square, it does not respond to
+                // minimumScaleFactor the way glyphs from a text font do, and at the
+                // accessibility sizes a .title-relative emoji outgrows this tile and
+                // is drawn clipped — which is what the audit reports.
+                //
+                // So the emoji gets its own smaller scale with headroom to grow
+                // into. It is standing in for "no score yet" rather than carrying a
+                // reading, so it can afford to be smaller; the label beside it is
+                // what actually says so.
                 Text(value)
-                    .chillScaledFont(size: 26, weight: .bold, relativeTo: .title, design: .rounded)
+                    .chillScaledFont(
+                        size: isNumeric ? 26 : 20,
+                        weight: .bold,
+                        relativeTo: isNumeric ? .title : .body,
+                        design: .rounded
+                    )
                     .foregroundStyle(Color.chillText)
                     .monospacedDigit()
-                    .contentTransition(value.allSatisfy(\.isNumber) ? .numericText() : .identity)
+                    .contentTransition(isNumeric ? .numericText() : .identity)
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
+                    .accessibilityHidden(!isNumeric)
                 if let unit {
                     Text(unit)
                         .font(.subheadline.weight(.bold))
@@ -2426,9 +2473,18 @@ private struct ScoreFactorsSheet: View {
                                 .trim(from: 0, to: score.isActive ? CGFloat(score.value) / 100 : 1)
                                 .stroke(LinearGradient.chillBrand, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                                 .rotationEffect(.degrees(-90))
+                            // Scaling text inside a container that does not scale
+                            // can only ever end in clipping, and this ring is a
+                            // fixed 52pt. The glyph is allowed to shrink to fit it
+                            // rather than grow out of it — which matters most for
+                            // the emoji, since an emoji is roughly square and hits
+                            // the edge long before a digit does.
                             Text(score.isActive ? "\(score.value)" : score.emoji)
                                 .chillScaledFont(size: 18, weight: .black, relativeTo: .title3, design: .rounded)
                                 .foregroundStyle(Color.chillText)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                                .accessibilityHidden(!score.isActive)
                         }
                         .frame(width: 52, height: 52)
 

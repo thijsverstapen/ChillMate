@@ -302,7 +302,9 @@ private struct SafetyStatusMetric: View {
             Text(title)
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(Color.chillSecondary)
-                .lineLimit(1)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
         .frame(minHeight: 74)

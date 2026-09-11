@@ -3836,8 +3836,13 @@ private struct BetaNoticeLine: View {
             Text(text)
                 .font(.caption.weight(.heavy))
                 .foregroundStyle(.white.opacity(0.86))
-                .lineLimit(1)
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        // A fixed 202pt width with a one-line limit clipped this at the larger
+        // text sizes. The width stays, because the row it sits in is built around
+        // it; the text is allowed to use two lines inside that width.
         .frame(width: 202, alignment: .leading)
     }
 }
