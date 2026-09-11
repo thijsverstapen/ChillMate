@@ -649,6 +649,16 @@ struct SelectedSubstanceTimingCard: View {
                             TimingFigure(label: String(localized: "Lasts"), value: entry.timing.totalText, isLead: false)
                         }
 
+                        // Planning a night around "lasts" alone is how a Saturday
+                        // costs a Tuesday. The after-effects window is the figure
+                        // that makes the rest of the week legible.
+                        if let after = entry.timing.afterEffectsText {
+                            Text("After effects reported for another \(after) once it is over.")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
                         if let redose = entry.substance.reference?.redoseGuidance {
                             Text(redose)
                                 .font(.caption2.weight(.semibold))

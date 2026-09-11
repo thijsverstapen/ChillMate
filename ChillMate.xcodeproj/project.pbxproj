@@ -99,6 +99,8 @@
 		AAB100000000000000000021 /* PanicHideControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000021 /* PanicHideControl.swift */; };
 		AAB100000000000000000022 /* NightPatterns.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000022 /* NightPatterns.swift */; };
 		AAB100000000000000000023 /* AlcoholUnits.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000023 /* AlcoholUnits.swift */; };
+		AAB100000000000000000024 /* ComedownTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000024 /* ComedownTimeline.swift */; };
+		AAB100000000000000000025 /* ComedownPhaseCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000025 /* ComedownPhaseCard.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -266,6 +268,8 @@
 		AAF100000000000000000021 /* PanicHideControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanicHideControl.swift; sourceTree = "<group>"; };
 		AAF100000000000000000022 /* NightPatterns.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightPatterns.swift; sourceTree = "<group>"; };
 		AAF100000000000000000023 /* AlcoholUnits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlcoholUnits.swift; sourceTree = "<group>"; };
+		AAF100000000000000000024 /* ComedownTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComedownTimeline.swift; sourceTree = "<group>"; };
+		AAF100000000000000000025 /* ComedownPhaseCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComedownPhaseCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -356,6 +360,8 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF100000000000000000025 /* ComedownPhaseCard.swift */,
+				AAF100000000000000000024 /* ComedownTimeline.swift */,
 				AAF100000000000000000023 /* AlcoholUnits.swift */,
 				AAF100000000000000000022 /* NightPatterns.swift */,
 				AAF100000000000000000021 /* PanicHideControl.swift */,
@@ -727,6 +733,8 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000025 /* ComedownPhaseCard.swift in Sources */,
+				AAB100000000000000000024 /* ComedownTimeline.swift in Sources */,
 				AAB100000000000000000023 /* AlcoholUnits.swift in Sources */,
 				AAB100000000000000000022 /* NightPatterns.swift in Sources */,
 				AAB100000000000000000021 /* PanicHideControl.swift in Sources */,

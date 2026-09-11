@@ -6853,6 +6853,93 @@
         }
       }
     },
+    "After effects": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachwirkungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efectos residuales"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effets résiduels"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naeffecten"
+          }
+        }
+      },
+      "comment": "Comedown timeline phase, and the label of the after-effects row in the dose reference"
+    },
+    "After effects reported for another %@ once it is over.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenn es vorbei ist, werden noch %@ Nachwirkungen berichtet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cuando termina, se describen efectos residuales durante %@ más."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une fois que c'est fini, des effets résiduels sont rapportés pendant encore %@."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Als het voorbij is, worden er nog %@ aan naeffecten gerapporteerd."
+          }
+        }
+      },
+      "comment": "After-effects duration, under the timing figures in the risk checker"
+    },
+    "After effects reported until about %@.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nachwirkungen werden bis etwa %@ berichtet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se describen efectos residuales hasta alrededor de %@."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des effets résiduels sont rapportés jusque vers %@."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naeffecten worden gerapporteerd tot ongeveer %@."
+          }
+        }
+      },
+      "comment": "When the after-effects window can still be running until"
+    },
     "After substance nights": {
       "localizations": {
         "de": {
@@ -6880,6 +6967,35 @@
           }
         }
       }
+    },
+    "After-effects figures: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zahlen zu den Nachwirkungen: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cifras de los efectos residuales: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiffres des effets résiduels : %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cijfers over naeffecten: %@"
+          }
+        }
+      },
+      "comment": "Attribution under the after-effects window"
     },
     "Aftercare": {
       "localizations": {
@@ -8594,6 +8710,35 @@
           }
         }
       }
+    },
+    "Around the point the reported effects run out. Anything after this is the comedown, not the dose.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etwa an dem Punkt, an dem die berichtete Wirkung endet. Alles danach gehört zu den Nachwirkungen, nicht zur Dosis."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alrededor del punto en que terminan los efectos descritos. Todo lo que viene después es el bajón, no la dosis."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autour du moment où les effets rapportés s'arrêtent. Tout ce qui suit relève des effets résiduels, pas de la dose."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rond het punt waarop de gerapporteerde werking ophoudt. Alles daarna hoort bij de naeffecten, niet bij de dosis."
+          }
+        }
+      },
+      "comment": "What the wearing-off phase means"
     },
     "Around-sex PrEP guide": {
       "localizations": {
@@ -15946,6 +16091,35 @@
         }
       }
     },
+    "Coming down": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Runterkommen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El bajón"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La descente"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De dip"
+          }
+        }
+      },
+      "comment": "Heading over what a source says about the comedown"
+    },
     "Coming home safe is the whole goal tonight.": {
       "localizations": {
         "de": {
@@ -15973,6 +16147,35 @@
           }
         }
       }
+    },
+    "Coming up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setzt ein"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subida"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Montée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Komt op"
+          }
+        }
+      },
+      "comment": "Comedown timeline phase: taken, possibly not arrived yet"
     },
     "Common": {
       "localizations": {
@@ -28942,6 +29145,35 @@
         }
       }
     },
+    "In effect": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wirkt"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En efecto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En action"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Werkt"
+          }
+        }
+      },
+      "comment": "Comedown timeline phase: the effects are running"
+    },
     "Inconclusive": {
       "localizations": {
         "de": {
@@ -29271,6 +29503,35 @@
           }
         }
       }
+    },
+    "Inside the reported window for the effects themselves.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Innerhalb des berichteten Zeitfensters für die Wirkung selbst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dentro de la ventana descrita para los efectos en sí."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans la fenêtre rapportée pour les effets eux-mêmes."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Binnen het gerapporteerde venster voor de werking zelf."
+          }
+        }
+      },
+      "comment": "What the in-effect phase means"
     },
     "Insights": {
       "localizations": {
@@ -29605,6 +29866,35 @@
         }
       },
       "comment": "Methamphetamine safety content"
+    },
+    "It may not have arrived yet. This is the window where a second dose gets taken because the first seems not to be working.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es kann sein, dass es noch nicht da ist. Genau in diesem Zeitfenster wird eine zweite Dosis genommen, weil die erste nicht zu wirken scheint."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puede que todavía no haya llegado. Esta es justo la ventana en la que se toma una segunda dosis porque la primera parece no hacer efecto."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce n'est peut-être pas encore arrivé. C'est exactement le moment où une deuxième dose est prise parce que la première ne semble pas agir."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het kan nog niet zijn aangekomen. Dit is precies het moment waarop mensen een tweede dosis nemen omdat de eerste niets lijkt te doen."
+          }
+        }
+      },
+      "comment": "What the coming-up phase means"
     },
     "It sounds like something serious may have happened. You don't have to deal with this alone.": {
       "localizations": {
@@ -40557,6 +40847,64 @@
         }
       }
     },
+    "Past every figure published for this. That is about the reported window, not about how you actually feel.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jenseits aller Zahlen, die dazu veröffentlicht sind. Das sagt etwas über das berichtete Zeitfenster aus, nicht darüber, wie du dich tatsächlich fühlst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más allá de todas las cifras publicadas sobre esto. Eso habla de la ventana descrita, no de cómo te sientes de verdad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Au-delà de tous les chiffres publiés à ce sujet. Cela concerne la fenêtre rapportée, pas ce que tu ressens vraiment."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorbij elk cijfer dat hierover gepubliceerd is. Dat gaat over het gerapporteerde venster, niet over hoe jij je werkelijk voelt."
+          }
+        }
+      },
+      "comment": "What the done phase means, and what it deliberately does not claim"
+    },
+    "Past the published window": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Außerhalb des veröffentlichten Zeitfensters"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más allá de la ventana publicada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Au-delà de la fenêtre publiée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voorbij het gepubliceerde venster"
+          }
+        }
+      },
+      "comment": "Comedown timeline phase: every published figure has elapsed"
+    },
     "Patterns": {
       "localizations": {
         "de": {
@@ -43836,6 +44184,35 @@
           }
         }
       }
+    },
+    "PsychonautWiki publishes no after-effects window for cocaine. What it names in that place instead is craving and compulsive redosing, arriving as the effects fade. So there is no hour to wait out here — the comedown is the part where the decision gets made again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PsychonautWiki veröffentlicht für Kokain kein Zeitfenster für Nachwirkungen. Stattdessen steht dort Verlangen und zwanghaftes Nachlegen, das einsetzt, sobald die Wirkung nachlässt. Es gibt hier also keine Stunde zum Aussitzen — das Runterkommen ist genau der Moment, in dem die Entscheidung erneut fällt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PsychonautWiki no publica ninguna ventana de efectos residuales para la cocaína. Lo que aparece en su lugar es el craving y el consumo compulsivo, que llegan en cuanto los efectos bajan. Así que aquí no hay una hora que esperar: el bajón es justo el momento en el que la decisión se vuelve a tomar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PsychonautWiki ne publie aucune fenêtre d'effets résiduels pour la cocaïne. Ce qui figure à la place, c'est le craving et la reprise compulsive, qui arrivent dès que les effets retombent. Il n'y a donc pas d'heure à attendre ici — la descente est justement le moment où la décision se reprend."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PsychonautWiki publiceert geen venster voor naeffecten van cocaïne. Wat er in plaats daarvan staat is craving en dwangmatig bijnemen, dat opkomt zodra de werking wegebt. Er is hier dus geen uur om uit te zitten — de dip is juist het moment waarop de beslissing opnieuw valt."
+          }
+        }
+      },
+      "comment": "What PsychonautWiki reports in place of a cocaine after-effects duration"
     },
     "Queer": {
       "localizations": {
@@ -51552,6 +51929,35 @@
         }
       }
     },
+    "Sources: %@ for doses and timing, %@ for after effects": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quellen: %@ für Dosen und Timing, %@ für die Nachwirkungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuentes: %@ para dosis y tiempos, %@ para los efectos residuales"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sources : %@ pour les doses et la durée, %@ pour les effets résiduels"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bronnen: %@ voor doses en timing, %@ voor naeffecten"
+          }
+        }
+      },
+      "comment": "Attribution when the dose figures and the after-effects figures came from different places"
+    },
     "Sources: NHS on calculating units, Trimbos on the standard glass. The Gezondheidsraad's position since June 2026 is that there is no safe lower limit.": {
       "localizations": {
         "de": {
@@ -54765,6 +55171,35 @@
         }
       }
     },
+    "The effects are reported to be over and the after-effects are not. This is the part that lands on tomorrow.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Wirkung gilt als vorbei, die Nachwirkungen nicht. Das ist der Teil, der auf morgen fällt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los efectos deberían haber terminado; los residuales, no. Esta es la parte que cae sobre mañana."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les effets sont censés être terminés, les effets résiduels non. C'est la partie qui retombe sur demain."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De werking zou voorbij zijn, de naeffecten niet. Dit is het deel dat op morgen terechtkomt."
+          }
+        }
+      },
+      "comment": "What the after-effects phase means"
+    },
     "The fact that you are pausing means you are listening to yourself.": {
       "localizations": {
         "de": {
@@ -54876,6 +55311,35 @@
           }
         }
       }
+    },
+    "The low tends to skip a day. PsychonautWiki reports the day after often feeling fine — sometimes better than fine — with the dip landing the day after that, which is why people do not link it to the night. If you know it is coming you can put something gentle in that day rather than something demanding.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Tief überspringt oft einen Tag. PsychonautWiki berichtet, dass sich der Tag danach meist gut anfühlt — manchmal besser als gut — und das Tief erst am Tag darauf kommt. Genau deshalb stellen die meisten keinen Zusammenhang mit der Nacht her. Wenn du weißt, dass es kommt, kannst du dir für diesen Tag etwas Sanftes vornehmen statt etwas Forderndes."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El bajón suele saltarse un día. PsychonautWiki describe que el día siguiente se suele estar bien — a veces incluso mejor que bien — y que el bajón llega al día siguiente de ese, que es justo por lo que la gente no lo relaciona con la noche. Si sabes que viene, puedes dejar ese día para algo suave en lugar de algo exigente."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le creux saute souvent un jour. PsychonautWiki rapporte que le lendemain se passe en général bien — parfois même très bien — et que la descente arrive le jour d'après, ce qui explique pourquoi on ne fait pas le lien avec la soirée. Si tu sais qu'elle arrive, tu peux prévoir quelque chose de doux ce jour-là plutôt que quelque chose d'exigeant."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De dip slaat vaak een dag over. PsychonautWiki meldt dat de dag erna meestal goed voelt — soms zelfs beter dan goed — en dat de dip pas de dag daarna landt, en daarom leggen mensen het verband met die nacht niet. Als je weet dat hij komt, kun je die dag iets zachts plannen in plaats van iets veeleisends."
+          }
+        }
+      },
+      "comment": "What PsychonautWiki reports about the MDMA comedown"
     },
     "The medication you entered was not recognised, so this check does not account for it. Check the spelling, or ask a pharmacist.": {
       "localizations": {
@@ -59752,6 +60216,35 @@
           }
         }
       }
+    },
+    "Wearing off": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klingt ab"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se está pasando"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fin des effets"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ebt weg"
+          }
+        }
+      },
+      "comment": "Comedown timeline phase: the published total duration is running out"
     },
     "Weekend night check-ins": {
       "comment": "Toggle to enable or disable weekend night check-ins.",
@@ -68022,6 +68515,35 @@
           }
         }
       }
+    },
+    "tomorrow %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "morgen %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mañana %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "demain %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "morgen %@"
+          }
+        }
+      },
+      "comment": "A clock time on the following day, inside a sentence"
     },
     "with sex or substances": {
       "localizations": {

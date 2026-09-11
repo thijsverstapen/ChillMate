@@ -207,9 +207,15 @@ struct DrugTimerView: View {
                     }
 
                     if !pastTimers.isEmpty {
-                        LazyVStack(spacing: 12) {
-                            ForEach(pastTimers) { timer in
-                                DrugTimerCard(timer: timer, now: .now)
+                        // Also on a clock, which it was not before. The check-in
+                        // window ending is not the dose ending: a finished timer is
+                        // exactly when the comedown card has something to say, and
+                        // a static `.now` froze it at whatever the screen was built.
+                        TimelineView(.periodic(from: .now, by: 60)) { context in
+                            LazyVStack(spacing: 12) {
+                                ForEach(pastTimers) { timer in
+                                    DrugTimerCard(timer: timer, now: context.date)
+                                }
                             }
                         }
                     }
@@ -499,6 +505,20 @@ private struct DrugTimerCard: View {
         timer.redoseNudgeIsActive(at: now) && redoseDecision == .undecided
     }
 
+    /// The published curve for what this timer is tracking, where there is one.
+    ///
+    /// The timer's own duration is a wellbeing reminder window the user can move;
+    /// this is what the sources actually publish about the substance, which is a
+    /// different thing and outlives the timer by hours or days.
+    private var comedown: ComedownTimeline? {
+        guard let substance = Substance(rawValue: timer.substanceName) else { return nil }
+        return ComedownTimeline(
+            substance: substance,
+            route: AdministrationRoute(rawValue: timer.administrationRoute)?.referenceRoute,
+            startedAt: timer.startedAt
+        )
+    }
+
     private var remainingText: String {
         let interval = max(0, timer.endsAt.timeIntervalSince(now))
         let hours = Int(interval / 3600)
@@ -570,6 +590,10 @@ private struct DrugTimerCard: View {
             if isActive {
                 ProgressView(value: progress)
                     .tint(progress >= 0.4 ? .orange : Color.chillSecondaryBlue)
+            }
+
+            if let comedown, comedown.isActive(at: now) {
+                ComedownPhaseCard(timeline: comedown, now: now)
             }
 
             if shouldShowRedoseNudge {

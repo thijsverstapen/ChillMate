@@ -167,6 +167,14 @@ private struct DrugReferenceSection: View {
                     DoseRow(label: String(localized: "Onset"), value: timing.onsetText)
                     DoseRow(label: String(localized: "Peak"), value: timing.peakText)
                     DoseRow(label: String(localized: "Total"), value: timing.totalText)
+
+                    // The row the app never had. Total duration describes the part
+                    // of the curve somebody is awake for; this one describes the
+                    // part that lands on the next day, which is the part people
+                    // plan around badly because they were never given the figure.
+                    if let after = timing.afterEffectsText {
+                        DoseRow(label: String(localized: "After effects"), value: after)
+                    }
                 }
                 .padding(.top, 2)
             }
@@ -184,10 +192,34 @@ private struct DrugReferenceSection: View {
                 .padding(.top, 2)
             }
 
-            Text("Source: \(reference.source.name)")
-                .font(.caption2)
-                .foregroundStyle(Color.chillSecondary.opacity(0.85))
-                .accessibilityLabel(Text("Source: \(reference.source.name)"))
+            if let comedown = reference.comedownNote {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Coming down")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(tint)
+                    Text(comedown)
+                        .font(.caption)
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.top, 2)
+            }
+
+            // Two names where the figures came from two places. GHB's ladder is
+            // Drugs and Me's and its after-effects window is PsychonautWiki's, and
+            // printing one name over both would send a reader who wanted to check
+            // to a page that does not carry the number they are checking.
+            if let afterSource = reference.afterEffectsSource, afterSource.name != reference.source.name {
+                Text("Sources: \(reference.source.name) for doses and timing, \(afterSource.name) for after effects")
+                    .font(.caption2)
+                    .foregroundStyle(Color.chillSecondary.opacity(0.85))
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                Text("Source: \(reference.source.name)")
+                    .font(.caption2)
+                    .foregroundStyle(Color.chillSecondary.opacity(0.85))
+                    .accessibilityLabel(Text("Source: \(reference.source.name)"))
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
