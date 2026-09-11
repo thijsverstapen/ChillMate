@@ -30,7 +30,7 @@ enum InteractionChart {
         let isApproximate: Bool
     }
 
-    /// 39 of the pairs ChillMate can make. The rest are not on the chart.
+    /// 48 of the pairs ChillMate can make. The rest are not on the chart.
     static let entries: [String: Entry] = [
         "alcohol+benzodiazepines": Entry(grading: .critical, isApproximate: false),
         "alcohol+cannabis": Entry(grading: .lowRisk, isApproximate: false),
@@ -39,6 +39,7 @@ enum InteractionChart {
         "alcohol+ghb": Entry(grading: .critical, isApproximate: false),
         "alcohol+ketamine": Entry(grading: .critical, isApproximate: false),
         "alcohol+mdma": Entry(grading: .caution, isApproximate: false),
+        "alcohol+methamphetamine": Entry(grading: .caution, isApproximate: true),
         "alcohol+psychedelics": Entry(grading: .lowRisk, isApproximate: true),
         "benzodiazepines+cannabis": Entry(grading: .lowRisk, isApproximate: false),
         "benzodiazepines+cocaine": Entry(grading: .lowRisk, isApproximate: false),
@@ -46,30 +47,38 @@ enum InteractionChart {
         "benzodiazepines+ghb": Entry(grading: .critical, isApproximate: false),
         "benzodiazepines+ketamine": Entry(grading: .caution, isApproximate: false),
         "benzodiazepines+mdma": Entry(grading: .lowRisk, isApproximate: false),
+        "benzodiazepines+methamphetamine": Entry(grading: .lowRisk, isApproximate: true),
         "benzodiazepines+psychedelics": Entry(grading: .lowRisk, isApproximate: true),
         "cannabis+cocaine": Entry(grading: .caution, isApproximate: false),
         "cannabis+gbl": Entry(grading: .lowRisk, isApproximate: false),
         "cannabis+ghb": Entry(grading: .lowRisk, isApproximate: false),
         "cannabis+ketamine": Entry(grading: .lowRisk, isApproximate: false),
         "cannabis+mdma": Entry(grading: .lowRisk, isApproximate: false),
+        "cannabis+methamphetamine": Entry(grading: .caution, isApproximate: true),
         "cannabis+psychedelics": Entry(grading: .caution, isApproximate: true),
         "cocaine+gbl": Entry(grading: .caution, isApproximate: false),
         "cocaine+ghb": Entry(grading: .caution, isApproximate: false),
         "cocaine+ketamine": Entry(grading: .caution, isApproximate: false),
         "cocaine+mdma": Entry(grading: .caution, isApproximate: false),
+        "cocaine+methamphetamine": Entry(grading: .caution, isApproximate: true),
         "cocaine+psychedelics": Entry(grading: .caution, isApproximate: true),
         "gbl+ketamine": Entry(grading: .critical, isApproximate: false),
         "gbl+mdma": Entry(grading: .caution, isApproximate: false),
+        "gbl+methamphetamine": Entry(grading: .caution, isApproximate: true),
         "gbl+psychedelics": Entry(grading: .lowRisk, isApproximate: true),
         "gbl+threeMMC": Entry(grading: .caution, isApproximate: true),
         "ghb+ketamine": Entry(grading: .critical, isApproximate: false),
         "ghb+mdma": Entry(grading: .caution, isApproximate: false),
+        "ghb+methamphetamine": Entry(grading: .caution, isApproximate: true),
         "ghb+psychedelics": Entry(grading: .lowRisk, isApproximate: true),
         "ghb+threeMMC": Entry(grading: .caution, isApproximate: true),
         "ketamine+mdma": Entry(grading: .lowRisk, isApproximate: false),
+        "ketamine+methamphetamine": Entry(grading: .caution, isApproximate: true),
         "ketamine+psychedelics": Entry(grading: .lowRisk, isApproximate: true),
+        "mdma+methamphetamine": Entry(grading: .caution, isApproximate: true),
         "mdma+psychedelics": Entry(grading: .lowRisk, isApproximate: true),
         "mdma+threeMMC": Entry(grading: .critical, isApproximate: true),
+        "methamphetamine+psychedelics": Entry(grading: .caution, isApproximate: true),
         "psychedelics+threeMMC": Entry(grading: .caution, isApproximate: true),
     ]
 

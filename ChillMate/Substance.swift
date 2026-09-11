@@ -21,6 +21,10 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
     // of any kind. A new case is additive for SwiftData, which stores these as
     // raw strings.
     case benzodiazepines = "Benzodiazepines"
+    // Also added in 5.0.0. Methamphetamine is central to the settings this app
+    // is used in and could not be logged or checked at all — someone had to pick
+    // "Other", which produces no interaction row and no timing.
+    case methamphetamine = "Meth"
     case unknown = "Unknown"
     case other = "Other"
 
@@ -46,6 +50,7 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
         case .viagra: "viagra"
         case .psychedelics: "psychedelics"
         case .benzodiazepines: "benzodiazepines"
+        case .methamphetamine: "methamphetamine"
         case .unknown: "unknown"
         case .other: "other"
         }
@@ -77,6 +82,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
             "circle.hexagongrid.fill"
         case .benzodiazepines:
             "pills.fill"
+        case .methamphetamine:
+            "flame.fill"
         case .unknown:
             "questionmark.circle.fill"
         case .other:
@@ -112,6 +119,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
             .indigo
         case .benzodiazepines:
             .purple
+        case .methamphetamine:
+            .pink
         case .unknown:
             .gray
         case .other:
@@ -146,6 +155,12 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
         // still working the next day. A window that covered only the short-acting
         // ones would tell someone they were clear when they were not.
         case .benzodiazepines:
+            4...12
+        // PsychonautWiki gives 4 to 7 hours snorted and 8 to 12 swallowed, both
+        // running far longer for irregular users. The upper bound follows the oral
+        // figure because underestimating how long this is still working is what
+        // drives the redosing.
+        case .methamphetamine:
             4...12
         case .unknown, .other:
             1...4
@@ -198,6 +213,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
             String(localized: "Sildenafil for erections. Avoid with poppers or nitrates because blood pressure can drop dangerously.")
         case .psychedelics:
             String(localized: "Can strongly change perception and emotions. Setting, support, and mental state matter.")
+        case .methamphetamine:
+            String(localized: "A long, strong stimulant. Sessions stretch for many hours, sleep and eating stop, and the comedown is heavy. Injecting and sharing equipment carry their own risks, and judgement about sex and consent shifts a long way before you notice it has.")
         case .benzodiazepines:
             String(localized: "Sedatives that differ enormously between compounds: some are gone in a few hours, others are still working the next day. The danger is rarely the benzo on its own — it is stacking it with alcohol, GHB/GBL or another depressant.")
         case .unknown:
@@ -207,53 +224,64 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// The three things most likely to go wrong with this substance.
+    ///
+    /// Every line was a bare Swift string until 5.0.0, which meant it reached
+    /// `Label(_:systemImage:)` as a `String` rather than a `LocalizedStringKey`.
+    /// That overload does not localize, so all of this shipped in English to every
+    /// Dutch, German, French and Spanish user — on the drug information screen,
+    /// where the whole point is knowing what you are dealing with. Nothing caught
+    /// it because the CI gate reads `String(localized:)` calls, and there were
+    /// none here to read.
     var mainRisks: [String] {
         switch self {
         case .cannabis:
-            ["Anxiety or paranoia", "Memory and coordination changes", "Stronger effects with edibles or high-potency products"]
+            [String(localized: "Anxiety or paranoia"), String(localized: "Memory and coordination changes"), String(localized: "Stronger effects with edibles or high-potency products")]
         case .alcohol:
-            ["Lowered inhibition", "Vomiting or injury risk", "Breathing risk when mixed with depressants"]
+            [String(localized: "Lowered inhibition"), String(localized: "Vomiting or injury risk"), String(localized: "Breathing risk when mixed with depressants")]
         case .mdma:
-            ["Overheating and dehydration", "Jaw tension and high heart rate", "Next-day low mood or sleep disruption"]
+            [String(localized: "Overheating and dehydration"), String(localized: "Jaw tension and high heart rate"), String(localized: "Next-day low mood or sleep disruption")]
         case .threeMMC:
-            ["Strong urge to continue", "High heart rate and anxiety", "Sleep loss and low mood afterwards"]
+            [String(localized: "Strong urge to continue"), String(localized: "High heart rate and anxiety"), String(localized: "Sleep loss and low mood afterwards")]
         case .ketamine:
-            ["Dissociation and falls", "Memory gaps", "Consent clarity can be affected"]
+            [String(localized: "Dissociation and falls"), String(localized: "Memory gaps"), String(localized: "Consent clarity can be affected")]
         case .ghb, .gbl:
-            ["Unconsciousness can happen quickly", "Breathing problems when mixed", "Harder to judge safety and consent"]
+            [String(localized: "Unconsciousness can happen quickly"), String(localized: "Breathing problems when mixed"), String(localized: "Harder to judge safety and consent")]
         case .cocaine:
-            ["Heart strain", "Anxiety or agitation", "Sleep loss and impulsive decisions"]
+            [String(localized: "Heart strain"), String(localized: "Anxiety or agitation"), String(localized: "Sleep loss and impulsive decisions")]
         case .poppers:
-            ["Blood pressure drop", "Dizziness or fainting", "Higher risk with erectile medication"]
+            [String(localized: "Blood pressure drop"), String(localized: "Dizziness or fainting"), String(localized: "Higher risk with erectile medication")]
         case .kamagra, .viagra:
-            ["Blood pressure effects", "Headache or dizziness", "Dangerous with poppers or nitrates"]
+            [String(localized: "Blood pressure effects"), String(localized: "Headache or dizziness"), String(localized: "Dangerous with poppers or nitrates")]
         case .psychedelics:
-            ["Strong emotional shifts", "Panic or confusion", "Long duration and setting sensitivity"]
+            [String(localized: "Strong emotional shifts"), String(localized: "Panic or confusion"), String(localized: "Long duration and setting sensitivity")]
         case .benzodiazepines:
-            ["Breathing risk when stacked with other depressants", "Memory gaps and blackouts", "Dependence builds fast with regular use"]
+            [String(localized: "Breathing risk when stacked with other depressants"), String(localized: "Memory gaps and blackouts"), String(localized: "Dependence builds fast with regular use")]
+        case .methamphetamine:
+            [String(localized: "Heart strain and dangerously high temperature"), String(localized: "Days without sleep, then a heavy crash"), String(localized: "Consent and limits get much harder to hold")]
         case .unknown:
-            ["Unknown strength", "Unknown contents", "Higher risk when mixed"]
+            [String(localized: "Unknown strength"), String(localized: "Unknown contents"), String(localized: "Higher risk when mixed")]
         case .other:
-            ["Unknown risk profile", "Timing and amount may be uncertain", "Avoid mixing unknown substances"]
+            [String(localized: "Unknown risk profile"), String(localized: "Timing and amount may be uncertain"), String(localized: "Avoid mixing unknown substances")]
         }
     }
 
     var mixingRisks: [String] {
         switch self {
         case .ghb, .gbl:
-            ["Avoid alcohol, benzodiazepines, opioids, ketamine, and other sedatives."]
+            [String(localized: "Avoid alcohol, benzodiazepines, opioids, ketamine, and other sedatives.")]
         case .poppers:
-            ["Avoid Viagra, Kamagra, sildenafil, nitrates, nicorandil, or riociguat."]
+            [String(localized: "Avoid Viagra, Kamagra, sildenafil, nitrates, nicorandil, or riociguat.")]
         case .kamagra, .viagra:
-            ["Avoid poppers and nitrate-like medication because blood pressure can drop sharply."]
+            [String(localized: "Avoid poppers and nitrate-like medication because blood pressure can drop sharply.")]
         case .mdma, .threeMMC, .cocaine:
-            ["Avoid stacking stimulants and be careful with serotonergic medication or MAOIs."]
+            [String(localized: "Avoid stacking stimulants and be careful with serotonergic medication or MAOIs.")]
         case .alcohol:
-            ["Avoid GHB/GBL, benzodiazepines, opioids, ketamine, and heavy stimulant use."]
+            [String(localized: "Avoid GHB/GBL, benzodiazepines, opioids, ketamine, and heavy stimulant use.")]
         case .ketamine:
-            ["Avoid depressant stacks and settings where falls, water, stairs, or consent confusion are likely."]
+            [String(localized: "Avoid depressant stacks and settings where falls, water, stairs, or consent confusion are likely.")]
         default:
-            ["Avoid unknown mixes, pressure to continue, and combining with medication without professional advice."]
+            [String(localized: "Avoid unknown mixes, pressure to continue, and combining with medication without professional advice.")]
         }
     }
 
@@ -337,6 +365,14 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
                 String(localized: "Severe panic that will not settle, or does not know where they are"),
                 String(localized: "Seizure, or a dangerously high temperature"),
                 String(localized: "At risk of harming themselves or cannot be kept safe")
+            ]
+
+        case .methamphetamine:
+            [
+                String(localized: "Chest pain, a racing heart that will not settle, or collapse"),
+                String(localized: "Very hot to the touch, or has stopped sweating"),
+                String(localized: "Seizure, or twitching they cannot control"),
+                String(localized: "Severe agitation, paranoia, or does not know where they are")
             ]
 
         // NHS medicines guidance on diazepam names slower, shallower breathing as
@@ -454,6 +490,8 @@ enum Substance: String, CaseIterable, Identifiable, Sendable {
                 return URL(string: "https://www.drugsinfo.nl/lsd")
             case .benzodiazepines:
                 return URL(string: "https://www.drugsinfo.nl/benzodiazepines")
+            case .methamphetamine:
+                return URL(string: "https://www.drugsinfo.nl/crystal-meth")
             case .unknown, .other:
                 return nil
             }

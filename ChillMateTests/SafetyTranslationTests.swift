@@ -216,3 +216,95 @@ struct PluralFormTests {
         #expect(rendered == "0 jour", "French renders zero days as \"\(rendered)\"")
     }
 }
+
+/// Guards the defect that shipped `mainRisks` and `mixingRisks` in English to
+/// every non-English user.
+///
+/// Those were bare Swift string literals, which reach
+/// `Label(_:systemImage:)` as a `String` rather than a `LocalizedStringKey` and
+/// are therefore not localized at all. The localization gate could not see them
+/// because it reads `String(localized:)` calls and there were none.
+///
+/// So this checks the thing that actually matters rather than the shape of the
+/// call: that the text differs between languages. A line that comes back
+/// identical in Dutch, German, French and Spanish is either untranslated or a
+/// proper noun, and there are no proper nouns in these two lists.
+@Suite("Drug information is translated, not just localizable")
+struct DrugInformationTranslationTests {
+
+    private static let substances = Substance.allCases.filter { $0 != .unknown && $0 != .other }
+
+    /// These checks read the English key and then look it up in each shipped
+    /// `.lproj`, so they only mean anything in the English pass.
+    ///
+    /// `mainRisks` resolves through `String(localized:)` against `Bundle.main`.
+    /// In the Dutch pass it therefore already returns Dutch, and looking a Dutch
+    /// sentence up as a catalog key finds nothing and hands the same sentence
+    /// back — which would fail for every language regardless of how well
+    /// translated it is. The first version of this file did exactly that.
+    ///
+    /// CI runs the suite once per language, so the English pass covers all four
+    /// translations and the other four passes skip.
+    private static var isEnglishPass: Bool {
+        Bundle.main.preferredLocalizations.first?.hasPrefix("en") ?? false
+    }
+
+    private static let translated = AppLanguage.allCases.filter { $0 != .english }
+
+    @Test("Main risks are translated into every language", .tags(.safety))
+    func mainRisksAreTranslated() throws {
+        guard Self.isEnglishPass else { return }
+
+        for language in Self.translated {
+            let bundle = try #require(SafetyLine.bundle(for: language))
+            for substance in Self.substances {
+                for risk in substance.mainRisks {
+                    let value = bundle.localizedString(forKey: risk, value: "\u{0}absent", table: nil)
+                    #expect(value != "\u{0}absent",
+                            "\(language.rawValue) has no translation for \(substance.rawValue): \"\(risk)\"")
+                    #expect(value != risk,
+                            "\(language.rawValue) shows \(substance.rawValue)'s risk in English: \"\(risk)\"")
+                }
+            }
+        }
+    }
+
+    @Test("Mixing risks are translated into every language", .tags(.safety))
+    func mixingRisksAreTranslated() throws {
+        guard Self.isEnglishPass else { return }
+
+        for language in Self.translated {
+            let bundle = try #require(SafetyLine.bundle(for: language))
+            for substance in Self.substances {
+                for risk in substance.mixingRisks {
+                    let value = bundle.localizedString(forKey: risk, value: "\u{0}absent", table: nil)
+                    #expect(value != "\u{0}absent",
+                            "\(language.rawValue) has no translation for \(substance.rawValue)'s mixing risk")
+                    #expect(value != risk,
+                            "\(language.rawValue) shows \(substance.rawValue)'s mixing risk in English")
+                }
+            }
+        }
+    }
+
+    /// The substance's own name, which is the one place a raw value doubles as
+    /// display text.
+    ///
+    /// English is excluded rather than skipped for convenience: a String Catalog
+    /// stores no entry whose translation equals its key, so `en.lproj` genuinely
+    /// holds a fraction of the keys and a lookup there reports perfectly good
+    /// strings as missing.
+    @Test("Every substance has a name in every translated language", .tags(.safety))
+    func displayNamesResolve() throws {
+        guard Self.isEnglishPass else { return }
+
+        for language in Self.translated {
+            let bundle = try #require(SafetyLine.bundle(for: language))
+            for substance in Self.substances {
+                let name = bundle.localizedString(forKey: substance.rawValue, value: "\u{0}absent", table: nil)
+                #expect(name != "\u{0}absent",
+                        "\(language.rawValue) has no name for \(substance.rawValue)")
+            }
+        }
+    }
+}

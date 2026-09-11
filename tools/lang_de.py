@@ -269,6 +269,7 @@ S = {
     "demo_reset": "Zurücksetzen",
     "demo_note": "Das läuft in dieser Seite. Nichts von dem, was du antippst, geht irgendwohin, genau wie in der App.",
     "combos_h2": "Alle 30 Kombinationen auf einen Blick",
+    "combos_source_note": "Jede Einstufung hier wird mit TripSits veröffentlichter Drogen-Kombinationstabelle abgeglichen, und jede Zeile sagt, wie sie dazu steht. Wo ChillMate höher einstuft, steht das dabei. Ein fehlender Eintrag heißt, dass niemand dieses Paar bewertet hat, nicht dass nichts passiert.",
     "combos_meds_h2": "Die Medikamentengruppen, die es erkennt",
     "demo_try": "Beispiel: GHB und Alkohol",
 

@@ -187,6 +187,7 @@ extension Substance: AppEnum {
         .viagra: DisplayRepresentation(title: "Viagra"),
         .psychedelics: DisplayRepresentation(title: "Psychedelics"),
         .benzodiazepines: DisplayRepresentation(title: "Benzodiazepines"),
+        .methamphetamine: DisplayRepresentation(title: "Meth"),
         .unknown: DisplayRepresentation(title: "Unknown"),
         .other: DisplayRepresentation(title: "Other")
     ]

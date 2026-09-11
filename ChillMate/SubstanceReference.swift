@@ -63,15 +63,25 @@ struct SubstanceReference: Sendable {
         }
     }
 
-    /// Phase timings in minutes.
+    /// Phase timings in minutes, for one route.
+    ///
+    /// Carrying the route is not decoration. Smoked cannabis comes up inside ten
+    /// minutes and is done in a few hours; swallowed cannabis takes twenty to
+    /// sixty minutes and runs four to ten. This app stored the smoked figures and
+    /// showed them next to an oral dose row, so anyone reading about an edible was
+    /// told it arrives in under ten minutes — which is exactly the belief that
+    /// makes people take a second one.
     struct Timing: Sendable {
+        /// Nil where the substance has one meaningful route, or where the
+        /// published figures do not separate them.
+        let route: Route?
         let onset: ClosedRange<Double>
         let peak: ClosedRange<Double>
         let total: ClosedRange<Double>
     }
 
     let doses: [Doses]
-    let timing: Timing?
+    let timings: [Timing]
     let source: Source
 
     /// A note explaining why a substance carries no dose ladder, when it does not.
@@ -118,7 +128,7 @@ extension Substance {
             SubstanceReference(
                 doses: [.init(route: .oral, unit: .grams,
                               light: 10...20, common: 20...30, strong: 30...40, heavyFrom: 40)],
-                timing: .init(onset: 2...5, peak: 30...90, total: 90...300),
+                timings: [.init(route: nil, onset: 2...5, peak: 30...90, total: 90...300)],
                 source: .psychonautWiki,
                 noDoseReason: nil,
                 redoseGuidance: nil
@@ -132,17 +142,23 @@ extension Substance {
                     .init(route: .oral, unit: .milligrams,
                           light: 2.5...5, common: 5...10, strong: 10...25, heavyFrom: 25)
                 ],
-                timing: .init(onset: 0.1...10, peak: 15...45, total: 150...300),
+                timings: [
+                    .init(route: .smoked, onset: 0.1...10, peak: 15...45, total: 150...300),
+                    // Added 11 September 2026. These were missing, and the smoked
+                    // figures were shown beside an oral dose row — telling anyone
+                    // reading about an edible that it arrives in under ten minutes.
+                    .init(route: .oral, onset: 20...60, peak: 60...150, total: 240...600)
+                ],
                 source: .psychonautWiki,
                 noDoseReason: nil,
-                redoseGuidance: nil
+                redoseGuidance: String(localized: "Smoked, you know inside ten minutes. Swallowed, it can take a full hour — so an edible that seems not to be working usually is, and a second one lands on top of the first for the next several hours.")
             )
 
         case .mdma:
             SubstanceReference(
                 doses: [.init(route: .oral, unit: .milligrams,
                               light: 20...80, common: 80...120, strong: 120...150, heavyFrom: 150)],
-                timing: .init(onset: 30...45, peak: 90...150, total: 180...360),
+                timings: [.init(route: nil, onset: 30...45, peak: 90...150, total: 180...360)],
                 source: .psychonautWiki,
                 noDoseReason: nil,
                 redoseGuidance: String(localized: "Give it 60 to 90 minutes before deciding anything. Eating beforehand delays the onset, which is what makes people take more too early.")
@@ -156,7 +172,10 @@ extension Substance {
                     .init(route: .oral, unit: .milligrams,
                           light: 25...50, common: 50...150, strong: 150...250, heavyFrom: 350)
                 ],
-                timing: .init(onset: 5...10, peak: 60...90, total: 150...270),
+                timings: [
+                    .init(route: .insufflated, onset: 5...10, peak: 60...90, total: 150...270),
+                    .init(route: .oral, onset: 10...30, peak: 120...180, total: 240...360)
+                ],
                 source: .psychonautWiki,
                 noDoseReason: nil,
                 redoseGuidance: nil
@@ -170,7 +189,10 @@ extension Substance {
                     .init(route: .oral, unit: .milligrams,
                           light: 50...100, common: 100...300, strong: 300...450, heavyFrom: 450)
                 ],
-                timing: .init(onset: 1...3, peak: 15...45, total: 60...120),
+                timings: [
+                    .init(route: .insufflated, onset: 1...3, peak: 15...45, total: 60...120),
+                    .init(route: .oral, onset: 10...30, peak: 45...90, total: 60...140)
+                ],
                 source: .psychonautWiki,
                 noDoseReason: nil,
                 redoseGuidance: nil
@@ -180,7 +202,7 @@ extension Substance {
             SubstanceReference(
                 doses: [.init(route: .oral, unit: .grams,
                               light: 0.5...1, common: 1...2.5, strong: 2.5...4, heavyFrom: 4)],
-                timing: .init(onset: 5...30, peak: 45...90, total: 90...150),
+                timings: [.init(route: nil, onset: 5...30, peak: 45...90, total: 90...150)],
                 source: .drugsAndMe,
                 noDoseReason: nil,
                 redoseGuidance: String(localized: "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under.")
@@ -190,7 +212,7 @@ extension Substance {
             SubstanceReference(
                 doses: [.init(route: .oral, unit: .millilitres,
                               light: 0.3...0.9, common: 0.9...1.5, strong: 1.5...3, heavyFrom: 3)],
-                timing: .init(onset: 3...10, peak: 30...45, total: 60...120),
+                timings: [.init(route: nil, onset: 3...10, peak: 30...45, total: 60...120)],
                 source: .drugsAndMe,
                 noDoseReason: nil,
                 redoseGuidance: String(localized: "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under.")
@@ -200,16 +222,22 @@ extension Substance {
             SubstanceReference(
                 doses: [.init(route: .insufflated, unit: .milligrams,
                               light: 10...30, common: 30...60, strong: 60...90, heavyFrom: 90)],
-                timing: .init(onset: 3...10, peak: 7.5...16, total: 10...90),
+                timings: [.init(route: nil, onset: 3...10, peak: 7.5...16, total: 10...90)],
                 source: .psychonautWiki,
                 noDoseReason: nil,
-                redoseGuidance: nil
+                // No published interval exists, and inventing one would be worse
+                // than saying so. What *is* published is the behaviour: PsychonautWiki
+                // records compulsive redosing as more prevalent with cocaine than
+                // with any other common stimulant, and cravings arriving almost
+                // immediately on the comedown. Paired with a total duration as short
+                // as ten minutes, that is the whole problem in two facts.
+                redoseGuidance: String(localized: "There is no published safe interval for this one. What is published is that it drives redosing harder than any other common stimulant, and that the craving arrives almost as soon as you come down — while the last dose has barely finished. Decide the number of lines before you start, not during.")
             )
 
         case .poppers:
             SubstanceReference(
                 doses: [],
-                timing: .init(onset: 0.1...0.5, peak: 0.5...2, total: 2...5),
+                timings: [.init(route: nil, onset: 0.1...0.5, peak: 0.5...2, total: 2...5)],
                 source: .psychonautWiki,
                 noDoseReason: String(localized: "Poppers are inhaled from the bottle, so there is no measured dose. Effects arrive within seconds and fade within minutes."),
                 redoseGuidance: nil
@@ -219,19 +247,47 @@ extension Substance {
             SubstanceReference(
                 doses: [.init(route: .oral, unit: .milligrams,
                               light: 25...25, common: 50...50, strong: 100...100, heavyFrom: 100)],
-                timing: .init(onset: 30...60, peak: 60...120, total: 240...360),
+                timings: [.init(route: nil, onset: 30...60, peak: 60...120, total: 240...360)],
                 source: .nhs,
                 noDoseReason: nil,
-                redoseGuidance: nil
+                // NHS medicines guidance on sildenafil, fetched 11 September 2026:
+                // "Do not take more than 1 tablet a day as the effects can last up
+                // to 36 hours." This is the hardest redose rule in the whole file
+                // and the one most often broken — a second pill gets taken when the
+                // first seems not to have worked, while the first is still active.
+                redoseGuidance: String(localized: "One tablet in twenty-four hours, and no more. The effects can last up to thirty-six hours, so a second one taken because the first seemed not to work stacks on a dose that is still going.")
             )
 
         case .psychedelics:
             SubstanceReference(
                 doses: [],
-                timing: nil,
+                timings: [],
                 source: .psychonautWiki,
                 noDoseReason: String(localized: "Psychedelics covers substances with completely different scales, from micrograms to grams. Look up the specific one rather than trusting a shared figure."),
                 redoseGuidance: nil
+            )
+
+        // PsychonautWiki, fetched 11 September 2026. Both routes are listed
+        // because they behave differently enough to matter: snorted comes up in
+        // minutes and is done in four to seven hours, swallowed takes up to
+        // three-quarters of an hour to arrive and runs eight to twelve. The timing
+        // below spans both, and the total takes the oral figure, because the
+        // failure mode is believing it has finished when it has not.
+        case .methamphetamine:
+            SubstanceReference(
+                doses: [
+                    .init(route: .insufflated, unit: .milligrams,
+                          light: 5...10, common: 10...30, strong: 30...60, heavyFrom: 60),
+                    .init(route: .oral, unit: .milligrams,
+                          light: 5...10, common: 10...25, strong: 25...50, heavyFrom: 50)
+                ],
+                timings: [
+                    .init(route: .insufflated, onset: 3...5, peak: 90...180, total: 240...420),
+                    .init(route: .oral, onset: 15...45, peak: 180...300, total: 480...720)
+                ],
+                source: .psychonautWiki,
+                noDoseReason: nil,
+                redoseGuidance: String(localized: "It keeps working long after it stops feeling like it is. The published total runs to twelve hours, so a redose late in a session lands on top of a dose that has not finished.")
             )
 
         // No dose ladder, for the same reason as psychedelics and more sharply:
@@ -242,7 +298,7 @@ extension Substance {
         case .benzodiazepines:
             SubstanceReference(
                 doses: [],
-                timing: nil,
+                timings: [],
                 source: .nhs,
                 noDoseReason: String(localized: "Benzodiazepines covers drugs whose doses differ by a factor of twenty or more, and whose effects last anywhere from a few hours to well into the next day. Look up the specific one you have, and treat any pill of unknown origin as unknown strength."),
                 redoseGuidance: nil

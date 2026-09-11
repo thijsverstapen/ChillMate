@@ -288,6 +288,7 @@ S = {
     "demo_reset": "Clear",
     "demo_note": "This runs inside the page. Nothing you tap gets sent anywhere, exactly like the app.",
     "combos_h2": "All 30 combinations, in one list",
+    "combos_source_note": "Every rating here is checked against TripSit's published drug combination chart, and each row says how it compares. Where ChillMate rates something higher, it says so. A missing entry means nobody has rated that pair, not that nothing happens.",
     "combos_meds_h2": "The medication groups it recognises",
     "demo_try": "Try GHB and alcohol",
 

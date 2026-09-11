@@ -1660,7 +1660,7 @@ RELEASES = [
 
 
 def combination_table(lang):
-    """The 30 documented combinations, rendered as HTML rather than hidden in JSON.
+    """Every documented combination, rendered as HTML rather than hidden in JSON.
 
     The checker page carried 196 visible words and kept every warning inside a
     `<script type="application/json">` blob. That is invisible to a crawler and
@@ -1678,14 +1678,20 @@ def combination_table(lang):
     order = {"critical": 0, "serious": 1, "caution": 2}
     rules = sorted(raw["rules"], key=lambda r: (order.get(r["level"], 9),
                                                 r["substances"]))
+    labels = raw.get("corroborationLabels", {})
     rows = ""
     for rule in rules:
         pair = " + ".join(rule["substances"])
         level = raw["levels"][rule["level"]][lang]
+        # Where the rating comes from, per row, the same line the app shows.
+        # Without it every warning here carries identical apparent authority, and
+        # they do not all rest on the same thing.
+        source = labels.get(rule.get("corroboration", ""), {}).get(lang, "")
+        note = f'<br><span class="combos-source">{e(source)}</span>' if source else ""
         rows += (f'          <tr>\n'
                  f'            <th scope="row">{e(pair)}</th>\n'
                  f'            <td><span class="pill pill--{rule["level"]}">{e(level)}</span></td>\n'
-                 f'            <td>{e(rule["warning"][lang])}</td>\n'
+                 f'            <td>{e(rule["warning"][lang])}{note}</td>\n'
                  f'          </tr>\n')
 
     groups = "".join(
@@ -1707,6 +1713,8 @@ def combination_table(lang):
 {rows}          </tbody>
         </table>
       </div>
+
+      <p class="combos-note">{t(s["combos_source_note"])}</p>
 
       <h2 id="medication" style="margin-top:clamp(40px,5vw,72px)">{e(no_orphan(s["combos_meds_h2"]))}</h2>
       <ul class="med-groups">

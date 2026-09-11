@@ -30,6 +30,8 @@ import sys
 #     has no 3-MMC row.
 #   * "Psychedelics" is one entry in ChillMate and several on the chart, so the
 #     most severe of LSD and mushrooms is taken.
+#   * Methamphetamine is read against the chart's "amphetamines" row, which is the
+#     class rather than the specific drug.
 MAPPING = {
     "cannabis": ["cannabis"],
     "alcohol": ["alcohol"],
@@ -41,9 +43,10 @@ MAPPING = {
     "cocaine": ["cocaine"],
     "psychedelics": ["lsd", "mushrooms"],
     "benzodiazepines": ["benzodiazepines"],
+    "methamphetamine": ["amphetamines"],
 }
 
-APPROXIMATE = {"threeMMC", "psychedelics"}
+APPROXIMATE = {"threeMMC", "psychedelics", "methamphetamine"}
 
 # The chart's four low-risk gradings all sit below ChillMate's mildest level, so
 # they collapse to one case. The three above it map one-for-one.

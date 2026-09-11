@@ -74,13 +74,16 @@ struct InteractionChartTests {
     ///   them is the thing that row exists to warn about.
     /// * 3-MMC is read against mephedrone, and the chart's mephedrone row is
     ///   itself incomplete: it has MDMA, GHB/GBL and LSD, and nothing for cocaine,
-    ///   alcohol, cannabis or ketamine.
+    ///   alcohol, cannabis, ketamine or amphetamines.
     @Test("Every uncovered pair is uncovered for a known reason", .tags(.safety))
     func uncoveredSubstancesAreTheExpectedOnes() {
         let notOnChartAtAll: Set<Substance> = [.poppers, .viagra, .kamagra]
         let knownGaps: Set<String> = [
             "GBL+GHB",
             "3MMC+Alcohol", "3MMC+Benzodiazepines", "3MMC+Cannabis", "3MMC+Cocaine", "3MMC+Ketamine",
+            // The chart's amphetamines row has no mephedrone entry either, so the
+            // two long stimulants meet in a gap on both sides.
+            "3MMC+Meth",
         ]
 
         for interaction in Self.everyPair where interaction.corroboration == .notOnChart {

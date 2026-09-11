@@ -152,9 +152,11 @@ private struct DrugReferenceSection: View {
                 .padding(.top, 2)
             }
 
-            if let timing = reference.timing {
+            ForEach(Array(reference.timings.enumerated()), id: \.offset) { _, timing in
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Timing")
+                    // Named per route where the routes differ, because that is the
+                    // whole point of separating them.
+                    Text(timing.route.map { String(localized: "Timing — \($0.label)") } ?? String(localized: "Timing"))
                         .font(.caption2.weight(.bold))
                         .foregroundStyle(tint)
 

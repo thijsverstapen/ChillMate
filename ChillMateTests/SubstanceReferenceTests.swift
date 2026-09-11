@@ -82,16 +82,34 @@ struct SubstanceReferenceTests {
 
     @Test("Timings run in order", .tags(.safety), arguments: Substance.allCases)
     func timingsAreOrdered(substance: Substance) {
-        guard let timing = substance.reference?.timing else { return }
+        for timing in substance.reference?.timings ?? [] {
+            let route = timing.route.map { " (\($0))" } ?? ""
 
-        #expect(timing.onset.lowerBound >= 0)
-        #expect(timing.onset.lowerBound <= timing.onset.upperBound)
-        #expect(timing.peak.lowerBound <= timing.peak.upperBound)
-        #expect(timing.total.lowerBound <= timing.total.upperBound)
-        #expect(timing.onset.lowerBound <= timing.peak.lowerBound,
-                "\(substance.rawValue) peaks before it starts")
-        #expect(timing.peak.lowerBound <= timing.total.upperBound,
-                "\(substance.rawValue) peaks after it is over")
+            #expect(timing.onset.lowerBound >= 0)
+            #expect(timing.onset.lowerBound <= timing.onset.upperBound)
+            #expect(timing.peak.lowerBound <= timing.peak.upperBound)
+            #expect(timing.total.lowerBound <= timing.total.upperBound)
+            #expect(timing.onset.lowerBound <= timing.peak.lowerBound,
+                    "\(substance.rawValue)\(route) peaks before it starts")
+            #expect(timing.peak.lowerBound <= timing.total.upperBound,
+                    "\(substance.rawValue)\(route) peaks after it is over")
+        }
+    }
+
+    /// A substance whose dose table separates routes must separate its timings the
+    /// same way, or one route's figures stand in for the other's.
+    ///
+    /// This is the shape of the cannabis bug: two dose rows, one set of timings,
+    /// and the smoked onset presented as if it were the edible's.
+    @Test("Routes that differ on dose also differ on timing", .tags(.safety), arguments: Substance.allCases)
+    func routedDosesHaveRoutedTimings(substance: Substance) {
+        guard let reference = substance.reference, reference.doses.count > 1 else { return }
+        guard !reference.timings.isEmpty else { return }
+
+        #expect(reference.timings.count > 1,
+                "\(substance.rawValue) lists \(reference.doses.count) routes but one set of timings")
+        #expect(reference.timings.allSatisfy { $0.route != nil },
+                "\(substance.rawValue) has per-route timings that do not say which route")
     }
 
     @Test("Every figure carries a named source", .tags(.safety), arguments: Substance.allCases)
@@ -126,8 +144,18 @@ struct SubstanceReferenceTests {
             #expect(guidance.isEmpty == false)
         }
 
-        // Not an oversight: nothing citable to say.
-        for substance in [Substance.cocaine, .ketamine, .cannabis, .poppers] {
+        // Added in 5.0.0, each with something citable behind it: NHS medicines
+        // guidance gives sildenafil a hard one-a-day rule, and PsychonautWiki
+        // gives cannabis a twenty-to-sixty-minute oral onset and records cocaine's
+        // compulsive redosing as more prevalent than any other common stimulant.
+        for substance in [Substance.cocaine, .cannabis, .viagra, .kamagra, .methamphetamine] {
+            let guidance = try #require(substance.reference?.redoseGuidance,
+                                        "\(substance.rawValue) has a source for redosing and does not show it")
+            #expect(guidance.isEmpty == false)
+        }
+
+        // Still not an oversight: nothing citable to say.
+        for substance in [Substance.ketamine, .poppers, .psychedelics, .benzodiazepines] {
             #expect(substance.reference?.redoseGuidance == nil,
                     "\(substance.rawValue) states a redose interval with no source behind it")
         }

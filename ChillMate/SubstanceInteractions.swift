@@ -510,7 +510,7 @@ enum SubstanceInteractionChecker {
         SubstanceInteraction(
             substances: [.benzodiazepines, .cocaine],
             level: .caution,
-            warning: String(localized: "Each hides the other. Cocaine masks how sedated the benzo is making you, so it is easy to take more of both, and when the cocaine fades the full benzo dose is still there. Neither cancels the other out — they just make each other harder to judge.")
+            warning: String(localized: "Each hides the other. Cocaine masks how sedated the benzo is making you, so it is easy to take more of both, and when the cocaine fades the full benzo dose is still there. Neither cancels the other out. They just make each other harder to judge.")
         ),
         SubstanceInteraction(
             substances: [.benzodiazepines, .threeMMC],
@@ -556,6 +556,82 @@ enum SubstanceInteractionChecker {
             substances: [.benzodiazepines, .ketamine],
             level: .caution,
             warning: String(localized: "Both make you unsteady and sedated, and together that can tip into losing consciousness at higher doses than you expect. Stay seated, stay with someone, and remember that vomiting while out of it is the danger.")
+        ),
+
+        // MARK: Methamphetamine
+        //
+        // New in 5.0.0 with the substance. TripSit files methamphetamine under
+        // "amphetamines", and that row covers nine of these thirteen pairs; those
+        // nine take the chart's rating and follow its stated mechanism.
+        //
+        // The four it does not cover are marked in the table as not on the chart,
+        // and each is rated by the same reasoning as an existing row: 3-MMC as a
+        // second long stimulant, and poppers and the two sildenafil products as
+        // the blood-pressure group.
+        SubstanceInteraction(
+            substances: [.methamphetamine, .alcohol],
+            level: .serious,
+            warning: String(localized: "Meth strips out the sedation you use to judge how drunk you are, so drinking runs well past where you would normally stop, including past the point you would usually pass out. Dehydration and liver strain both climb. Set an hourly limit before you start, because you will not feel either one arrive.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .ghb],
+            level: .serious,
+            warning: String(localized: "A stimulant lifts your breathing rate, which lets a larger GHB dose sit on board without feeling like one. When the meth fades first, and it can even after hours, the full GHB arrives at once and breathing is what it takes. Never redose GHB to match how alert you still feel.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .gbl],
+            level: .serious,
+            warning: String(localized: "GBL becomes GHB in the body, and meth masks how much sedation is waiting. If the stimulant wears off first, the whole dose lands together and can stop someone breathing. Keep the timing on paper, not in your head.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .benzodiazepines],
+            level: .caution,
+            warning: String(localized: "Each dulls the other, which is exactly the problem: if one wears off before the other, whatever is left arrives with nothing holding it back. Taking a benzo to come down works, but it is still a depressant on top of a heart that has been running hard.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .cocaine],
+            level: .serious,
+            warning: String(localized: "Two stimulants, one heart. The strain adds up and cocaine partly blocks what meth does, so people take more of both chasing an effect that will not come. Chest pain that does not pass needs help, not another line.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .threeMMC],
+            level: .serious,
+            warning: String(localized: "Both are long stimulants and together they keep a session going far past the point your heart, your temperature and your sleep can carry it. Neither lets you feel the other stacking up.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .mdma],
+            level: .serious,
+            warning: String(localized: "Both strain the heart and both raise your temperature, and meth deepens the damage MDMA does. Overheating is the sharp risk and thought loops are the common one. Keep cool, keep drinking water at a sensible rate, and stop if your chest feels tight.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .ketamine],
+            level: .caution,
+            warning: String(localized: "No surprise between them, but blood pressure goes up and ketamine takes your balance while meth keeps you moving. Injuries happen here that nobody feels at the time. Sit down for the ketamine.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .cannabis],
+            level: .caution,
+            warning: String(localized: "Cannabis does not take the edge off a stimulant. It raises anxiety and feeds thought loops, and on a long meth session that is the direction things already go.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .psychedelics],
+            level: .caution,
+            warning: String(localized: "A stimulant raises anxiety and locks you into thought loops, which is the hardest thing to steer out of in an altered state. Panic is the usual outcome rather than anything physical.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .poppers],
+            level: .serious,
+            warning: String(localized: "Meth tightens blood vessels and pushes blood pressure up; poppers drop it in seconds. Swinging between the two strains the heart and can trigger an irregular beat or a blackout. Sit down first, and get help for chest pain that does not pass.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .viagra],
+            level: .serious,
+            warning: String(localized: "Viagra and meth pull your circulation in opposite directions while both leave the heart working hard, over a session that tends to be a long one. Chest tightness or a heart that will not settle means stop.")
+        ),
+        SubstanceInteraction(
+            substances: [.methamphetamine, .kamagra],
+            level: .serious,
+            warning: String(localized: "Kamagra is sildenafil at an unverified strength, and meth already has the heart working hard for hours. The two pull circulation opposite ways. Stop if your chest tightens or your heart will not settle.")
         ),
     ]}
 

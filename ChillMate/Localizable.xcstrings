@@ -3548,6 +3548,35 @@
         }
       }
     },
+    "A long, strong stimulant. Sessions stretch for many hours, sleep and eating stop, and the comedown is heavy. Injecting and sharing equipment carry their own risks, and judgement about sex and consent shifts a long way before you notice it has.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein lang wirkendes, starkes Stimulans. Sessions ziehen sich über viele Stunden, Schlafen und Essen hören auf, und der Runterkommer ist heftig. Injizieren und das Teilen von Zubehör bringen eigene Risiken mit, und dein Urteil über Sex und Einvernehmen verschiebt sich weit, bevor du es merkst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un estimulante fuerte y de larga duración. Las sesiones se alargan muchas horas, se deja de dormir y de comer, y el bajón es duro. Inyectarse y compartir material tienen sus propios riesgos, y el criterio sobre el sexo y el consentimiento se desplaza mucho antes de que lo notes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un stimulant puissant et de longue durée. Les sessions s’étirent sur de nombreuses heures, le sommeil et les repas s’arrêtent, et la descente est lourde. S’injecter et partager le matériel comportent leurs propres risques, et le jugement sur le sexe et le consentement se déplace loin avant que tu ne le remarques."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een lang werkend, sterk stimulerend middel. Sessies rekken urenlang, slapen en eten stoppen, en de comedown is zwaar. Injecteren en het delen van spullen hebben hun eigen risico's, en je oordeel over seks en toestemming verschuift al ver voordat je het doorhebt."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
+    },
     "A low-stimulation space for anxiety, panic, or feeling unwell. Start the breathing timer, check off grounding steps, then call help if you need another person.": {
       "localizations": {
         "de": {
@@ -4720,6 +4749,64 @@
           }
         }
       }
+    },
+    "A stimulant lifts your breathing rate, which lets a larger GHB dose sit on board without feeling like one. When the meth fades first, and it can even after hours, the full GHB arrives at once and breathing is what it takes. Never redose GHB to match how alert you still feel.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Stimulans hebt deine Atemfrequenz, wodurch eine größere GHB-Dosis im Körper sein kann, ohne sich danach anzufühlen. Wenn das Meth zuerst nachlässt, und das kann es, auch nach Stunden, kommt das ganze GHB auf einmal, und es holt sich die Atmung. Dosiere GHB nie danach nach, wie wach du dich noch fühlst."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un estimulante sube tu frecuencia respiratoria, lo que permite que una dosis mayor de GHB esté en el cuerpo sin parecerlo. Cuando la meta baja primero ,y puede hacerlo, incluso tras horas, todo el GHB llega de golpe, y lo que se lleva es la respiración. Nunca repitas dosis de GHB según lo despierto que te sientas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un stimulant augmente ton rythme respiratoire, ce qui permet à une dose de GHB plus importante d’être présente sans en avoir l’air. Quand la meth retombe la première, et elle le peut, même après des heures, tout le GHB arrive d’un coup, et c’est la respiration qu’il prend. Ne reprends jamais de GHB en te fiant à ton état d’éveil."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een stimulerend middel verhoogt je ademhaling, waardoor een grotere GHB-dosis in je lijf kan zitten zonder dat het zo voelt. Als de meth als eerste wegvalt, en dat kan, zelfs na uren, komt de volle GHB in één keer, en de ademhaling is wat het pakt. Herdoseer GHB nooit op hoe helder je je nog voelt."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
+    },
+    "A stimulant raises anxiety and locks you into thought loops, which is the hardest thing to steer out of in an altered state. Panic is the usual outcome rather than anything physical.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Stimulans steigert Angst und sperrt dich in Gedankenschleifen, das Schwerste, aus dem man sich in einem veränderten Zustand herauslenkt. Panik ist das übliche Ergebnis, nicht etwas Körperliches."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un estimulante aumenta la ansiedad y te encierra en bucles de pensamiento, lo más difícil de esquivar en un estado alterado. El pánico es el resultado habitual, más que algo físico."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un stimulant augmente l’anxiété et t’enferme dans des boucles de pensée, la chose la plus difficile à quitter dans un état modifié. La panique est l’issue habituelle, plutôt qu’un problème physique."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een stimulerend middel verhoogt de angst en zet je vast in denkloops, en dat is het moeilijkste om uit te sturen in een veranderde staat. Paniek is de gebruikelijke uitkomst, eerder dan iets lichamelijks."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
     },
     "A way home is planned before the Chill starts.": {
       "localizations": {
@@ -6706,7 +6793,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Alkohol und Ketamin zusammen bringen ein sehr hohes Risiko für Erbrechen und Bewusstlosigkeit. Die Gefahr ist, sich zu übergeben, während man zu weggetreten ist, um sich aufzusetzen — nicht die Desorientierung. Halte jemanden Nüchternen in der Nähe und bring jeden, der nicht aufwacht, in die stabile Seitenlage."
+            "value": "Alkohol und Ketamin zusammen bringen ein sehr hohes Risiko für Erbrechen und Bewusstlosigkeit. Die Gefahr ist, sich zu übergeben, während man zu weggetreten ist, um sich aufzusetzen, nicht die Desorientierung. Halte jemanden Nüchternen in der Nähe und bring jeden, der nicht aufwacht, in die stabile Seitenlage."
           }
         },
         "es": {
@@ -7200,6 +7287,64 @@
           }
         }
       }
+    },
+    "Anxiety or agitation": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angst oder Unruhe"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ansiedad o agitación"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anxiété ou agitation"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angst of onrust"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Anxiety or paranoia": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angst oder Paranoia"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ansiedad o paranoia"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anxiété ou paranoïa"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angst of paranoia"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Anxious": {
       "localizations": {
@@ -8562,6 +8707,238 @@
         }
       }
     },
+    "Avoid GHB/GBL, benzodiazepines, opioids, ketamine, and heavy stimulant use.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meide GHB/GBL, Benzodiazepine, Opioide, Ketamin und starken Stimulanziengebrauch."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evita GHB/GBL, benzodiacepinas, opioides, ketamina y el uso intenso de estimulantes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évite le GHB/GBL, les benzodiazépines, les opioïdes, la kétamine et un usage lourd de stimulants."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vermijd GHB/GBL, benzodiazepinen, opioïden, ketamine en zwaar gebruik van stimulerende middelen."
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Avoid Viagra, Kamagra, sildenafil, nitrates, nicorandil, or riociguat.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meide Viagra, Kamagra, Sildenafil, Nitrate, Nicorandil oder Riociguat."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evita Viagra, Kamagra, sildenafilo, nitratos, nicorandil o riociguat."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évite le Viagra, le Kamagra, le sildénafil, les nitrates, le nicorandil ou le riociguat."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vermijd Viagra, Kamagra, sildenafil, nitraten, nicorandil of riociguat."
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Avoid alcohol, benzodiazepines, opioids, ketamine, and other sedatives.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meide Alkohol, Benzodiazepine, Opioide, Ketamin und andere Beruhigungsmittel."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evita el alcohol, las benzodiacepinas, los opioides, la ketamina y otros sedantes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évite l’alcool, les benzodiazépines, les opioïdes, la kétamine et les autres sédatifs."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vermijd alcohol, benzodiazepinen, opioïden, ketamine en andere kalmerende middelen."
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Avoid depressant stacks and settings where falls, water, stairs, or consent confusion are likely.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meide Dämpfer-Stapel und Situationen, in denen Stürze, Wasser, Treppen oder Unklarheit über Einvernehmen wahrscheinlich sind."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evita acumular depresores y los entornos donde sean probables las caídas, el agua, las escaleras o la confusión sobre el consentimiento."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évite les cumuls de dépresseurs et les lieux où les chutes, l’eau, les escaliers ou la confusion sur le consentement sont probables."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vermijd stapels verdovende middelen en situaties waarin vallen, water, trappen of onduidelijkheid over toestemming waarschijnlijk zijn."
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Avoid mixing unknown substances": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mische keine unbekannten Substanzen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evita mezclar sustancias desconocidas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évite de mélanger des substances inconnues"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meng geen onbekende middelen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Avoid poppers and nitrate-like medication because blood pressure can drop sharply.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meide Poppers und nitratähnliche Medikamente, weil der Blutdruck stark abfallen kann."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evita los poppers y los medicamentos tipo nitrato, porque la tensión puede caer bruscamente."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évite les poppers et les médicaments de type nitrate, car la tension peut chuter fortement."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vermijd poppers en nitraatachtige medicatie, want je bloeddruk kan scherp dalen."
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Avoid stacking stimulants and be careful with serotonergic medication or MAOIs.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Staple keine Stimulanzien und sei vorsichtig mit serotonergen Medikamenten oder MAO-Hemmern."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evita acumular estimulantes y ten cuidado con la medicación serotoninérgica o los IMAO."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évite de cumuler les stimulants et fais attention aux médicaments sérotoninergiques ou aux IMAO."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stapel geen stimulerende middelen en wees voorzichtig met serotonerge medicatie of MAO-remmers."
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Avoid unknown mixes, pressure to continue, and combining with medication without professional advice.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meide unbekannte Mischungen, Druck weiterzumachen und die Kombination mit Medikamenten ohne fachlichen Rat."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evita mezclas desconocidas, la presión para seguir y combinar con medicación sin consejo profesional."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Évite les mélanges inconnus, la pression à continuer, et les associations avec des médicaments sans avis professionnel."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vermijd onbekende mengsels, druk om door te gaan, en combineren met medicatie zonder professioneel advies."
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Back": {
       "localizations": {
         "de": {
@@ -9326,6 +9703,64 @@
         }
       }
     },
+    "Blood pressure drop": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blutdruckabfall"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bajada de tensión"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chute de tension"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bloeddrukdaling"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Blood pressure effects": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswirkungen auf den Blutdruck"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efectos sobre la tensión"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effets sur la tension"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effecten op de bloeddruk"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Blue lips, slow breathing, or gasping": {
       "localizations": {
         "de": {
@@ -9527,6 +9962,35 @@
           }
         }
       }
+    },
+    "Both are long stimulants and together they keep a session going far past the point your heart, your temperature and your sleep can carry it. Neither lets you feel the other stacking up.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide sind lang wirkende Stimulanzien und ziehen eine Session zusammen weit über das hinaus, was Herz, Temperatur und Schlaf tragen. Keines lässt dich spüren, wie sich das andere aufstapelt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambos son estimulantes de larga duración y juntos alargan una sesión mucho más allá de lo que tu corazón, tu temperatura y tu sueño pueden sostener. Ninguno te deja notar cómo se acumula el otro."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce sont deux stimulants de longue durée, et ensemble ils prolongent une session bien au-delà de ce que ton cœur, ta température et ton sommeil peuvent porter. Aucun ne te laisse sentir l’autre s’accumuler."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allebei zijn het lang werkende stimulerende middelen, en samen rekken ze een sessie ver voorbij wat je hart, je temperatuur en je slaap aankunnen. Geen van beide laat je voelen dat de ander zich opstapelt."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
     },
     "Both are sedating, and cannabis suppresses vomiting. That matters here: it can mask the nausea that warns you a GHB dose is too high, and it raises the risk of choking if you fall asleep.": {
       "extractionState": "manual",
@@ -9988,6 +10452,35 @@
       },
       "comment": "Interaction warning: benzodiazepines + cannabis"
     },
+    "Both strain the heart and both raise your temperature, and meth deepens the damage MDMA does. Overheating is the sharp risk and thought loops are the common one. Keep cool, keep drinking water at a sensible rate, and stop if your chest feels tight.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide belasten das Herz und beide erhöhen die Temperatur, und Meth verstärkt den Schaden, den MDMA anrichtet. Überhitzung ist das scharfe Risiko, Gedankenschleifen das häufige. Bleib kühl, trink Wasser in vernünftigem Tempo, und hör auf, wenn deine Brust eng wird."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambos sobrecargan el corazón y suben la temperatura, y la meta agrava el daño que hace la MDMA. El sobrecalentamiento es el riesgo agudo y los bucles de pensamiento el común. Mantente fresco, bebe agua a un ritmo sensato y para si notas el pecho apretado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les deux sollicitent le cœur et font monter la température, et la meth aggrave les dégâts de la MDMA. La surchauffe est le risque aigu, les boucles de pensée le risque courant. Reste au frais, bois de l’eau à un rythme raisonnable, et arrête si ta poitrine se serre."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allebei belasten ze het hart en allebei verhogen ze je temperatuur, en meth verergert de schade die MDMA aanricht. Oververhitting is het scherpe risico, denkloops het gewone. Blijf koel, drink water in een verstandig tempo, en stop als je borst strak aanvoelt."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
+    },
     "Both top and bottom recorded": {
       "localizations": {
         "de": {
@@ -10366,6 +10859,93 @@
           }
         }
       }
+    },
+    "Breathing problems when mixed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atemprobleme beim Mischen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Problemas respiratorios al mezclar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Problèmes respiratoires en mélange"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ademhalingsproblemen bij mengen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Breathing risk when mixed with depressants": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atemrisiko in Kombination mit Dämpfern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riesgo respiratorio al mezclar con depresores"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risque respiratoire en mélange avec des dépresseurs"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ademhalingsrisico bij mengen met verdovende middelen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Breathing risk when stacked with other depressants": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atemrisiko beim Stapeln mit anderen Dämpfern"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riesgo respiratorio al acumular con otros depresores"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risque respiratoire en cumul avec d’autres dépresseurs"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ademhalingsrisico bij stapelen met andere verdovende middelen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Breathing, contact, and grounding": {
       "localizations": {
@@ -11136,6 +11716,35 @@
           }
         }
       }
+    },
+    "Cannabis does not take the edge off a stimulant. It raises anxiety and feeds thought loops, and on a long meth session that is the direction things already go.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannabis nimmt einem Stimulans nicht die Schärfe. Es steigert Angst und füttert Gedankenschleifen, und in einer langen Meth-Session geht es ohnehin schon in diese Richtung."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El cannabis no suaviza un estimulante. Aumenta la ansiedad y alimenta los bucles de pensamiento, y en una sesión larga de meta esa es ya la dirección que llevan las cosas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le cannabis n’adoucit pas un stimulant. Il augmente l’anxiété et alimente les boucles de pensée, et sur une longue session de meth c’est déjà la direction que ça prend."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannabis haalt de scherpte niet van een stimulerend middel af. Het verhoogt de angst en voedt denkloops, en op een lange meth-sessie is dat de kant die het toch al op gaat."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
     },
     "Cannabis on top of a stimulant tends to add anxiety and a faster heartbeat rather than taking the edge off, and it blurs how hard the comedown is hitting you.": {
       "extractionState": "manual",
@@ -12577,6 +13186,35 @@
           }
         }
       }
+    },
+    "Chest pain, a racing heart that will not settle, or collapse": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brustschmerzen, ein rasendes Herz, das sich nicht beruhigt, oder Zusammenbruch"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dolor en el pecho, corazón acelerado que no se calma, o colapso"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Douleur à la poitrine, cœur emballé qui ne se calme pas, ou effondrement"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pijn op de borst, een razend hart dat niet tot rust komt, of instorten"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Chest pain, fainting, or an irregular heartbeat": {
       "localizations": {
@@ -15354,6 +15992,35 @@
         }
       }
     },
+    "Consent and limits get much harder to hold": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einvernehmen und Grenzen sind viel schwerer zu halten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El consentimiento y los límites se vuelven mucho más difíciles de sostener"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le consentement et les limites deviennent bien plus difficiles à tenir"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toestemming en grenzen worden veel moeilijker vast te houden"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Consent basics": {
       "localizations": {
         "de": {
@@ -15409,6 +16076,35 @@
           }
         }
       }
+    },
+    "Consent clarity can be affected": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klarheit über Einvernehmen kann leiden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La claridad del consentimiento puede verse afectada"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La clarté du consentement peut être altérée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duidelijkheid over toestemming kan wegvallen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Contact a sexual-health service, GP, or hospital as soon as possible. PEP works best when started quickly and is generally time limited to 72 hours.": {
       "localizations": {
@@ -17070,6 +17766,35 @@
         }
       }
     },
+    "Dangerous with poppers or nitrates": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gefährlich mit Poppers oder Nitraten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peligroso con poppers o nitratos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dangereux avec les poppers ou les nitrates"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gevaarlijk met poppers of nitraten"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Data map": {
       "comment": "A heading for the data map in the privacy dashboard.",
       "isCommentAutoGenerated": true,
@@ -17245,6 +17970,35 @@
           }
         }
       }
+    },
+    "Days without sleep, then a heavy crash": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tage ohne Schlaf, dann ein harter Absturz"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Días sin dormir y después una caída dura"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des jours sans sommeil, puis une grosse descente"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dagen zonder slaap, dan een zware crash"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Dehydration": {
       "localizations": {
@@ -17767,6 +18521,35 @@
         }
       }
     },
+    "Dependence builds fast with regular use": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abhängigkeit entsteht bei regelmäßigem Gebrauch schnell"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La dependencia se instala rápido con el uso regular"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La dépendance s’installe vite en usage régulier"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afhankelijkheid bouwt snel op bij regelmatig gebruik"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Depressed": {
       "localizations": {
         "de": {
@@ -18173,6 +18956,35 @@
         }
       }
     },
+    "Dissociation and falls": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dissoziation und Stürze"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disociación y caídas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dissociation et chutes"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dissociatie en vallen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Dissociative effects can affect balance, memory, and consent clarity.": {
       "localizations": {
         "de": {
@@ -18200,6 +19012,35 @@
           }
         }
       }
+    },
+    "Dizziness or fainting": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwindel oder Ohnmacht"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mareo o desmayo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vertiges ou évanouissement"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duizeligheid of flauwvallen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Do next": {
       "localizations": {
@@ -19090,12 +19931,41 @@
         }
       }
     },
-    "Each hides the other. Cocaine masks how sedated the benzo is making you, so it is easy to take more of both, and when the cocaine fades the full benzo dose is still there. Neither cancels the other out — they just make each other harder to judge.": {
+    "Each dulls the other, which is exactly the problem: if one wears off before the other, whatever is left arrives with nothing holding it back. Taking a benzo to come down works, but it is still a depressant on top of a heart that has been running hard.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beide verdecken einander. Kokain überdeckt, wie sediert dich das Benzo macht, also nimmt man leicht von beidem mehr, und wenn das Kokain nachlässt, ist die volle Benzo-Dosis noch da. Sie heben sich nicht auf — sie machen sich nur gegenseitig schwerer einschätzbar."
+            "value": "Beide dämpfen einander, und genau das ist das Problem: lässt eines vor dem anderen nach, kommt der Rest ungebremst an. Ein Benzo zum Runterkommen funktioniert, ist aber trotzdem ein Dämpfer auf einem Herzen, das lange auf Hochtouren lief."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada uno apaga al otro, y ese es justo el problema: si uno baja antes que el otro, lo que queda llega sin nada que lo frene. Tomar una benzo para bajar funciona, pero sigue siendo un depresor sobre un corazón que ha ido a tope."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chacun atténue l’autre, et c’est exactement le problème : si l’un retombe avant l’autre, ce qui reste arrive sans rien pour le freiner. Prendre une benzo pour redescendre fonctionne, mais cela reste un dépresseur sur un cœur qui a beaucoup tourné."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ze dempen elkaar, en dat is precies het probleem: valt de een eerder weg dan de ander, dan komt wat er over is aan zonder iets dat het tegenhoudt. Een benzo nemen om af te kicken werkt, maar het blijft een verdovend middel boven op een hart dat hard heeft gewerkt."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
+    },
+    "Each hides the other. Cocaine masks how sedated the benzo is making you, so it is easy to take more of both, and when the cocaine fades the full benzo dose is still there. Neither cancels the other out. They just make each other harder to judge.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beide verdecken einander. Kokain überdeckt, wie sediert dich das Benzo macht, also nimmt man leicht von beidem mehr, und wenn das Kokain nachlässt, ist die volle Benzo-Dosis noch da. Sie heben sich nicht auf, sie machen sich nur gegenseitig schwerer einschätzbar."
           }
         },
         "es": {
@@ -19107,13 +19977,13 @@
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Chacun masque l’autre. La cocaïne cache à quel point la benzo te sédate, donc on prend facilement plus des deux, et quand la cocaïne retombe la dose entière de benzo est toujours là. Aucun n’annule l’autre — ils se rendent juste plus difficiles à juger."
+            "value": "Chacun masque l’autre. La cocaïne cache à quel point la benzo te sédate, donc on prend facilement plus des deux, et quand la cocaïne retombe la dose entière de benzo est toujours là. Aucun n’annule l’autre, ils se rendent juste plus difficiles à juger."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ze verbergen elkaar. Cocaïne maskeert hoe suf de benzo je maakt, dus neem je makkelijk meer van allebei, en als de cocaïne wegebt is de volle benzodosis er nog. Ze heffen elkaar niet op — ze maken elkaar alleen moeilijker in te schatten."
+            "value": "Ze verbergen elkaar. Cocaïne maskeert hoe suf de benzo je maakt, dus neem je makkelijk meer van allebei, en als de cocaïne wegebt is de volle benzodosis er nog. Ze heffen elkaar niet op, ze maken elkaar alleen moeilijker in te schatten."
           }
         }
       },
@@ -22090,6 +22960,35 @@
         }
       }
     },
+    "GBL becomes GHB in the body, and meth masks how much sedation is waiting. If the stimulant wears off first, the whole dose lands together and can stop someone breathing. Keep the timing on paper, not in your head.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GBL wird im Körper zu GHB, und Meth verdeckt, wie viel Sedierung wartet. Lässt das Stimulans zuerst nach, landet die ganze Dosis auf einmal und kann die Atmung stoppen. Halte die Zeiten schriftlich fest, nicht im Kopf."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El GBL se convierte en GHB en el cuerpo, y la meta enmascara cuánta sedación está esperando. Si el estimulante baja primero, toda la dosis llega junta y puede parar la respiración. Lleva los tiempos por escrito, no en la cabeza."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le GBL devient du GHB dans le corps, et la meth masque la sédation qui attend. Si le stimulant retombe en premier, toute la dose arrive ensemble et peut arrêter la respiration. Note les horaires sur papier, pas dans ta tête."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GBL wordt in het lichaam GHB, en meth maskeert hoeveel sufheid er klaarstaat. Valt het stimulerende middel als eerste weg, dan komt de hele dosis samen aan en kan iemands ademhaling stoppen. Houd de timing op papier bij, niet in je hoofd."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
+    },
     "GBL becomes GHB in the body, and with a benzodiazepine the two strengthen each other unpredictably. People go under fast and are easily mistaken for asleep. Put anyone unresponsive on their side and call emergency services.": {
       "localizations": {
         "de": {
@@ -23751,6 +24650,35 @@
         }
       }
     },
+    "Harder to judge safety and consent": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwerer einzuschätzen, was sicher und einvernehmlich ist"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más difícil valorar la seguridad y el consentimiento"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus difficile de juger la sécurité et le consentement"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moeilijker om veiligheid en toestemming in te schatten"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Has been sick while unable to sit up": {
       "localizations": {
         "de": {
@@ -23814,6 +24742,35 @@
           }
         }
       }
+    },
+    "Headache or dizziness": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopfschmerzen oder Schwindel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dolor de cabeza o mareo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maux de tête ou vertiges"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoofdpijn of duizeligheid"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Heading out? Set up first": {
       "comment": "Hint to the user that they should set up their care plan before heading out.",
@@ -24147,6 +25104,35 @@
           }
         }
       }
+    },
+    "Heart strain and dangerously high temperature": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herzbelastung und gefährlich hohe Temperatur"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sobrecarga del corazón y temperatura peligrosamente alta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tension sur le cœur et température dangereusement élevée"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belasting van het hart en een gevaarlijk hoge temperatuur"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Heartbreak": {
       "localizations": {
@@ -24701,6 +25687,35 @@
         }
       }
     },
+    "High heart rate and anxiety": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoher Puls und Angst"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pulso alto y ansiedad"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rythme cardiaque élevé et anxiété"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoge hartslag en angst"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "High-risk": {
       "localizations": {
         "de": {
@@ -24763,6 +25778,64 @@
           }
         }
       }
+    },
+    "Higher risk when mixed": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Höheres Risiko beim Mischen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mayor riesgo al mezclar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risque plus élevé en mélange"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoger risico bij mengen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Higher risk with erectile medication": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Höheres Risiko mit Erektionsmitteln"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mayor riesgo con medicamentos para la erección"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risque plus élevé avec les médicaments pour l’érection"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoger risico met erectiemedicatie"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "History": {
       "comment": "A tab that shows the user's history.",
@@ -27586,6 +28659,35 @@
         }
       }
     },
+    "It keeps working long after it stops feeling like it is. The published total runs to twelve hours, so a redose late in a session lands on top of a dose that has not finished.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es wirkt noch lange, nachdem es sich nicht mehr so anfühlt. Die veröffentlichte Gesamtdauer reicht bis zwölf Stunden, also landet eine späte Nachdosierung auf einer Dosis, die noch nicht durch ist."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sigue haciendo efecto mucho después de que deje de notarse. La duración total publicada llega a doce horas, así que repetir dosis tarde se suma a una dosis que no ha terminado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ça continue d’agir bien après que la sensation soit partie. La durée totale publiée va jusqu’à douze heures : une reprise tardive s’ajoute donc à une dose qui n’a pas fini."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het werkt nog lang door nadat het niet meer zo voelt. De gepubliceerde totale duur loopt tot twaalf uur, dus een herdosering laat op de avond komt boven op een dosis die nog niet klaar is."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
+    },
     "It sounds like something serious may have happened. You don't have to deal with this alone.": {
       "localizations": {
         "de": {
@@ -27683,6 +28785,35 @@
           }
         }
       }
+    },
+    "Jaw tension and high heart rate": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kieferpressen und hoher Puls"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tensión mandibular y pulso alto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crispation de la mâchoire et rythme cardiaque élevé"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaakklem en een hoge hartslag"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Jellinek": {
       "localizations": {
@@ -28007,6 +29138,35 @@
           }
         }
       }
+    },
+    "Kamagra is sildenafil at an unverified strength, and meth already has the heart working hard for hours. The two pull circulation opposite ways. Stop if your chest tightens or your heart will not settle.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamagra ist Sildenafil in ungeprüfter Stärke, und Meth lässt das Herz ohnehin schon stundenlang hart arbeiten. Beide ziehen den Kreislauf in entgegengesetzte Richtungen. Hör auf, wenn die Brust eng wird oder sich das Herz nicht beruhigt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La Kamagra es sildenafilo de potencia sin verificar, y la meta ya tiene al corazón trabajando duro durante horas. Ambas tiran de la circulación en direcciones opuestas. Para si notas el pecho apretado o el corazón no se calma."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Kamagra est du sildénafil à une puissance non vérifiée, et la meth fait déjà travailler le cœur dur pendant des heures. Les deux tirent la circulation en sens inverse. Arrête si ta poitrine se serre ou si ton cœur ne se calme pas."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kamagra is sildenafil in een niet-gecontroleerde sterkte, en meth laat het hart al urenlang hard werken. De twee trekken je bloedsomloop tegengesteld. Stop als je borst strak wordt of je hart niet tot rust komt."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
     },
     "Kamagra is sildenafil, the same active ingredient as Viagra. Taking both stacks one dose on top of another and raises the risk of a blood pressure drop, headache, vision changes, and an erection that will not go down. An erection lasting more than four hours needs urgent medical care.": {
       "localizations": {
@@ -30318,6 +31478,35 @@
         }
       }
     },
+    "Long duration and setting sensitivity": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lange Dauer und Empfindlichkeit für das Umfeld"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Larga duración y sensibilidad al entorno"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Longue durée et sensibilité au cadre"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lange duur en gevoeligheid voor de omgeving"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Look and feel": {
       "extractionState": "manual",
       "localizations": {
@@ -30436,6 +31625,35 @@
           }
         }
       }
+    },
+    "Lowered inhibition": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geringere Hemmschwelle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menos inhibición"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inhibitions réduites"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minder remmingen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Lube": {
       "localizations": {
@@ -31364,6 +32582,35 @@
         }
       }
     },
+    "Memory and coordination changes": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veränderungen bei Gedächtnis und Koordination"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambios en la memoria y la coordinación"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changements de mémoire et de coordination"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veranderingen in geheugen en coördinatie"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Memory gap protocol": {
       "localizations": {
         "de": {
@@ -31419,6 +32666,35 @@
           }
         }
       }
+    },
+    "Memory gaps and blackouts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erinnerungslücken und Blackouts"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagunas de memoria y black-outs"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trous de mémoire et black-outs"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gaten in je geheugen en black-outs"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Message": {
       "localizations": {
@@ -31551,6 +32827,93 @@
           }
         }
       }
+    },
+    "Meth": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crystal Meth"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metanfetamina"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meth"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crystal meth"
+          }
+        }
+      },
+      "comment": "Substance display name (methamphetamine)"
+    },
+    "Meth strips out the sedation you use to judge how drunk you are, so drinking runs well past where you would normally stop, including past the point you would usually pass out. Dehydration and liver strain both climb. Set an hourly limit before you start, because you will not feel either one arrive.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meth nimmt dir die Sedierung, an der du abliest, wie betrunken du bist, also trinkst du weit über den Punkt hinaus, an dem du sonst aufhören würdest, auch über den, an dem du sonst wegsacken würdest. Dehydrierung und Leberbelastung steigen beide. Leg vorher ein Stundenlimit fest, denn du wirst keines von beidem kommen spüren."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La meta elimina la sedación con la que juzgas lo borracho que estás, así que bebes mucho más allá de donde pararías normalmente, incluso más allá del punto en que te desmayarías. La deshidratación y la carga hepática suben las dos. Ponte un límite por hora antes de empezar, porque no vas a notar llegar ninguna de las dos."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La meth supprime la sédation qui te sert à jauger ton ivresse, donc tu bois bien au-delà du point où tu t’arrêterais, y compris au-delà de celui où tu t’écroulerais normalement. La déshydratation et la charge sur le foie montent toutes les deux. Fixe une limite par heure avant de commencer, parce que tu ne sentiras venir ni l’une ni l’autre."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meth haalt de sufheid weg waarmee je inschat hoe dronken je bent, dus je drinkt ver voorbij waar je normaal zou stoppen, ook voorbij het punt waarop je normaal buiten westen zou raken. Uitdroging en belasting van je lever lopen allebei op. Spreek vooraf een limiet per uur af, want je voelt geen van beide aankomen."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
+    },
+    "Meth tightens blood vessels and pushes blood pressure up; poppers drop it in seconds. Swinging between the two strains the heart and can trigger an irregular beat or a blackout. Sit down first, and get help for chest pain that does not pass.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meth verengt die Gefäße und treibt den Blutdruck hoch; Poppers lassen ihn in Sekunden fallen. Das Hin und Her belastet das Herz und kann einen unregelmäßigen Herzschlag oder einen Blackout auslösen. Setz dich vorher hin und hol Hilfe bei Brustschmerz, der nicht vergeht."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La meta estrecha los vasos y sube la tensión; los poppers la bajan en segundos. Oscilar entre ambos sobrecarga el corazón y puede provocar un ritmo irregular o un desmayo. Siéntate primero y busca ayuda si el dolor en el pecho no pasa."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La meth resserre les vaisseaux et fait monter la tension ; les poppers la font chuter en quelques secondes. Faire l’aller-retour entre les deux sollicite le cœur et peut déclencher un rythme irrégulier ou un black-out. Assieds-toi d’abord, et fais-toi aider si la douleur thoracique persiste."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meth vernauwt je bloedvaten en duwt je bloeddruk omhoog; poppers laten hem in seconden zakken. Heen en weer schieten tussen die twee belast het hart en kan een onregelmatige hartslag of een black-out uitlokken. Ga eerst zitten, en haal hulp bij pijn op de borst die niet wegtrekt."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
     },
     "Mind: panic attacks and grounding": {
       "localizations": {
@@ -32874,6 +34237,35 @@
           }
         }
       }
+    },
+    "Next-day low mood or sleep disruption": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gedrückte Stimmung oder Schlafstörungen am nächsten Tag"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ánimo bajo o sueño alterado al día siguiente"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moral en baisse ou sommeil perturbé le lendemain"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sombere stemming of slecht slapen de dag erna"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Night safety check-ins": {
       "localizations": {
@@ -34405,6 +35797,35 @@
           }
         }
       }
+    },
+    "No surprise between them, but blood pressure goes up and ketamine takes your balance while meth keeps you moving. Injuries happen here that nobody feels at the time. Sit down for the ketamine.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Überraschung zwischen beiden, aber der Blutdruck steigt, und Ketamin nimmt dir das Gleichgewicht, während Meth dich in Bewegung hält. Hier passieren Verletzungen, die im Moment niemand spürt. Setz dich fürs Ketamin hin."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada inesperado entre ambas, pero la tensión sube y la ketamina te quita el equilibrio mientras la meta te mantiene en movimiento. Aquí pasan lesiones que nadie nota en el momento. Siéntate para la ketamina."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rien d’inattendu entre les deux, mais la tension monte et la kétamine te prend l’équilibre pendant que la meth te garde en mouvement. C’est là que surviennent des blessures que personne ne sent sur le moment. Assieds-toi pour la kétamine."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen verrassing tussen die twee, maar je bloeddruk gaat omhoog en ketamine neemt je balans af terwijl meth je in beweging houdt. Hier ontstaan blessures die niemand op dat moment voelt. Ga zitten voor de ketamine."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
     },
     "No timers yet.": {
       "localizations": {
@@ -35969,6 +37390,35 @@
         }
       }
     },
+    "One tablet in twenty-four hours, and no more. The effects can last up to thirty-six hours, so a second one taken because the first seemed not to work stacks on a dose that is still going.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Tablette in vierundzwanzig Stunden, nicht mehr. Die Wirkung kann bis zu sechsunddreißig Stunden anhalten — eine zweite, genommen weil die erste nicht zu wirken schien, landet also auf einer Dosis, die noch läuft."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una pastilla en veinticuatro horas, no más. Los efectos pueden durar hasta treinta y seis horas, así que una segunda tomada porque la primera parecía no funcionar se suma a una dosis que sigue activa."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un comprimé par vingt-quatre heures, pas plus. Les effets peuvent durer jusqu’à trente-six heures : un deuxième pris parce que le premier semblait inefficace s’ajoute donc à une dose encore active."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eén tablet per vierentwintig uur, niet meer. De werking kan tot zesendertig uur aanhouden, dus een tweede die je neemt omdat de eerste niet leek te werken komt boven op een dosis die nog bezig is."
+          }
+        }
+      },
+      "comment": "Drug reference"
+    },
     "One thing that slows breathing is selected. Keep the dose low, leave long gaps, and stay with someone who knows what you took.": {
       "extractionState": "manual",
       "localizations": {
@@ -37252,6 +38702,35 @@
         }
       }
     },
+    "Overheating and dehydration": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überhitzung und Dehydrierung"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sobrecalentamiento y deshidratación"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surchauffe et déshydratation"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oververhitting en uitdroging"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Overstimulated": {
       "localizations": {
         "de": {
@@ -37685,6 +39164,35 @@
           }
         }
       }
+    },
+    "Panic or confusion": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panik oder Verwirrtheit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pánico o confusión"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panique ou confusion"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paniek of verwardheid"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Panic support": {
       "localizations": {
@@ -45520,6 +47028,35 @@
         }
       }
     },
+    "Seizure, or twitching they cannot control": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Krampfanfall oder unkontrollierbares Zucken"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convulsión, o espasmos que no puede controlar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Convulsion, ou secousses incontrôlables"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een toeval, of trekkingen die diegene niet kan stoppen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Select %@": {
       "localizations": {
         "de": {
@@ -46168,6 +47705,35 @@
           }
         }
       }
+    },
+    "Severe agitation, paranoia, or does not know where they are": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starke Unruhe, Paranoia, oder weiß nicht, wo er ist"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Agitación intensa, paranoia, o no sabe dónde está"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forte agitation, paranoïa, ou ne sait plus où il est"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ernstige onrust, paranoia, of weet niet meer waar die is"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Severe panic that does not settle": {
       "localizations": {
@@ -47516,6 +49082,64 @@
         }
       }
     },
+    "Sleep loss and impulsive decisions": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlafverlust und impulsive Entscheidungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pérdida de sueño y decisiones impulsivas"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perte de sommeil et décisions impulsives"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slaapverlies en impulsieve beslissingen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Sleep loss and low mood afterwards": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlafverlust und gedrückte Stimmung danach"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pérdida de sueño y ánimo bajo después"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perte de sommeil et moral en baisse après"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slaapverlies en een sombere stemming erna"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Sleep not yet logged": {
       "extractionState": "manual",
       "localizations": {
@@ -47873,6 +49497,35 @@
           }
         }
       }
+    },
+    "Smoked, you know inside ten minutes. Swallowed, it can take a full hour — so an edible that seems not to be working usually is, and a second one lands on top of the first for the next several hours.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geraucht weißt du es in zehn Minuten. Geschluckt kann es eine volle Stunde dauern — ein Edible, das nicht zu wirken scheint, tut es meist doch, und ein zweites landet für die nächsten Stunden auf dem ersten."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fumado lo sabes en menos de diez minutos. Tragado puede tardar una hora entera: un comestible que parece no funcionar normalmente sí lo hace, y uno segundo se suma al primero durante las horas siguientes."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fumé, tu le sais en moins de dix minutes. Avalé, cela peut prendre une heure entière — un comestible qui semble ne pas agir agit généralement, et un deuxième s’ajoute au premier pour les heures qui suivent."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gerookt weet je het binnen tien minuten. Geslikt kan het een uur duren — een edible die niet lijkt te werken, werkt meestal wel, en een tweede komt de uren erna boven op de eerste."
+          }
+        }
+      },
+      "comment": "Drug reference"
     },
     "Sniffed": {
       "localizations": {
@@ -49625,6 +51278,35 @@
         }
       }
     },
+    "Strong emotional shifts": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starke emotionale Schwankungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambios emocionales fuertes"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forts changements émotionnels"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sterke emotionele omslagen"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Strong streak. Your body is building real recovery.": {
       "localizations": {
         "de": {
@@ -49652,6 +51334,64 @@
           }
         }
       }
+    },
+    "Strong urge to continue": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starker Drang weiterzumachen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuerte impulso de seguir"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forte envie de continuer"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sterke drang om door te gaan"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Stronger effects with edibles or high-potency products": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stärkere Wirkung bei Edibles oder hochpotenten Produkten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Efectos más fuertes con comestibles o productos de alta potencia"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effets plus forts avec les comestibles ou les produits très puissants"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sterkere effecten bij edibles of producten met hoge sterkte"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Substance": {
       "comment": "A label for a picker that lets the user select a substance.",
@@ -51811,6 +53551,35 @@
         }
       }
     },
+    "There is no published safe interval for this one. What is published is that it drives redosing harder than any other common stimulant, and that the craving arrives almost as soon as you come down — while the last dose has barely finished. Decide the number of lines before you start, not during.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für dieses Mittel gibt es kein veröffentlichtes sicheres Intervall. Veröffentlicht ist dagegen: Es treibt das Nachdosieren stärker an als jedes andere gängige Stimulans, und das Verlangen kommt fast sofort beim Runterkommen — während die letzte Dosis kaum durch ist. Leg die Anzahl Lines vorher fest, nicht währenddessen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay un intervalo seguro publicado para esta. Lo que sí está publicado es que empuja a repetir dosis más que cualquier otro estimulante común, y que las ganas llegan casi en cuanto bajas, cuando la dosis anterior apenas ha terminado. Decide el número de rayas antes de empezar, no durante."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il n’existe aucun intervalle sûr publié pour celui-ci. Ce qui est publié, c’est qu’il pousse à reprendre plus fort que n’importe quel autre stimulant courant, et que l’envie revient presque dès la descente — alors que la dose précédente vient à peine de finir. Décide du nombre de lignes avant de commencer, pas pendant."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voor dit middel bestaat geen gepubliceerd veilig interval. Wat wél gepubliceerd is: het drijft herdoseren harder aan dan welk ander gangbaar stimulerend middel ook, en de drang komt bijna zodra je naar beneden gaat — terwijl de vorige dosis nauwelijks is uitgewerkt. Bepaal het aantal lijntjes vooraf, niet tijdens."
+          }
+        }
+      },
+      "comment": "Drug reference"
+    },
     "There is no version of care that is too small to count.": {
       "localizations": {
         "de": {
@@ -52918,6 +54687,64 @@
           }
         }
       }
+    },
+    "Timing and amount may be uncertain": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zeitpunkt und Menge können unsicher sein"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El momento y la cantidad pueden ser inciertos"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le moment et la quantité peuvent être incertains"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timing en hoeveelheid kunnen onzeker zijn"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Timing — %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timing — %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiempos — %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timing — %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timing — %@"
+          }
+        }
+      },
+      "comment": "Drug reference"
     },
     "Tiny care plan": {
       "comment": "A heading for a section of the Aftercare view.",
@@ -54155,6 +55982,35 @@
         }
       }
     },
+    "Two stimulants, one heart. The strain adds up and cocaine partly blocks what meth does, so people take more of both chasing an effect that will not come. Chest pain that does not pass needs help, not another line.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zwei Stimulanzien, ein Herz. Die Belastung addiert sich, und Kokain blockiert teilweise, was Meth tut, also nimmt man von beidem mehr und jagt einer Wirkung nach, die nicht kommt. Brustschmerz, der nicht vergeht, braucht Hilfe, keine weitere Line."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dos estimulantes, un corazón. La carga se suma y la cocaína bloquea en parte lo que hace la meta, así que se toma más de ambos persiguiendo un efecto que no va a llegar. El dolor en el pecho que no pasa necesita ayuda, no otra raya."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deux stimulants, un seul cœur. La charge s’additionne et la cocaïne bloque en partie l’effet de la meth, donc on prend plus des deux en courant après un effet qui ne viendra pas. Une douleur thoracique qui persiste demande de l’aide, pas une ligne de plus."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twee stimulerende middelen, één hart. De belasting telt op en cocaïne blokkeert deels wat meth doet, dus mensen nemen meer van allebei op jacht naar een effect dat niet komt. Pijn op de borst die niet wegtrekt heeft hulp nodig, geen volgende lijn."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
+    },
     "Uber": {
       "localizations": {
         "de": {
@@ -54216,6 +56072,35 @@
           }
         }
       }
+    },
+    "Unconsciousness can happen quickly": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewusstlosigkeit kann schnell eintreten"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La inconsciencia puede llegar rápido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La perte de connaissance peut arriver vite"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bewusteloosheid kan snel optreden"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Undecided": {
       "localizations": {
@@ -54328,6 +56213,93 @@
           }
         }
       }
+    },
+    "Unknown contents": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unbekannte Inhaltsstoffe"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Composición desconocida"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Composition inconnue"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onbekende inhoud"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Unknown risk profile": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unbekanntes Risikoprofil"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfil de riesgo desconocido"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profil de risque inconnu"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onbekend risicoprofiel"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
+    "Unknown strength": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unbekannte Stärke"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Potencia desconocida"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puissance inconnue"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Onbekende sterkte"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Unknown substances are harder to predict. Avoid mixing and seek help if something feels wrong.": {
       "localizations": {
@@ -55297,6 +57269,35 @@
         }
       }
     },
+    "Very hot to the touch, or has stopped sweating": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sehr heiß bei Berührung, oder schwitzt nicht mehr"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muy caliente al tacto, o ha dejado de sudar"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Très chaud au toucher, ou ne transpire plus"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heel heet om aan te raken, of is gestopt met zweten"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
+    },
     "Very little sleep": {
       "localizations": {
         "de": {
@@ -55457,6 +57458,35 @@
           }
         }
       }
+    },
+    "Viagra and meth pull your circulation in opposite directions while both leave the heart working hard, over a session that tends to be a long one. Chest tightness or a heart that will not settle means stop.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Viagra und Meth ziehen deinen Kreislauf in entgegengesetzte Richtungen, während beide das Herz hart arbeiten lassen, über eine Session, die meist lang ist. Ein enges Gefühl in der Brust oder ein Herz, das sich nicht beruhigt, heißt aufhören."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La Viagra y la meta tiran de tu circulación en direcciones opuestas mientras ambas hacen trabajar duro al corazón, en una sesión que suele ser larga. Opresión en el pecho o un corazón que no se calma significa parar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Viagra et la meth tirent ta circulation dans des directions opposées tout en faisant travailler le cœur dur, sur une session qui a tendance à être longue. Une poitrine serrée ou un cœur qui ne se calme pas, ça veut dire stop."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Viagra en meth trekken je bloedsomloop twee kanten op terwijl ze allebei het hart hard laten werken, over een sessie die meestal lang duurt. Een strak gevoel op de borst of een hart dat niet tot rust komt betekent stoppen."
+          }
+        }
+      },
+      "comment": "Methamphetamine safety content"
     },
     "Viagra raises heart rate and can add to the physical anxiety a trip already brings, making it harder to tell nerves from a real problem.": {
       "extractionState": "manual",
@@ -55620,6 +57650,35 @@
           }
         }
       }
+    },
+    "Vomiting or injury risk": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risiko für Erbrechen oder Verletzungen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riesgo de vómitos o lesiones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risque de vomissements ou de blessure"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kans op braken of letsel"
+          }
+        }
+      },
+      "comment": "Drug information: risk line"
     },
     "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under.": {
       "localizations": {

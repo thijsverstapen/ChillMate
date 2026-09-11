@@ -566,13 +566,14 @@ private struct RiskWarningLine: View {
 struct SelectedSubstanceTimingCard: View {
     let substances: Set<Substance>
 
+    /// One entry per substance per route, so a substance whose routes behave
+    /// differently shows both rather than one standing in for the other.
     private var timed: [(substance: Substance, timing: SubstanceReference.Timing)] {
         substances
-            .compactMap { substance in
-                guard let timing = substance.reference?.timing else { return nil }
-                return (substance, timing)
+            .sorted { $0.rawValue < $1.rawValue }
+            .flatMap { substance in
+                (substance.reference?.timings ?? []).map { (substance, $0) }
             }
-            .sorted { $0.substance.rawValue < $1.substance.rawValue }
     }
 
     var body: some View {
@@ -585,9 +586,13 @@ struct SelectedSubstanceTimingCard: View {
                     .foregroundStyle(Color.chillText)
                     .fixedSize(horizontal: false, vertical: true)
 
-                ForEach(timed, id: \.substance) { entry in
+                ForEach(Array(timed.enumerated()), id: \.offset) { _, entry in
                     VStack(alignment: .leading, spacing: 6) {
-                        Label(entry.substance.localizedDisplayName, systemImage: entry.substance.symbolName)
+                        Label(
+                            entry.timing.route.map { "\(entry.substance.localizedDisplayName) — \($0.label)" }
+                                ?? entry.substance.localizedDisplayName,
+                            systemImage: entry.substance.symbolName
+                        )
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(Color.chillText)
 
