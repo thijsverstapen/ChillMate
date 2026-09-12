@@ -30,6 +30,24 @@ enum ActiveDoseTimer {
             .max { $0.startedAt < $1.startedAt }
     }
 
+    /// Whether the user has asked for discreet wording.
+    ///
+    /// The same setting that already keeps substance names out of notification
+    /// text. A Lock Screen widget is read by whoever is standing next to you, so
+    /// it has at least as much claim on that setting as a banner does — and the
+    /// safe route activity refuses to carry a destination for exactly this
+    /// reason, so a dose widget naming the substance would be the app applying
+    /// two different standards to the same screen.
+    ///
+    /// Defaults to false, matching `NotificationService`: an unset key is not the
+    /// same as "off", and reading it with a bare `bool(forKey:)` would be.
+    private static var prefersDiscreetWording: Bool {
+        guard UserDefaults.standard.object(forKey: DefaultsKey.discreetNotifications) != nil else {
+            return false
+        }
+        return UserDefaults.standard.bool(forKey: DefaultsKey.discreetNotifications)
+    }
+
     /// What crosses into the widget extension for one timer.
     static func snapshot(for timer: DrugDoseTimerRecord) -> DoseTimerSnapshot {
         // `afterEffectsEnd`, not `lastPublishedMoment`. The latter falls back to
@@ -44,7 +62,9 @@ enum ActiveDoseTimer {
             )?.afterEffectsEnd
         }
         return DoseTimerSnapshot(
-            substanceName: timer.substanceName,
+            substanceName: prefersDiscreetWording
+                ? String(localized: "Check-in")
+                : timer.substanceName,
             startedAt: timer.startedAt,
             endsAt: timer.endsAt,
             comedownEndsAt: comedownEnd

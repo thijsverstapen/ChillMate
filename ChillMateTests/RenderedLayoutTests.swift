@@ -26,27 +26,54 @@ struct RenderedLayoutTests {
     /// out of room first.
     private static let narrowWidth: CGFloat = 320
 
-    private static let growingSizes: [DynamicTypeSize] = [
-        .large, .xxLarge, .accessibility1, .accessibility3, .accessibility5
-    ]
+    /// Three points on the ladder, not five.
+    ///
+    /// Rendering is the expensive part of this suite — a `ImageRenderer` pass is
+    /// most of a second — and the suite runs five times, once per language. Three
+    /// points still prove monotonic growth and still span the whole range; five
+    /// cost four minutes of CI to prove the same thing.
+    private static let growingSizes: [DynamicTypeSize] = [.large, .accessibility1, .accessibility5]
 
-    private func height(of view: some View, at typeSize: DynamicTypeSize, width: CGFloat = narrowWidth) -> CGFloat {
+    /// One render per size, not two.
+    ///
+    /// Width and height were asked for separately, which rendered every component
+    /// at every size twice over.
+    private func size(of view: some View, at typeSize: DynamicTypeSize) -> CGSize {
         let renderer = ImageRenderer(
             content: view
-                .frame(width: width)
+                .frame(width: Self.narrowWidth)
                 .dynamicTypeSize(typeSize)
-                .padding(0)
         )
         renderer.scale = 1
-        return renderer.uiImage?.size.height ?? 0
+        return renderer.uiImage?.size ?? .zero
     }
 
-    private func width(of view: some View, at typeSize: DynamicTypeSize, width: CGFloat = narrowWidth) -> CGFloat {
-        let renderer = ImageRenderer(
-            content: view.frame(width: width).dynamicTypeSize(typeSize)
-        )
-        renderer.scale = 1
-        return renderer.uiImage?.size.width ?? 0
+    /// Everything this suite asserts about one component, in a single pass over
+    /// the type sizes.
+    private func check(_ view: some View, _ label: String) {
+        let sizes = Self.growingSizes.map { size(of: view, at: $0) }
+
+        #expect(sizes.allSatisfy { $0.height > 0 }, "\(label) rendered nothing: \(sizes)")
+
+        // Nothing spills sideways.
+        for (size, typeSize) in zip(sizes, Self.growingSizes) {
+            #expect(
+                size.width <= Self.narrowWidth + 1,
+                "\(label) is \(size.width)pt wide at \(typeSize)"
+            )
+        }
+
+        // Text that keeps getting bigger inside a box that does not is text that
+        // is being cut off. A height that plateaus across the ladder is the shape
+        // of that bug, and it is invisible in a screenshot at the default size.
+        for (smaller, larger) in zip(sizes, sizes.dropFirst()) {
+            #expect(larger.height >= smaller.height, "\(label) stopped growing: \(sizes.map(\.height))")
+        }
+        #expect(sizes.last!.height > sizes.first!.height, "\(label) never grew at all: \(sizes.map(\.height))")
+
+        // A component taller than about ten screens at the largest type size is
+        // usually a layout that has lost its bounds rather than a generous one.
+        #expect(sizes.last!.height < 8000, "\(label) is \(sizes.last!.height)pt tall at AX5")
     }
 
     // MARK: - The components under test
@@ -77,56 +104,20 @@ struct RenderedLayoutTests {
         )
     }
 
-    // MARK: - Nothing spills sideways
+    // MARK: - The components
 
-    @Test("Nothing is wider than the screen it is on")
-    func nothingSpillsHorizontally() {
-        for size in Self.growingSizes {
-            #expect(width(of: header, at: size) <= Self.narrowWidth + 1, "header at \(size)")
-            #expect(width(of: disclaimer, at: size) <= Self.narrowWidth + 1, "disclaimer at \(size)")
-            #expect(width(of: sectionTitle, at: size) <= Self.narrowWidth + 1, "section title at \(size)")
-            #expect(width(of: comedown, at: size) <= Self.narrowWidth + 1, "comedown at \(size)")
-        }
-    }
+    @Test("A page header fits and grows")
+    func headerIsSound() { check(header, "page header") }
 
-    // MARK: - Nothing stops growing
-
-    /// Text that keeps getting bigger inside a box that does not is text that is
-    /// being cut off. A card whose height plateaus across three accessibility
-    /// sizes is the shape of that bug, and it is invisible in a screenshot taken
-    /// at the default size.
-    private func assertGrows(_ view: some View, _ label: String) {
-        let heights = Self.growingSizes.map { height(of: view, at: $0) }
-        #expect(heights.allSatisfy { $0 > 0 }, "\(label) rendered nothing: \(heights)")
-        for (smaller, larger) in zip(heights, heights.dropFirst()) {
-            #expect(larger >= smaller, "\(label) stopped growing: \(heights)")
-        }
-        #expect(heights.last! > heights.first!, "\(label) never grew at all: \(heights)")
-    }
-
-    @Test("A page header grows with the text")
-    func headerGrows() { assertGrows(header, "header") }
-
-    @Test("The safety disclaimer grows with the text")
-    func disclaimerGrows() { assertGrows(disclaimer, "disclaimer") }
-
-    @Test("The comedown card grows with the text")
-    func comedownGrows() { assertGrows(comedown, "comedown card") }
+    @Test("The safety disclaimer fits and grows")
+    func disclaimerIsSound() { check(disclaimer, "safety disclaimer") }
 
     /// A section title is one line of text and a symbol, and it still has to
-    /// reflow rather than truncate — it carries the name of the thing below it.
-    @Test("A section title grows with the text")
-    func sectionTitleGrows() { assertGrows(sectionTitle, "section title") }
+    /// reflow rather than truncate: it carries the name of the thing below it.
+    @Test("A section title fits and grows")
+    func sectionTitleIsSound() { check(sectionTitle, "section title") }
 
-    // MARK: - Sanity
+    @Test("The comedown card fits and grows")
+    func comedownIsSound() { check(comedown, "comedown card") }
 
-    /// A card that is taller than about ten screens at the largest type size is
-    /// usually a layout that has lost its bounds rather than one being generous.
-    @Test("Nothing renders absurdly tall at the largest type size")
-    func nothingIsAbsurd() {
-        for (view, label) in [(AnyView(header), "header"), (AnyView(disclaimer), "disclaimer"), (AnyView(comedown), "comedown")] {
-            let tallest = height(of: view, at: .accessibility5)
-            #expect(tallest < 8000, "\(label) is \(tallest) points tall at AX5")
-        }
-    }
 }

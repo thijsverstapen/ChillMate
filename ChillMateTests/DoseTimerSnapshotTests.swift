@@ -152,6 +152,36 @@ struct DoseTimerSnapshotTests {
         #expect(ActiveDoseTimer.mostRelevant(in: [timer], now: start.addingTimeInterval(3 * 3600)) == nil)
     }
 
+    /// The Lock Screen is read by whoever is standing next to you. The setting
+    /// that already keeps substance names out of notification text has to reach
+    /// this surface too, or the app is applying two standards to one screen —
+    /// the safe route activity refuses to carry a destination for exactly this
+    /// reason.
+    // No `.serialized` trait here: the suite already carries one, and this test
+    // reaches into `UserDefaults.standard`, so that guarantee has to hold.
+    @Test("Discreet wording keeps the substance name off the Lock Screen")
+    func discreetWordingHidesTheSubstance() throws {
+        let key = DefaultsKey.discreetNotifications
+        let previous = UserDefaults.standard.object(forKey: key)
+        defer {
+            if let previous {
+                UserDefaults.standard.set(previous, forKey: key)
+            } else {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
+        }
+
+        let timer = record(substance: .ketamine, startedAt: start, route: .sniffed)
+
+        UserDefaults.standard.set(false, forKey: key)
+        #expect(ActiveDoseTimer.snapshot(for: timer).substanceName == Substance.ketamine.rawValue)
+
+        UserDefaults.standard.set(true, forKey: key)
+        let discreet = ActiveDoseTimer.snapshot(for: timer).substanceName
+        #expect(discreet != Substance.ketamine.rawValue)
+        #expect(!discreet.isEmpty)
+    }
+
     /// The route has to reach the published curve, or an edible gets the smoked
     /// window on the Lock Screen too.
     @Test("The logged route picks the published curve")

@@ -13573,6 +13573,35 @@
         }
       }
     },
+    "Check-in": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check-in"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check-in"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check-in"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check-in"
+          }
+        }
+      },
+      "comment": "Neutral stand-in for the substance name on the Lock Screen when discreet wording is on"
+    },
     "Check-in ended": {
       "localizations": {
         "de": {

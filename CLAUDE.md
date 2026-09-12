@@ -64,13 +64,25 @@ before pushing. They take seconds and are the first CI job.
   `String(localized:)` means adding the key to `ChillMate/Localizable.xcstrings` with
   `de`, `es`, `fr` and `nl` translations. English is the key itself and is not stored.
   Address the user informally in every language (`je`, `du`, `tu`, `tú`).
+  `scripts/add_strings.py` takes a JSON of keys and adds them in one go.
+
+  The gate is wider than it looks and worth knowing before you fight it. It reads
+  Swift string literals properly rather than by regex, so interpolation and
+  nesting are handled; it checks every literal in a labelled control's first
+  argument, so a ternary cannot hide one; it covers App Intents, widget gallery
+  names and all four product targets; it refuses a bare literal assigned to
+  anything named like something a person reads; it refuses an English sentence
+  anywhere in `NotificationService.swift` outside `String(localized:)`; and it
+  refuses `.rawValue` in a position a person will read, where
+  `localizedDisplayName` is meant. Each of those rules exists because a string
+  shipped in English through that exact hole.
 - **Every `UserDefaults` key lives in `DefaultsKey`** (`ChillMate/DefaultsKeys.swift`).
   No string literals at call sites.
 - **No build artifacts tracked.** `DerivedData/`, `build/` and `*.log` are ignored.
 
 ## Tests
 
-222 unit tests. CI runs the whole suite once per language, so an assertion that only
+619 unit tests. CI runs the whole suite once per language, so an assertion that only
 holds in English fails four times over.
 
 - **Never assert an English literal against localized output.** Name the line through
@@ -83,6 +95,14 @@ holds in English fails four times over.
   while proving nothing.
 - UI tests are advisory in CI, not a gate. They drive a real simulator and fail on
   shared runners for reasons unrelated to the change.
+- `PerformanceTests` runs once, not per language, and is skipped in the language
+  loop. Its numbers are ceilings with an order of magnitude of headroom, not
+  benchmarks: they exist to catch a change that makes something quadratic in the
+  number of logged nights.
+- `RenderedLayoutTests` asserts layout rather than pixels — nothing wider than a
+  320pt screen, and nothing that *stops* growing as the text does, which is what
+  clipping looks like from outside. It runs per language on purpose, because
+  German is reliably the longest of the five.
 
 ## Data
 
