@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import WidgetKit
+import ChillMateCore
 
 /// Which dose the phone's other surfaces should be showing, and telling all of
 /// them at once.
@@ -75,10 +76,18 @@ enum ActiveDoseTimer {
     ///
     /// Call this from anywhere a timer is created, deleted or edited, including
     /// from App Intents, which run without any of the app's views on screen.
+    /// - Parameter services: substitutable so a test can watch this happen. It
+    ///   is the one broadcast the whole app funnels through, so a fake here
+    ///   proves the seam rather than the wiring of one screen.
     @MainActor
-    static func broadcast(_ timers: [DrugDoseTimerRecord], now: Date = .now) {
-        WatchConnectivityService.shared.sendActiveTimers(timers)
-        DoseTimerSnapshot.write(mostRelevant(in: timers, now: now).map(snapshot(for:)))
+    static func broadcast(
+        _ timers: [DrugDoseTimerRecord],
+        now: Date = .now,
+        services: Services = .live,
+        defaults: UserDefaults? = WidgetSharedKey.suite
+    ) {
+        services.watch.sendActiveTimers(timers)
+        DoseTimerSnapshot.write(mostRelevant(in: timers, now: now).map(snapshot(for:)), to: defaults)
         WidgetCenter.shared.reloadAllTimelines()
     }
 

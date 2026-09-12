@@ -1,5 +1,19 @@
 import Foundation
 
+/// The three things a pattern needs from a logged night.
+///
+/// `NightPatterns` took `[NightEntry]`, which is a SwiftData `@Model`, so a type
+/// whose entire job is arithmetic over dates and substance names could not be
+/// compiled without a persistence framework. It reads three properties; this is
+/// those three properties.
+///
+/// `NightEntry` conforms in the app, so nothing at the call sites changed.
+public protocol LoggedNight {
+    var date: Date { get }
+    var isSkipped: Bool { get }
+    var substances: [String] { get }
+}
+
 /// What the logs say about shape rather than volume.
 ///
 /// The insights screen counted four things over the chosen window — chills, risky
@@ -11,43 +25,43 @@ import Foundation
 /// Everything here is descriptive and derived only from what the person logged.
 /// Nothing infers, diagnoses, or advises. `PersonalBaselineCard` already sets the
 /// framing this follows: usual for you, not good or bad.
-struct NightPatterns: Equatable {
+public struct NightPatterns: Equatable {
 
     /// The weekday that holds the most logged nights, and how many of them.
     ///
     /// Nil below `minimumNights`, because one Saturday is not a pattern and
     /// presenting it as one is the failure this whole type exists to avoid.
-    struct Busiest: Equatable {
-        let weekday: Int
-        let count: Int
-        let share: Double
+    public struct Busiest: Equatable {
+        public let weekday: Int
+        public let count: Int
+        public let share: Double
     }
 
     /// How this window compares with the one immediately before it, of equal
     /// length. Nil when there is no earlier window to compare against.
-    struct Change: Equatable {
-        let current: Int
-        let previous: Int
+    public struct Change: Equatable {
+        public let current: Int
+        public let previous: Int
 
-        var difference: Int { current - previous }
-        var isFlat: Bool { difference == 0 }
+        public var difference: Int { current - previous }
+        public var isFlat: Bool { difference == 0 }
     }
 
     /// The two substances that most often appear on the same night, with the
     /// number of nights they did.
-    struct Pairing: Equatable {
-        let first: String
-        let second: String
-        let nights: Int
+    public struct Pairing: Equatable {
+        public let first: String
+        public let second: String
+        public let nights: Int
     }
 
     /// Below this, there is not enough to call anything a pattern.
-    static let minimumNights = 6
+    public static let minimumNights = 6
 
-    let busiest: Busiest?
-    let change: Change?
-    let pairing: Pairing?
-    let loggedNights: Int
+    public let busiest: Busiest?
+    public let change: Change?
+    public let pairing: Pairing?
+    public let loggedNights: Int
 
     /// - Parameters:
     ///   - entries: every entry available, not only the window. The comparison
@@ -55,12 +69,12 @@ struct NightPatterns: Equatable {
     ///     the old "risky logs" tile came to report three weeks under a caption
     ///     promising three months.
     ///   - windowDays: the window the screen is showing.
-    init(entries: [NightEntry], windowDays: Int, now: Date = .now, calendar: Calendar = .current) {
+    public init<Night: LoggedNight>(entries: [Night], windowDays: Int, now: Date = .now, calendar: Calendar = .current) {
         let start = calendar.date(byAdding: .day, value: -windowDays, to: now) ?? now
         let previousStart = calendar.date(byAdding: .day, value: -(windowDays * 2), to: now) ?? now
 
-        let logged = entries.filter { !$0.skippedNight && $0.date >= start && $0.date <= now }
-        let previous = entries.filter { !$0.skippedNight && $0.date >= previousStart && $0.date < start }
+        let logged = entries.filter { !$0.isSkipped && $0.date >= start && $0.date <= now }
+        let previous = entries.filter { !$0.isSkipped && $0.date >= previousStart && $0.date < start }
 
         loggedNights = logged.count
 
@@ -110,7 +124,7 @@ struct NightPatterns: Equatable {
     }
 
     /// Whether there is anything here worth putting on screen.
-    var hasAnythingToSay: Bool {
+    public var hasAnythingToSay: Bool {
         busiest != nil || pairing != nil || (change.map { !$0.isFlat } ?? false)
     }
 }

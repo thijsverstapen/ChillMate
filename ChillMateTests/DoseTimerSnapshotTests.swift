@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// What crosses from the app into the Lock Screen widget.

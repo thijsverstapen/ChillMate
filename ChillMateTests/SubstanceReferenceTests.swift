@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// Guards the sourced dose and duration reference, and the emergency signs.

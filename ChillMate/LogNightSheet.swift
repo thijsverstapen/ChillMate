@@ -4,8 +4,10 @@ import ContactsUI
 import MapKit
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 struct LogNightSheet: View {
+    @Environment(\.services) private var services
     @Environment(\.dismiss) private var dismiss
     @AppStorage(DefaultsKey.oneHandedControls) private var oneHandedControls = true
 
@@ -252,7 +254,7 @@ struct LogNightSheet: View {
         if healthKitAutoSync {
             let snapshot = HealthLogSnapshot(entry: entry)
             Task {
-                try? await HealthKitService.shared.save(snapshot)
+                try? await services.health.save(snapshot)
             }
         }
 
@@ -260,14 +262,14 @@ struct LogNightSheet: View {
             let entryRef = entry
             let ctx = modelContext
             Task {
-                if let hours = try? await HealthKitService.shared.sleepHoursAfterEntry(startDate: entryRef.startDate),
+                if let hours = try? await services.health.sleepHoursAfterEntry(startDate: entryRef.startDate),
                    hours > 0 {
                     await MainActor.run {
                         entryRef.sleptYet = true
                         entryRef.sleepHours = hours
                         ctx.saveChanges()
                         if hours >= 7 {
-                            NotificationService.shared.schedulePositiveSleepNotification(hours: hours)
+                            services.notifications.schedulePositiveSleepNotification(hours: hours)
                         }
                     }
                 }
@@ -277,17 +279,17 @@ struct LogNightSheet: View {
         let warningEntries = entries + [entry]
         if notificationsEnabled, HealthWarning.shouldWarn(entries: warningEntries) {
             let count = HealthWarning.recentRiskCount(entries: warningEntries)
-            NotificationService.shared.scheduleRiskWarning(count: count)
+            services.notifications.scheduleRiskWarning(count: count)
         }
 
         if isTracked {
             let aftercareDate = Calendar.current.date(byAdding: .day, value: 1, to: endDate) ?? endDate.addingTimeInterval(24 * 60 * 60)
             Task {
-                if (try? await NotificationService.shared.requestAuthorization()) == true {
+                if (try? await services.notifications.requestAuthorization()) == true {
                     await MainActor.run {
                         notificationsEnabled = true
-                        NotificationService.shared.scheduleAftercareReminder(entryID: entry.id, after: aftercareDate)
-                        NotificationService.shared.schedule48hFollowUp(entryID: entry.id, sessionDate: endDate)
+                        services.notifications.scheduleAftercareReminder(entryID: entry.id, after: aftercareDate)
+                        services.notifications.schedule48hFollowUp(entryID: entry.id, sessionDate: endDate)
                     }
                 }
             }
@@ -306,7 +308,7 @@ struct LogNightSheet: View {
 
         Task {
             do {
-                let location = try await LocationLookupService.shared.currentLoggedLocation()
+                let location = try await services.location.currentLoggedLocation()
                 await MainActor.run {
                     attachedLocation = location
                     locationMessage = nil

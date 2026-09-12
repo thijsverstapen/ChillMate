@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import ChillMateCore
 
 struct PrivacyReceiptView: View {
     @Environment(\.dismiss) private var dismiss

@@ -16,7 +16,6 @@
 		994F16462FD9D043009DA0A5 /* ChillMate.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 994F16452FD9D043009DA0A5 /* ChillMate.storekit */; };
 		A11B00000000000000000001 /* ChillMate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000011 /* ChillMate.swift */; };
 		A11B00000000000000000002 /* NightEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000012 /* NightEntry.swift */; };
-		A11B00000000000000000003 /* Substance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000013 /* Substance.swift */; };
 		A11B00000000000000000004 /* LiquidGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000014 /* LiquidGlass.swift */; };
 		A11B00000000000000000005 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000015 /* DashboardView.swift */; };
 		A11B00000000000000000006 /* LogNightSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000016 /* LogNightSheet.swift */; };
@@ -64,7 +63,6 @@
 		B22C00000000000000000004 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000014 /* SettingsView.swift */; };
 		B22C00000000000000000005 /* WatchConnectivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000015 /* WatchConnectivityService.swift */; };
 		B22C00000000000000000006 /* AppIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000016 /* AppIntents.swift */; };
-		B22C00000000000000000007 /* SubstanceInteractions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000017 /* SubstanceInteractions.swift */; };
 		B22C00000000000000000009 /* SpotlightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22C00000000000000000019 /* SpotlightService.swift */; };
 		B33D00000000000000000001 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B33D00000000000000000011 /* LaunchScreen.storyboard */; };
 		C33D00000000000000000001 /* InsightsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D00000000000000000011 /* InsightsViews.swift */; };
@@ -75,7 +73,6 @@
 		C44E00000000000000000003 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E00000000000000000013 /* NotificationService.swift */; };
 		D55F00000000000000000001 /* CareModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000011 /* CareModels.swift */; };
 		D55F00000000000000000003 /* CareToolsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000013 /* CareToolsModels.swift */; };
-		D55F00000000000000000004 /* MedicationRiskData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000014 /* MedicationRiskData.swift */; };
 		D55F00000000000000000005 /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000015 /* JournalView.swift */; };
 		D55F00000000000000000006 /* LegalViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000016 /* LegalViews.swift */; };
 		D55F00000000000000000007 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000017 /* FeedbackView.swift */; };
@@ -93,13 +90,7 @@
 		F88B00000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000015 /* Assets.xcassets */; };
 		F88B00000000000000000005 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000016 /* Localizable.xcstrings */; };
 		F99C00000000000000000002 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F99C00000000000000000001 /* Localizable.xcstrings */; };
-		AAB10000000000000000001E /* SubstanceReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001E /* SubstanceReference.swift */; };
-		AAB10000000000000000001F /* InteractionChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001F /* InteractionChart.swift */; };
-		AAB100000000000000000020 /* CombinationAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000020 /* CombinationAssessment.swift */; };
 		AAB100000000000000000021 /* PanicHideControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000021 /* PanicHideControl.swift */; };
-		AAB100000000000000000022 /* NightPatterns.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000022 /* NightPatterns.swift */; };
-		AAB100000000000000000023 /* AlcoholUnits.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000023 /* AlcoholUnits.swift */; };
-		AAB100000000000000000024 /* ComedownTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000024 /* ComedownTimeline.swift */; };
 		AAB100000000000000000025 /* ComedownPhaseCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000025 /* ComedownPhaseCard.swift */; };
 		AAB100000000000000000026 /* ActiveDoseTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000026 /* ActiveDoseTimer.swift */; };
 		AAB100000000000000000027 /* DoseTimerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000027 /* DoseTimerWidget.swift */; };
@@ -123,8 +114,12 @@
 		AAB100000000000000000039 /* SettingsAccountData.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000037 /* SettingsAccountData.swift */; };
 		AAB10000000000000000003A /* DailyAffirmations.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000038 /* DailyAffirmations.swift */; };
 		AAB10000000000000000003B /* BackupPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000039 /* BackupPayload.swift */; };
-		AAB10000000000000000003C /* SessionCheckInSchedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003A /* SessionCheckInSchedule.swift */; };
-		AAB10000000000000000003D /* NightMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003B /* NightMode.swift */; };
+		AAB10000000000000000003E /* SubstancePresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003C /* SubstancePresentation.swift */; };
+		AAE100000000000000000000 /* ChillMateCore in Frameworks */ = {isa = PBXBuildFile; productRef = AAD100000000000000000000 /* ChillMateCore */; };
+		AAB10000000000000000003C /* SubstanceReferenceLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003A /* SubstanceReferenceLinks.swift */; };
+		AAB10000000000000000003D /* AdministrationRouteMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003B /* AdministrationRouteMapping.swift */; };
+		AAB10000000000000000003F /* RiskLevelTint.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003D /* RiskLevelTint.swift */; };
+		AAB10000000000000000001E /* Services.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001E /* Services.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -209,7 +204,6 @@
 		A11B00000000000000000008 /* ChillMate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChillMate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A11B00000000000000000011 /* ChillMate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChillMate.swift; sourceTree = "<group>"; };
 		A11B00000000000000000012 /* NightEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightEntry.swift; sourceTree = "<group>"; };
-		A11B00000000000000000013 /* Substance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Substance.swift; sourceTree = "<group>"; };
 		A11B00000000000000000014 /* LiquidGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlass.swift; sourceTree = "<group>"; };
 		A11B00000000000000000015 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		A11B00000000000000000016 /* LogNightSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogNightSheet.swift; sourceTree = "<group>"; };
@@ -253,7 +247,6 @@
 		B22C00000000000000000014 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B22C00000000000000000015 /* WatchConnectivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityService.swift; sourceTree = "<group>"; };
 		B22C00000000000000000016 /* AppIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIntents.swift; sourceTree = "<group>"; };
-		B22C00000000000000000017 /* SubstanceInteractions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstanceInteractions.swift; sourceTree = "<group>"; };
 		B22C00000000000000000019 /* SpotlightService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightService.swift; sourceTree = "<group>"; };
 		B33D00000000000000000011 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C33D00000000000000000011 /* InsightsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsViews.swift; sourceTree = "<group>"; };
@@ -266,7 +259,6 @@
 		C85331B142C2356AE703C063 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		D55F00000000000000000011 /* CareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareModels.swift; sourceTree = "<group>"; };
 		D55F00000000000000000013 /* CareToolsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolsModels.swift; sourceTree = "<group>"; };
-		D55F00000000000000000014 /* MedicationRiskData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedicationRiskData.swift; sourceTree = "<group>"; };
 		D55F00000000000000000015 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		D55F00000000000000000016 /* LegalViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegalViews.swift; sourceTree = "<group>"; };
 		D55F00000000000000000017 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
@@ -286,13 +278,7 @@
 		F88B00000000000000000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F88B00000000000000000016 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		F99C00000000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		AAF10000000000000000001E /* SubstanceReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstanceReference.swift; sourceTree = "<group>"; };
-		AAF10000000000000000001F /* InteractionChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractionChart.swift; sourceTree = "<group>"; };
-		AAF100000000000000000020 /* CombinationAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinationAssessment.swift; sourceTree = "<group>"; };
 		AAF100000000000000000021 /* PanicHideControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanicHideControl.swift; sourceTree = "<group>"; };
-		AAF100000000000000000022 /* NightPatterns.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightPatterns.swift; sourceTree = "<group>"; };
-		AAF100000000000000000023 /* AlcoholUnits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlcoholUnits.swift; sourceTree = "<group>"; };
-		AAF100000000000000000024 /* ComedownTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComedownTimeline.swift; sourceTree = "<group>"; };
 		AAF100000000000000000025 /* ComedownPhaseCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComedownPhaseCard.swift; sourceTree = "<group>"; };
 		AAF100000000000000000026 /* ActiveDoseTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveDoseTimer.swift; sourceTree = "<group>"; };
 		AAF100000000000000000027 /* DoseTimerWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoseTimerWidget.swift; sourceTree = "<group>"; };
@@ -314,8 +300,11 @@
 		AAF100000000000000000037 /* SettingsAccountData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAccountData.swift; sourceTree = "<group>"; };
 		AAF100000000000000000038 /* DailyAffirmations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyAffirmations.swift; sourceTree = "<group>"; };
 		AAF100000000000000000039 /* BackupPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupPayload.swift; sourceTree = "<group>"; };
-		AAF10000000000000000003A /* SessionCheckInSchedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionCheckInSchedule.swift; sourceTree = "<group>"; };
-		AAF10000000000000000003B /* NightMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightMode.swift; sourceTree = "<group>"; };
+		AAF10000000000000000003C /* SubstancePresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstancePresentation.swift; sourceTree = "<group>"; };
+		AAF10000000000000000003A /* SubstanceReferenceLinks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstanceReferenceLinks.swift; sourceTree = "<group>"; };
+		AAF10000000000000000003B /* AdministrationRouteMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdministrationRouteMapping.swift; sourceTree = "<group>"; };
+		AAF10000000000000000003D /* RiskLevelTint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RiskLevelTint.swift; sourceTree = "<group>"; };
+		AAF10000000000000000001E /* Services.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Services.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -360,6 +349,7 @@
 		A11B00000000000000000018 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				AAE100000000000000000000 /* ChillMateCore in Frameworks */,
 			);
 		};
 		C8F13ECCBCB479B91B4D8F0F /* Frameworks */ = {
@@ -406,9 +396,12 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
-				AAF10000000000000000003B /* NightMode.swift */,
-				AAF10000000000000000003A /* SessionCheckInSchedule.swift */,
-				AAF100000000000000000039 /* BackupPayload.swift */,
+				AAF10000000000000000001E /* Services.swift */,
+				AAF10000000000000000003D /* RiskLevelTint.swift */,
+				AAF10000000000000000003B /* AdministrationRouteMapping.swift */,
+				AAF10000000000000000003A /* SubstanceReferenceLinks.swift */,
+				AAF10000000000000000003C /* SubstancePresentation.swift */,
+								AAF100000000000000000039 /* BackupPayload.swift */,
 				AAF100000000000000000038 /* DailyAffirmations.swift */,
 				AAF100000000000000000037 /* SettingsAccountData.swift */,
 				AAF100000000000000000036 /* SettingsCards.swift */,
@@ -427,14 +420,8 @@
 				AAF100000000000000000028 /* SiriShortcutsCard.swift */,
 				AAF100000000000000000026 /* ActiveDoseTimer.swift */,
 				AAF100000000000000000025 /* ComedownPhaseCard.swift */,
-				AAF100000000000000000024 /* ComedownTimeline.swift */,
-				AAF100000000000000000023 /* AlcoholUnits.swift */,
-				AAF100000000000000000022 /* NightPatterns.swift */,
-				AAF100000000000000000021 /* PanicHideControl.swift */,
-				AAF100000000000000000020 /* CombinationAssessment.swift */,
-				AAF10000000000000000001F /* InteractionChart.swift */,
-				AAF10000000000000000001E /* SubstanceReference.swift */,
-				AAF1000000000000000000F0 /* WidgetSharedKeys.swift */,
+										AAF100000000000000000021 /* PanicHideControl.swift */,
+										AAF1000000000000000000F0 /* WidgetSharedKeys.swift */,
 				AAF10000000000000000001D /* DelayedAction.swift */,
 				AAF10000000000000000001C /* RecentlyDeletedView.swift */,
 				AAF10000000000000000001B /* SecurityHealthCheckView.swift */,
@@ -471,8 +458,7 @@
 				99C79EAC2FBC8C3200A17BA3 /* ChillMate.entitlements */,
 				A11B00000000000000000011 /* ChillMate.swift */,
 				A11B00000000000000000012 /* NightEntry.swift */,
-				A11B00000000000000000013 /* Substance.swift */,
-				A11B00000000000000000014 /* LiquidGlass.swift */,
+						A11B00000000000000000014 /* LiquidGlass.swift */,
 				A11B00000000000000000015 /* DashboardView.swift */,
 				A11B00000000000000000016 /* LogNightSheet.swift */,
 				B22C00000000000000000011 /* ChillMateModelContainer.swift */,
@@ -483,8 +469,7 @@
 				B22C00000000000000000015 /* WatchConnectivityService.swift */,
 				B22C00000000000000000016 /* AppIntents.swift */,
 				0AFF00000000000000000F11 /* OnDeviceAffirmationService.swift */,
-				B22C00000000000000000017 /* SubstanceInteractions.swift */,
-				B22C00000000000000000019 /* SpotlightService.swift */,
+						B22C00000000000000000019 /* SpotlightService.swift */,
 				C44E00000000000000000011 /* UserProfile.swift */,
 				C44E00000000000000000012 /* ProfileSetupView.swift */,
 				C44E00000000000000000013 /* NotificationService.swift */,
@@ -497,8 +482,7 @@
 				C33D00000000000000000011 /* InsightsViews.swift */,
 				C33D00000000000000000012 /* SupportDirectoryViews.swift */,
 				C33D00000000000000000013 /* WeeklyReflectionViews.swift */,
-				D55F00000000000000000014 /* MedicationRiskData.swift */,
-				D55F00000000000000000013 /* CareToolsModels.swift */,
+						D55F00000000000000000013 /* CareToolsModels.swift */,
 				E66F00000000000000000010 /* DrugTimerActivityAttributes.swift */,
 				994F16452FD9D043009DA0A5 /* ChillMate.storekit */,
 				F99C00000000000000000001 /* Localizable.xcstrings */,
@@ -641,6 +625,9 @@
 				E66F00000000000000000044 /* PBXTargetDependency */,
 				F88B00000000000000000044 /* PBXTargetDependency */,
 			);
+			packageProductDependencies = (
+				AAD100000000000000000000 /* ChillMateCore */,
+			);
 			name = ChillMate;
 			productName = ChillMate;
 			productReference = A11B00000000000000000008 /* ChillMate.app */;
@@ -682,6 +669,20 @@
 		};
 /* End PBXNativeTarget section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		AAC100000000000000000000 /* XCLocalSwiftPackageReference "ChillMateCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ChillMateCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AAD100000000000000000000 /* ChillMateCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ChillMateCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+
 /* Begin PBXProject section */
 		A11B00000000000000000026 /* Project object */ = {
 			isa = PBXProject;
@@ -719,6 +720,9 @@
 				es,
 				de,
 				fr,
+			);
+			packageReferences = (
+				AAC100000000000000000000 /* XCLocalSwiftPackageReference "ChillMateCore" */,
 			);
 			mainGroup = A11B00000000000000000019;
 			minimizedProjectReferenceProxies = 1;
@@ -801,9 +805,12 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				AAB10000000000000000003D /* NightMode.swift in Sources */,
-				AAB10000000000000000003C /* SessionCheckInSchedule.swift in Sources */,
-				AAB10000000000000000003B /* BackupPayload.swift in Sources */,
+				AAB10000000000000000001E /* Services.swift in Sources */,
+				AAB10000000000000000003F /* RiskLevelTint.swift in Sources */,
+				AAB10000000000000000003D /* AdministrationRouteMapping.swift in Sources */,
+				AAB10000000000000000003C /* SubstanceReferenceLinks.swift in Sources */,
+				AAB10000000000000000003E /* SubstancePresentation.swift in Sources */,
+								AAB10000000000000000003B /* BackupPayload.swift in Sources */,
 				AAB10000000000000000003A /* DailyAffirmations.swift in Sources */,
 				AAB100000000000000000039 /* SettingsAccountData.swift in Sources */,
 				AAB100000000000000000038 /* SettingsCards.swift in Sources */,
@@ -822,14 +829,8 @@
 				AAB100000000000000000028 /* SiriShortcutsCard.swift in Sources */,
 				AAB100000000000000000026 /* ActiveDoseTimer.swift in Sources */,
 				AAB100000000000000000025 /* ComedownPhaseCard.swift in Sources */,
-				AAB100000000000000000024 /* ComedownTimeline.swift in Sources */,
-				AAB100000000000000000023 /* AlcoholUnits.swift in Sources */,
-				AAB100000000000000000022 /* NightPatterns.swift in Sources */,
-				AAB100000000000000000021 /* PanicHideControl.swift in Sources */,
-				AAB100000000000000000020 /* CombinationAssessment.swift in Sources */,
-				AAB10000000000000000001F /* InteractionChart.swift in Sources */,
-				AAB10000000000000000001E /* SubstanceReference.swift in Sources */,
-				AAB1000000000000000000F1 /* WidgetSharedKeys.swift in Sources */,
+										AAB100000000000000000021 /* PanicHideControl.swift in Sources */,
+										AAB1000000000000000000F1 /* WidgetSharedKeys.swift in Sources */,
 				AAB10000000000000000001D /* DelayedAction.swift in Sources */,
 				AAB10000000000000000001C /* RecentlyDeletedView.swift in Sources */,
 				AAB10000000000000000001B /* SecurityHealthCheckView.swift in Sources */,
@@ -863,8 +864,7 @@
 				AAB100000000000000000001 /* DefaultsKeys.swift in Sources */,
 				A11B00000000000000000001 /* ChillMate.swift in Sources */,
 				A11B00000000000000000002 /* NightEntry.swift in Sources */,
-				A11B00000000000000000003 /* Substance.swift in Sources */,
-				A11B00000000000000000004 /* LiquidGlass.swift in Sources */,
+						A11B00000000000000000004 /* LiquidGlass.swift in Sources */,
 				A11B00000000000000000005 /* DashboardView.swift in Sources */,
 				A11B00000000000000000006 /* LogNightSheet.swift in Sources */,
 				B22C00000000000000000001 /* ChillMateModelContainer.swift in Sources */,
@@ -874,8 +874,7 @@
 				B22C00000000000000000005 /* WatchConnectivityService.swift in Sources */,
 				B22C00000000000000000006 /* AppIntents.swift in Sources */,
 				0AFF00000000000000000F01 /* OnDeviceAffirmationService.swift in Sources */,
-				B22C00000000000000000007 /* SubstanceInteractions.swift in Sources */,
-				B22C00000000000000000009 /* SpotlightService.swift in Sources */,
+						B22C00000000000000000009 /* SpotlightService.swift in Sources */,
 				C44E00000000000000000001 /* UserProfile.swift in Sources */,
 				C44E00000000000000000002 /* ProfileSetupView.swift in Sources */,
 				C44E00000000000000000003 /* NotificationService.swift in Sources */,
@@ -887,8 +886,7 @@
 				C33D00000000000000000001 /* InsightsViews.swift in Sources */,
 				C33D00000000000000000002 /* SupportDirectoryViews.swift in Sources */,
 				C33D00000000000000000003 /* WeeklyReflectionViews.swift in Sources */,
-				D55F00000000000000000004 /* MedicationRiskData.swift in Sources */,
-				D55F00000000000000000003 /* CareToolsModels.swift in Sources */,
+						D55F00000000000000000003 /* CareToolsModels.swift in Sources */,
 				E66F00000000000000000001 /* DrugTimerActivityAttributes.swift in Sources */,
 				F77A00000000000000000001 /* EncryptedBackupService.swift in Sources */,
 			);

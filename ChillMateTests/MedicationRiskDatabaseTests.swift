@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// The medication matcher feeds the risk checker's clinical warnings, and it was

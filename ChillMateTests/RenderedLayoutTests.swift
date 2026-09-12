@@ -1,5 +1,6 @@
 import SwiftUI
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// Snapshot tests that snapshot the *layout* rather than the pixels.

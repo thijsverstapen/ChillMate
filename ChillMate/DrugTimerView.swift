@@ -1,8 +1,10 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 struct DrugTimerView: View {
+    @Environment(\.services) private var services
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @AppStorage(DefaultsKey.drugTimerTrackedPeople) private var trackedPeopleData = Data("[]".utf8)
@@ -244,14 +246,14 @@ struct DrugTimerView: View {
         syncTimersToWatch()
 
         Task {
-            if (try? await NotificationService.shared.requestAuthorization()) == true {
-                NotificationService.shared.scheduleSessionCheckIns(
+            if (try? await services.notifications.requestAuthorization()) == true {
+                services.notifications.scheduleSessionCheckIns(
                     id: timer.id,
                     startsAt: timer.startedAt,
                     endsAt: timer.endsAt,
                     destination: .timers
                 )
-                NotificationService.shared.scheduleRedoseNudge(
+                services.notifications.scheduleRedoseNudge(
                     id: timer.id,
                     startsAt: timer.startedAt,
                     durationHours: timer.durationHours
@@ -482,6 +484,7 @@ private struct StaticEffectWindowSummary: View {
 }
 
 private struct DrugTimerCard: View {
+    @Environment(\.services) private var services
     @Environment(\.modelContext) private var modelContext
     @Bindable var timer: DrugDoseTimerRecord
     let now: Date
@@ -572,8 +575,8 @@ private struct DrugTimerCard: View {
                         title: "\(timer.substanceName) timer",
                         detail: timer.startedAt.formatted(date: .abbreviated, time: .shortened)
                     )
-                    NotificationService.shared.clearSessionCheckIns(id: timer.id)
-                    NotificationService.shared.clearRedoseNudge(id: timer.id)
+                    services.notifications.clearSessionCheckIns(id: timer.id)
+                    services.notifications.clearRedoseNudge(id: timer.id)
                     modelContext.delete(timer)
                     modelContext.saveChanges()
                     ActiveDoseTimer.broadcast(from: modelContext)

@@ -124,7 +124,7 @@ final class ICloudBackupService {
 
     func saveLatestBackup(localContext: ModelContext) throws -> Date {
         let directory = try backupDirectory()
-        let data = try EncryptedBackupService.shared.encryptedBackupData(localContext: localContext)
+        let data = try Services.live.encryptedBackups.encryptedBackupData(localContext: localContext)
         let latestURL = directory.appendingPathComponent(latestFileName)
         try data.write(to: latestURL, options: [.atomic, .completeFileProtection])
 
@@ -141,7 +141,7 @@ final class ICloudBackupService {
     func restoreLatestBackup(into context: ModelContext) throws -> ChillMateBackupImportSummary {
         let url = try latestBackupURL()
         let data = try Data(contentsOf: url)
-        let summary = try EncryptedBackupService.shared.importEncryptedBackupData(data, into: context)
+        let summary = try Services.live.encryptedBackups.importEncryptedBackupData(data, into: context)
         UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.lastICloudRestoreTimestamp)
         UserDefaults.standard.set(String(localized: "Restored \(summary.totalItems) items from iCloud."), forKey: DefaultsKey.lastICloudBackupStatus)
         return summary

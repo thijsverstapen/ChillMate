@@ -1,4 +1,5 @@
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// Finding a substance by the name people actually use for it.

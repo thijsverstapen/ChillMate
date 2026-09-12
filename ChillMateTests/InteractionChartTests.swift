@@ -1,4 +1,5 @@
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// Holds the risk table to the source it claims to be checked against.

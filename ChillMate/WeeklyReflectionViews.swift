@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 // Weekly reflection views extracted from CareToolsView.swift as part of splitting that file.
 

@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 // Private insights views extracted from CareToolsView.swift as part of splitting that file.
 

@@ -1,4 +1,5 @@
 import SwiftUI
+import ChillMateCore
 
 /// Where a dose is on its published curve, including the part that lands on
 /// tomorrow.

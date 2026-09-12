@@ -3,6 +3,7 @@ import PhotosUI
 import SwiftData
 import SwiftUI
 import TipKit
+import ChillMateCore
 
 /// The cards the settings pages are built from.
 ///

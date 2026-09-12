@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// Covers the two things a finding has to get right besides its wording: who it

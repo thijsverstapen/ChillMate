@@ -11,6 +11,7 @@ import UIKit
 /// This is a move, not a rewrite.
 
 struct AppHomeView: View {
+    @Environment(\.services) private var services
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
     @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
@@ -66,7 +67,7 @@ struct AppHomeView: View {
         didAttemptRecoveryRestore = true
 
         do {
-            if let summary = try EncryptedBackupService.shared.restoreOnDeviceRecoverySnapshotIfNeeded(into: modelContext) {
+            if let summary = try services.encryptedBackups.restoreOnDeviceRecoverySnapshotIfNeeded(into: modelContext) {
                 // These status lines are persisted and re-rendered much later in the
                 // privacy timeline and the Settings backup card, so they have to be
                 // translated at the moment they are written. Nothing localizes them
@@ -85,7 +86,7 @@ struct AppHomeView: View {
         // unavailable), surfacing a persistent, misleading error status on every
         // backgrounding.
         do {
-            if try EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext) {
+            if try services.encryptedBackups.refreshOnDeviceRecoverySnapshot(localContext: modelContext) {
                 lastOnDeviceRecoveryStatus = String(localized: "Encrypted on-device recovery backup updated.")
             }
         } catch {
@@ -94,7 +95,7 @@ struct AppHomeView: View {
 
         guard iCloudBackupEnabled else { return }
         do {
-            let date = try ICloudBackupService.shared.saveLatestBackup(localContext: modelContext)
+            let date = try services.cloudBackups.saveLatestBackup(localContext: modelContext)
             lastICloudBackupTimestamp = date.timeIntervalSince1970
             // saveLatestBackup already wrote a translated status line. This write
             // is a deliberate refinement of it, not a restatement: an automatic
@@ -104,7 +105,7 @@ struct AppHomeView: View {
         } catch {
             // Signed out of iCloud is an expected state, not a failure worth an
             // alarming banner; keep the wording calm and actionable.
-            lastICloudBackupStatus = ICloudBackupService.shared.isAvailable
+            lastICloudBackupStatus = services.cloudBackups.isAvailable
                 ? String(localized: "Encrypted iCloud backup could not update.")
                 : String(localized: "iCloud backup is paused. Sign in to iCloud with iCloud Drive on to resume.")
         }

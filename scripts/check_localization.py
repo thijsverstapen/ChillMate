@@ -129,6 +129,11 @@ SOURCE_CATALOGS = [
     # which is the most-read surface in the app and the one a person looks at
     # when they are least able to translate in their head.
     ("ChillMateLiveActivityExtension", ROOT / "ChillMateLiveActivityExtension/Localizable.xcstrings"),
+    # The domain module. Its `String(localized:)` calls all pass `bundle: .main`,
+    # so they resolve from the app's catalog and are checked against it — the
+    # package deliberately has no catalog of its own, because two catalogs would
+    # give every moved string a second way to fall back to English.
+    ("ChillMateCore/Sources/ChillMateCore", ROOT / "ChillMate/Localizable.xcstrings"),
 ]
 
 # Explicit localization, plus the places Apple takes a `LocalizedStringResource`.

@@ -1241,9 +1241,13 @@ def source_checksum() -> tuple[str, int, str]:
     import hashlib
     # Every target that ships in the binary. Omitting the Live Activity
     # extension excluded shipped code from a page whose whole point is that
-    # the digest covers what was audited.
+    # the digest covers what was audited, and moving the domain into
+    # `ChillMateCore` would have quietly done the same thing again: thirteen
+    # files, including the whole risk engine, left the app directories and the
+    # count dropped from 97 to 91 without the claim getting any weaker in
+    # writing. A claim that shrinks when code moves is not a claim.
     targets = ("ChillMate", "ChillMateWatchApp", "ChillMateWatchAppWidget",
-               "ChillMateLiveActivityExtension")
+               "ChillMateLiveActivityExtension", "ChillMateCore")
     swift = sorted(f for target in targets
                    for f in ROOT.glob(f"{target}/**/*.swift")
                    if "DerivedData" not in str(f))
@@ -1299,7 +1303,7 @@ def build_privacy():
     <p class="meta">Checked against {swift_count} Swift files, commit <a href="{REPO}/commit/{commit}"><code>{commit}</code></a>, whose combined SHA-256 begins <code>{checksum}</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
-        <caption>Checked against ChillMate {VERSION} (build {BUILD}), across all {swift_count} Swift files in the app targets.</caption>
+        <caption>Checked against ChillMate {VERSION} (build {BUILD}), across all {swift_count} Swift files in the app targets and the domain package.</caption>
         <thead>
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>

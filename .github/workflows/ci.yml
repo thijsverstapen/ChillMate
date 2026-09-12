@@ -148,6 +148,18 @@ jobs:
       # and a budget tight enough to be interesting here would fail on load.
       # What they catch is the shape of regression that is invisible on six test
       # entries and unusable on three years of real ones.
+      #
+      # `-enablePerformanceTestsDiagnostics YES` is Apple's mechanism for getting
+      # Instruments data out of CI: when a measurement regresses it collects a
+      # trace and a memgraph and attaches them to the result bundle, which the
+      # upload step below already publishes. It costs nothing on a green run,
+      # because there is nothing to collect.
+      #
+      # It is the only mechanism available here. `xctrace record` against an iOS
+      # Simulator produces a trace directory containing no samples: CPU profiling
+      # wants a real process on real hardware, and a GitHub runner has no device
+      # attached. Three attempts, three empty traces and a hung recorder, so this
+      # is written down rather than left for somebody to rediscover.
       - name: Performance and memory budgets
         run: |
           set -o pipefail
@@ -156,6 +168,7 @@ jobs:
             -destination "$DESTINATION" \
             -only-testing:ChillMateTests/PerformanceTests \
             -testLanguage en \
+            -enablePerformanceTestsDiagnostics YES \
             -resultBundlePath TestResults/Performance.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify

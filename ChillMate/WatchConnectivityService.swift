@@ -136,7 +136,7 @@ final class WatchConnectivityService: NSObject {
         if payload["homeSafeReported"] as? Bool == true {
             UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.lastHomeSafeTimestamp)
             NotificationCenter.default.post(name: .watchDidReportHomeSafe, object: nil)
-            Task { await NotificationService.shared.clearSafetyCheckInsForTonight() }
+            Task { await Services.live.notifications.clearSafetyCheckInsForTonight() }
         }
         if payload["sosRequested"] as? Bool == true {
             NotificationCenter.default.post(name: .watchDidRequestSOS, object: nil)
@@ -152,7 +152,7 @@ extension WatchConnectivityService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard activationState == .activated else { return }
         Task { @MainActor in
-            WatchConnectivityService.shared.syncStandaloneState()
+            Services.live.watch.syncStandaloneState()
         }
     }
 

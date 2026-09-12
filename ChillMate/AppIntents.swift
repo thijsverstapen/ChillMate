@@ -1,6 +1,7 @@
 import AppIntents
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 // MARK: - Hydration log (shared daily flag)
 
@@ -214,7 +215,46 @@ struct OpenSaferPlanIntent: AppIntent {
 
 /// Lets Siri and Shortcuts pass a substance into an intent, which is what turns
 /// these from "open a screen" into "answer a question" or "start the thing".
-extension Substance: AppEnum {
+/// The substance a Shortcut or a Siri phrase can name.
+///
+/// A mirror of `Substance`, which lives in `ChillMateCore` now, because App
+/// Intents will not take one from an imported module: the metadata processor
+/// reads an `AppEnum`'s cases out of the app target's own source at build time
+/// and fails with "enums implemented in an imported framework or library are not
+/// supported". So the domain keeps the substance and the app keeps the parameter,
+/// joined by a raw value they share.
+///
+/// `SubstanceChoiceTests` checks the two lists stay identical, which is the part
+/// that would otherwise rot: adding a substance to the domain and forgetting it
+/// here would silently drop it out of Siri.
+enum SubstanceChoice: String, CaseIterable, Identifiable, Sendable {
+    case cannabis = "Cannabis"
+    case alcohol = "Alcohol"
+    case mdma = "MDMA"
+    case threeMMC = "3MMC"
+    case ketamine = "Ketamine"
+    case ghb = "GHB"
+    case gbl = "GBL"
+    case cocaine = "Cocaine"
+    case poppers = "Poppers"
+    case kamagra = "Kamagra"
+    case viagra = "Viagra"
+    case psychedelics = "Psychedelics"
+    case benzodiazepines = "Benzodiazepines"
+    case methamphetamine = "Meth"
+    case unknown = "Unknown"
+    case other = "Other"
+
+    var id: String { rawValue }
+
+    /// The domain substance this names. Never nil in practice, and the test
+    /// above is what keeps that true.
+    var substance: Substance {
+        Substance(rawValue: rawValue) ?? .other
+    }
+}
+
+extension SubstanceChoice: AppEnum {
     static var typeDisplayRepresentation: TypeDisplayRepresentation {
         TypeDisplayRepresentation(name: "Substance")
     }
@@ -225,7 +265,7 @@ extension Substance: AppEnum {
     ///
     /// These are drug and brand names. They read the same in every language
     /// ChillMate ships, so they are surfaced verbatim rather than translated.
-    static let caseDisplayRepresentations: [Substance: DisplayRepresentation] = [
+    static let caseDisplayRepresentations: [SubstanceChoice: DisplayRepresentation] = [
         .cannabis: DisplayRepresentation(title: "Cannabis"),
         .alcohol: DisplayRepresentation(title: "Alcohol"),
         .mdma: DisplayRepresentation(title: "MDMA"),
@@ -253,10 +293,10 @@ struct CheckCombinationIntent: AppIntent {
     static let openAppWhenRun = false
 
     @Parameter(title: "First substance")
-    var first: Substance
+    var first: SubstanceChoice
 
     @Parameter(title: "Second substance")
-    var second: Substance
+    var second: SubstanceChoice
 
     static var parameterSummary: some ParameterSummary {
         Summary("Check \(\.$first) with \(\.$second)")
@@ -269,7 +309,7 @@ struct CheckCombinationIntent: AppIntent {
         }
 
         // Sorted most severe first by the checker, so the first row is the verdict.
-        let warnings = SubstanceInteractionChecker.warnings(for: [first, second])
+        let warnings = SubstanceInteractionChecker.warnings(for: [first.substance, second.substance])
 
         guard let worst = warnings.first else {
             let none = String(localized: "ChillMate has nothing on file for \(first.rawValue) with \(second.rawValue). That does not mean it is safe. It means there is nothing on file here.")
@@ -289,7 +329,7 @@ struct StartDoseTimerIntent: AppIntent {
     static let openAppWhenRun = false
 
     @Parameter(title: "Substance")
-    var substance: Substance
+    var substance: SubstanceChoice
 
     @Parameter(title: "Hours", default: 2, inclusiveRange: (1, 12))
     var hours: Int
@@ -317,8 +357,8 @@ struct StartDoseTimerIntent: AppIntent {
             return (timer.id, timer.startedAt, timer.endsAt)
         }
 
-        if (try? await NotificationService.shared.requestAuthorization()) == true {
-            await NotificationService.shared.scheduleSessionCheckIns(
+        if (try? await Services.live.notifications.requestAuthorization()) == true {
+            await Services.live.notifications.scheduleSessionCheckIns(
                 id: started.id,
                 startsAt: started.startsAt,
                 endsAt: started.endsAt,
@@ -339,7 +379,7 @@ struct LogSubstanceIntent: AppIntent {
     static let openAppWhenRun = false
 
     @Parameter(title: "Substance")
-    var substance: Substance
+    var substance: SubstanceChoice
 
     static var parameterSummary: some ParameterSummary {
         Summary("Log \(\.$substance) in ChillMate")

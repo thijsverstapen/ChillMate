@@ -1,4 +1,5 @@
 import Foundation
+import ChillMateCore
 @testable import ChillMate
 
 /// Every safety line the risk checker can put on screen, named by its String

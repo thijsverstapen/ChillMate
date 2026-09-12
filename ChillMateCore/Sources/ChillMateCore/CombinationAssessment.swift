@@ -1,5 +1,4 @@
 import Foundation
-import SwiftUI
 
 // The risk engine, moved out of `CombinationRiskCheckerView.swift` where it had
 // grown to more than half the file.
@@ -24,7 +23,7 @@ import SwiftUI
 /// That guess collapsed to the mildest badge for every non-English user, and it
 /// stamped the "nothing matched" line with a risk badge because that sentence
 /// happens to contain the word "can".
-struct InteractionFinding: Identifiable, Hashable {
+public struct InteractionFinding: Identifiable, Hashable {
     /// Stable, language-independent identity.
     ///
     /// This used to be the finding's own localized text, which made a row's
@@ -33,18 +32,18 @@ struct InteractionFinding: Identifiable, Hashable {
     /// compared without comparing prose. Table rows borrow
     /// `SubstanceInteraction.id` (the sorted substance names); preset lines carry
     /// the branch that produced them.
-    let id: String
-    let text: String
+    public let id: String
+    public let text: String
     /// Nil only on the "nothing matched" line, which is informational and gets no
     /// severity badge.
-    let level: SubstanceInteraction.Level?
+    public let level: SubstanceInteraction.Level?
 }
 
 /// The branches of the preset chain, as identifiers rather than sentences.
 ///
 /// Gives each hand-written line an identity that survives translation, so
 /// `InteractionFinding` never has to fall back to keying on its own text.
-enum PresetLineID: String {
+public enum PresetLineID: String {
     case nitratesWithErectileMedication
     case alphaBlockersWithErectileMedication
     case ghbWithDepressants
@@ -71,20 +70,29 @@ enum PresetLineID: String {
 /// screen actually produces for a selection. The interaction table used to be
 /// verified in isolation, which let a green suite coexist with a screen that never
 /// consulted it.
-struct CombinationAssessment {
-    let substances: [Substance]
-    let medicationText: String
-    let timing: CombinationTiming
+public struct CombinationAssessment {
+    public let substances: [Substance]
+    public let medicationText: String
+    public let timing: CombinationTiming
+
+    // Spelled out because a struct's memberwise initializer is internal, and this
+    // one is built by the risk checker screen and by the tests, both of which are
+    // outside the module now.
+    public init(substances: [Substance], medicationText: String, timing: CombinationTiming) {
+        self.substances = substances
+        self.medicationText = medicationText
+        self.timing = timing
+    }
 
     private var substanceSet: Set<Substance> {
         Set(substances)
     }
 
-    var medicationMatches: [MedicationRiskMatch] {
+    public var medicationMatches: [MedicationRiskMatch] {
         MedicationRiskDatabase.matches(in: medicationText)
     }
 
-    var matchedMedicationSummary: String {
+    public var matchedMedicationSummary: String {
         medicationMatches
             .map { "\($0.category.label) (\($0.matchedTerm))" }
             .joined(separator: ", ")
@@ -110,7 +118,7 @@ struct CombinationAssessment {
         medicationMatches.contains { $0.category == category }
     }
 
-    var serotoninRisk: RiskLevel {
+    public var serotoninRisk: RiskLevel {
         if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
             return .high
         }
@@ -126,14 +134,14 @@ struct CombinationAssessment {
         return serotonergicSubstances.count >= 2 ? .high : (!serotonergicSubstances.isEmpty ? .caution : .lower)
     }
 
-    var dehydrationRisk: RiskLevel {
+    public var dehydrationRisk: RiskLevel {
         let stimulantLevel: RiskLevel = stimulants.isEmpty ? .lower : (timing == .withinDay ? .caution : .high)
         let alcoholLevel: RiskLevel = substanceSet.contains(.alcohol) ? .caution : .lower
         let combinationLevel: RiskLevel = substanceSet.contains(.alcohol) && !stimulants.isEmpty ? .high : .lower
         return RiskLevel.highest(stimulantLevel, alcoholLevel, combinationLevel)
     }
 
-    var stimulantOverloadRisk: RiskLevel {
+    public var stimulantOverloadRisk: RiskLevel {
         let stimulantMedicationCount = hasMedicationCategory(.stimulantMedication) ? 1 : 0
         let totalStimulants = stimulants.count + stimulantMedicationCount
 
@@ -162,7 +170,7 @@ struct CombinationAssessment {
     /// Breathing slowing or stopping. This is the hazard behind most fatal
     /// outcomes involving the substances ChillMate tracks, and nothing on this
     /// screen used to name it.
-    var respiratoryRisk: RiskLevel {
+    public var respiratoryRisk: RiskLevel {
         let total = depressants.count + depressantMedicationCount
 
         // GHB and GBL have a narrow margin on their own; anything else sedating
@@ -184,7 +192,7 @@ struct CombinationAssessment {
 
     /// Strain on the heart: stimulants driving rate and pressure up, and
     /// vasodilators swinging pressure the other way.
-    var cardiacRisk: RiskLevel {
+    public var cardiacRisk: RiskLevel {
         let stimulantCount = stimulants.count + (hasMedicationCategory(.stimulantMedication) ? 1 : 0)
         let hasPoppers = substanceSet.contains(.poppers)
 
@@ -209,7 +217,7 @@ struct CombinationAssessment {
 
     /// A sudden drop in blood pressure. The poppers and erection-medication pair
     /// is the well-known one, but nitrates and alpha blockers reach it too.
-    var bloodPressureRisk: RiskLevel {
+    public var bloodPressureRisk: RiskLevel {
         let hasPoppers = substanceSet.contains(.poppers)
 
         if hasPoppers && (hasErectileMedication || hasMedicationCategory(.nitrateLike)) {
@@ -231,69 +239,69 @@ struct CombinationAssessment {
         return .lower
     }
 
-    var respiratoryDetail: String {
+    public var respiratoryDetail: String {
         switch respiratoryRisk {
         case .high:
-            String(localized: "More than one thing that slows breathing is selected. Signs to watch for: snoring or gurgling, slow or shallow breaths, blue lips, or someone who cannot be woken. Put them on their side and call emergency services. Do not leave them to sleep it off.")
+            String(localized: "More than one thing that slows breathing is selected. Signs to watch for: snoring or gurgling, slow or shallow breaths, blue lips, or someone who cannot be woken. Put them on their side and call emergency services. Do not leave them to sleep it off.", bundle: .main)
         case .caution:
-            String(localized: "One thing that slows breathing is selected. Keep the dose low, leave long gaps, and stay with someone who knows what you took.")
+            String(localized: "One thing that slows breathing is selected. Keep the dose low, leave long gaps, and stay with someone who knows what you took.", bundle: .main)
         case .lower:
-            String(localized: "Nothing selected is a known breathing depressant, though amount and other medication still matter.")
+            String(localized: "Nothing selected is a known breathing depressant, though amount and other medication still matter.", bundle: .main)
         }
     }
 
-    var cardiacDetail: String {
+    public var cardiacDetail: String {
         switch cardiacRisk {
         case .high:
-            String(localized: "This mix puts real strain on the heart, either by stacking stimulants or by swinging blood pressure up and down. Chest pain, a heart rate that will not settle, or breathlessness at rest all mean stop and get help.")
+            String(localized: "This mix puts real strain on the heart, either by stacking stimulants or by swinging blood pressure up and down. Chest pain, a heart rate that will not settle, or breathlessness at rest all mean stop and get help.", bundle: .main)
         case .caution:
-            String(localized: "Something selected raises heart rate or moves blood pressure. Sit down if your heart races, and give yourself long breaks.")
+            String(localized: "Something selected raises heart rate or moves blood pressure. Sit down if your heart races, and give yourself long breaks.", bundle: .main)
         case .lower:
-            String(localized: "No obvious pattern of heart strain is selected.")
+            String(localized: "No obvious pattern of heart strain is selected.", bundle: .main)
         }
     }
 
-    var bloodPressureDetail: String {
+    public var bloodPressureDetail: String {
         switch bloodPressureRisk {
         case .high:
-            String(localized: "This combination can drop blood pressure suddenly and severely. That means fainting, and at worst a stroke or cardiac arrest. Do not combine these. If someone collapses, lie them flat, raise their legs, and call emergency services.")
+            String(localized: "This combination can drop blood pressure suddenly and severely. That means fainting, and at worst a stroke or cardiac arrest. Do not combine these. If someone collapses, lie them flat, raise their legs, and call emergency services.", bundle: .main)
         case .caution:
-            String(localized: "Something selected widens blood vessels and lowers blood pressure. Sit or lie down before using it, and stand up slowly afterwards.")
+            String(localized: "Something selected widens blood vessels and lowers blood pressure. Sit or lie down before using it, and stand up slowly afterwards.", bundle: .main)
         case .lower:
-            String(localized: "No obvious blood pressure drop is selected.")
+            String(localized: "No obvious blood pressure drop is selected.", bundle: .main)
         }
     }
 
-    var serotoninDetail: String {
+    public var serotoninDetail: String {
         switch serotoninRisk {
         case .high:
-            String(localized: "You've selected a medication or substance mix that can affect serotonin, a brain chemical involved in mood and body function. Signs to watch for: confusion, fever, agitation, shaking, sweating, or diarrhea. Get help if these appear.")
+            String(localized: "You've selected a medication or substance mix that can affect serotonin, a brain chemical involved in mood and body function. Signs to watch for: confusion, fever, agitation, shaking, sweating, or diarrhea. Get help if these appear.", bundle: .main)
         case .caution:
-            String(localized: "One of your selections can affect serotonin levels. Risk can increase with repeated use, heat, dehydration, or other medication.")
+            String(localized: "One of your selections can affect serotonin levels. Risk can increase with repeated use, heat, dehydration, or other medication.", bundle: .main)
         case .lower:
-            String(localized: "No known serotonin-related combination is selected.")
+            String(localized: "No known serotonin-related combination is selected.", bundle: .main)
         }
     }
 
-    var dehydrationDetail: String {
+    public var dehydrationDetail: String {
         switch dehydrationRisk {
         case .high:
-            String(localized: "Stimulants, alcohol, heat, dancing, and long sessions can push dehydration and overheating risk up.")
+            String(localized: "Stimulants, alcohol, heat, dancing, and long sessions can push dehydration and overheating risk up.", bundle: .main)
         case .caution:
-            String(localized: "Hydration and cooling matter, especially if sleep, food, or breaks have been limited.")
+            String(localized: "Hydration and cooling matter, especially if sleep, food, or breaks have been limited.", bundle: .main)
         case .lower:
-            String(localized: "No strong dehydration pattern is selected, but check water, food, temperature, and rest.")
+            String(localized: "No strong dehydration pattern is selected, but check water, food, temperature, and rest.", bundle: .main)
         }
     }
 
-    var stimulantDetail: String {
+    public var stimulantDetail: String {
         switch stimulantOverloadRisk {
         case .high:
-            String(localized: "More than one stimulant pattern is selected, including possible prescribed stimulant medication. Heart rate, anxiety, jaw tension, overheating, and pressure to continue can stack.")
+            String(localized: "More than one stimulant pattern is selected, including possible prescribed stimulant medication. Heart rate, anxiety, jaw tension, overheating, and pressure to continue can stack.", bundle: .main)
         case .caution:
-            String(localized: "A stimulant is selected in the current timing window. Pause, rest, and give your body time.")
+            String(localized: "A stimulant is selected in the current timing window. Pause, rest, and give your body time.", bundle: .main)
         case .lower:
-            String(localized: "No obvious stimulant stacking is selected.")
+            String(localized: "No obvious stimulant stacking is selected.", bundle: .main)
         }
     }
 
@@ -309,7 +317,7 @@ struct CombinationAssessment {
     /// rates serious, alcohol with ketamine being the plainest example, matched no
     /// preset branch and so fell through to the "nothing matched" line below, which
     /// told the user there was nothing worth knowing about a depressant stack.
-    var interactionFindings: [InteractionFinding] {
+    public var interactionFindings: [InteractionFinding] {
         let rated = SubstanceInteractionChecker.warnings(for: substanceSet)
 
         // Highest rating the table gave each hazard the preset chain also
@@ -340,7 +348,7 @@ struct CombinationAssessment {
             merged.append(
                 InteractionFinding(
                     id: PresetLineID.medicationNotRecognised.rawValue,
-                    text: String(localized: "The medication you entered was not recognised, so this check does not account for it. Check the spelling, or ask a pharmacist."),
+                    text: String(localized: "The medication you entered was not recognised, so this check does not account for it. Check the spelling, or ask a pharmacist.", bundle: .main),
                     level: nil
                 )
             )
@@ -351,7 +359,7 @@ struct CombinationAssessment {
         return [
             InteractionFinding(
                 id: PresetLineID.nothingMatched.rawValue,
-                text: String(localized: "No known major preset warning matched. Unknown amount, contents, health conditions, and medication changes can still matter."),
+                text: String(localized: "No known major preset warning matched. Unknown amount, contents, health conditions, and medication changes can still matter.", bundle: .main),
                 level: nil
             )
         ]
@@ -359,7 +367,7 @@ struct CombinationAssessment {
 
     /// Flat warning text in display order. `RiskCheckRecord` stores plain strings,
     /// so a saved check keeps exactly the wording the user was shown.
-    var interactionWarnings: [String] {
+    public var interactionWarnings: [String] {
         interactionFindings.map(\.text)
     }
 
@@ -386,7 +394,7 @@ struct CombinationAssessment {
             findings.append(
                 InteractionFinding(
                     id: PresetLineID.depressantLoad.rawValue,
-                    text: String(localized: "Three or more things here slow breathing. Stacked in one session they multiply rather than add, and this is the pattern behind most overdoses involving these substances. Do not use alone, and stagger or drop one."),
+                    text: String(localized: "Three or more things here slow breathing. Stacked in one session they multiply rather than add, and this is the pattern behind most overdoses involving these substances. Do not use alone, and stagger or drop one.", bundle: .main),
                     level: .critical
                 )
             )
@@ -398,11 +406,11 @@ struct CombinationAssessment {
         }
 
         if hasMedicationCategory(.nitrateLike) && (hasErectileMedication || substanceSet.contains(.poppers)) {
-            add(.nitratesWithErectileMedication, String(localized: "Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine."), .critical)
+            add(.nitratesWithErectileMedication, String(localized: "Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine.", bundle: .main), .critical)
         }
 
         if hasMedicationCategory(.alphaBlocker) && hasErectileMedication {
-            add(.alphaBlockersWithErectileMedication, String(localized: "Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining."), .serious)
+            add(.alphaBlockersWithErectileMedication, String(localized: "Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining.", bundle: .main), .serious)
         }
 
         if hasGHBLike {
@@ -418,12 +426,12 @@ struct CombinationAssessment {
                 let sedatingMedication = hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)
                 add(
                     .ghbWithDepressants,
-                    String(localized: "GHB/GBL with alcohol, ketamine, sedatives, or opioids can cause unconsciousness or breathing problems."),
+                    String(localized: "GHB/GBL with alcohol, ketamine, sedatives, or opioids can cause unconsciousness or breathing problems.", bundle: .main),
                     .critical,
                     superseding: sedatingMedication ? nil : .ghbDepressantStack
                 )
             } else {
-                add(.ghbAlone, String(localized: "GHB/GBL effects can be hard to predict and can become serious quickly."), .serious)
+                add(.ghbAlone, String(localized: "GHB/GBL effects can be hard to predict and can become serious quickly.", bundle: .main), .serious)
             }
         }
 
@@ -431,18 +439,18 @@ struct CombinationAssessment {
             if substanceSet.contains(.viagra) || substanceSet.contains(.kamagra) {
                 add(
                     .poppersWithErectileMedication,
-                    String(localized: "Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination."),
+                    String(localized: "Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination.", bundle: .main),
                     .critical,
                     superseding: .poppersWithErectileMedication
                 )
             } else {
-                add(.poppersAlone, String(localized: "Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication."), .serious)
+                add(.poppersAlone, String(localized: "Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication.", bundle: .main), .serious)
             }
         }
 
         if (hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)) &&
             (substanceSet.contains(.alcohol) || substanceSet.contains(.ketamine) || substanceSet.contains(.cannabis) || hasGHBLike) {
-            add(.sedativesWithDepressants, String(localized: "Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse."), .serious)
+            add(.sedativesWithDepressants, String(localized: "Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse.", bundle: .main), .serious)
         }
 
         if stimulants.count >= 2 {
@@ -451,24 +459,24 @@ struct CombinationAssessment {
             // gives way when the table speaks.
             add(
                 .multipleStimulants,
-                String(localized: "Multiple stimulants can stack heart strain, anxiety, and overheating."),
+                String(localized: "Multiple stimulants can stack heart strain, anxiety, and overheating.", bundle: .main),
                 .serious,
                 superseding: .stimulantStack
             )
         }
 
         if hasMedicationCategory(.stimulantMedication) && !stimulants.isEmpty {
-            add(.prescribedStimulants, String(localized: "Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk."), .serious)
+            add(.prescribedStimulants, String(localized: "Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk.", bundle: .main), .serious)
         }
 
         if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
-            add(.maoiWithSerotonergics, String(localized: "Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice."), .critical)
+            add(.maoiWithSerotonergics, String(localized: "Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice.", bundle: .main), .critical)
         } else if hasMedicationCategory(.serotonergic) && !serotonergicSubstances.isEmpty {
-            add(.antidepressantsWithSerotonergics, String(localized: "Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics."), .serious)
+            add(.antidepressantsWithSerotonergics, String(localized: "Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics.", bundle: .main), .serious)
         }
 
         if hasMedicationCategory(.ritonavirBooster) && (hasErectileMedication || substanceSet.contains(.mdma) || substanceSet.contains(.threeMMC)) {
-            add(.ritonavirBooster, String(localized: "Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist."), .serious)
+            add(.ritonavirBooster, String(localized: "Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist.", bundle: .main), .serious)
         }
 
         if substanceSet.contains(.alcohol) && substanceSet.contains(.cocaine) {
@@ -476,7 +484,7 @@ struct CombinationAssessment {
             // so it supersedes this line rather than repeating it.
             add(
                 .alcoholWithCocaine,
-                String(localized: "Alcohol and cocaine together can increase strain on the heart and reduce judgment."),
+                String(localized: "Alcohol and cocaine together can increase strain on the heart and reduce judgment.", bundle: .main),
                 .serious,
                 superseding: .alcoholWithCocaine
             )
@@ -492,7 +500,7 @@ struct CombinationAssessment {
 /// Only the preset lines a curated table entry can genuinely stand in for are
 /// classified. Anything unclassified on either side is always kept, so a table row
 /// added later can never silently swallow a preset warning.
-enum HazardTopic: Hashable {
+public enum HazardTopic: Hashable {
     /// GHB or GBL stacked with another depressant.
     case ghbDepressantStack
     /// Poppers with Viagra or Kamagra.
@@ -504,7 +512,7 @@ enum HazardTopic: Hashable {
 
     /// Classifies a curated table entry, or returns nil when no preset line covers
     /// the same ground.
-    init?(_ substances: Set<Substance>) {
+    public init?(_ substances: Set<Substance>) {
         let stimulants: Set<Substance> = [.mdma, .threeMMC, .cocaine]
 
         if substances.contains(.ghb) || substances.contains(.gbl),
@@ -524,7 +532,7 @@ enum HazardTopic: Hashable {
 }
 
 extension RiskLevel {
-    var severity: Int {
+    public var severity: Int {
         switch self {
         case .lower:
             0
@@ -535,7 +543,7 @@ extension RiskLevel {
         }
     }
 
-    static func highest(_ levels: RiskLevel...) -> RiskLevel {
+    public static func highest(_ levels: RiskLevel...) -> RiskLevel {
         levels.max { $0.severity < $1.severity } ?? .lower
     }
 }

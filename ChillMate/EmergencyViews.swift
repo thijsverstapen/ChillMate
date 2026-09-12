@@ -3,6 +3,7 @@ import SwiftData
 import SwiftUI
 
 struct EmergencyNetherlandsView: View {
+    @Environment(\.services) private var services
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -201,7 +202,7 @@ struct EmergencyNetherlandsView: View {
 
         Task {
             do {
-                let location = try await LocationLookupService.shared.currentLoggedLocation()
+                let location = try await services.location.currentLoggedLocation()
                 await MainActor.run {
                     openMessageComposer(location: location)
                     locationMessage = String(localized: "Prepared iMessage with your current location.")

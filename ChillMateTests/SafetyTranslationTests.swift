@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// What the risk checker actually says, in each of the five languages ChillMate

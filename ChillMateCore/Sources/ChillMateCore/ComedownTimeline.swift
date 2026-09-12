@@ -18,10 +18,10 @@ import Foundation
 /// working" until the longest published figure has passed, never the shortest.
 /// Being told you are done when you might not be is the error that matters; being
 /// told you might still be feeling it when you are not costs nothing.
-struct ComedownTimeline: Equatable, Sendable {
+public struct ComedownTimeline: Equatable, Sendable {
 
     /// The phase a dose is in, read conservatively.
-    enum Phase: String, Equatable, Sendable, CaseIterable {
+    public enum Phase: String, Equatable, Sendable, CaseIterable {
         /// Taken, possibly not arrived. The window in which a second dose gets
         /// taken because the first "isn't working".
         case comingUp
@@ -35,26 +35,26 @@ struct ComedownTimeline: Equatable, Sendable {
         case done
     }
 
-    let substance: Substance
-    let route: SubstanceReference.Route?
-    let startedAt: Date
+    public let substance: Substance
+    public let route: SubstanceReference.Route?
+    public let startedAt: Date
 
     /// Earliest and latest the effects are reported to arrive.
-    let onset: ClosedRange<Date>
+    public let onset: ClosedRange<Date>
     /// Earliest and latest the effects are reported to peak.
-    let peak: ClosedRange<Date>
+    public let peak: ClosedRange<Date>
     /// Earliest and latest the effects themselves are reported to be over.
-    let over: ClosedRange<Date>
+    public let over: ClosedRange<Date>
     /// When after-effects can still be running until, or nil where the source
     /// publishes no window for this substance.
-    let afterEffectsEnd: Date?
+    public let afterEffectsEnd: Date?
 
     /// What the source says about this comedown in words, where it says anything.
-    let note: String?
+    public let note: String?
 
     /// Who to credit for the after-effects figure — not always who to credit for
     /// the dose ladder.
-    let afterEffectsSourceName: String?
+    public let afterEffectsSourceName: String?
 
     /// Builds a timeline, or nil when nothing is published for this substance.
     ///
@@ -64,7 +64,7 @@ struct ComedownTimeline: Equatable, Sendable {
     ///     falls back to the longest timing on file rather than to nothing, because
     ///     a conservative answer beats no answer here.
     ///   - startedAt: when the dose was taken.
-    init?(substance: Substance, route: SubstanceReference.Route? = nil, startedAt: Date) {
+    public init?(substance: Substance, route: SubstanceReference.Route? = nil, startedAt: Date) {
         guard let reference = substance.reference,
               let timing = reference.timing(for: route) else { return nil }
 
@@ -87,7 +87,7 @@ struct ComedownTimeline: Equatable, Sendable {
     }
 
     /// The phase at a given moment, read at the outer edge of every range.
-    func phase(at now: Date) -> Phase {
+    public func phase(at now: Date) -> Phase {
         if now < onset.upperBound { return .comingUp }
         if now < over.lowerBound { return .inEffect }
         if now < over.upperBound { return .wearingOff }
@@ -96,12 +96,12 @@ struct ComedownTimeline: Equatable, Sendable {
     }
 
     /// Whether anything published is still running.
-    func isActive(at now: Date) -> Bool {
+    public func isActive(at now: Date) -> Bool {
         phase(at: now) != .done
     }
 
     /// The last moment any published figure covers.
-    var lastPublishedMoment: Date {
+    public var lastPublishedMoment: Date {
         afterEffectsEnd ?? over.upperBound
     }
 }
@@ -109,13 +109,13 @@ struct ComedownTimeline: Equatable, Sendable {
 extension ComedownTimeline.Phase {
 
     /// A short name for the phase, for a row that also carries the times.
-    var label: String {
+    public var label: String {
         switch self {
-        case .comingUp: String(localized: "Coming up")
-        case .inEffect: String(localized: "In effect")
-        case .wearingOff: String(localized: "Wearing off")
-        case .afterEffects: String(localized: "After effects")
-        case .done: String(localized: "Past the published window")
+        case .comingUp: String(localized: "Coming up", bundle: .main)
+        case .inEffect: String(localized: "In effect", bundle: .main)
+        case .wearingOff: String(localized: "Wearing off", bundle: .main)
+        case .afterEffects: String(localized: "After effects", bundle: .main)
+        case .done: String(localized: "Past the published window", bundle: .main)
         }
     }
 
@@ -123,22 +123,22 @@ extension ComedownTimeline.Phase {
     ///
     /// These describe the published figures and stop there. None of them tells
     /// anybody what to take, and none of them promises how they will feel.
-    var detail: String {
+    public var detail: String {
         switch self {
         case .comingUp:
-            String(localized: "It may not have arrived yet. This is the window where a second dose gets taken because the first seems not to be working.")
+            String(localized: "It may not have arrived yet. This is the window where a second dose gets taken because the first seems not to be working.", bundle: .main)
         case .inEffect:
-            String(localized: "Inside the reported window for the effects themselves.")
+            String(localized: "Inside the reported window for the effects themselves.", bundle: .main)
         case .wearingOff:
-            String(localized: "Around the point the reported effects run out. Anything after this is the comedown, not the dose.")
+            String(localized: "Around the point the reported effects run out. Anything after this is the comedown, not the dose.", bundle: .main)
         case .afterEffects:
-            String(localized: "The effects are reported to be over and the after-effects are not. This is the part that lands on tomorrow.")
+            String(localized: "The effects are reported to be over and the after-effects are not. This is the part that lands on tomorrow.", bundle: .main)
         case .done:
-            String(localized: "Past every figure published for this. That is about the reported window, not about how you actually feel.")
+            String(localized: "Past every figure published for this. That is about the reported window, not about how you actually feel.", bundle: .main)
         }
     }
 
-    var symbolName: String {
+    public var symbolName: String {
         switch self {
         case .comingUp: "arrow.up.circle.fill"
         case .inEffect: "waveform.path.ecg"
@@ -158,7 +158,7 @@ extension SubstanceReference {
     /// logged as injected has no published row here, and answering with the
     /// shortest curve would tell somebody it is over when the figures do not say
     /// that.
-    func timing(for route: Route?) -> Timing? {
+    public func timing(for route: Route?) -> Timing? {
         if let route, let exact = timings.first(where: { $0.route == route }) {
             return exact
         }
@@ -166,22 +166,5 @@ extension SubstanceReference {
             return shared
         }
         return timings.max { $0.total.upperBound < $1.total.upperBound }
-    }
-}
-
-extension AdministrationRoute {
-
-    /// The reference route this logged route corresponds to, where one exists.
-    ///
-    /// Injection has no counterpart: nothing in `SubstanceReference` carries
-    /// intravenous figures, and mapping it onto the oral row would attach the
-    /// wrong curve to the fastest route there is.
-    var referenceRoute: SubstanceReference.Route? {
-        switch self {
-        case .sniffed: .insufflated
-        case .swallowed: .oral
-        case .smoked: .smoked
-        case .injected: nil
-        }
     }
 }

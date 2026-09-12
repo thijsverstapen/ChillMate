@@ -309,13 +309,13 @@ enum AccountDataDeletion {
         }
 
         do {
-            try EncryptedBackupService.shared.deleteOnDeviceRecoverySnapshot()
+            try Services.live.encryptedBackups.deleteOnDeviceRecoverySnapshot()
         } catch {
             errors.append(error)
         }
 
         do {
-            try ICloudBackupService.shared.deleteBackups()
+            try Services.live.cloudBackups.deleteBackups()
         } catch {
             errors.append(error)
         }

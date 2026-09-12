@@ -7,6 +7,7 @@ import UserNotifications
 
 @main
 struct ChillMateApp: App {
+    @Environment(\.services) private var services
     @UIApplicationDelegateAdaptor(ChillMateAppDelegate.self) private var appDelegate
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
@@ -45,8 +46,8 @@ struct ChillMateApp: App {
                 adoptControlDestination()
                 recordAppUse()
                 refreshPrivacyAndNotificationState()
-                WatchConnectivityService.shared.activate()
-                SpotlightService.shared.indexTools()
+                services.watch.activate()
+                services.spotlight.indexTools()
                 ChillTips.configure()
                 TypedRecordsMigration.runIfNeeded()
                 DataRetentionSweep.runIfNeeded()
@@ -64,7 +65,7 @@ struct ChillMateApp: App {
                     adoptControlDestination()
                     recordAppUse()
                     refreshLiveActivities()
-                    WatchConnectivityService.shared.syncStandaloneState()
+                    services.watch.syncStandaloneState()
                 }
 
                 refreshPrivacyAndNotificationState()
@@ -98,8 +99,8 @@ struct ChillMateApp: App {
         }
 
         guard notificationsEnabled else {
-            NotificationService.shared.clearInactivityReminders()
-            NotificationService.shared.clearDailyAffirmations()
+            services.notifications.clearInactivityReminders()
+            services.notifications.clearDailyAffirmations()
             return
         }
 
@@ -108,11 +109,11 @@ struct ChillMateApp: App {
         if lastScheduled < today {
             UserDefaults.standard.set(today.timeIntervalSince1970, forKey: DefaultsKey.lastInactivityScheduleDay)
             let lastUseDate = Date(timeIntervalSince1970: lastAppUseTimestamp)
-            NotificationService.shared.scheduleInactivityReminders(from: lastUseDate)
+            services.notifications.scheduleInactivityReminders(from: lastUseDate)
         }
 
         // Re-apply weekend night safety check-ins (self-gates on the setting).
-        NotificationService.shared.scheduleWeekendSafetyCheckIns()
+        services.notifications.scheduleWeekendSafetyCheckIns()
 
         if dailyAffirmationsEnabled {
             // Regenerate affirmations on-device at most once per day so fresh,
@@ -123,11 +124,11 @@ struct ChillMateApp: App {
                 UserDefaults.standard.set(today.timeIntervalSince1970, forKey: DefaultsKey.lastAffirmationScheduleDay)
                 let language = UserDefaults.standard.string(forKey: DefaultsKey.appLanguage) ?? "en"
                 Task {
-                    await NotificationService.shared.scheduleDailyAffirmationsUsingOnDeviceModel(languageCode: language)
+                    await services.notifications.scheduleDailyAffirmationsUsingOnDeviceModel(languageCode: language)
                 }
             }
         } else {
-            NotificationService.shared.clearDailyAffirmations()
+            services.notifications.clearDailyAffirmations()
         }
     }
 }
@@ -144,7 +145,7 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         // and into a protected file. No-op once done.
         BackgroundPhotoStore.migrateFromUserDefaultsIfNeeded()
         UNUserNotificationCenter.current().delegate = self
-        NotificationService.shared.registerCategories()
+        Services.live.notifications.registerCategories()
         // Required for CloudKit silent-push sync and HealthKit background delivery
         if UserDefaults.standard.bool(forKey: DefaultsKey.iCloudBackupEnabled) {
             application.registerForRemoteNotifications()
@@ -181,7 +182,7 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         case NotificationService.ActionIdentifier.logNow:
             UserDefaults.standard.set(NotificationDestination.log.rawValue, forKey: DefaultsKey.pendingAppDestination)
         case NotificationService.ActionIdentifier.snooze:
-            NotificationService.shared.snoozeCurrentCheckIn()
+            Services.live.notifications.snoozeCurrentCheckIn()
         case NotificationService.ActionIdentifier.getHelp:
             UserDefaults.standard.set(NotificationDestination.emergency.rawValue, forKey: DefaultsKey.pendingAppDestination)
         case NotificationService.ActionIdentifier.imSafe:
@@ -220,16 +221,6 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
     }
 }
 
-
-// MARK: - Localized enum display
-
-extension RawRepresentable where RawValue == String {
-    /// Localized display text for a String-backed enum, resolved from the String Catalog
-    /// by rawValue. The rawValue stays the stable storage key; this is display-only.
-    var localizedDisplayName: String {
-        Bundle.main.localizedString(forKey: rawValue, value: rawValue, table: nil)
-    }
-}
 
 enum LocalizedEnumStrings {
     /// Extraction anchors. These keep every displayed enum rawValue present in the

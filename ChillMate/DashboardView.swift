@@ -2,8 +2,10 @@ import SwiftData
 import PhotosUI
 import SwiftUI
 import WidgetKit
+import ChillMateCore
 
 struct DashboardView: View {
+    @Environment(\.services) private var services
     @Environment(\.modelContext) private var modelContext
     @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
     @AppStorage(DefaultsKey.lastKnownHRVms) private var lastKnownHRVms: Double = 0
@@ -285,9 +287,9 @@ struct DashboardView: View {
             }
             .onChange(of: metrics.pepConcernEntry?.id) { _, entryID in
                 if let entry = metrics.pepConcernEntry, notificationsEnabled {
-                    NotificationService.shared.schedulePEPWindowReminders(entry: entry)
+                    services.notifications.schedulePEPWindowReminders(entry: entry)
                 } else {
-                    NotificationService.shared.clearPEPWindowReminders()
+                    services.notifications.clearPEPWindowReminders()
                 }
             }
             .modifier(WatchRelayObservers(
@@ -301,17 +303,17 @@ struct DashboardView: View {
             ))
             .task(id: healthKitHRVReadEnabled) {
                 guard healthKitHRVReadEnabled else { return }
-                if let hrv = try? await HealthKitService.shared.latestHRV() {
+                if let hrv = try? await services.health.latestHRV() {
                     lastKnownHRVms = hrv
                     // The watch needs this too: paired with heart rate it is what
                     // separates dancing from strain.
-                    WatchConnectivityService.shared.sendLatestHRV(hrv)
+                    services.watch.sendLatestHRV(hrv)
                 }
             }
             .task(id: healthKitHeartRateReadEnabled) {
                 // The resting read has existed since 4.3.0 and had no caller.
                 guard healthKitHeartRateReadEnabled else { return }
-                if let resting = try? await HealthKitService.shared.latestRestingHeartRate() {
+                if let resting = try? await services.health.latestRestingHeartRate() {
                     lastKnownRestingBPM = resting
                 }
             }
@@ -320,8 +322,8 @@ struct DashboardView: View {
                 // its elevated-heart-rate warning card has data. Only runs when the
                 // user has already granted heart-rate reads (no surprise prompt).
                 guard healthKitHeartRateReadEnabled else { return }
-                let bpm = (try? await HealthKitService.shared.latestHeartRate()) ?? nil
-                WatchConnectivityService.shared.sendLatestHeartRate(bpm)
+                let bpm = (try? await services.health.latestHeartRate()) ?? nil
+                services.watch.sendLatestHeartRate(bpm)
             }
             .toolbar { panicToolbarItem }
             .safeAreaInset(edge: .bottom) {
@@ -423,7 +425,7 @@ struct DashboardView: View {
         shared.set(metrics.dailyScore.isActive, forKey: WidgetSharedKey.scoreIsActive)
         WidgetCenter.shared.reloadAllTimelines()
 
-        WatchConnectivityService.shared.sendMetrics(
+        services.watch.sendMetrics(
             recoveryStreakDays: metrics.recoveryStreakDays,
             dailyScore: metrics.dailyScore.displayValue,
             dailyScoreActive: metrics.dailyScore.isActive
@@ -439,7 +441,7 @@ struct DashboardView: View {
         // figures, is the same trigger the widget and the watch already use, so
         // the digest can never drift from what the app is showing.
         if weeklyDigestEnabled {
-            NotificationService.shared.scheduleWeeklySummary(
+            services.notifications.scheduleWeeklySummary(
                 streak: metrics.recoveryStreakDays,
                 score: metrics.dailyScore.displayValue
             )

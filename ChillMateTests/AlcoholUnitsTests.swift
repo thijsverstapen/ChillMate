@@ -1,4 +1,5 @@
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// The alcohol arithmetic, and the line it does not cross.

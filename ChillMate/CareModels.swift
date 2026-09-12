@@ -1,6 +1,7 @@
 import Foundation
 import ActivityKit
 import SwiftData
+import ChillMateCore
 
 @Model
 final class STDTestRecord {

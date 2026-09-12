@@ -10,23 +10,23 @@ import Foundation
 /// Set up first" is the wrong sentence to put in front of them.
 ///
 /// Pure and testable so the window is stated once and can be argued with.
-enum NightMode {
+public enum NightMode {
 
     /// Midnight to five. The hours when the tools that matter are the ones for
     /// being out, and when a crisis is likeliest.
-    static let smallHours = 0..<5
+    public static let smallHours = 0..<5
 
     /// Six in the evening to midnight: the hours people actually plan in.
-    static let preNightHours = 18..<24
+    public static let preNightHours = 18..<24
 
     /// Whether it is the middle of the night.
-    static func isActive(at date: Date = .now, calendar: Calendar = .current) -> Bool {
+    public static func isActive(at date: Date = .now, calendar: Calendar = .current) -> Bool {
         smallHours.contains(calendar.component(.hour, from: date))
     }
 
     /// Whether the clock alone suggests somebody is getting ready rather than
     /// already out.
-    static func isPreNight(at date: Date = .now, calendar: Calendar = .current) -> Bool {
+    public static func isPreNight(at date: Date = .now, calendar: Calendar = .current) -> Bool {
         preNightHours.contains(calendar.component(.hour, from: date))
     }
 }

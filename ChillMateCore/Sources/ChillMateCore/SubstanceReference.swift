@@ -23,15 +23,15 @@ import Foundation
 /// - Drugs and Me, fetched 8 September 2026 (the GHB and GBL ladders)
 /// - NHS medicines guidance, fetched 11 September 2026 (sildenafil)
 /// - WHO opioid overdose fact sheet (the overdose triad)
-struct SubstanceReference: Sendable {
+public struct SubstanceReference: Sendable {
 
     /// Where a figure came from. Shown next to the figures it justifies.
-    struct Source: Sendable {
-        let name: String
-        let url: URL?
+    public struct Source: Sendable {
+        public let name: String
+        public let url: URL?
     }
 
-    enum Unit: Sendable {
+    public enum Unit: Sendable {
         case milligrams
         case grams
         case millilitres
@@ -39,28 +39,28 @@ struct SubstanceReference: Sendable {
 
     /// One route's dose ladder. `heavy` is the point at which reported harm rises
     /// sharply — it is displayed as a warning, never as another option.
-    struct Doses: Sendable {
-        let route: Route
-        let unit: Unit
-        let light: ClosedRange<Double>
-        let common: ClosedRange<Double>
-        let strong: ClosedRange<Double>
+    public struct Doses: Sendable {
+        public let route: Route
+        public let unit: Unit
+        public let light: ClosedRange<Double>
+        public let common: ClosedRange<Double>
+        public let strong: ClosedRange<Double>
         /// Doses at or above this are reported as heavy.
-        let heavyFrom: Double
+        public let heavyFrom: Double
     }
 
-    enum Route: Sendable {
+    public enum Route: Sendable {
         case oral
         case insufflated
         case smoked
         case inhaled
 
-        var label: String {
+        public var label: String {
             switch self {
-            case .oral: String(localized: "Swallowed")
-            case .insufflated: String(localized: "Snorted")
-            case .smoked: String(localized: "Smoked")
-            case .inhaled: String(localized: "Inhaled")
+            case .oral: String(localized: "Swallowed", bundle: .main)
+            case .insufflated: String(localized: "Snorted", bundle: .main)
+            case .smoked: String(localized: "Smoked", bundle: .main)
+            case .inhaled: String(localized: "Inhaled", bundle: .main)
             }
         }
     }
@@ -73,13 +73,13 @@ struct SubstanceReference: Sendable {
     /// showed them next to an oral dose row, so anyone reading about an edible was
     /// told it arrives in under ten minutes — which is exactly the belief that
     /// makes people take a second one.
-    struct Timing: Sendable {
+    public struct Timing: Sendable {
         /// Nil where the substance has one meaningful route, or where the
         /// published figures do not separate them.
-        let route: Route?
-        let onset: ClosedRange<Double>
-        let peak: ClosedRange<Double>
-        let total: ClosedRange<Double>
+        public let route: Route?
+        public let onset: ClosedRange<Double>
+        public let peak: ClosedRange<Double>
+        public let total: ClosedRange<Double>
 
         /// How long the source reports effects lingering *after* the total
         /// duration ends, in minutes from the end of `total`.
@@ -91,15 +91,15 @@ struct SubstanceReference: Sendable {
         ///
         /// Nil means the source publishes no window, which is not the same as
         /// there being none. The screen says which of the two it is.
-        let afterEffects: ClosedRange<Double>?
+        public let afterEffects: ClosedRange<Double>?
     }
 
-    let doses: [Doses]
-    let timings: [Timing]
-    let source: Source
+    public let doses: [Doses]
+    public let timings: [Timing]
+    public let source: Source
 
     /// A note explaining why a substance carries no dose ladder, when it does not.
-    let noDoseReason: String?
+    public let noDoseReason: String?
 
     /// What is published about waiting before a second dose, where anything is.
     ///
@@ -107,13 +107,13 @@ struct SubstanceReference: Sendable {
     /// documented for GHB and MDMA and thin for the rest, and CLAUDE.md's rule is
     /// that new safety claims need a source. A confident sentence about cocaine
     /// redosing would be this app inventing one.
-    let redoseGuidance: String?
+    public let redoseGuidance: String?
 
     /// What the source says about the period after the effects end, where it says
     /// something a duration cannot carry.
     ///
     /// Same rule as `redoseGuidance`: nil unless a named source states it.
-    let comedownNote: String?
+    public let comedownNote: String?
 
     /// Where the after-effects figures came from, when that is not where the
     /// doses came from.
@@ -122,22 +122,22 @@ struct SubstanceReference: Sendable {
     /// are PsychonautWiki's. Leaving this nil would print the wrong name under a
     /// figure, which is worse than printing none: the whole point of attribution
     /// is that a reader can go and check, and they would check the wrong page.
-    let afterEffectsSource: Source?
+    public let afterEffectsSource: Source?
 }
 
 extension SubstanceReference.Source {
 
-    static let psychonautWiki = Self(
+    public static let psychonautWiki = Self(
         name: "PsychonautWiki",
         url: URL(string: "https://psychonautwiki.org")
     )
 
-    static let drugsAndMe = Self(
+    public static let drugsAndMe = Self(
         name: "Drugs and Me",
         url: URL(string: "https://www.drugsand.me")
     )
 
-    static let nhs = Self(
+    public static let nhs = Self(
         name: "NHS",
         url: URL(string: "https://www.nhs.uk/medicines/sildenafil-viagra/")
     )
@@ -150,7 +150,7 @@ extension Substance {
     /// Nil for `unknown` and `other` by definition, and for `psychedelics` because
     /// it is a category rather than a substance: LSD and psilocybin do not share a
     /// scale, and a single range across them would be worse than none.
-    var reference: SubstanceReference? {
+    public var reference: SubstanceReference? {
         switch self {
 
         case .alcohol:
@@ -185,7 +185,7 @@ extension Substance {
                 ],
                 source: .psychonautWiki,
                 noDoseReason: nil,
-                redoseGuidance: String(localized: "Smoked, you know inside ten minutes. Swallowed, it can take a full hour — so an edible that seems not to be working usually is, and a second one lands on top of the first for the next several hours."),
+                redoseGuidance: String(localized: "Smoked, you know inside ten minutes. Swallowed, it can take a full hour — so an edible that seems not to be working usually is, and a second one lands on top of the first for the next several hours.", bundle: .main),
                 comedownNote: nil,
                 afterEffectsSource: nil
             )
@@ -198,12 +198,12 @@ extension Substance {
                                 afterEffects: 720...2880)],
                 source: .psychonautWiki,
                 noDoseReason: nil,
-                redoseGuidance: String(localized: "Give it 60 to 90 minutes before deciding anything. Eating beforehand delays the onset, which is what makes people take more too early."),
+                redoseGuidance: String(localized: "Give it 60 to 90 minutes before deciding anything. Eating beforehand delays the onset, which is what makes people take more too early.", bundle: .main),
                 // PsychonautWiki records the low after MDMA as tending to skip a
                 // day. That single fact is why people do not connect the two: the
                 // day after is fine, so the day that is not fine gets put down to
                 // sleep, or work, or nothing in particular.
-                comedownNote: String(localized: "The low tends to skip a day. PsychonautWiki reports the day after often feeling fine — sometimes better than fine — with the dip landing the day after that, which is why people do not link it to the night. If you know it is coming you can put something gentle in that day rather than something demanding."),
+                comedownNote: String(localized: "The low tends to skip a day. PsychonautWiki reports the day after often feeling fine — sometimes better than fine — with the dip landing the day after that, which is why people do not link it to the night. If you know it is coming you can put something gentle in that day rather than something demanding.", bundle: .main),
                 afterEffectsSource: nil
             )
 
@@ -257,7 +257,7 @@ extension Substance {
                                 afterEffects: 120...240)],
                 source: .drugsAndMe,
                 noDoseReason: nil,
-                redoseGuidance: String(localized: "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under."),
+                redoseGuidance: String(localized: "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under.", bundle: .main),
                 comedownNote: nil,
                 afterEffectsSource: .psychonautWiki
             )
@@ -270,7 +270,7 @@ extension Substance {
                                 afterEffects: 60...180)],
                 source: .drugsAndMe,
                 noDoseReason: nil,
-                redoseGuidance: String(localized: "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under."),
+                redoseGuidance: String(localized: "Wait at least 90 minutes before a second dose, and longer if you rarely use it. Redosing before the first dose has fully arrived is the most common way people go under.", bundle: .main),
                 comedownNote: nil,
                 afterEffectsSource: .psychonautWiki
             )
@@ -293,8 +293,8 @@ extension Substance {
                 // with any other common stimulant, and cravings arriving almost
                 // immediately on the comedown. Paired with a total duration as short
                 // as ten minutes, that is the whole problem in two facts.
-                redoseGuidance: String(localized: "There is no published safe interval for this one. What is published is that it drives redosing harder than any other common stimulant, and that the craving arrives almost as soon as you come down — while the last dose has barely finished. Decide the number of lines before you start, not during."),
-                comedownNote: String(localized: "PsychonautWiki publishes no after-effects window for cocaine. What it names in that place instead is craving and compulsive redosing, arriving as the effects fade. So there is no hour to wait out here — the comedown is the part where the decision gets made again."),
+                redoseGuidance: String(localized: "There is no published safe interval for this one. What is published is that it drives redosing harder than any other common stimulant, and that the craving arrives almost as soon as you come down — while the last dose has barely finished. Decide the number of lines before you start, not during.", bundle: .main),
+                comedownNote: String(localized: "PsychonautWiki publishes no after-effects window for cocaine. What it names in that place instead is craving and compulsive redosing, arriving as the effects fade. So there is no hour to wait out here — the comedown is the part where the decision gets made again.", bundle: .main),
                 afterEffectsSource: nil
             )
 
@@ -304,7 +304,7 @@ extension Substance {
                 timings: [.init(route: nil, onset: 0.1...0.5, peak: 0.5...2, total: 2...5,
                                 afterEffects: nil)],
                 source: .psychonautWiki,
-                noDoseReason: String(localized: "Poppers are inhaled from the bottle, so there is no measured dose. Effects arrive within seconds and fade within minutes."),
+                noDoseReason: String(localized: "Poppers are inhaled from the bottle, so there is no measured dose. Effects arrive within seconds and fade within minutes.", bundle: .main),
                 redoseGuidance: nil,
                 comedownNote: nil,
                 afterEffectsSource: nil
@@ -323,7 +323,7 @@ extension Substance {
                 // to 36 hours." This is the hardest redose rule in the whole file
                 // and the one most often broken — a second pill gets taken when the
                 // first seems not to have worked, while the first is still active.
-                redoseGuidance: String(localized: "One tablet in twenty-four hours, and no more. The effects can last up to thirty-six hours, so a second one taken because the first seemed not to work stacks on a dose that is still going."),
+                redoseGuidance: String(localized: "One tablet in twenty-four hours, and no more. The effects can last up to thirty-six hours, so a second one taken because the first seemed not to work stacks on a dose that is still going.", bundle: .main),
                 comedownNote: nil,
                 afterEffectsSource: nil
             )
@@ -333,7 +333,7 @@ extension Substance {
                 doses: [],
                 timings: [],
                 source: .psychonautWiki,
-                noDoseReason: String(localized: "Psychedelics covers substances with completely different scales, from micrograms to grams. Look up the specific one rather than trusting a shared figure."),
+                noDoseReason: String(localized: "Psychedelics covers substances with completely different scales, from micrograms to grams. Look up the specific one rather than trusting a shared figure.", bundle: .main),
                 redoseGuidance: nil,
                 comedownNote: nil,
                 afterEffectsSource: nil
@@ -361,7 +361,7 @@ extension Substance {
                 ],
                 source: .psychonautWiki,
                 noDoseReason: nil,
-                redoseGuidance: String(localized: "It keeps working long after it stops feeling like it is. The published total runs to twelve hours, so a redose late in a session lands on top of a dose that has not finished."),
+                redoseGuidance: String(localized: "It keeps working long after it stops feeling like it is. The published total runs to twelve hours, so a redose late in a session lands on top of a dose that has not finished.", bundle: .main),
                 comedownNote: nil,
                 afterEffectsSource: nil
             )
@@ -376,7 +376,7 @@ extension Substance {
                 doses: [],
                 timings: [],
                 source: .nhs,
-                noDoseReason: String(localized: "Benzodiazepines covers drugs whose doses differ by a factor of twenty or more, and whose effects last anywhere from a few hours to well into the next day. Look up the specific one you have, and treat any pill of unknown origin as unknown strength."),
+                noDoseReason: String(localized: "Benzodiazepines covers drugs whose doses differ by a factor of twenty or more, and whose effects last anywhere from a few hours to well into the next day. Look up the specific one you have, and treat any pill of unknown origin as unknown strength.", bundle: .main),
                 redoseGuidance: nil,
                 comedownNote: nil,
                 afterEffectsSource: nil
@@ -393,7 +393,7 @@ extension Substance {
 extension SubstanceReference.Unit {
     /// A `Measurement` for `value` in this unit, so the reader's locale decides
     /// how it is written.
-    func measurement(_ value: Double) -> String {
+    public func measurement(_ value: Double) -> String {
         switch self {
         case .milligrams:
             Measurement(value: value, unit: UnitMass.milligrams)
@@ -408,7 +408,7 @@ extension SubstanceReference.Unit {
     }
 
     /// "80–120 mg": the unit is written once, on the upper bound.
-    func range(_ bounds: ClosedRange<Double>) -> String {
+    public func range(_ bounds: ClosedRange<Double>) -> String {
         guard bounds.lowerBound != bounds.upperBound else {
             return measurement(bounds.upperBound)
         }
@@ -416,14 +416,14 @@ extension SubstanceReference.Unit {
         return "\(lower)–\(measurement(bounds.upperBound))"
     }
 
-    func from(_ value: Double) -> String {
+    public func from(_ value: Double) -> String {
         measurement(value)
     }
 }
 
 extension SubstanceReference.Timing {
     /// "30–45 min", or "1.5–2.5 h" once a bound passes an hour.
-    static func describe(_ bounds: ClosedRange<Double>) -> String {
+    public static func describe(_ bounds: ClosedRange<Double>) -> String {
         if bounds.upperBound >= 60 {
             let lower = (bounds.lowerBound / 60).formatted(.number.precision(.fractionLength(0...1)))
             let upper = Measurement(value: bounds.upperBound / 60, unit: UnitDuration.hours)
@@ -436,23 +436,23 @@ extension SubstanceReference.Timing {
         return bounds.lowerBound == bounds.upperBound ? upper : "\(lower)–\(upper)"
     }
 
-    var onsetText: String { Self.describe(onset) }
-    var peakText: String { Self.describe(peak) }
-    var totalText: String { Self.describe(total) }
+    public var onsetText: String { Self.describe(onset) }
+    public var peakText: String { Self.describe(peak) }
+    public var totalText: String { Self.describe(total) }
 
     /// The after-effects window, or nil where the source publishes none.
-    var afterEffectsText: String? { afterEffects.map(Self.describe) }
+    public var afterEffectsText: String? { afterEffects.map(Self.describe) }
 
     /// How long after the dose the after-effects window can still be running, in
     /// minutes: the end of the longest total plus the end of the longest
     /// after-effects window. Nil where nothing is published.
-    var afterEffectsEndFromDose: Double? {
+    public var afterEffectsEndFromDose: Double? {
         afterEffects.map { total.upperBound + $0.upperBound }
     }
 
     /// When the after-effects window can first begin, in minutes from the dose:
     /// the earliest the effects themselves can be over.
-    var afterEffectsStartFromDose: Double? {
+    public var afterEffectsStartFromDose: Double? {
         afterEffects.map { _ in total.lowerBound }
     }
 }

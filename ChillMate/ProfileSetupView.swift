@@ -138,6 +138,7 @@ struct AgeVerificationInfo: View {
 }
 
 struct ProfileSetupView: View {
+    @Environment(\.services) private var services
     @Environment(\.modelContext) private var modelContext
     @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
     @AppStorage(DefaultsKey.healthKitSexualActivityWriteEnabled) private var healthKitSexualActivityWriteEnabled = false
@@ -916,7 +917,7 @@ struct ProfileSetupView: View {
 
         Task {
             do {
-                try await HealthKitService.shared.requestAuthorization(scopes: Set(HealthKitPermissionScope.allCases))
+                try await services.health.requestAuthorization(scopes: Set(HealthKitPermissionScope.allCases))
                 await MainActor.run {
                     healthKitAutoSync = true
                     healthKitSexualActivityWriteEnabled = true
@@ -948,12 +949,12 @@ struct ProfileSetupView: View {
 
         Task {
             do {
-                let granted = try await NotificationService.shared.requestAuthorization()
+                let granted = try await services.notifications.requestAuthorization()
                 await MainActor.run {
                     notificationsEnabled = granted
                     if granted {
-                        NotificationService.shared.scheduleCheckInReminder()
-                        NotificationService.shared.scheduleInactivityReminders()
+                        services.notifications.scheduleCheckInReminder()
+                        services.notifications.scheduleInactivityReminders()
                     }
                     permissionMessage = granted ? "Notifications are on." : "Notification permission was not granted."
                     isCheckingPermissions = false
@@ -974,7 +975,7 @@ struct ProfileSetupView: View {
 
         Task {
             do {
-                _ = try await LocationLookupService.shared.currentLoggedLocation()
+                _ = try await services.location.currentLoggedLocation()
                 await MainActor.run {
                     locationServicesChecked = true
                     permissionMessage = String(localized: "Location is ready for logs and emergency messages.")
@@ -1015,9 +1016,9 @@ struct ProfileSetupView: View {
 
         Task {
             await MainActor.run {
-                if ICloudBackupService.shared.isAvailable {
+                if services.cloudBackups.isAvailable {
                     iCloudBackupEnabled = true
-                    lastICloudBackupStatus = ICloudBackupService.shared.statusLine
+                    lastICloudBackupStatus = services.cloudBackups.statusLine
                     permissionMessage = String(localized: "iCloud backup is ready. ChillMate will save encrypted backup files to iCloud Drive.")
                 } else {
                     iCloudBackupEnabled = false
@@ -1034,7 +1035,7 @@ struct ProfileSetupView: View {
 
         Task {
             do {
-                let summary = try ICloudBackupService.shared.restoreLatestBackup(into: modelContext)
+                let summary = try services.cloudBackups.restoreLatestBackup(into: modelContext)
                 await MainActor.run {
                     iCloudBackupEnabled = true
                     backupImportMessage = String(localized: "Restored from iCloud. \(summary.displayText)")
@@ -1073,7 +1074,7 @@ struct ProfileSetupView: View {
                 }
 
                 let data = try Data(contentsOf: url)
-                let summary = try EncryptedBackupService.shared.importEncryptedBackupData(data, into: modelContext)
+                let summary = try services.encryptedBackups.importEncryptedBackupData(data, into: modelContext)
 
                 await MainActor.run {
                     backupImportMessage = summary.displayText
@@ -1334,6 +1335,7 @@ private struct ProfileSetupPhotoPicker: View {
 }
 
 private struct ProfilePermissionsPage: View {
+    @Environment(\.services) private var services
     @Binding var healthKitAutoSync: Bool
     @Binding var notificationsEnabled: Bool
     @Binding var dailyAffirmationsEnabled: Bool
@@ -1412,9 +1414,9 @@ private struct ProfilePermissionsPage: View {
                         action: {
                             weekendSafetyEnabled.toggle()
                             if weekendSafetyEnabled {
-                                NotificationService.shared.scheduleWeekendSafetyCheckIns()
+                                services.notifications.scheduleWeekendSafetyCheckIns()
                             } else {
-                                NotificationService.shared.clearWeekendSafetyCheckIns()
+                                services.notifications.clearWeekendSafetyCheckIns()
                             }
                         }
                     )
@@ -1441,9 +1443,9 @@ private struct ProfilePermissionsPage: View {
                             if weeklyDigestEnabled {
                                 // Placeholder figures. Home reschedules with the real streak and score
                                 // the next time it recomputes metrics, which is on its next appearance.
-                                NotificationService.shared.scheduleWeeklySummary(streak: 0, score: 0)
+                                services.notifications.scheduleWeeklySummary(streak: 0, score: 0)
                             } else {
-                                NotificationService.shared.clearWeeklySummary()
+                                services.notifications.clearWeeklySummary()
                             }
                         }
                     )
@@ -1459,9 +1461,9 @@ private struct ProfilePermissionsPage: View {
                             stiReminderEnabled.toggle()
                             if stiReminderEnabled {
                                 let dueDate = Calendar.current.date(byAdding: .month, value: 3, to: .now) ?? .now
-                                NotificationService.shared.scheduleSTIReminder(dueDate: dueDate)
+                                services.notifications.scheduleSTIReminder(dueDate: dueDate)
                             } else {
-                                NotificationService.shared.clearSTIReminder()
+                                services.notifications.clearSTIReminder()
                             }
                         }
                     )

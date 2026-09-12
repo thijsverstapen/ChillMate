@@ -1,15 +1,29 @@
 import Foundation
 
+/// The one thing the medication matcher needs from a saved medication.
+///
+/// It took `[ProfileMedication]`, which is a SwiftData model, so a name matcher
+/// could not be compiled without a persistence framework. `UserProfile` supplies
+/// the conformance in the app.
+public protocol SavedMedication {
+    var id: UUID { get }
+    var name: String { get }
+    var dosage: String { get }
+    var effectiveHours: Double { get }
+    /// When it was taken and how long it is expected to work, already written out.
+    var timingSummary: String { get }
+}
+
 // Medication interaction-matching data and logic extracted from CareToolsView.swift.
 // These are pure (non-View) types with no dependency on CareToolsView's private members,
 // which also makes the matching logic unit-testable in isolation.
 
-struct MedicationRiskMatch: Hashable {
-    let category: MedicationRiskCategory
-    let matchedTerm: String
+public struct MedicationRiskMatch: Hashable {
+    public let category: MedicationRiskCategory
+    public let matchedTerm: String
 }
 
-enum MedicationRiskCategory: String, CaseIterable {
+public enum MedicationRiskCategory: String, CaseIterable, Sendable {
     case serotonergic
     case maoi
     case sedative
@@ -19,28 +33,28 @@ enum MedicationRiskCategory: String, CaseIterable {
     case stimulantMedication
     case ritonavirBooster
 
-    var label: String {
+    public var label: String {
         switch self {
         case .serotonergic:
-            String(localized: "Affects serotonin")
+            String(localized: "Affects serotonin", bundle: .main)
         case .maoi:
-            String(localized: "MAOI")
+            String(localized: "MAOI", bundle: .main)
         case .sedative:
-            String(localized: "Sedative")
+            String(localized: "Sedative", bundle: .main)
         case .opioid:
-            String(localized: "Opioid")
+            String(localized: "Opioid", bundle: .main)
         case .nitrateLike:
-            String(localized: "Nitrate-like")
+            String(localized: "Nitrate-like", bundle: .main)
         case .alphaBlocker:
-            String(localized: "Alpha blocker")
+            String(localized: "Alpha blocker", bundle: .main)
         case .stimulantMedication:
-            String(localized: "Stimulant medication")
+            String(localized: "Stimulant medication", bundle: .main)
         case .ritonavirBooster:
-            String(localized: "Ritonavir/cobicistat")
+            String(localized: "Ritonavir/cobicistat", bundle: .main)
         }
     }
 
-    var aliases: [String] {
+    public var aliases: [String] {
         switch self {
         case .serotonergic:
             [
@@ -72,8 +86,8 @@ enum MedicationRiskCategory: String, CaseIterable {
     }
 }
 
-enum MedicationRiskDatabase {
-    static func matches(in text: String) -> [MedicationRiskMatch] {
+public enum MedicationRiskDatabase {
+    public static func matches(in text: String) -> [MedicationRiskMatch] {
         let normalizedText = normalized(text)
         guard !normalizedText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             return []
@@ -108,16 +122,16 @@ enum MedicationRiskDatabase {
     }
 }
 
-struct MedicationSuggestion: Identifiable {
-    let id: String
-    let name: String
-    let detail: String
-    let dosage: String?
-    let effectiveHours: Double?
+public struct MedicationSuggestion: Identifiable {
+    public let id: String
+    public let name: String
+    public let detail: String
+    public let dosage: String?
+    public let effectiveHours: Double?
 }
 
-enum MedicationSuggestionDatabase {
-    static func suggestions(for query: String, savedMedications: [ProfileMedication]) -> [MedicationSuggestion] {
+public enum MedicationSuggestionDatabase {
+    public static func suggestions<Medication: SavedMedication>(for query: String, savedMedications: [Medication]) -> [MedicationSuggestion] {
         let normalizedQuery = normalized(query)
         guard normalizedQuery.count >= 2 else {
             return []
@@ -151,7 +165,7 @@ enum MedicationSuggestionDatabase {
                 MedicationSuggestion(
                     id: id,
                     name: name,
-                    detail: String(localized: "Common interaction category"),
+                    detail: String(localized: "Common interaction category", bundle: .main),
                     dosage: nil,
                     effectiveHours: nil
                 )

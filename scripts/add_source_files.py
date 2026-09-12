@@ -21,7 +21,12 @@ A file is filed under one group, which is what resolves its path on disk, and
 compiled into any number of targets. Those are separate choices: --group says
 where the file lives, --target says who builds it.
 
+Pass --remove to unregister files instead, which is what a file leaving the app
+target needs: Xcode's error for a stale reference does not mention the file is
+gone.
+
 Usage:  scripts/add_source_files.py Foo.swift Bar.swift
+        scripts/add_source_files.py --remove Gone.swift
         scripts/add_source_files.py --target app --target liveactivity Shared.swift
         scripts/add_source_files.py --group liveactivity --target liveactivity Widget.swift
         scripts/add_source_files.py --resource InfoPlist.xcstrings
@@ -199,6 +204,33 @@ def add_file(text, filename, resource=False, targets=("app",), group="app"):
     return text
 
 
+def remove_file(text, filename):
+    """Unregister a file completely: its reference, its group entry, and every
+    build file that points at it.
+
+    Needed when a file leaves the app target — moving the domain into
+    `ChillMateCore` left nine of them registered, and Xcode fails the build with
+    "did you forget to declare these files as outputs of any script phases",
+    which says nothing about what actually happened.
+    """
+    file_id = existing_file_id(text, filename)
+    if file_id is None:
+        print(f"  skip (not registered): {filename}")
+        return text
+
+    build_ids = re.findall(
+        r"([0-9A-F]{24}) /\* " + re.escape(filename) + r" in \w+ \*/ = \{isa = PBXBuildFile;",
+        text,
+    )
+    for build_id in build_ids:
+        text = re.sub(r"\t\t" + build_id + r" /\* [^\n]*\n", "", text)
+        text = re.sub(r"\t\t\t\t" + build_id + r" /\* [^\n]*\n", "", text)
+    text = re.sub(r"\t\t" + file_id + r" /\* [^\n]*\n", "", text)
+    text = re.sub(r"\t\t\t\t" + file_id + r" /\* [^\n]*\n", "", text)
+    print(f"  removed: {filename} ({len(build_ids)} membership(s))")
+    return text
+
+
 def main(argv):
     resource = "--resource" in argv
     targets = []
@@ -231,8 +263,12 @@ def main(argv):
 
     original = PBXPROJ.read_text()
     text = original
+    remove = "--remove" in argv
     for name in names:
-        text = add_file(text, name, resource=resource, targets=targets or ("app",), group=group)
+        if remove:
+            text = remove_file(text, name)
+        else:
+            text = add_file(text, name, resource=resource, targets=targets or ("app",), group=group)
 
     # Every file was already registered, so leave the project's mtime alone
     # rather than rewriting it byte for byte and dirtying the working tree.

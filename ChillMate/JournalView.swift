@@ -8,6 +8,7 @@ import UIKit
 // Journal feature views extracted from CareToolsView.swift as part of splitting that file.
 
 struct JournalView: View {
+    @Environment(\.services) private var services
     @Environment(\.modelContext) private var modelContext
     @Query(ChillMateQueries.recentJournalEntries) private var journalEntries: [JournalEntry]
 
@@ -218,7 +219,7 @@ struct JournalView: View {
             entry.feelsGoodAbout = feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines)
             entry.photos = photoData
             modelContext.saveChanges()
-            SpotlightService.shared.indexJournalEntry(entry)
+            services.spotlight.indexJournalEntry(entry)
         } else {
             let entry = JournalEntry(
                 date: date,
@@ -231,7 +232,7 @@ struct JournalView: View {
             )
             modelContext.insert(entry)
             modelContext.saveChanges()
-            SpotlightService.shared.indexJournalEntry(entry)
+            services.spotlight.indexJournalEntry(entry)
         }
 
         // Saved → drop back to the read-only overview for the day.
@@ -254,7 +255,7 @@ struct JournalView: View {
         guard let entry = selectedJournalEntry else { return }
         journalHaptic = .warning
         journalHapticTick += 1
-        SpotlightService.shared.removeJournalEntry(entry)
+        services.spotlight.removeJournalEntry(entry)
         modelContext.delete(entry)
         modelContext.saveChanges()
         isEditing = false

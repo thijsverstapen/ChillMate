@@ -1,4 +1,5 @@
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 extension Tag {

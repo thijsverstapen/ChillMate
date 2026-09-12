@@ -1,4 +1,5 @@
 import Foundation
+import ChillMateCore
 
 /// The affirmation text, out of the notification scheduler.
 ///

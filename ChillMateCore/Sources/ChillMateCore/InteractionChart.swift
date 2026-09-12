@@ -7,31 +7,31 @@
 // compared at run time by `SubstanceInteraction.corroboration`, and every row
 // of the app's own table is re-checked against this one by `InteractionChartTests`.
 
-enum InteractionChart {
+public enum InteractionChart {
     /// A chart grading, in ChillMate's own severity terms.
     ///
     /// The chart's four low-risk gradings all sit below ChillMate's mildest
     /// level, so they collapse into `lowRisk`.
-    enum Grading: Int, Comparable, Sendable {
+    public enum Grading: Int, Comparable, Sendable {
         case lowRisk = 0
         case caution = 1
         case serious = 2
         case critical = 3
 
-        static func < (lhs: Grading, rhs: Grading) -> Bool { lhs.rawValue < rhs.rawValue }
+        public static func < (lhs: Grading, rhs: Grading) -> Bool { lhs.rawValue < rhs.rawValue }
     }
 
-    struct Entry: Sendable {
-        let grading: Grading
+    public struct Entry: Sendable {
+        public let grading: Grading
         /// True when the pair was read against a near neighbour rather than
         /// itself: 3-MMC against mephedrone, or the psychedelics group against
         /// the most severe of LSD and mushrooms. Shown to the reader as a
         /// weaker claim than an exact match.
-        let isApproximate: Bool
+        public let isApproximate: Bool
     }
 
     /// 48 of the pairs ChillMate can make. The rest are not on the chart.
-    static let entries: [String: Entry] = [
+    public static let entries: [String: Entry] = [
         "alcohol+benzodiazepines": Entry(grading: .critical, isApproximate: false),
         "alcohol+cannabis": Entry(grading: .lowRisk, isApproximate: false),
         "alcohol+cocaine": Entry(grading: .serious, isApproximate: false),
@@ -83,7 +83,7 @@ enum InteractionChart {
     ]
 
     /// Looks up a pair. The key is the two raw case names, sorted, joined by `+`.
-    static func entry(for substances: Set<Substance>) -> Entry? {
+    public static func entry(for substances: Set<Substance>) -> Entry? {
         guard substances.count == 2 else { return nil }
         let key = substances.map(\.chartKey).sorted().joined(separator: "+")
         return entries[key]

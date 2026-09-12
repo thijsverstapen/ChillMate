@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 /// The month calendar and everything you reach from a day in it.
 ///

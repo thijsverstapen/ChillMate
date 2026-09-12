@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import UIKit
+import ChillMateCore
 
 /// What an encrypted backup actually contains: the archive envelope and one DTO
 /// per model.

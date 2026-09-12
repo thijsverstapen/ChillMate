@@ -4,6 +4,7 @@ import TipKit
 import UIKit
 
 struct PanicSupportView: View {
+    @Environment(\.services) private var services
     @Environment(\.dismiss) private var dismiss
     @AppStorage(DefaultsKey.trustedContactName) private var trustedContactName = ""
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
@@ -283,7 +284,7 @@ struct PanicSupportView: View {
 
         Task {
             // Silent on failure. The session happened whether Health records it or not.
-            try? await HealthKitService.shared.saveMindfulMinutes(from: startedAt, to: .now)
+            try? await services.health.saveMindfulMinutes(from: startedAt, to: .now)
         }
     }
 

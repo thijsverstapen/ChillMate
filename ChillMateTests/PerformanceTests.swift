@@ -1,4 +1,5 @@
 import XCTest
+import ChillMateCore
 @testable import ChillMate
 
 /// Time and memory budgets for the work that grows with a person's history.

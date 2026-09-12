@@ -3,6 +3,7 @@ import SwiftData
 import SwiftUI
 import TipKit
 import UniformTypeIdentifiers
+import ChillMateCore
 
 /// Eleven full-width cards made Settings a long, undifferentiated scroll. The
 /// same eleven destinations now sit in five labelled groups of compact rows.
@@ -119,6 +120,7 @@ enum SettingsSectionPage: String, CaseIterable, Identifiable {
 
 @MainActor
 struct SettingsView: View {
+    @Environment(\.services) private var services
     @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
     @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
     @State private var isShowingDuressSetup = false
@@ -171,7 +173,7 @@ struct SettingsView: View {
             checkInHour = comps.hour ?? 10
             checkInMinute = comps.minute ?? 0
             if notificationsEnabled {
-                NotificationService.shared.scheduleCheckInReminder()
+                services.notifications.scheduleCheckInReminder()
             }
         }
     }
@@ -258,23 +260,23 @@ struct SettingsView: View {
                 if isOn {
                     // Placeholder figures. Home reschedules with the real streak and score
                     // the next time it recomputes metrics, which is on its next appearance.
-                    NotificationService.shared.scheduleWeeklySummary(streak: 0, score: 0)
+                    services.notifications.scheduleWeeklySummary(streak: 0, score: 0)
                 } else {
-                    NotificationService.shared.clearWeeklySummary()
+                    services.notifications.clearWeeklySummary()
                 }
             }
             .onChange(of: stiReminderEnabled) { _, isOn in
                 if isOn {
                     let dueDate = Calendar.current.date(byAdding: .month, value: stiReminderMonths, to: .now) ?? .now
-                    NotificationService.shared.scheduleSTIReminder(dueDate: dueDate)
+                    services.notifications.scheduleSTIReminder(dueDate: dueDate)
                 } else {
-                    NotificationService.shared.clearSTIReminder()
+                    services.notifications.clearSTIReminder()
                 }
             }
             // Push Apple Watch preference changes immediately (previously they
             // only reached the watch once, at session activation). One combined
             // observer keeps the modifier chain within the type-checker's budget.
-            .onChange(of: watchSettingsFingerprint) { _, _ in WatchConnectivityService.shared.sendSettings() }
+            .onChange(of: watchSettingsFingerprint) { _, _ in services.watch.sendSettings() }
             .endEditingOnTap()
         }
     }
@@ -377,9 +379,9 @@ struct SettingsView: View {
                 set: { newValue in
                     weekendSafetyEnabled = newValue
                     if newValue {
-                        NotificationService.shared.scheduleWeekendSafetyCheckIns()
+                        services.notifications.scheduleWeekendSafetyCheckIns()
                     } else {
-                        NotificationService.shared.clearWeekendSafetyCheckIns()
+                        services.notifications.clearWeekendSafetyCheckIns()
                     }
                 }
             )
@@ -709,7 +711,7 @@ struct SettingsView: View {
         isWorking = true
         Task {
             do {
-                try await HealthKitService.shared.requestAuthorization()
+                try await services.health.requestAuthorization()
                 await MainActor.run {
                     healthKitAutoSync = true
                     healthKitSexualActivityWriteEnabled = true
@@ -732,7 +734,7 @@ struct SettingsView: View {
         isWorking = true
         Task {
             do {
-                try await HealthKitService.shared.requestAuthorization(scopes: [scope])
+                try await services.health.requestAuthorization(scopes: [scope])
                 await MainActor.run {
                     setHealthScope(scope, enabled: true)
                     message = String(localized: "\(scope.localizedDisplayName) is enabled.")
@@ -799,7 +801,7 @@ struct SettingsView: View {
                 return
             }
             do {
-                let data = try EncryptedBackupService.shared.encryptedBackupData(localContext: modelContext)
+                let data = try services.encryptedBackups.encryptedBackupData(localContext: modelContext)
                 let formatter = ISO8601DateFormatter()
                 formatter.formatOptions = [.withInternetDateTime]
                 let stamp = formatter.string(from: .now)
@@ -850,7 +852,7 @@ struct SettingsView: View {
                 }
 
                 let data = try Data(contentsOf: url)
-                let summary = try EncryptedBackupService.shared.importEncryptedBackupData(data, into: modelContext)
+                let summary = try services.encryptedBackups.importEncryptedBackupData(data, into: modelContext)
 
                 await MainActor.run {
                     message = summary.displayText
@@ -872,7 +874,7 @@ struct SettingsView: View {
                 return
             }
 
-            NotificationService.shared.clearScheduledNotifications()
+            services.notifications.clearScheduledNotifications()
             dailyAffirmationsEnabled = false
             message = nil
             return
@@ -881,15 +883,15 @@ struct SettingsView: View {
         isWorking = true
         Task {
             do {
-                let granted = try await NotificationService.shared.requestAuthorization()
+                let granted = try await services.notifications.requestAuthorization()
                 await MainActor.run {
                     isRevertingToggle = !granted
                     notificationsEnabled = granted
                     if granted {
-                        NotificationService.shared.scheduleCheckInReminder()
-                        NotificationService.shared.scheduleInactivityReminders()
+                        services.notifications.scheduleCheckInReminder()
+                        services.notifications.scheduleInactivityReminders()
                         if dailyAffirmationsEnabled {
-                            NotificationService.shared.scheduleDailyAffirmations()
+                            services.notifications.scheduleDailyAffirmations()
                         }
                     }
                     message = granted ? "Notifications are on." : "Notification permission was not granted."
@@ -917,14 +919,14 @@ struct SettingsView: View {
             return
         }
 
-        guard ICloudBackupService.shared.isAvailable else {
+        guard services.cloudBackups.isAvailable else {
             isRevertingToggle = true
             iCloudBackupEnabled = false
             message = ICloudBackupError.iCloudUnavailable.localizedDescription
             return
         }
 
-        lastICloudBackupStatus = ICloudBackupService.shared.statusLine
+        lastICloudBackupStatus = services.cloudBackups.statusLine
         message = String(localized: "iCloud backup is on. ChillMate saves encrypted backup files to your iCloud Drive.")
     }
 
@@ -938,7 +940,7 @@ struct SettingsView: View {
         message = nil
         Task {
             do {
-                let date = try ICloudBackupService.shared.saveLatestBackup(localContext: modelContext)
+                let date = try services.cloudBackups.saveLatestBackup(localContext: modelContext)
                 await MainActor.run {
                     lastICloudBackupTimestamp = date.timeIntervalSince1970
                     // The service already wrote the durable status line, translated.
@@ -969,7 +971,7 @@ struct SettingsView: View {
                 return
             }
             do {
-                let summary = try ICloudBackupService.shared.restoreLatestBackup(into: modelContext)
+                let summary = try services.cloudBackups.restoreLatestBackup(into: modelContext)
                 await MainActor.run {
                     message = String(localized: "Restored from iCloud. \(summary.displayText)")
                     isWorking = false
@@ -989,7 +991,7 @@ struct SettingsView: View {
         message = nil
         Task {
             do {
-                try ICloudBackupService.shared.deleteBackups()
+                try services.cloudBackups.deleteBackups()
                 await MainActor.run {
                     lastICloudBackupTimestamp = 0
                     message = String(localized: "iCloud backups deleted.")
@@ -1011,13 +1013,13 @@ struct SettingsView: View {
                 return
             }
 
-            NotificationService.shared.clearDailyAffirmations()
+            services.notifications.clearDailyAffirmations()
             message = nil
             return
         }
 
         if notificationsEnabled {
-            NotificationService.shared.scheduleDailyAffirmations()
+            services.notifications.scheduleDailyAffirmations()
             message = String(localized: "Daily affirmations are on.")
             return
         }
@@ -1025,15 +1027,15 @@ struct SettingsView: View {
         isWorking = true
         Task {
             do {
-                let granted = try await NotificationService.shared.requestAuthorization()
+                let granted = try await services.notifications.requestAuthorization()
                 await MainActor.run {
                     isRevertingToggle = !granted
                     notificationsEnabled = granted
                     dailyAffirmationsEnabled = granted
                     if granted {
-                        NotificationService.shared.scheduleCheckInReminder()
-                        NotificationService.shared.scheduleInactivityReminders()
-                        NotificationService.shared.scheduleDailyAffirmations()
+                        services.notifications.scheduleCheckInReminder()
+                        services.notifications.scheduleInactivityReminders()
+                        services.notifications.scheduleDailyAffirmations()
                     }
                     message = granted ? "Daily affirmations are on." : "Notification permission was not granted."
                     isWorking = false
@@ -1147,7 +1149,7 @@ struct SettingsView: View {
 
         do {
             try AccountDataDeletion.deleteAllData(currentContext: modelContext)
-            NotificationService.shared.clearScheduledNotifications()
+            services.notifications.clearScheduledNotifications()
             requiresFaceID = false
             requiresPIN = false
             healthKitAutoSync = false

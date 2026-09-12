@@ -1,4 +1,5 @@
 import Foundation
+import ChillMateCore
 
 /// The sheet somebody hands to a GP, a sexual-health service, a therapist or an
 /// addiction-care worker.

@@ -19,19 +19,19 @@ import Foundation
 ///
 /// Sources fetched 11 September 2026: NHS "Calculating alcohol units", Trimbos
 /// Expertisecentrum Alcohol.
-enum AlcoholUnits {
+public enum AlcoholUnits {
 
     /// Grams of ethanol per millilitre.
-    static let ethanolDensity = 0.789
+    public static let ethanolDensity = 0.789
 
     /// Grams of pure alcohol in one UK unit.
-    static let gramsPerUKUnit = 8.0
+    public static let gramsPerUKUnit = 8.0
 
     /// Grams of pure alcohol in one continental standard glass.
-    static let gramsPerStandardGlass = 10.0
+    public static let gramsPerStandardGlass = 10.0
 
     /// Grams of pure alcohol in a drink.
-    static func grams(volumeML: Double, abvPercent: Double) -> Double {
+    public static func grams(volumeML: Double, abvPercent: Double) -> Double {
         guard volumeML > 0, abvPercent > 0 else { return 0 }
         return volumeML * (abvPercent / 100) * ethanolDensity
     }
@@ -42,13 +42,13 @@ enum AlcoholUnits {
     /// defined by volume of ethanol, not mass, and the two differ by a couple of
     /// percent. Matching the guideline someone is reading matters more than
     /// internal tidiness.
-    static func ukUnits(volumeML: Double, abvPercent: Double) -> Double {
+    public static func ukUnits(volumeML: Double, abvPercent: Double) -> Double {
         guard volumeML > 0, abvPercent > 0 else { return 0 }
         return (abvPercent * volumeML) / 1000
     }
 
     /// Continental standard glasses of 10 g.
-    static func standardGlasses(volumeML: Double, abvPercent: Double) -> Double {
+    public static func standardGlasses(volumeML: Double, abvPercent: Double) -> Double {
         grams(volumeML: volumeML, abvPercent: abvPercent) / gramsPerStandardGlass
     }
 
@@ -58,29 +58,29 @@ enum AlcoholUnits {
     /// These are the reference servings, not what anybody is actually poured. A
     /// large glass of wine in a bar is nearer 250 ml, and saying so is the point of
     /// having them on screen at all.
-    struct Serving: Identifiable, Sendable {
-        let id: String
-        let name: String
-        let volumeML: Double
-        let abvPercent: Double
+    public struct Serving: Identifiable, Sendable {
+        public let id: String
+        public let name: String
+        public let volumeML: Double
+        public let abvPercent: Double
 
-        var grams: Double { AlcoholUnits.grams(volumeML: volumeML, abvPercent: abvPercent) }
-        var ukUnits: Double { AlcoholUnits.ukUnits(volumeML: volumeML, abvPercent: abvPercent) }
+        public var grams: Double { AlcoholUnits.grams(volumeML: volumeML, abvPercent: abvPercent) }
+        public var ukUnits: Double { AlcoholUnits.ukUnits(volumeML: volumeML, abvPercent: abvPercent) }
     }
 
     /// The reference servings, from the Dutch standard-glass definition: 250 ml of
     /// beer, 100 ml of wine, 35 ml of spirits, each about 10 g.
-    static var referenceServings: [Serving] {
+    public static var referenceServings: [Serving] {
         [
-            Serving(id: "beer", name: String(localized: "Beer, 250 ml at 5%"),
+            Serving(id: "beer", name: String(localized: "Beer, 250 ml at 5%", bundle: .main),
                     volumeML: 250, abvPercent: 5),
-            Serving(id: "wine", name: String(localized: "Wine, 100 ml at 12%"),
+            Serving(id: "wine", name: String(localized: "Wine, 100 ml at 12%", bundle: .main),
                     volumeML: 100, abvPercent: 12),
-            Serving(id: "spirit", name: String(localized: "Spirits, 35 ml at 35%"),
+            Serving(id: "spirit", name: String(localized: "Spirits, 35 ml at 35%", bundle: .main),
                     volumeML: 35, abvPercent: 35),
-            Serving(id: "strongbeer", name: String(localized: "Strong beer, 330 ml at 8%"),
+            Serving(id: "strongbeer", name: String(localized: "Strong beer, 330 ml at 8%", bundle: .main),
                     volumeML: 330, abvPercent: 8),
-            Serving(id: "largewine", name: String(localized: "Large glass of wine, 250 ml at 13%"),
+            Serving(id: "largewine", name: String(localized: "Large glass of wine, 250 ml at 13%", bundle: .main),
                     volumeML: 250, abvPercent: 13),
         ]
     }

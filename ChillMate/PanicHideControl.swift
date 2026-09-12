@@ -17,12 +17,13 @@ import SwiftUI
 /// behaviour.
 struct PanicHideButton: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.services) private var services
     @State private var isPrivacyScreenActive = false
 
     var body: some View {
         Button(role: .destructive) {
             Task {
-                _ = try? EncryptedBackupService.shared
+                _ = try? services.encryptedBackups
                     .refreshOnDeviceRecoverySnapshot(localContext: modelContext)
             }
             isPrivacyScreenActive = true

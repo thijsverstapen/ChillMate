@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// Covers the combinations added in 4.2.1, and the structural properties the

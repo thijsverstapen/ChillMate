@@ -1,5 +1,6 @@
 import Foundation
 import UserNotifications
+import ChillMateCore
 
 enum NotificationTone: String, CaseIterable, Identifiable {
     case gentle = "Gentle"

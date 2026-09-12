@@ -5,6 +5,7 @@ import SwiftUI
 import UIKit
 
 struct SafeRouteHomeView: View {
+    @Environment(\.services) private var services
     @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
     @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = TrustedContactDefaults.message
@@ -112,7 +113,7 @@ struct SafeRouteHomeView: View {
 
         Task {
             do {
-                let location = try await LocationLookupService.shared.currentLoggedLocation()
+                let location = try await services.location.currentLoggedLocation()
                 await MainActor.run {
                     currentLocation = location
                     isFetchingLocation = false
@@ -214,8 +215,8 @@ struct SafeRouteHomeView: View {
         journeyArrival = arrival
         Task {
             await SafeRouteLiveActivityController.start(expectedArrival: arrival)
-            if (try? await NotificationService.shared.requestAuthorization()) == true {
-                NotificationService.shared.scheduleSafeRouteCheck(expectedArrival: arrival)
+            if (try? await services.notifications.requestAuthorization()) == true {
+                services.notifications.scheduleSafeRouteCheck(expectedArrival: arrival)
             }
             // Read the truth back rather than trusting the optimistic set above:
             // Live Activities can be switched off system-wide, and the card
@@ -226,13 +227,13 @@ struct SafeRouteHomeView: View {
 
     private func markArrived() {
         journeyArrival = nil
-        NotificationService.shared.clearSafeRouteCheck()
+        services.notifications.clearSafeRouteCheck()
         Task { await SafeRouteActivityAttributes.markArrived() }
     }
 
     private func cancelJourney() {
         journeyArrival = nil
-        NotificationService.shared.clearSafeRouteCheck()
+        services.notifications.clearSafeRouteCheck()
         Task { await SafeRouteLiveActivityController.end() }
     }
 
