@@ -109,6 +109,41 @@ jobs:
       # -target rather than -scheme because there is only one scheme in the
       # project; -derivedDataPath is omitted deliberately, since xcodebuild
       # rejects it without -scheme.
+      # The simulator builds arm64 and a device build asks for whatever ARCHS
+      # resolves to, so a whole class of problem is invisible to every other step
+      # here. That is not hypothetical: the iOS 26 SDK resolves ARCHS to
+      # "arm64 arm64e" unless a target says otherwise, and once the domain moved
+      # into a Swift package the app wanted an arm64e slice of a module that only
+      # builds arm64. Debug on the simulator was green the whole time; archiving
+      # failed with "Unable to resolve module dependency".
+      #
+      # Archive rather than build, because archiving is the thing that breaks: it
+      # embeds the extension and the watch app and links the package for real.
+      - name: Release archive for device
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/ChillMate.xcarchive" \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | xcbeautify
+
+      # An arm64e slice would mean the package mismatch above had come back, and
+      # arm64e is a preview ABI a third-party app does not ship.
+      - name: The archive is arm64 and nothing else
+        run: |
+          binary="$RUNNER_TEMP/ChillMate.xcarchive/Products/Applications/ChillMate.app/ChillMate"
+          lipo -info "$binary"
+          if lipo -info "$binary" | grep -q arm64e; then
+            echo "::error::The archive contains an arm64e slice."
+            exit 1
+          fi
+
       - name: Build the watch targets
         run: |
           set -o pipefail

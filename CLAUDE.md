@@ -68,6 +68,24 @@ xcodebuild build -project ChillMate.xcodeproj -target ChillMateWatchApp \
   -destination 'generic/platform=watchOS Simulator' CODE_SIGNING_ALLOWED=NO
 ```
 
+Both of those are Debug on the simulator, which builds arm64 and hides anything
+architecture-shaped. Before pushing something structural — a new target, a
+package, a build-setting change — archive for a device too:
+
+```bash
+xcodebuild archive -scheme ChillMate -configuration Release \
+  -destination 'generic/platform=iOS' -archivePath /tmp/ChillMate.xcarchive \
+  -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+  CODE_SIGN_IDENTITY=""
+```
+
+The iOS 26 SDK resolves `ARCHS` to `arm64 arm64e` unless a target says otherwise,
+and `EXCLUDED_ARCHS = arm64e` is set on the project's own configurations so every
+target inherits it. Without that the app asks for an arm64e slice of every
+module, which a Swift package does not build, and the archive fails with
+"Unable to resolve module dependency" while the simulator stays green. CI archives
+for device and fails if an arm64e slice appears.
+
 If `xcodebuild` reports "requires Xcode, but active developer directory ... is a
 command line tools instance", fix it with
 `sudo xcode-select -s /Applications/Xcode.app/Contents/Developer`, or prefix a single

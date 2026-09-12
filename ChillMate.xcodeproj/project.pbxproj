@@ -1088,6 +1088,14 @@
 		A11B00000000000000000028 /* Debug configuration for PBXProject "ChillMate" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				// arm64e is a preview ABI, not something a third-party app ships.
+				// The two watch targets already excluded it; the iOS app and the
+				// Live Activity extension did not, so a device build asked for an
+				// arm64e slice of every module. That went unnoticed until the domain
+				// moved into a Swift package, which builds arm64 and is then rejected
+				// as "built for incompatible target". Set here so every target
+				// inherits it rather than four places agreeing by hand.
+				EXCLUDED_ARCHS = arm64e;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -1162,6 +1170,14 @@
 		A11B00000000000000000029 /* Release configuration for PBXProject "ChillMate" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				// arm64e is a preview ABI, not something a third-party app ships.
+				// The two watch targets already excluded it; the iOS app and the
+				// Live Activity extension did not, so a device build asked for an
+				// arm64e slice of every module. That went unnoticed until the domain
+				// moved into a Swift package, which builds arm64 and is then rejected
+				// as "built for incompatible target". Set here so every target
+				// inherits it rather than four places agreeing by hand.
+				EXCLUDED_ARCHS = arm64e;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
