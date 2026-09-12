@@ -53,6 +53,13 @@ struct WatchDashboardView: View {
                         WatchHeartRateCard(bpm: bpm)
                     }
 
+                    if connectivity.strainDetectionEnabled,
+                       let bpm = connectivity.latestBPM,
+                       let hrv = connectivity.latestHRVms,
+                       WatchStrainCard.isStrained(bpm: bpm, hrvMs: hrv) {
+                        WatchStrainCard(bpm: bpm, hrvMs: hrv)
+                    }
+
                     NavigationLink {
                         BreathingScreen(hapticsEnabled: connectivity.breathingHapticsEnabled)
                     } label: {
@@ -69,6 +76,13 @@ struct WatchDashboardView: View {
                         connectivity.logQuickSkip()
                         WKInterfaceDevice.current().play(.success)
                     }
+                    // Double tap is the one gesture that works with a drink in the
+                    // other hand, in a coat, without looking at the screen. Logging
+                    // a clear night is the right thing to put behind it: it is the
+                    // only action here that is always safe to repeat by accident,
+                    // because it guards on `quickSkipSentToday` and does nothing
+                    // the second time.
+                    .handGestureShortcut(.primaryAction, isEnabled: !connectivity.quickSkipSentToday)
 
                     NavigationLink {
                         SafetyScreen(connectivity: connectivity)
@@ -602,6 +616,8 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     @Published var dailyScore = 0
     @Published var dailyScoreActive = false
     @Published var latestBPM: Double? = nil
+    @Published var latestHRVms: Double? = nil
+    @Published var strainDetectionEnabled = true
     @Published var trustedContactName = ""
     @Published var trustedContactPhone = ""
     /// Last number relayed by the phone. Persisted (see `emergencyNumberKey`) so a
@@ -631,10 +647,8 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         super.init()
         rolloverIfNeeded()
         hydrationCount = defaults.integer(forKey: hydrationCountKey)
-        quickSkipSentToday = defaults.integer(forKey: quickSkipDayKey) == Self.todayKey
-        if let stored = defaults.string(forKey: emergencyNumberKey), !stored.isEmpty {
-            emergencyNumber = stored
-        }
+        quickSkipSentToday = !WatchLogic.isAvailableToday(lastSentDay: defaults.integer(forKey: quickSkipDayKey))
+        emergencyNumber = WatchLogic.emergencyNumber(stored: defaults.string(forKey: emergencyNumberKey))
         activate()
     }
 
@@ -647,7 +661,7 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     // MARK: Local day rollover
 
     private static var todayKey: Int {
-        Int(Calendar.current.startOfDay(for: .now).timeIntervalSinceReferenceDate / 86_400)
+        WatchLogic.dayKey(for: .now)
     }
 
     private func rolloverIfNeeded() {
@@ -742,20 +756,26 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         if let value = context["dailyScoreActive"] as? Bool { dailyScoreActive = value }
         if let value = context["trustedContactName"] as? String { trustedContactName = value }
         if let value = context["trustedContactPhone"] as? String { trustedContactPhone = value }
-        if let value = context["emergencyNumber"] as? String, !value.isEmpty {
-            emergencyNumber = value
-            defaults.set(value, forKey: emergencyNumberKey)
+        if let value = context["emergencyNumber"] as? String,
+           !value.trimmingCharacters(in: .whitespaces).isEmpty {
+            emergencyNumber = WatchLogic.emergencyNumber(stored: nil, relayed: value)
+            defaults.set(emergencyNumber, forKey: emergencyNumberKey)
         }
 
         if let value = context["hasBPM"] as? Bool {
             latestBPM = value ? (context["latestBPM"] as? Double) : nil
         }
 
-        if let value = context["watchHydrationReminders"] as? Bool { hydrationRemindersEnabled = value }
-        if let value = context["watchHeartRateWarnings"] as? Bool { heartRateWarningsEnabled = value }
-        if let value = context["watchBreathingHaptics"] as? Bool { breathingHapticsEnabled = value }
-        if let value = context["watchDiscreetCheckIns"] as? Bool { discreetCheckInsEnabled = value }
-        if let value = context["watchVisibleTimers"] as? Bool { visibleTimersEnabled = value }
+        if let value = context[WidgetSharedKey.hasHRV] as? Bool {
+            latestHRVms = value ? (context[WidgetSharedKey.latestHRVms] as? Double) : nil
+        }
+
+        if let value = context[WidgetSharedKey.watchHydrationReminders] as? Bool { hydrationRemindersEnabled = value }
+        if let value = context[WidgetSharedKey.watchHeartRateWarnings] as? Bool { heartRateWarningsEnabled = value }
+        if let value = context[WidgetSharedKey.watchStrainDetection] as? Bool { strainDetectionEnabled = value }
+        if let value = context[WidgetSharedKey.watchBreathingHaptics] as? Bool { breathingHapticsEnabled = value }
+        if let value = context[WidgetSharedKey.watchDiscreetCheckIns] as? Bool { discreetCheckInsEnabled = value }
+        if let value = context[WidgetSharedKey.watchVisibleTimers] as? Bool { visibleTimersEnabled = value }
 
         publishWidgetSnapshot()
     }
@@ -797,5 +817,53 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String: Any]) {
         let box = WCContextBox(dict: applicationContext)
         Task { @MainActor in self.applyContext(box.dict) }
+    }
+}
+
+
+/// Shown when heart rate and heart-rate variability disagree with each other.
+///
+/// The elevated heart-rate card above fires on rate alone, which on a dance floor
+/// is almost always just dancing. Strain is the pairing: a fast heart *and*
+/// suppressed variability together are the body under load rather than in motion,
+/// and that combination is what precedes overheating on stimulants.
+///
+/// Named for strain rather than temperature, which the setting that gates it also
+/// once promised. Apple's wrist temperature is derived during sleep only, so
+/// there is no body temperature to read on a night out, and a card claiming to
+/// watch one would be inventing a sensor. What the watch can actually see is
+/// this, and this is worth seeing.
+private struct WatchStrainCard: View {
+    let bpm: Double
+    let hrvMs: Double
+
+    /// Sustained high rate with low variability. Both thresholds are deliberately
+    /// conservative: this interrupts someone's night, so it should be quiet until
+    /// it is worth being loud.
+    static func isStrained(bpm: Double, hrvMs: Double) -> Bool {
+        bpm > 120 && hrvMs > 0 && hrvMs < 30
+    }
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "thermometer.high")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(.orange)
+                .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Your body is working hard")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.orange)
+                Text("Cool down, find water, and sit out the next one.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(.orange.opacity(0.16), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .accessibilityElement(children: .combine)
     }
 }

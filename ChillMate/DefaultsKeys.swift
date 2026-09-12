@@ -28,6 +28,11 @@ import Foundation
 enum DefaultsKey {
     // MARK: Lock & privacy
     static let requiresFaceID = "requiresFaceID"
+    /// True while the app is showing the decoy store a duress PIN opens.
+    ///
+    /// Cleared by an unlock with the real PIN, which is the only thing that clears
+    /// it. See `LocalSecurityService.saveDuressPIN`.
+    static let duressModeActive = "duressModeActive"
     static let requiresPIN = "requiresPIN"
     static let autoLockMinutes = "autoLockMinutes"
     static let localEncryptionEnabled = "localEncryptionEnabled"
@@ -156,6 +161,14 @@ enum DefaultsKey {
     static let onboardingSwipeHintShown = "onboardingSwipeHintShown"
     static let locationServicesChecked = "locationServicesChecked"
     static let lastSelectedTab = "lastSelectedTab"
+
+    /// Set by the Focus filter when a Focus the user has configured for going out
+    /// is active. Read by Home to lead with the during-session tools.
+    static let focusSessionMode = "focusSessionMode"
+
+    /// Most recent resting heart rate read from HealthKit, cached so the recovery
+    /// card has a figure before the async read returns.
+    static let lastKnownRestingBPM = "lastKnownRestingBPM"
     static let lastBackgroundedAt = "lastBackgroundedAt"
     static let oneHandedControls = "oneHandedControls"
 

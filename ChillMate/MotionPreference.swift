@@ -96,3 +96,60 @@ extension View {
         self.animation(reduceMotion ? nil : animation, value: value)
     }
 }
+
+/// A line limit that gives way at the accessibility text sizes.
+///
+/// A hard `.lineLimit(1)` on a label whose length varies by language is the most
+/// common Dynamic Type bug in this app. Apple's accessibility audit found six of
+/// them on the Home tab alone, and in every case the half that was truncated was
+/// the half that said what the number meant — "Log to activate", a metric's
+/// caption, the name of the tool the row opens.
+///
+/// `minimumScaleFactor` is not a fix for this. It buys one step of headroom and
+/// then truncates anyway, and shrinking text is the wrong answer for a reader who
+/// has asked for larger text.
+///
+/// So below the accessibility threshold the limit holds and ordinary layouts keep
+/// their intended shape, and past it the text wraps instead. A sentence over three
+/// lines is readable; half a sentence is not.
+struct ChillAccessibleLineLimit: ViewModifier {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    let limit: Int
+    let scale: CGFloat
+    let accessibilityLimit: Int?
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if dynamicTypeSize.isAccessibilitySize {
+            content
+                .lineLimit(accessibilityLimit)
+                .minimumScaleFactor(1)
+                .fixedSize(horizontal: false, vertical: true)
+        } else {
+            content
+                .lineLimit(limit)
+                .minimumScaleFactor(scale)
+        }
+    }
+}
+
+extension View {
+    /// Replacement for `.lineLimit(_:)` paired with `.minimumScaleFactor(_:)` on
+    /// any label a person needs to read in full.
+    ///
+    /// - Parameters:
+    ///   - limit: the line limit to hold below the accessibility sizes.
+    ///   - scale: the scale factor to allow below the accessibility sizes.
+    ///   - accessibilityLimit: an optional ceiling past the threshold. `nil`, the
+    ///     default, means no limit at all — let it wrap as far as it needs to.
+    func chillLineLimit(
+        _ limit: Int,
+        scale: CGFloat = 0.8,
+        accessibilityLimit: Int? = nil
+    ) -> some View {
+        modifier(
+            ChillAccessibleLineLimit(limit: limit, scale: scale, accessibilityLimit: accessibilityLimit)
+        )
+    }
+}

@@ -2,11 +2,15 @@ import SwiftData
 import PhotosUI
 import SwiftUI
 import WidgetKit
+import ChillMateCore
 
 struct DashboardView: View {
+    @Environment(\.services) private var services
     @Environment(\.modelContext) private var modelContext
     @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
     @AppStorage(DefaultsKey.lastKnownHRVms) private var lastKnownHRVms: Double = 0
+    @AppStorage(DefaultsKey.lastKnownRestingBPM) private var lastKnownRestingBPM: Double = 0
+    @AppStorage(DefaultsKey.weeklyDigestEnabled) private var weeklyDigestEnabled = false
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.reductionGoalSessions) private var reductionGoalSessions = 0
@@ -21,7 +25,6 @@ struct DashboardView: View {
 
     @State private var isShowingLogSheet = false
     @State private var isShowingCalendar = false
-    @State private var isPrivacyScreenActive = false
     @State private var hydrationLoggedToday = false
     @State private var quickSkipHaptic = 0
     @Binding var careNavPath: [CareToolPage]
@@ -64,7 +67,8 @@ struct DashboardView: View {
             entryCount: entries.count,
             contentVersion: entries.reduce(into: 0) { $0 &+= $1.contentVersion },
             profileCount: profiles.count,
-            hrv: lastKnownHRVms
+            hrv: lastKnownHRVms,
+            restingBPM: lastKnownRestingBPM
         )
     }
 
@@ -75,7 +79,8 @@ struct DashboardView: View {
             entries: entries,
             profiles: profiles,
             calendar: calendar,
-            latestHRVms: lastKnownHRVms
+            latestHRVms: lastKnownHRVms,
+            latestRestingBPM: lastKnownRestingBPM
         )
     }
 
@@ -84,6 +89,7 @@ struct DashboardView: View {
         let contentVersion: Int
         let profileCount: Int
         let hrv: Double
+        let restingBPM: Double
     }
 
     @ViewBuilder
@@ -122,25 +128,12 @@ struct DashboardView: View {
         }
     }
 
+    /// The panic control now lives in `PanicHideControl.swift` and is on all three
+    /// tabs. It was only ever here.
     @ToolbarContentBuilder
     private var panicToolbarItem: some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
-            Button(role: .destructive) {
-                Task {
-                    _ = try? EncryptedBackupService.shared.refreshOnDeviceRecoverySnapshot(localContext: modelContext)
-                }
-                isPrivacyScreenActive = true
-            } label: {
-                Image(systemName: "xmark.octagon.fill")
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(.red)
-                    .frame(width: 36, height: 36)
-                    .glassSurface(radius: 18, tint: .white.opacity(0.34), interactive: true)
-            }
-            .buttonStyle(ChillPlainButtonStyle())
-            .accessibilityLabel("Panic close app")
-            .accessibilityIdentifier(AccessibilityID.panicButton)
-            .sensoryFeedback(trigger: isPrivacyScreenActive) { _, active in active ? .impact(weight: .heavy) : nil }
+            PanicHideButton()
         }
     }
 
@@ -279,7 +272,8 @@ struct DashboardView: View {
                     entries: entries,
                     profiles: profiles,
                     calendar: calendar,
-                    latestHRVms: lastKnownHRVms
+                    latestHRVms: lastKnownHRVms,
+                    latestRestingBPM: lastKnownRestingBPM
                 )
             }
             .onAppear {
@@ -293,9 +287,9 @@ struct DashboardView: View {
             }
             .onChange(of: metrics.pepConcernEntry?.id) { _, entryID in
                 if let entry = metrics.pepConcernEntry, notificationsEnabled {
-                    NotificationService.shared.schedulePEPWindowReminders(entry: entry)
+                    services.notifications.schedulePEPWindowReminders(entry: entry)
                 } else {
-                    NotificationService.shared.clearPEPWindowReminders()
+                    services.notifications.clearPEPWindowReminders()
                 }
             }
             .modifier(WatchRelayObservers(
@@ -309,8 +303,18 @@ struct DashboardView: View {
             ))
             .task(id: healthKitHRVReadEnabled) {
                 guard healthKitHRVReadEnabled else { return }
-                if let hrv = try? await HealthKitService.shared.latestHRV() {
+                if let hrv = try? await services.health.latestHRV() {
                     lastKnownHRVms = hrv
+                    // The watch needs this too: paired with heart rate it is what
+                    // separates dancing from strain.
+                    services.watch.sendLatestHRV(hrv)
+                }
+            }
+            .task(id: healthKitHeartRateReadEnabled) {
+                // The resting read has existed since 4.3.0 and had no caller.
+                guard healthKitHeartRateReadEnabled else { return }
+                if let resting = try? await services.health.latestRestingHeartRate() {
+                    lastKnownRestingBPM = resting
                 }
             }
             .task(id: healthKitHeartRateReadEnabled) {
@@ -318,8 +322,8 @@ struct DashboardView: View {
                 // its elevated-heart-rate warning card has data. Only runs when the
                 // user has already granted heart-rate reads (no surprise prompt).
                 guard healthKitHeartRateReadEnabled else { return }
-                let bpm = (try? await HealthKitService.shared.latestHeartRate()) ?? nil
-                WatchConnectivityService.shared.sendLatestHeartRate(bpm)
+                let bpm = (try? await services.health.latestHeartRate()) ?? nil
+                services.watch.sendLatestHeartRate(bpm)
             }
             .toolbar { panicToolbarItem }
             .safeAreaInset(edge: .bottom) {
@@ -334,8 +338,7 @@ struct DashboardView: View {
             }
             .modifier(DashboardCovers(
                 isShowingLogSheet: $isShowingLogSheet,
-                isShowingCalendar: $isShowingCalendar,
-                isPrivacyScreenActive: $isPrivacyScreenActive
+                isShowingCalendar: $isShowingCalendar
             ))
             .sensoryFeedback(.success, trigger: quickSkipHaptic)
         }
@@ -365,9 +368,16 @@ struct DashboardView: View {
             return (.groupAfter, String(localized: "Check in on last night"))
         }
 
-        // Evening or the small hours: most people set up before heading out.
-        let hour = Calendar.current.component(.hour, from: now)
-        if hour >= 18 || hour < 4 {
+        // The small hours and the evening are not the same moment, and treating
+        // them as one told everybody reading this at 2am to go and plan their
+        // night. At 2am the night is happening: the useful tools are the timer,
+        // the route home and panic support, not a checklist for later.
+        if NightMode.isActive(at: now) {
+            return (.groupDuring, String(localized: "It's late. Here if you need it"))
+        }
+
+        // Evening: most people set up before heading out.
+        if NightMode.isPreNight(at: now) {
             return (.groupBefore, String(localized: "Heading out? Set up first"))
         }
 
@@ -375,9 +385,16 @@ struct DashboardView: View {
     }
 
     /// `CareToolGroup.homeGroups`, but with the current moment moved to the top.
+    ///
+    /// A Focus filter beats the app's own guess. The app infers the moment from
+    /// logs and the clock, which is a reasonable guess and still a guess; someone
+    /// who has told iOS they are going out has stated it outright, and a stated
+    /// fact should win over an inference.
     private var orderedToolGroups: [CareToolGroup] {
         let base = CareToolGroup.homeGroups
-        guard let lead = currentMoment?.page,
+        let focusLead: CareToolPage? = UserDefaults.standard.bool(forKey: DefaultsKey.focusSessionMode) ? .groupDuring : nil
+
+        guard let lead = focusLead ?? currentMoment?.page,
               let index = base.firstIndex(where: { $0.page == lead }) else {
             return base
         }
@@ -392,8 +409,7 @@ struct DashboardView: View {
         // Takes the metrics the body already computed. Reading `dashboardMetrics`
         // here re-derived them a second time in the same pass.
         if metrics.realityCheckActive || metrics.healthWarningCount > 3 { return true }
-        let hour = Calendar.current.component(.hour, from: .now)
-        return hour >= 0 && hour < 5
+        return NightMode.isActive()
     }
 
     private func entryNeedsAftercare(_ entry: NightEntry, now: Date) -> Bool {
@@ -409,11 +425,27 @@ struct DashboardView: View {
         shared.set(metrics.dailyScore.isActive, forKey: WidgetSharedKey.scoreIsActive)
         WidgetCenter.shared.reloadAllTimelines()
 
-        WatchConnectivityService.shared.sendMetrics(
+        services.watch.sendMetrics(
             recoveryStreakDays: metrics.recoveryStreakDays,
             dailyScore: metrics.dailyScore.displayValue,
             dailyScoreActive: metrics.dailyScore.isActive
         )
+
+        // The weekly digest is a repeating calendar notification whose body is
+        // baked in when it is scheduled, and both places that scheduled it passed
+        // streak: 0, score: 0. So it fired every Sunday, forever, telling someone
+        // on a forty-day streak that they were at zero days — in an app whose
+        // whole point is that the streak is worth something.
+        //
+        // Rescheduling here, wherever the dashboard has just recomputed the real
+        // figures, is the same trigger the widget and the watch already use, so
+        // the digest can never drift from what the app is showing.
+        if weeklyDigestEnabled {
+            services.notifications.scheduleWeeklySummary(
+                streak: metrics.recoveryStreakDays,
+                score: metrics.dailyScore.displayValue
+            )
+        }
     }
 
     private func quickSkip() {
@@ -461,11 +493,10 @@ private struct WatchRelayObservers: ViewModifier {
     }
 }
 
-/// The dashboard's three full-screen covers.
+/// The dashboard's full-screen covers.
 private struct DashboardCovers: ViewModifier {
     @Binding var isShowingLogSheet: Bool
     @Binding var isShowingCalendar: Bool
-    @Binding var isPrivacyScreenActive: Bool
 
     func body(content: Content) -> some View {
         content
@@ -475,9 +506,7 @@ private struct DashboardCovers: ViewModifier {
             .fullScreenCover(isPresented: $isShowingCalendar) {
                 CalendarOverviewView()
             }
-            .fullScreenCover(isPresented: $isPrivacyScreenActive) {
-                PrivacyShieldView(dismiss: { isPrivacyScreenActive = false })
-            }
+
     }
 }
 
@@ -503,7 +532,7 @@ private struct DashboardMetrics {
         return healthWarningCount > 3 || (dailyScore.isActive && dailyScore.value < 30) || recentSessionsWithSubstances >= 10
     }
 
-    init(entries: [NightEntry], profiles: [UserProfile], calendar: Calendar, latestHRVms: Double = 0) {
+    init(entries: [NightEntry], profiles: [UserProfile], calendar: Calendar, latestHRVms: Double = 0, latestRestingBPM: Double = 0) {
         let cutoffDate = calendar.date(byAdding: .month, value: -3, to: .now) ?? .now
         var trackedCount = 0
         var skippedCount = 0
@@ -587,7 +616,7 @@ private struct DashboardMetrics {
             recoveryStreakDays = max(0, calendar.dateComponents([.day], from: startDay, to: today).day ?? 0)
         }
 
-        dailyScore = DailyRecoveryScore(entries: entries, recoveryStreakDays: recoveryStreakDays, calendar: calendar, latestHRVms: latestHRVms)
+        dailyScore = DailyRecoveryScore(entries: entries, recoveryStreakDays: recoveryStreakDays, calendar: calendar, latestHRVms: latestHRVms, latestRestingBPM: latestRestingBPM)
     }
 }
 
@@ -629,17 +658,36 @@ private struct DailyScoreStatusPill: View {
 
     var body: some View {
         VStack(spacing: 3) {
+            // The inactive state puts an emoji here in place of the score. An emoji
+            // is roughly square and does not shrink into its line box the way a
+            // digit does, so at the larger text sizes it outgrows this card and is
+            // drawn clipped. It gets a smaller size with headroom, the same
+            // treatment as `StatTile`, rather than the digit's 26pt.
+                // Hidden from accessibility, and not only to quiet the audit.
+                //
+                // The emoji stands in for a score that does not exist yet; the
+                // label beside it is what says so, and VoiceOver reading "smiling
+                // face with open mouth" before "Log to activate" is noise in front
+                // of the instruction. Hiding it also settles a finding no amount of
+                // resizing could: `performAccessibilityAudit` reports emoji as
+                // clipped text whatever size they are drawn at, because an emoji
+                // glyph's bounds exceed its layout frame by design. Replacing the
+                // emoji with plain text made the finding disappear at every size,
+                // which is what identified it as a property of the glyph rather
+                // than of this layout.
             Text(score.isActive ? "\(score.value)" : score.emoji)
-                .font(.system(size: score.isActive ? 24 : 26, weight: .bold))
+                .font(.system(size: score.isActive ? 24 : 18, weight: .bold))
                 .monospacedDigit()
                 .foregroundStyle(Color.chillText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+                .accessibilityHidden(!score.isActive)
 
             Text("Daily score")
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(Color.chillText)
-                .lineLimit(1)
+                .chillLineLimit(2, scale: 0.7)
+                .fixedSize(horizontal: false, vertical: true)
 
             Text(score.isActive ? score.label : String(localized: "Log a Chill to activate your daily score"))
                 .chillScaledFont(size: 9, weight: .semibold, relativeTo: .caption2)
@@ -683,431 +731,6 @@ private struct ProfileToolbarIcon: View {
                 .stroke(.white.opacity(0.55), lineWidth: 1)
         }
         .accessibilityHidden(true)
-    }
-}
-
-private struct CalendarOverviewButton: View {
-    let open: () -> Void
-
-    var body: some View {
-        Button(action: open) {
-            HStack(spacing: 14) {
-                Image(systemName: "calendar")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Color.chillPrimary)
-                    .frame(width: 44, height: 44)
-                    .glassSurface(radius: 22, tint: Color.chillPrimary.opacity(0.14))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Calendar")
-                        .font(.headline)
-                        .foregroundStyle(Color.chillText)
-
-                    Text("View logged and skipped Chills month by month")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.chillSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-            .padding(16)
-            .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.09), interactive: true)
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(localized: "Calendar"))
-        .accessibilityHint(String(localized: "View logged and skipped Chills month by month"))
-        .accessibilityAddTraits(.isButton)
-        .buttonStyle(ChillPlainButtonStyle())
-    }
-}
-
-private struct CalendarMonthData {
-    let monthDays: [Date]
-    let leadingBlankCount: Int
-    let monthEntries: [NightEntry]
-    let monthTimers: [DrugDoseTimerRecord]
-    let entriesByDay: [Date: [NightEntry]]
-    let journalEntriesByDay: [Date: [JournalEntry]]
-    let daySummaries: [Date: CalendarDaySummary]
-    let monthlySubstanceCounts: [(name: String, count: Int)]
-
-    init(displayedMonth: Date, entries: [NightEntry], journalEntries: [JournalEntry], timers: [DrugDoseTimerRecord], calendar: Calendar) {
-        let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: displayedMonth)) ?? displayedMonth
-        let nextMonth = calendar.date(byAdding: .month, value: 1, to: monthStart) ?? monthStart
-
-        if let range = calendar.range(of: .day, in: .month, for: monthStart) {
-            monthDays = range.compactMap { day in
-                calendar.date(byAdding: .day, value: day - 1, to: monthStart)
-            }
-        } else {
-            monthDays = []
-        }
-
-        if let firstDay = monthDays.first {
-            let weekday = calendar.component(.weekday, from: firstDay)
-            leadingBlankCount = (weekday + 5) % 7
-        } else {
-            leadingBlankCount = 0
-        }
-
-        monthEntries = entries.filter { entry in
-            entry.date >= monthStart && entry.date < nextMonth
-        }
-        monthTimers = timers.filter { timer in
-            timer.startedAt >= monthStart && timer.startedAt < nextMonth
-        }
-        let groupedEntries = Dictionary(grouping: monthEntries) { entry in
-            calendar.startOfDay(for: entry.date)
-        }
-        entriesByDay = groupedEntries
-
-        let monthJournalEntries = journalEntries.filter { entry in
-            entry.date >= monthStart && entry.date < nextMonth
-        }
-        let groupedJournals = Dictionary(grouping: monthJournalEntries) { entry in
-            calendar.startOfDay(for: entry.date)
-        }
-        journalEntriesByDay = groupedJournals
-
-        var summaries: [Date: CalendarDaySummary] = [:]
-        for day in monthDays {
-            let key = calendar.startOfDay(for: day)
-            summaries[key] = CalendarDaySummary(
-                entries: groupedEntries[key] ?? [],
-                journalCount: groupedJournals[key]?.count ?? 0
-            )
-        }
-        daySummaries = summaries
-
-        var substanceCounts: [String: Int] = [:]
-        for entry in monthEntries {
-            for substance in entry.substances {
-                substanceCounts[substance, default: 0] += 1
-            }
-        }
-        monthlySubstanceCounts = substanceCounts
-            .map { (name: $0.key, count: $0.value) }
-            .sorted { first, second in
-                first.count == second.count ? first.name < second.name : first.count > second.count
-            }
-    }
-}
-
-private struct CalendarDaySummary {
-    let trackedCount: Int
-    let hasSkipped: Bool
-    let hasSubstances: Bool
-    let hasJournal: Bool
-
-    static let empty = CalendarDaySummary(entries: [], journalCount: 0)
-
-    init(entries: [NightEntry], journalCount: Int) {
-        var trackedCount = 0
-        var hasSkipped = false
-        var hasSubstances = false
-
-        for entry in entries {
-            if entry.isTrackedEvent {
-                trackedCount += 1
-            }
-            if entry.skippedNight {
-                hasSkipped = true
-            }
-            if !entry.substances.isEmpty {
-                hasSubstances = true
-            }
-        }
-
-        self.trackedCount = trackedCount
-        self.hasSkipped = hasSkipped
-        self.hasSubstances = hasSubstances
-        self.hasJournal = journalCount > 0
-    }
-}
-
-struct CalendarOverviewView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
-    @Query(ChillMateQueries.recentEntries) private var entries: [NightEntry]
-    @Query(ChillMateQueries.recentJournalEntries) private var journalEntries: [JournalEntry]
-    @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
-    @State private var displayedMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: .now)) ?? .now
-    @State private var selectedDay = Calendar.current.startOfDay(for: .now)
-
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 7)
-    private let calendar = Calendar.current
-    let showsBackButton: Bool
-
-    init(showsBackButton: Bool = true) {
-        self.showsBackButton = showsBackButton
-    }
-
-    private var monthTitle: String {
-        displayedMonth.formatted(.dateTime.month(.wide).year())
-    }
-
-    private var monthData: CalendarMonthData {
-        CalendarMonthData(
-            displayedMonth: displayedMonth,
-            entries: entries,
-            journalEntries: journalEntries,
-            timers: timers,
-            calendar: calendar
-        )
-    }
-
-    var body: some View {
-        if showsBackButton {
-            // Presented as a modal cover (e.g. from the dashboard): keep an owned
-            // NavigationStack so the back chevron has a toolbar to live in. The
-            // cover never pushes, so the edge swipe acts as a dismiss, not a pop.
-            NavigationStack {
-                calendarContent
-                    .navigationTitle(Text(verbatim: ""))
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbarBackground(.hidden, for: .navigationBar)
-                    .toolbar {
-                        ToolbarItem(placement: .topBarLeading) {
-                            BackChevronButton {
-                                dismiss()
-                            }
-                        }
-                    }
-                    .edgeSwipeToDismiss()
-            }
-        } else {
-            // Used as a tab root: render WITHOUT a NavigationStack so there is no
-            // interactive pop gesture that can slide the screen to a blank state.
-            calendarContent
-        }
-    }
-
-    @ViewBuilder
-    private var calendarContent: some View {
-        let data = monthData
-        let selectedKey = calendar.startOfDay(for: selectedDay)
-        let selectedEntries = data.entriesByDay[selectedKey] ?? []
-        let selectedJournalEntries = data.journalEntriesByDay[selectedKey] ?? []
-
-        ZStack {
-            DashboardBackdrop()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    PageHeader(
-                        title: String(localized: "Calendar"),
-                        subtitle: String(localized: "Tap a day to see logs, skipped Chills, substances, and notes in one place."),
-                        symbol: "calendar",
-                        tint: Color.chillPrimary
-                    )
-                    .disablesRootSwipeBack()
-
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            Button {
-                                changeMonth(by: -1)
-                            } label: {
-                                Image(systemName: "chevron.left")
-                                    .frame(width: 38, height: 38)
-                            }
-                            .buttonStyle(.bordered)
-                            .tint(Color.chillPrimary)
-                            .accessibilityLabel(String(localized: "Previous month"))
-
-                            Spacer()
-
-                            Text(monthTitle)
-                                .font(.title3.bold())
-                                .foregroundStyle(Color.chillText)
-
-                            Spacer()
-
-                            Button {
-                                changeMonth(by: 1)
-                            } label: {
-                                Image(systemName: "chevron.right")
-                                    .frame(width: 38, height: 38)
-                            }
-                            .buttonStyle(.bordered)
-                            .tint(Color.chillPrimary)
-                            .accessibilityLabel(String(localized: "Next month"))
-                        }
-
-                        LazyVGrid(columns: columns, spacing: 8) {
-                            ForEach(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], id: \.self) { label in
-                                Text(label)
-                                    .font(.caption.weight(.bold))
-                                    .foregroundStyle(Color.chillSecondary)
-                                    .frame(maxWidth: .infinity)
-                            }
-
-                            ForEach(0..<data.leadingBlankCount, id: \.self) { _ in
-                                Color.clear
-                                    .frame(height: 48)
-                            }
-
-                            ForEach(data.monthDays, id: \.self) { day in
-                                let dayKey = calendar.startOfDay(for: day)
-                                CalendarDayCell(
-                                    day: day,
-                                    summary: data.daySummaries[dayKey] ?? .empty,
-                                    isSelected: calendar.isDate(day, inSameDayAs: selectedDay)
-                                ) {
-                                    selectedDay = day
-                                }
-                            }
-                        }
-                    }
-                    .padding(16)
-                    .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        SectionTitle(
-                            title: selectedDay.formatted(.dateTime.weekday(.wide).month(.wide).day()),
-                            symbol: "calendar.badge.clock"
-                        )
-
-                        if selectedEntries.isEmpty {
-                            EmptyGlassState(text: String(localized: "No entries for this day."))
-                        } else {
-                            ForEach(selectedEntries) { entry in
-                                TimelineRow(entry: entry, delete: delete)
-                            }
-                        }
-
-                        if !selectedJournalEntries.isEmpty {
-                            VStack(alignment: .leading, spacing: 10) {
-                                SectionTitle(title: String(localized: "Journal"), symbol: "book.closed.fill")
-
-                                ForEach(selectedJournalEntries) { entry in
-                                    CalendarJournalCard(entry: entry)
-                                }
-                            }
-                        }
-                    }
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        SectionTitle(title: "Substance tags in \(monthTitle)", symbol: "pills.fill")
-
-                        if data.monthlySubstanceCounts.isEmpty {
-                            EmptyGlassState(text: String(localized: "No substance tags in this month."))
-                        } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(data.monthlySubstanceCounts.prefix(8), id: \.name) { item in
-                                    SubstanceBar(name: item.name, count: item.count, maxCount: data.monthlySubstanceCounts.first?.count ?? 1)
-                                }
-                            }
-                            .padding(16)
-                            .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
-                        }
-                    }
-
-                    DrugDoseHistoryGraph(timers: data.monthTimers, entries: data.monthEntries, monthDays: data.monthDays)
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        SectionTitle(title: String(localized: "Month timeline"), symbol: "list.bullet.rectangle")
-
-                        if data.monthEntries.isEmpty {
-                            EmptyGlassState(text: String(localized: "No entries in this month."))
-                        } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(data.monthEntries) { entry in
-                                    TimelineRow(entry: entry, delete: delete)
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding(20)
-                .padding(.bottom, 36)
-            }
-            .scrollIndicators(.hidden)
-        }
-    }
-
-    private func changeMonth(by value: Int) {
-        displayedMonth = calendar.date(byAdding: .month, value: value, to: displayedMonth) ?? displayedMonth
-        selectedDay = displayedMonth
-    }
-
-    private func delete(_ entry: NightEntry) {
-        RecentlyDeletedStore.record(
-            kind: "Chill log",
-            title: entry.skippedNight ? "Skipped Chill check" : "Chill log",
-            detail: entry.date.formatted(date: .abbreviated, time: .shortened)
-        )
-        modelContext.delete(entry)
-        modelContext.saveChanges()
-    }
-}
-
-private struct CalendarDayCell: View {
-    let day: Date
-    let summary: CalendarDaySummary
-    let isSelected: Bool
-    let select: () -> Void
-
-    private var calendar: Calendar { .current }
-
-    private var tint: Color {
-        if summary.trackedCount > 0 {
-            return Color.chillAccentTeal
-        }
-        if summary.hasSkipped {
-            return .indigo
-        }
-        if summary.hasJournal {
-            return Color.chillSecondaryBlue
-        }
-        return .clear
-    }
-
-    var body: some View {
-        Button(action: select) {
-            VStack(spacing: 5) {
-                Text("\(calendar.component(.day, from: day))")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(isSelected ? .white : Color.chillText)
-
-                HStack(spacing: 3) {
-                    if summary.trackedCount > 0 {
-                        Circle()
-                            .fill(isSelected ? .white : Color.chillAccentTeal)
-                            .frame(width: 6, height: 6)
-                    }
-
-                    if summary.hasSkipped {
-                        Circle()
-                            .fill(isSelected ? .white.opacity(0.72) : .indigo)
-                            .frame(width: 6, height: 6)
-                    }
-
-                    if summary.hasSubstances {
-                        Circle()
-                            .fill(isSelected ? .white.opacity(0.54) : Color.chillSecondaryBlue)
-                            .frame(width: 6, height: 6)
-                    }
-
-                    if summary.hasJournal {
-                        Circle()
-                            .fill(isSelected ? .white.opacity(0.42) : Color.chillSecondaryBlue)
-                            .frame(width: 6, height: 6)
-                    }
-                }
-                .frame(height: 8)
-            }
-            .frame(maxWidth: .infinity, minHeight: 48)
-            .background(
-                isSelected ? Color.chillPrimary : tint.opacity(summary.trackedCount == 0 && !summary.hasSkipped && !summary.hasSubstances && !summary.hasJournal ? 0.04 : 0.12),
-                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
-            )
-        }
-        .buttonStyle(ChillPlainButtonStyle())
     }
 }
 
@@ -1277,8 +900,7 @@ private struct RecoveryStreakBadge: View {
                             Text(displayText)
                                 .chillScaledFont(size: 30, weight: .bold, relativeTo: .title)
                                 .foregroundStyle(Color.chillText)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.72)
+                                .chillLineLimit(1, scale: 0.72)
 
                             Text(String(localized: "without logged substance use"))
                                 .font(.caption.weight(.semibold))
@@ -1371,7 +993,18 @@ private struct DailyRecoveryScore {
     /// called it once per entry and then `substancePoints` called it twice more on
     /// the latest row, so a several-hundred-entry store did thousands of redundant
     /// sorts per dashboard render.
-    init(entries: [NightEntry], recoveryStreakDays: Int, calendar: Calendar, latestHRVms: Double = 0) {
+    /// `latestRestingBPM` is shown, not scored.
+    ///
+    /// 4.3.0 added the HealthKit read for resting heart rate and respiratory rate
+    /// and then consumed neither: `latestRestingHeartRate()` had no caller
+    /// anywhere in the app. The release notes said the app reads them as recovery
+    /// signals, and it read them into nothing.
+    ///
+    /// It joins the factor list rather than the arithmetic on purpose. Folding a
+    /// new term into the score would silently move every existing user's number
+    /// with no explanation, and what a raised resting heart rate means the morning
+    /// after is context a person can read, not a coefficient.
+    init(entries: [NightEntry], recoveryStreakDays: Int, calendar: Calendar, latestHRVms: Double = 0, latestRestingBPM: Double = 0) {
         let latest = entries.first { !$0.skippedNight }
         // Read once and pass down, rather than re-reading the getter.
         let latestSubstances = latest?.substances ?? []
@@ -1399,7 +1032,9 @@ private struct DailyRecoveryScore {
                 Factor(name: String(localized: "Substances"), caption: String(localized: "no substance use logged")),
                 Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
                 Factor(name: String(localized: "Symptoms"), caption: String(localized: "starts after activation")),
-                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
+                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available"),
+            Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available")),
+                Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available"))
             ]
             return
         }
@@ -1429,7 +1064,8 @@ private struct DailyRecoveryScore {
             Factor(name: String(localized: "Anxiety"), caption: Self.anxietyCaption(latest, symptoms: latestSymptoms ?? [])),
             Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
             Factor(name: String(localized: "Symptoms"), caption: (latestSymptoms ?? []).isEmpty ? "none" : "\((latestSymptoms ?? []).count) selected"),
-            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available")
+            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available"),
+            Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available"))
         ]
     }
 
@@ -1666,7 +1302,7 @@ private struct WhatChangedPatternCard: View {
                 VStack(spacing: 8) {
                     ForEach(reasonCounts.prefix(5), id: \.reason) { item in
                         HStack {
-                            Text(item.reason.rawValue)
+                            Text(item.reason.localizedDisplayName)
                                 .font(.caption.weight(.bold))
                                 .foregroundStyle(Color.chillText)
                             Spacer()
@@ -1971,11 +1607,16 @@ private struct TodayFocusCard: View {
                 .shadow(color: action.tint.opacity(0.36), radius: 10, y: 4)
 
                 VStack(alignment: .leading, spacing: 4) {
+                    // The next-action headline. Its length swings from "Log a Chill"
+                    // to "Ready when you are" to the German for either, and one
+                    // headline-sized line at 75% does not hold the longer ones once
+                    // the text size grows — it truncates the sentence that tells
+                    // someone what the card is for.
                     Text(action.title)
                         .font(.headline.weight(.bold))
                         .foregroundStyle(Color.chillText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+                        .chillLineLimit(2, scale: 0.7)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Text(action.detail)
                         .font(.caption.weight(.semibold))
@@ -2208,13 +1849,19 @@ private struct MetricsGrid: View {
                 Button(action: openRecoveryStreak) {
                     StatTile(
                         value: "\(recoveryStreakDays)",
+                        // A `== 1` ternary, deliberately. Xcode rejects a plural
+                        // variation whose value does not print the number
+                        // ("Plural variation requires referencing the number in the
+                        // string ... use separate top-level strings"), and this unit
+                        // sits beside a number the tile already draws. Separate
+                        // strings picked in code is the sanctioned form here.
                         unit: recoveryStreakDays == 1 ? String(localized: "day") : String(localized: "days"),
                         label: String(localized: "Recovery streak"),
                         showsChevron: false
                     )
                 }
                 .buttonStyle(ChillPlainButtonStyle())
-                .accessibilityLabel(Text("Recovery streak \(recoveryStreakDays) days. Tap to open your calendar."))
+                .accessibilityLabel(Text("Recovery streak of \(recoveryStreakDays) days. Tap to open your calendar."))
 
                 Button { isShowingFactors = true } label: {
                     StatTile(
@@ -2289,14 +1936,38 @@ private struct StatTile: View {
     let label: String
     let showsChevron: Bool
 
+    /// True when `value` is a score rather than the placeholder emoji.
+    private var isNumeric: Bool { value.allSatisfy(\.isNumber) }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
+                // `value` is a number when the score is active and an emoji when
+                // it is not, and the two need different sizes.
+                //
+                // A digit at 26pt relative to .title is fine: it is narrow, and
+                // minimumScaleFactor shrinks it if the row runs out of width. An
+                // emoji is neither. It is roughly square, it does not respond to
+                // minimumScaleFactor the way glyphs from a text font do, and at the
+                // accessibility sizes a .title-relative emoji outgrows this tile and
+                // is drawn clipped — which is what the audit reports.
+                //
+                // So the emoji gets its own smaller scale with headroom to grow
+                // into. It is standing in for "no score yet" rather than carrying a
+                // reading, so it can afford to be smaller; the label beside it is
+                // what actually says so.
                 Text(value)
-                    .chillScaledFont(size: 26, weight: .bold, relativeTo: .title, design: .rounded)
+                    .chillScaledFont(
+                        size: isNumeric ? 26 : 20,
+                        weight: .bold,
+                        relativeTo: isNumeric ? .title : .body,
+                        design: .rounded
+                    )
                     .foregroundStyle(Color.chillText)
                     .monospacedDigit()
-                    .contentTransition(.numericText())
+                    .contentTransition(isNumeric ? .numericText() : .identity)
+                    .chillLineLimit(1, scale: 0.6)
+                    .accessibilityHidden(!isNumeric)
                 if let unit {
                     Text(unit)
                         .font(.subheadline.weight(.bold))
@@ -2309,11 +1980,18 @@ private struct StatTile: View {
                         .foregroundStyle(Color.chillTertiary)
                 }
             }
+            // One line at 80% is not enough room for "Log to activate" once the
+            // text size grows, so it truncated — which the accessibility audit
+            // reports as clipped text, and which on this tile hides the only
+            // instruction telling someone how to switch the score on.
+            //
+            // Two lines and a little more shrink. The tiles sit side by side, so
+            // the taller one sets the row height and they stay aligned.
             Text(label)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                .chillLineLimit(2, scale: 0.7)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
@@ -2339,9 +2017,18 @@ private struct ScoreFactorsSheet: View {
                                 .trim(from: 0, to: score.isActive ? CGFloat(score.value) / 100 : 1)
                                 .stroke(LinearGradient.chillBrand, style: StrokeStyle(lineWidth: 8, lineCap: .round))
                                 .rotationEffect(.degrees(-90))
+                            // Scaling text inside a container that does not scale
+                            // can only ever end in clipping, and this ring is a
+                            // fixed 52pt. The glyph is allowed to shrink to fit it
+                            // rather than grow out of it — which matters most for
+                            // the emoji, since an emoji is roughly square and hits
+                            // the edge long before a digit does.
                             Text(score.isActive ? "\(score.value)" : score.emoji)
                                 .chillScaledFont(size: 18, weight: .black, relativeTo: .title3, design: .rounded)
                                 .foregroundStyle(Color.chillText)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.5)
+                                .accessibilityHidden(!score.isActive)
                         }
                         .frame(width: 52, height: 52)
 
@@ -2426,19 +2113,24 @@ private struct MetricCard: View {
                     .chillScaledFont(size: 22, weight: .black, relativeTo: .title2, design: .rounded)
                     .monospacedDigit()
                     .foregroundStyle(Color.chillText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.70)
+                    .chillLineLimit(1, scale: 0.70)
 
+                // Both of these carry sentences whose length varies with the
+                // language and with what the card is reporting, and a hard
+                // one-line limit truncates them rather than wrapping. The audit
+                // reports that as clipped text; on this card it is the line that
+                // says what the number means.
                 Text(title)
                     .font(.caption.weight(.bold))
                     .foregroundStyle(Color.chillText.opacity(0.90))
-                    .lineLimit(1)
+                    .chillLineLimit(2, scale: 0.75)
+                    .fixedSize(horizontal: false, vertical: true)
 
                 Text(caption)
                     .font(.caption2.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.80)
+                    .chillLineLimit(2, scale: 0.75)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, minHeight: 80, alignment: .topLeading)
@@ -2469,7 +2161,7 @@ private struct SubstanceOverview: View {
     }
 }
 
-private struct DrugDoseHistoryGraph: View {
+struct DrugDoseHistoryGraph: View {
     let rows: [DoseHistoryRow]
     let monthDays: [Date]
 
@@ -2506,7 +2198,9 @@ private struct DrugDoseHistoryGraph: View {
     }
 }
 
-private struct DoseHistoryRow: Identifiable {
+// Internal alongside the graph that publishes it: `DrugDoseHistoryGraph` is used
+// from the calendar now, and a public-facing type cannot expose a private one.
+struct DoseHistoryRow: Identifiable {
     let id: String
     let substance: String
     let dayCounts: [Int]
@@ -2608,60 +2302,7 @@ private struct DoseHistoryRowView: View {
     }
 }
 
-private struct CalendarJournalCard: View {
-    let entry: JournalEntry
-
-    private var lines: [(String, String)] {
-        [
-            ("Clear memory", entry.rememberClearly),
-            ("Uncomfortable", entry.uncomfortableMoments),
-            ("Consent", entry.consentConcerns),
-            ("Regrets", entry.regrets),
-            ("Good", entry.feelsGoodAbout)
-        ].filter { !$0.1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 10) {
-                Image(systemName: "book.closed.fill")
-                    .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(Color.chillSecondaryBlue)
-                    .frame(width: 34, height: 34)
-                    .glassSurface(radius: 17, tint: Color.chillSecondaryBlue.opacity(0.12))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(entry.date.formatted(date: .omitted, time: .shortened))
-                        .font(.headline)
-                        .foregroundStyle(Color.chillText)
-                    Text(entry.photos.isEmpty ? String(localized: "Journal entry") : String(localized: "\(entry.photos.count) picture\(entry.photos.count == 1 ? "" : "s") attached"))
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.chillSecondary)
-                }
-
-                Spacer(minLength: 0)
-            }
-
-            ForEach(lines.prefix(3), id: \.0) { line in
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(line.0)
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Color.chillSecondary)
-                    Text(line.1)
-                        .font(.caption)
-                        .foregroundStyle(Color.chillText)
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .glassSurface(radius: 22, tint: Color.chillSecondaryBlue.opacity(0.07))
-    }
-}
-
-private struct SubstanceBar: View {
+struct SubstanceBar: View {
     let name: String
     let count: Int
     let maxCount: Int
@@ -2819,7 +2460,7 @@ private struct TimelineSection: View {
     }
 }
 
-private struct TimelineRow: View {
+struct TimelineRow: View {
     let entry: NightEntry
     let delete: (NightEntry) -> Void
 
@@ -3022,7 +2663,7 @@ private struct FloatingLogBar: View {
     }
 }
 
-private struct SectionTitle: View {
+struct SectionTitle: View {
     let title: String
     let symbol: String
 
@@ -3039,7 +2680,7 @@ private struct SectionTitle: View {
     }
 }
 
-private struct EmptyGlassState: View {
+struct EmptyGlassState: View {
     let text: String
 
     var body: some View {
@@ -3083,885 +2724,5 @@ private struct NightStatus: Identifiable {
         let substances = entry.substances.joined(separator: ", ")
         let drugText = substances.isEmpty ? "Tracked without substance tags." : substances
         return "\(drugText) \(entry.sleepSummary)"
-    }
-}
-
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let width = proposal.width ?? 0
-        var rowWidth: CGFloat = 0
-        var rowHeight: CGFloat = 0
-        var totalHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if rowWidth > 0, rowWidth + spacing + size.width > width {
-                totalHeight += rowHeight + spacing
-                rowWidth = size.width
-                rowHeight = size.height
-            } else {
-                rowWidth += rowWidth == 0 ? size.width : spacing + size.width
-                rowHeight = max(rowHeight, size.height)
-            }
-        }
-
-        totalHeight += rowHeight
-        return CGSize(width: width, height: totalHeight)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var x = bounds.minX
-        var y = bounds.minY
-        var rowHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-
-            if x > bounds.minX, x + size.width > bounds.maxX {
-                x = bounds.minX
-                y += rowHeight + spacing
-                rowHeight = 0
-            }
-
-            subview.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
-            x += size.width + spacing
-            rowHeight = max(rowHeight, size.height)
-        }
-    }
-}
-
-struct ProfileOverviewView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
-    @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
-    @State private var selectedPhoto: PhotosPickerItem?
-    @State private var isShowingProfileEditor = false
-    let showsBackButton: Bool
-
-    init(showsBackButton: Bool = true) {
-        self.showsBackButton = showsBackButton
-    }
-
-    private var profile: UserProfile? {
-        profiles.first
-    }
-
-    private var details: [ProfileDetail] {
-        guard let profile else {
-            return []
-        }
-
-        // `group` is an enum, not the label. Sections used to be filtered by
-        // comparing the localized label against English literals, so every
-        // section came out empty in Dutch, German, French and Spanish.
-        var items = [
-            ProfileDetail(group: .identity, label: String(localized: "Name"), value: profile.name, symbol: "person.fill"),
-            ProfileDetail(group: .identity, label: String(localized: "Date of birth"), value: "\(profile.dateOfBirth.formatted(date: .abbreviated, time: .omitted)) (\(profile.calculatedAge))", symbol: "calendar"),
-            ProfileDetail(group: .body, label: String(localized: "Weight"), value: "\(Int(profile.weightKg.rounded())) kg", symbol: "scalemass.fill"),
-            ProfileDetail(group: .body, label: String(localized: "Height"), value: "\(Int(profile.heightCm.rounded())) cm", symbol: "ruler.fill"),
-            ProfileDetail(group: .identity, label: String(localized: "Sex"), value: profile.sex, symbol: "person.2.fill"),
-            ProfileDetail(group: .identity, label: String(localized: "Sexual orientation"), value: profile.sexualOrientation, symbol: "heart.fill")
-        ]
-
-        if profile.sexualRole != SexualRole.notApplicable.rawValue {
-            items.append(ProfileDetail(group: .identity, label: String(localized: "Role"), value: profile.sexualRole, symbol: "arrow.left.arrow.right"))
-        }
-
-        items.append(
-            ProfileDetail(
-                group: .health,
-                label: String(localized: "PrEP"),
-                value: profile.isOnPrEP ? String(localized: "Yes") : String(localized: "No"),
-                symbol: "cross.case.fill"
-            )
-        )
-
-        if profile.isOnPrEP {
-            items.append(
-                ProfileDetail(
-                    group: .health,
-                    label: String(localized: "PrEP schedule"),
-                    value: profile.prepSchedule,
-                    symbol: "clock.badge.checkmark.fill"
-                )
-            )
-            items.append(
-                ProfileDetail(
-                    group: .health,
-                    label: String(localized: "PrEP since"),
-                    value: profile.prepStartDate.formatted(date: .abbreviated, time: .omitted),
-                    symbol: "calendar.badge.clock"
-                )
-            )
-        }
-
-        return items
-    }
-
-    var body: some View {
-        ZStack {
-            DashboardBackdrop()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                        if profile == nil {
-                            MissingProfileCard()
-                        } else {
-                            ProfilePhotoHeader(
-                                profileImageData: profile?.profileImageData,
-                                selectedPhoto: $selectedPhoto,
-                                updatePhoto: updateProfilePhoto
-                            )
-
-                            ProfileAllSections(details: details, medications: profile?.medications ?? [])
-                        }
-                    }
-                    .padding(20)
-                    .padding(.bottom, 40)
-                }
-            }
-            .navigationTitle(Text(verbatim: ""))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbar {
-                if profile != nil {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            isShowingProfileEditor = true
-                        } label: {
-                            Image(systemName: "pencil")
-                                .font(.headline.weight(.bold))
-                                .frame(width: 36, height: 36)
-                        }
-                        .buttonStyle(ChillPlainButtonStyle())
-                        .foregroundStyle(Color.chillText)
-                        .glassSurface(radius: 18, tint: .white.opacity(0.28), interactive: true)
-                        .accessibilityLabel("Edit")
-                    }
-                }
-            }
-            .fullScreenCover(isPresented: $isShowingProfileEditor) {
-                if let profile {
-                    ProfileEditView(profile: profile)
-                }
-            }
-    }
-
-    private func updateProfilePhoto(_ item: PhotosPickerItem?) {
-        guard let item else {
-            return
-        }
-
-        Task {
-            guard let data = try? await item.loadTransferable(type: Data.self) else {
-                return
-            }
-
-            let optimizedData = await ChillImageOptimizer.downsampledJPEG(from: data, maxPixelSize: 640, compressionQuality: 0.84)
-
-            guard let profile = profiles.first else {
-                return
-            }
-
-            profile.profileImageData = optimizedData
-            modelContext.saveChanges()
-        }
-    }
-}
-
-private struct ProfilePhotoHeader: View {
-    let profileImageData: Data?
-    @Binding var selectedPhoto: PhotosPickerItem?
-    let updatePhoto: (PhotosPickerItem?) -> Void
-    @State private var profileImage: UIImage?
-
-    private var imageIdentifier: String {
-        guard let profileImageData else {
-            return "none"
-        }
-
-        let prefixHash = profileImageData.prefix(32).reduce(0) { partial, byte in
-            (partial &* 31) &+ Int(byte)
-        }
-        return "\(profileImageData.count)-\(prefixHash)"
-    }
-
-    var body: some View {
-        VStack(alignment: .center, spacing: 14) {
-            ZStack(alignment: .bottomTrailing) {
-                Group {
-                    if let profileImage {
-                        Image(uiImage: profileImage)
-                            .resizable()
-                            .scaledToFill()
-                    } else {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(Color.chillPrimary.opacity(0.62))
-                            .padding(28)
-                    }
-                }
-                .frame(width: 132, height: 132)
-                .clipShape(Circle())
-                .glassSurface(radius: 66, tint: Color.chillPrimary.opacity(0.18))
-
-                PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                    Image(systemName: "camera.fill")
-                        .font(.headline)
-                        .foregroundStyle(Color.chillText)
-                        .frame(width: 42, height: 42)
-                        .background(.ultraThinMaterial, in: Circle())
-                        .overlay {
-                            Circle()
-                                .stroke(.white.opacity(0.35), lineWidth: 1)
-                        }
-                        .shadow(color: .black.opacity(0.16), radius: 12, y: 6)
-                }
-                .onChange(of: selectedPhoto) { _, newValue in
-                    updatePhoto(newValue)
-                }
-                .accessibilityLabel("Add profile picture")
-            }
-
-            Text("Your profile overview")
-                .font(.title2.bold())
-                .foregroundStyle(Color.chillText)
-
-            Text("Keep the details that shape your private overview up to date.")
-                .font(.callout)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color.chillSecondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(22)
-        .glassSurface(radius: 34, tint: .white.opacity(0.12))
-        .task(id: imageIdentifier) {
-            guard let profileImageData else {
-                profileImage = nil
-                return
-            }
-
-            let optimizedData = await ChillImageOptimizer.downsampledJPEG(from: profileImageData, maxPixelSize: 640, compressionQuality: 0.84)
-            profileImage = UIImage(data: optimizedData)
-        }
-    }
-}
-
-private struct ProfileEditView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
-    @AppStorage(DefaultsKey.lastDailyRecoveryScore) private var lastDailyRecoveryScore = 42
-    @AppStorage(DefaultsKey.country) private var country = "Netherlands"
-    @Bindable var profile: UserProfile
-
-    private var palette: DailyScorePalette {
-        DailyScorePalette(score: lastDailyRecoveryScore)
-    }
-
-    private var sexBinding: Binding<ProfileSex> {
-        Binding {
-            ProfileSex(rawValue: profile.sex) ?? .male
-        } set: { value in
-            profile.sex = value.rawValue
-            modelContext.saveChanges()
-        }
-    }
-
-    private var roleBinding: Binding<SexualRole> {
-        Binding {
-            SexualRole(rawValue: profile.sexualRole) ?? .notApplicable
-        } set: { value in
-            profile.sexualRole = value.rawValue
-            modelContext.saveChanges()
-        }
-    }
-
-    private var prepScheduleBinding: Binding<PrEPSchedule> {
-        Binding {
-            PrEPSchedule(rawValue: profile.prepSchedule) ?? .daily
-        } set: { value in
-            profile.prepSchedule = value.rawValue
-            modelContext.saveChanges()
-        }
-    }
-
-    private var dailyPrEPNotice: Bool {
-        profile.isOnPrEP &&
-        (PrEPSchedule(rawValue: profile.prepSchedule) ?? .daily) == .daily &&
-        (Calendar.current.dateComponents([.day], from: profile.prepStartDate, to: .now).day ?? 0) < 7
-    }
-
-    var body: some View {
-        NavigationStack {
-            profileEditContent
-            .navigationTitle(Text(verbatim: ""))
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    BackChevronButton {
-                        dismiss()
-                    }
-                }
-            }
-        }
-        .edgeSwipeToDismiss()
-        .endEditingOnTap()
-        .onChange(of: profile.dateOfBirth) { _, _ in
-            profile.age = profile.calculatedAge
-            modelContext.saveChanges()
-        }
-        .onChange(of: profile.weightKg) { _, _ in
-            modelContext.saveChanges()
-        }
-        .onChange(of: profile.heightCm) { _, _ in
-            modelContext.saveChanges()
-        }
-        .onChange(of: profile.homeAddress) { _, _ in
-            modelContext.saveChanges()
-        }
-        .onChange(of: profile.isOnPrEP) { _, _ in
-            modelContext.saveChanges()
-        }
-        .onChange(of: profile.prepStartDate) { _, _ in
-            modelContext.saveChanges()
-        }
-    }
-
-    /// Form content, split out of a 181-line body.
-    @ViewBuilder
-    private var profileEditContent: some View {
-        ZStack {
-            DashboardBackdrop()
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Edit profile")
-                            .font(.largeTitle.bold())
-                            .foregroundStyle(palette.heroText)
-                            .disablesRootSwipeBack()
-
-                        Text("These details keep your overview and timer estimates personal.")
-                            .font(.callout)
-                            .foregroundStyle(palette.heroSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding(.top, 44)
-
-                    VStack(spacing: 0) {
-                        ProfileSetupDateRow(
-                            title: String(localized: "Date of birth (\(profile.calculatedAge))"),
-                            date: $profile.dateOfBirth,
-                            systemImage: "calendar"
-                        )
-
-                        ProfileSetupRowDivider()
-
-                        ProfileSetupMeasurementRow(title: String(localized: "Weight"), value: $profile.weightKg, range: 35...180, unit: "kg", systemImage: "scalemass.fill")
-
-                        ProfileSetupRowDivider()
-
-                        ProfileSetupMeasurementRow(title: String(localized: "Height"), value: $profile.heightCm, range: 130...220, unit: "cm", systemImage: "ruler.fill")
-
-                        ProfileSetupRowDivider()
-
-                        ProfileSetupTextField(
-                            title: String(localized: "Home address"),
-                            placeholder: String(localized: "Street, number, and city"),
-                            text: $profile.homeAddress,
-                            systemImage: "house.fill",
-                            axis: .vertical
-                        )
-
-                        ProfileSetupRowDivider()
-
-                        ProfileSetupPickerRow(title: String(localized: "Country"), systemImage: "mappin.and.ellipse") {
-                            Picker("Country", selection: $country) {
-                                Text("Netherlands").tag("Netherlands")
-                                Text("Belgium").tag("Belgium")
-                                Text("Germany").tag("Germany")
-                                Text("United Kingdom").tag("United Kingdom")
-                                Text("Ireland").tag("Ireland")
-                                Text("France").tag("France")
-                                Text("Spain").tag("Spain")
-                                Text("United States").tag("United States")
-                                Text("Australia").tag("Australia")
-                                Text("Other").tag("Other")
-                            }
-                        }
-
-                        Text("Sets your default emergency number and the support resources shown across the app.")
-                            .font(.caption)
-                            .foregroundStyle(palette.heroSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 16)
-                            .padding(.top, 6)
-
-                        ProfileSetupRowDivider()
-
-                        ProfileSetupPickerRow(title: String(localized: "Sex"), systemImage: "person.2.fill") {
-                            Picker("Sex", selection: sexBinding) {
-                                ForEach(ProfileSex.allCases) { option in
-                                    Text(option.localizedDisplayName).tag(option)
-                                }
-                            }
-                        }
-
-                        ProfileSetupRowDivider()
-
-                        ProfileSetupPickerRow(title: String(localized: "Role"), systemImage: "arrow.left.arrow.right") {
-                            Picker("Role", selection: roleBinding) {
-                                ForEach(SexualRole.allCases) { option in
-                                    Text(option.localizedDisplayName).tag(option)
-                                }
-                            }
-                        }
-
-                        ProfileSetupRowDivider()
-
-                        ProfileSetupToggleRow(
-                            title: String(localized: "On PrEP"),
-                            subtitle: profile.isOnPrEP ? String(localized: "Enabled") : String(localized: "Not enabled"),
-                            isOn: $profile.isOnPrEP,
-                            systemImage: "cross.case.fill"
-                        )
-
-                        if profile.isOnPrEP {
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupPickerRow(title: String(localized: "PrEP schedule"), systemImage: "clock.badge.checkmark.fill") {
-                                Picker("PrEP schedule", selection: prepScheduleBinding) {
-                                    ForEach(PrEPSchedule.allCases) { option in
-                                        Text(option.localizedDisplayName).tag(option)
-                                    }
-                                }
-                            }
-
-                            ProfileSetupRowDivider()
-
-                            ProfileSetupDateRow(
-                                title: String(localized: "PrEP since"),
-                                date: $profile.prepStartDate,
-                                systemImage: "calendar.badge.clock"
-                            )
-
-                            if dailyPrEPNotice {
-                                ProfileSetupRowDivider()
-
-                                Text("Daily PrEP needs about 7 days to reach maximum protection for receptive anal sex. Until then, use extra protection and follow medical advice.")
-                                    .font(.caption.weight(.semibold))
-                                    .foregroundStyle(.red)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.vertical, 8)
-                            }
-                        }
-
-                        ProfileSetupRowDivider()
-
-                        Text("Changes save automatically.")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Color.chillSecondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 8)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
-                    .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
-
-                    ProfileMedicationEditor(profile: profile)
-                }
-                .padding(20)
-                .padding(.bottom, 36)
-            }
-            .scrollIndicators(.hidden)
-            .scrollDismissesKeyboard(.interactively)
-        }
-    }
-}
-
-private struct ProfileMeasurementStepper: View {
-    let title: String
-    @Binding var value: Double
-    let range: ClosedRange<Double>
-    let unit: String
-
-    var body: some View {
-        Stepper(value: $value, in: range, step: 1) {
-            HStack {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
-                Spacer()
-                Text("\(Int(value.rounded())) \(unit)")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-        }
-        .tint(Color.chillPrimary)
-    }
-}
-
-private struct ProfileMedicationEditor: View {
-    @Environment(\.modelContext) private var modelContext
-    @Bindable var profile: UserProfile
-    @State private var name = ""
-    @State private var dosage = ""
-    @State private var takenAt = Date.now
-    @State private var effectiveHours = 8.0
-
-    private var canAdd: Bool {
-        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionTitle(title: String(localized: "Medication"), symbol: "pills.fill")
-
-            VStack(spacing: 10) {
-                TextField("Medication name", text: $name)
-                    .textFieldStyle(.plain)
-                    .foregroundStyle(Color.chillText)
-                    .padding(14)
-                    .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                TextField("Medication amount from your prescription, optional", text: $dosage)
-                    .textFieldStyle(.plain)
-                    .foregroundStyle(Color.chillText)
-                    .padding(14)
-                    .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
-
-                DatePicker("Usually taken", selection: $takenAt, displayedComponents: [.hourAndMinute])
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
-                    .tint(Color.chillPrimary)
-
-                Stepper(value: $effectiveHours, in: 0.5...72, step: 0.5) {
-                    HStack {
-                        Text("Works for")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color.chillText)
-                        Spacer()
-                        Text("\(effectiveHours.formatted(.number.precision(.fractionLength(0...1)))) h")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.chillSecondary)
-                    }
-                }
-                .tint(Color.chillPrimary)
-
-                GlassActionButton(prominent: true, action: addMedication) {
-                    Label("Add medication", systemImage: "plus.circle.fill")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                }
-                .disabled(!canAdd)
-                .opacity(canAdd ? 1 : 0.55)
-            }
-
-            if profile.medications.isEmpty {
-                Text("No medication saved yet.")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-            } else {
-                VStack(spacing: 10) {
-                    ForEach(profile.medications) { medication in
-                        ProfileMedicationEditableRow(medication: medication) {
-                            removeMedication(medication)
-                        }
-                    }
-                }
-            }
-        }
-        .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08), interactive: true)
-    }
-
-    private func addMedication() {
-        let medication = ProfileMedication(
-            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
-            dosage: dosage.trimmingCharacters(in: .whitespacesAndNewlines),
-            takenAt: takenAt,
-            effectiveHours: effectiveHours
-        )
-        var medications = profile.medications
-        medications.append(medication)
-        profile.medications = medications
-        modelContext.saveChanges()
-        name = ""
-        dosage = ""
-        takenAt = .now
-        effectiveHours = 8
-    }
-
-    private func removeMedication(_ medication: ProfileMedication) {
-        var medications = profile.medications
-        medications.removeAll { $0.id == medication.id }
-        profile.medications = medications
-        modelContext.saveChanges()
-    }
-}
-
-private struct ProfileMedicationEditableRow: View {
-    let medication: ProfileMedication
-    let remove: () -> Void
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: "pills.fill")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(Color.chillSecondaryBlue)
-                .frame(width: 36, height: 36)
-                .glassSurface(radius: 18, tint: Color.chillSecondaryBlue.opacity(0.10))
-
-            VStack(alignment: .leading, spacing: 3) {
-                Text(medication.name)
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.chillText)
-                Text(medication.timingSummary)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-
-            Spacer(minLength: 0)
-
-            Button(role: .destructive, action: remove) {
-                Image(systemName: "trash.fill")
-            }
-            .buttonStyle(ChillPlainButtonStyle())
-            .foregroundStyle(Color.chillSecondary)
-        }
-        .padding(12)
-        .glassSurface(radius: 20, tint: .black.opacity(0.04), interactive: true)
-    }
-}
-
-private struct ProfileMedicationDetailCard: View {
-    let medication: ProfileMedication
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: "pills.fill")
-                .font(.system(size: 17, weight: .bold))
-                .foregroundStyle(Color.chillSecondaryBlue)
-                .frame(width: 40, height: 40)
-                .glassSurface(radius: 20, tint: Color.chillSecondaryBlue.opacity(0.10))
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(medication.name)
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
-                Text(medication.timingSummary)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(16)
-        .glassSurface(radius: 24, tint: .black.opacity(0.04))
-    }
-}
-
-private struct MissingProfileCard: View {
-    var body: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "person.crop.circle.badge.exclamationmark")
-                .font(.system(size: 44, weight: .bold))
-                .foregroundStyle(Color.chillPrimary)
-                .frame(width: 86, height: 86)
-                .glassSurface(radius: 43, tint: Color.chillPrimary.opacity(0.14))
-
-            Text("No profile yet")
-                .font(.title3.bold())
-                .foregroundStyle(Color.chillText)
-
-            Text("Create your profile from setup to see your details here.")
-                .font(.callout)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(Color.chillSecondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(24)
-        .glassSurface(radius: 30, tint: .black.opacity(0.04))
-    }
-}
-
-private struct ProfileDetailList: View {
-    let details: [ProfileDetail]
-
-    var body: some View {
-        VStack(spacing: 12) {
-            ForEach(details) { detail in
-                ProfileDetailRow(detail: detail)
-            }
-        }
-    }
-}
-
-private enum ProfileSectionPage: String, CaseIterable, Identifiable {
-    case identity = "Identity"
-    case body = "Body"
-    case health = "Health"
-    case medications = "Medication"
-
-    var id: String { rawValue }
-
-    var symbol: String {
-        switch self {
-        case .identity:
-            "person.text.rectangle.fill"
-        case .body:
-            "ruler.fill"
-        case .health:
-            "cross.case.fill"
-        case .medications:
-            "pills.fill"
-        }
-    }
-}
-
-/// One page with everything on it. Profile used to be four rows that reported
-/// only how many items each held, so reading your own details took four taps
-/// and four screens.
-private struct ProfileAllSections: View {
-    let details: [ProfileDetail]
-    let medications: [ProfileMedication]
-
-    var body: some View {
-        VStack(spacing: 20) {
-            ForEach(ProfileSectionPage.allCases) { page in
-                let rows = details.filter { $0.group == page }
-
-                if page == .medications || !rows.isEmpty {
-                    VStack(alignment: .leading, spacing: 10) {
-                        HStack(spacing: 10) {
-                            Image(systemName: page.symbol)
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundStyle(Color.chillPrimary)
-                                .frame(width: 30, height: 30)
-                                .glassSurface(radius: 10, tint: Color.chillPrimary.opacity(0.12))
-                                .accessibilityHidden(true)
-
-                            Text(page.localizedDisplayName)
-                                .font(.headline)
-                                .foregroundStyle(Color.chillText)
-
-                            Spacer(minLength: 0)
-                        }
-                        .accessibilityAddTraits(.isHeader)
-
-                        if page == .medications {
-                            if medications.isEmpty {
-                                EmptyGlassState(text: String(localized: "No medication saved yet. Use Edit on your profile to add medication, prescription amount, timing, and duration."))
-                            } else {
-                                VStack(spacing: 12) {
-                                    ForEach(medications) { medication in
-                                        ProfileMedicationDetailCard(medication: medication)
-                                    }
-                                }
-                            }
-                        } else {
-                            ProfileDetailList(details: rows)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-        }
-    }
-}
-
-private struct ProfileDetailRow: View {
-    let detail: ProfileDetail
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 14) {
-            Image(systemName: detail.symbol)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(Color.chillPrimary)
-                .frame(width: 40, height: 40)
-                .glassSurface(radius: 20, tint: Color.chillPrimary.opacity(0.12))
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(detail.label)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
-
-                Text(detail.displayValue)
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(16)
-        .glassSurface(radius: 24, tint: .black.opacity(0.04))
-    }
-}
-
-private struct ProfileDetail: Identifiable {
-    let group: ProfileSectionPage
-    let label: String
-    let value: String
-    let symbol: String
-
-    var id: String { label }
-
-    var displayValue: String {
-        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmedValue.isEmpty ? String(localized: "Not added yet") : trimmedValue
-    }
-}
-
-struct PrivacyShieldView: View {
-    let dismiss: () -> Void
-    @State private var showUnlockButton = false
-
-    var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-
-            VStack(spacing: 24) {
-                Spacer()
-
-                VStack(spacing: 14) {
-                    Image(systemName: "moon.fill")
-                        .font(.system(size: 52, weight: .light))
-                        .foregroundStyle(.white.opacity(0.38))
-
-                    Text("Screen paused")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.46))
-                }
-
-                Spacer()
-
-                if showUnlockButton {
-                    Button(action: dismiss) {
-                        Text("Resume")
-                            .font(.body.weight(.semibold))
-                            .foregroundStyle(.white.opacity(0.55))
-                            .padding(.horizontal, 28)
-                            .padding(.vertical, 12)
-                    }
-                    .buttonStyle(ChillPlainButtonStyle())
-                    .transition(.opacity)
-                }
-            }
-            .padding(.bottom, 48)
-        }
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.25)) {
-                showUnlockButton = true
-            }
-        }
-        .accessibilityAddTraits(.isButton)
-        .accessibilityLabel(Text("Show unlock"))
-        .statusBarHidden(true)
-        .persistentSystemOverlays(.hidden)
     }
 }

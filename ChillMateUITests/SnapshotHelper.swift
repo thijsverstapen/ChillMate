@@ -12,12 +12,18 @@
 //            the new SnapshotHelper.swift
 // -----------------------------------------------------
 
-// LOCAL PATCH (ChillMate): the five stored mutable statics below are marked
-// `nonisolated(unsafe)` so this file builds under Swift 6 language mode, which
-// every target in this project now uses. Upstream fastlane still ships them
-// unannotated. They are written once during test setup and read from the test
-// runner thereafter, so the annotation reflects existing behaviour rather than
-// changing it. Re-apply after regenerating this file from fastlane.
+// LOCAL PATCH (ChillMate): the five stored mutable statics below are left plain,
+// so they pick up the `@MainActor` isolation of the class that declares them.
+// Upstream fastlane ships them unannotated, which does not build under Swift 6
+// language mode; they were previously marked `nonisolated(unsafe)` here, which
+// did build but cost 19 warnings under SWIFT_STRICT_MEMORY_SAFETY, since every
+// read of an unsafe global then wants its own `unsafe` marker.
+//
+// Inheriting the actor is the better answer: every access is already on the
+// main actor (the class is `@MainActor`, and the one accessor outside it,
+// `XCUIElementQuery.deviceStatusBars`, is annotated), so the compiler can prove
+// what the `unsafe` marker only asserted. Re-apply after regenerating this file
+// from fastlane.
 
 import Foundation
 import XCTest
@@ -61,14 +67,14 @@ enum SnapshotError: Error, CustomDebugStringConvertible {
 @objcMembers
 @MainActor
 open class Snapshot: NSObject {
-    nonisolated(unsafe) static var app: XCUIApplication?
-    nonisolated(unsafe) static var waitForAnimations = true
-    nonisolated(unsafe) static var cacheDirectory: URL?
+    static var app: XCUIApplication?
+    static var waitForAnimations = true
+    static var cacheDirectory: URL?
     static var screenshotsDirectory: URL? {
         return cacheDirectory?.appendingPathComponent("screenshots", isDirectory: true)
     }
-    nonisolated(unsafe) static var deviceLanguage = ""
-    nonisolated(unsafe) static var currentLocale = ""
+    static var deviceLanguage = ""
+    static var currentLocale = ""
 
     open class func setupSnapshot(_ app: XCUIApplication, waitForAnimations: Bool = true) {
 

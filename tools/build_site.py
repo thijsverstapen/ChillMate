@@ -51,9 +51,34 @@ EMAIL = "chillmate@icloud.com"
 # with a price in dollars and a button that will not install anything for them.
 APP_ID = "6774212606"
 APP_STORE_URL = f"https://apps.apple.com/app/id{APP_ID}"
-VERSION = "4.2.1"
-BUILD = "422"
-UPDATED = "2026-08-11"
+
+
+def _shipping_version():
+    """The version and build, read out of the project rather than typed here.
+
+    They were typed here, and they went stale: the whole public site advertised
+    4.2.1 while 5.0.0 was in the project, including the privacy page's claim
+    about which build it had been checked against. A number a person has to
+    remember to change in two places is a number that will be wrong in one.
+
+    `MARKETING_VERSION` appears ten times in project.pbxproj and
+    `CURRENT_PROJECT_VERSION` ten more. They are supposed to agree, so reading
+    them all and refusing to continue when they disagree turns building the site
+    into a check on the release as well.
+    """
+    project = (ROOT / "ChillMate.xcodeproj" / "project.pbxproj").read_text()
+    versions = set(re.findall(r"MARKETING_VERSION = ([0-9A-Za-z.]+);", project))
+    builds = set(re.findall(r"CURRENT_PROJECT_VERSION = ([0-9]+);", project))
+    if len(versions) != 1:
+        raise SystemExit(f"project.pbxproj disagrees with itself about MARKETING_VERSION: {sorted(versions)}")
+    if len(builds) != 1:
+        raise SystemExit(f"project.pbxproj disagrees with itself about CURRENT_PROJECT_VERSION: {sorted(builds)}")
+    return versions.pop(), builds.pop()
+
+
+VERSION, BUILD = _shipping_version()
+# Replaced below, once RELEASES exists, with the date of the newest release.
+UPDATED = ""
 
 
 # --------------------------------------------------------------------------
@@ -1216,9 +1241,13 @@ def source_checksum() -> tuple[str, int, str]:
     import hashlib
     # Every target that ships in the binary. Omitting the Live Activity
     # extension excluded shipped code from a page whose whole point is that
-    # the digest covers what was audited.
+    # the digest covers what was audited, and moving the domain into
+    # `ChillMateCore` would have quietly done the same thing again: thirteen
+    # files, including the whole risk engine, left the app directories and the
+    # count dropped from 97 to 91 without the claim getting any weaker in
+    # writing. A claim that shrinks when code moves is not a claim.
     targets = ("ChillMate", "ChillMateWatchApp", "ChillMateWatchAppWidget",
-               "ChillMateLiveActivityExtension")
+               "ChillMateLiveActivityExtension", "ChillMateCore")
     swift = sorted(f for target in targets
                    for f in ROOT.glob(f"{target}/**/*.swift")
                    if "DerivedData" not in str(f))
@@ -1274,7 +1303,7 @@ def build_privacy():
     <p class="meta">Checked against {swift_count} Swift files, commit <a href="{REPO}/commit/{commit}"><code>{commit}</code></a>, whose combined SHA-256 begins <code>{checksum}</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
-        <caption>Checked against ChillMate {VERSION} (build {BUILD}), across all {swift_count} Swift files in the app targets.</caption>
+        <caption>Checked against ChillMate {VERSION} (build {BUILD}), across all {swift_count} Swift files in the app targets and the domain package.</caption>
         <thead>
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
@@ -1630,6 +1659,25 @@ def build_privacy_nl():
 
 
 RELEASES = [
+    ("5.0.0", "500", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [
+        "Benzodiazepines and methamphetamine can now be logged and checked. Until now there was no way to tell ChillMate about either, so GHB with a benzo returned no warning at all. Twenty-five new rated combinations between them.",
+        "Every combination is now compared with TripSit's published drug combination chart, and each warning says how it compares. That comparison found four ChillMate was rating too low: GHB, GBL and alcohol each with ketamine, and MDMA with 3-MMC, are all at the highest severity now.",
+        "The risk checker shows when each thing you selected comes up, peaks and finishes, leading with onset, because most overdoses are a second dose taken before the first arrived.",
+        "Timings are now per route. A cannabis edible takes twenty to sixty minutes, not the under-ten of smoking, and the app had been showing the wrong figures.",
+        "Forty-nine lines of drug information had been appearing in English whichever language you chose. Every main risk and mixing risk, for every substance, is translated now.",
+        "Twenty-seven labels used to cut themselves in half at the larger accessibility text sizes, and the half that went was the half that said what the number meant.",
+        "Calendar days read out properly to VoiceOver, and the week now starts on the day your region starts it.",
+        "Fixed: the weekly digest told everyone they were on a zero-day streak, the widget said \"1 days\", the watch's stress setting was connected to nothing, and resting heart rate was read from Apple Health and then ignored.",
+        "Every timing figure described the part of a night you are awake for. The published after-effects window is in the app now: MDMA is 12 to 48 hours on top of a 3 to 6 hour total, and a swallowed cannabis dose lingers 6 to 12 hours where a smoked one lingers 45 minutes. Cocaine gets no window, because PsychonautWiki publishes none, and the card says so rather than filling the gap.",
+        "A Lock Screen widget for the running dose, which outlives the Live Activity and keeps saying which half of the curve you are in.",
+        "A check-in for the way home: say roughly how long you will be, and it sits on your Lock Screen with one button on it. It carries no destination, because that screen is readable by whoever is standing next to you, and it never messages anybody by itself.",
+        "Panic support can be asked for out loud now, and leads the Shortcuts gallery. There is a settings page that shows the phrases and adds them in one tap.",
+        "Setup can be skipped from the first screen. Being eighteen and reading what the app does not claim to do are the only two things that cannot wait; everything else can be filled in later, and nothing is locked behind it.",
+        "At 2am Home leads with the tools for being out rather than a checklist for getting ready. It had been treating everything before four in the morning as \"before\".",
+        "The first-launch animation can be tapped away, and is skipped entirely if you have asked your phone for less motion.",
+        "The summary you hand to a GP now speaks your language rather than English, and reports the combination checks it was already being given and quietly dropping.",
+        "More things that had been shipping in English whatever you chose: the PrEP reminders, the duration inside the safer-plan reminder, four confirmations during setup, the default text of the message that goes to your trusted contact, the Focus filter in iOS Settings, and six pickers whose translations were sitting in the catalog unused.",
+    ]),
     ("4.2.1", "422", "2026-08-11", "August 2026", "Fixes, and one that mattered", [
         "Fixed a crash on opening the app after upgrading from 4.2.0, caused by two schema versions sharing a checksum.",
         "Choosing a language inside the app no longer drops your region, so dates, numbers and 24-hour time stay right.",
@@ -1660,7 +1708,7 @@ RELEASES = [
 
 
 def combination_table(lang):
-    """The 30 documented combinations, rendered as HTML rather than hidden in JSON.
+    """Every documented combination, rendered as HTML rather than hidden in JSON.
 
     The checker page carried 196 visible words and kept every warning inside a
     `<script type="application/json">` blob. That is invisible to a crawler and
@@ -1678,14 +1726,20 @@ def combination_table(lang):
     order = {"critical": 0, "serious": 1, "caution": 2}
     rules = sorted(raw["rules"], key=lambda r: (order.get(r["level"], 9),
                                                 r["substances"]))
+    labels = raw.get("corroborationLabels", {})
     rows = ""
     for rule in rules:
         pair = " + ".join(rule["substances"])
         level = raw["levels"][rule["level"]][lang]
+        # Where the rating comes from, per row, the same line the app shows.
+        # Without it every warning here carries identical apparent authority, and
+        # they do not all rest on the same thing.
+        source = labels.get(rule.get("corroboration", ""), {}).get(lang, "")
+        note = f'<br><span class="combos-source">{e(source)}</span>' if source else ""
         rows += (f'          <tr>\n'
                  f'            <th scope="row">{e(pair)}</th>\n'
                  f'            <td><span class="pill pill--{rule["level"]}">{e(level)}</span></td>\n'
-                 f'            <td>{e(rule["warning"][lang])}</td>\n'
+                 f'            <td>{e(rule["warning"][lang])}{note}</td>\n'
                  f'          </tr>\n')
 
     groups = "".join(
@@ -1707,6 +1761,8 @@ def combination_table(lang):
 {rows}          </tbody>
         </table>
       </div>
+
+      <p class="combos-note">{t(s["combos_source_note"])}</p>
 
       <h2 id="medication" style="margin-top:clamp(40px,5vw,72px)">{e(no_orphan(s["combos_meds_h2"]))}</h2>
       <ul class="med-groups">
@@ -1748,6 +1804,10 @@ def build_checker(lang):
 """, ident="checker")
     out += footer(lang, depth)
     return out, canonical
+
+
+# The newest release's date, so "last updated" cannot drift from what shipped.
+UPDATED = RELEASES[0][2]
 
 
 def build_changelog():
@@ -1917,7 +1977,7 @@ def build_security():
       <li><strong>No third-party SDKs</strong> receiving your data, so no supply chain of analytics vendors.</li>
       <li><strong>Sync is Apple's.</strong> iCloud sync and iCloud Drive backups run in your own account under Apple's encryption.</li>
     </ul>
-    <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activity show on a locked screen. And whether the discreet notification wording ever leaks something it should not.</p>
+    <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID, and the second PIN that opens the app empty. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activities show on a locked screen, which since 5.0.0 includes a running dose and a check-in for the way home. And whether the discreet notification wording ever leaks something it should not.</p>
   </div>
 
   <div class="card">
@@ -1936,7 +1996,8 @@ def build_security():
       <li>Whether the app really makes no network calls, on device, under instrumentation rather than by reading the source.</li>
       <li>The PIN derivation and Keychain handling, and whether the legacy migration path leaks anything.</li>
       <li>The encrypted backup format, and whether a backup file discloses anything without the key.</li>
-      <li>What the widgets, complications and Live Activity expose on a locked screen.</li>
+      <li>What the widgets, complications and Live Activities expose on a locked screen. Since 5.0.0 that includes a widget for a running dose and a check-in for the way home. The route check-in carries no destination at all, and the dose widget drops the substance name when discreet wording is on. Both of those are claims worth testing rather than believing.</li>
+      <li>Whether the duress PIN is genuinely indistinguishable from a real unlock: same screen, same timing, no failed attempt recorded, nothing anywhere saying which one was used.</li>
       <li>Whether discreet notification wording ever leaks a category it should not.</li>
     </ul>
     <p>Email <a href="mailto:{EMAIL}">{EMAIL}</a>. I cannot pay, I can give you a build, answer questions quickly, and publish what you find whether or not it is flattering.</p>

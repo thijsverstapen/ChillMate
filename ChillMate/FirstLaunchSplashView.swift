@@ -8,13 +8,23 @@ import UIKit
 ///
 /// The clip is silent and video-only, so it never touches the audio session or
 /// interrupts whatever the user is already listening to.
+///
+/// **It is skippable, and it is skipped outright when motion is reduced.** The
+/// animation is good and it is still six seconds standing between somebody and a
+/// combination checker they may have installed the app for tonight. So a tap
+/// anywhere ends it, the whole screen is one accessibility element that says so,
+/// and anyone who has asked their phone for less movement never sees it at all —
+/// a full-screen video is exactly what that setting is about.
 struct FirstLaunchSplashView: View {
     let onFinish: () -> Void
+
+    @Environment(\.chillReduceMotion) private var reduceMotion
 
     @State private var player = AVPlayer()
     @State private var didFinish = false
     @State private var endObserver: NSObjectProtocol?
     @State private var watchdog: Task<Void, Never>?
+    @State private var canSkip = false
 
     var body: some View {
         ZStack {
@@ -25,7 +35,28 @@ struct FirstLaunchSplashView: View {
 
             SplashPlayerView(player: player)
                 .ignoresSafeArea()
+
+            // Appears after a beat rather than immediately: a skip control on
+            // screen from frame one reads as an apology for the thing it is on.
+            if canSkip {
+                VStack {
+                    Spacer()
+                    Text("Tap to skip")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.white.opacity(0.55))
+                        .padding(.bottom, 44)
+                }
+                .transition(.opacity)
+                .allowsHitTesting(false)
+            }
         }
+        .contentShape(Rectangle())
+        .onTapGesture(perform: finishOnce)
+        .accessibilityElement()
+        .accessibilityLabel(Text("ChillMate is opening"))
+        .accessibilityHint(Text("Double tap to skip the introduction animation."))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { finishOnce() }
         .onAppear(perform: start)
         .onDisappear {
             watchdog?.cancel()
@@ -36,10 +67,24 @@ struct FirstLaunchSplashView: View {
     }
 
     private func start() {
+        // Somebody who has asked for reduced motion has asked not to be shown a
+        // six-second full-screen animation. There is no version of this that
+        // respects that setting and still plays.
+        guard !reduceMotion else {
+            finishOnce()
+            return
+        }
+
         guard let url = Bundle.main.url(forResource: "FirstLaunchSplash", withExtension: "mp4") else {
             // If the asset is missing for any reason, never block the first launch.
             finishOnce()
             return
+        }
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1.2))
+            guard !didFinish else { return }
+            withAnimation(.easeIn(duration: 0.3)) { canSkip = true }
         }
 
         let item = AVPlayerItem(url: url)

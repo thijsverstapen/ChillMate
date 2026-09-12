@@ -61,6 +61,7 @@ struct AftercareView: View {
 }
 
 private struct AftercareEntryCard: View {
+    @Environment(\.services) private var services
     @Environment(\.modelContext) private var modelContext
     @Environment(\.requestReview) private var requestReview
     @Bindable var entry: NightEntry
@@ -180,7 +181,7 @@ private struct AftercareEntryCard: View {
         Task {
             do {
                 let end = Calendar.current.date(byAdding: .hour, value: 18, to: entry.endDate) ?? entry.endDate.addingTimeInterval(18 * 60 * 60)
-                let hours = try await HealthKitService.shared.sleepHours(from: entry.endDate, to: end)
+                let hours = try await services.health.sleepHours(from: entry.endDate, to: end)
 
                 // HealthKit returns 0 (not an error) when the window has no samples,
                 // which is common for a just-ended or still-ongoing night. Never
@@ -199,11 +200,11 @@ private struct AftercareEntryCard: View {
                 entry.sleepHours = hours
                 modelContext.saveChanges()
 
-                if hours >= 6, (try? await NotificationService.shared.requestAuthorization()) == true {
-                    NotificationService.shared.schedulePositiveSleepNotification(hours: hours)
+                if hours >= 6, (try? await services.notifications.requestAuthorization()) == true {
+                    services.notifications.schedulePositiveSleepNotification(hours: hours)
                 }
 
-                sleepImportMessage = "Apple Health sleep: \(hours.formatted(.number.precision(.fractionLength(0...1)))) h."
+                sleepImportMessage = String(localized: "Apple Health sleep: \(hours.formatted(.number.precision(.fractionLength(0...1)))) h.")
             } catch {
                 sleepImportMessage = error.localizedDescription
             }
@@ -233,8 +234,7 @@ private struct AftercareEntryCard: View {
                     } label: {
                         Text(symptom.localizedDisplayName)
                             .font(.caption.weight(.bold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.75)
+                            .chillLineLimit(1, scale: 0.75)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
                     }
@@ -285,7 +285,7 @@ private struct AftercareEntryCard: View {
                 let mood = AftercareMood(rawValue: entry.aftercareMood) ?? .okay
                 let completedAt = entry.aftercareCompletedAt ?? .now
                 Task {
-                    try? await HealthKitService.shared.saveStateOfMind(date: completedAt, mood: mood)
+                    try? await services.health.saveStateOfMind(date: completedAt, mood: mood)
                 }
             }
         } label: {

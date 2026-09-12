@@ -1,4 +1,5 @@
 import Testing
+import ChillMateCore
 @testable import ChillMate
 
 /// The three assessments added in 4.3.0. The existing three (serotonin,

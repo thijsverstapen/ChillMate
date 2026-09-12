@@ -67,6 +67,7 @@ struct SupportResource: Identifiable {
     let tags: [String]
 
     static let netherlands: [SupportResource] = [
+        drugChecking("https://www.drugs-test.nl"),
         SupportResource(title: String(localized: "112 emergency"), detail: String(localized: "Immediate danger, unconsciousness, seizure, blue lips, chest pain, severe overheating, or cannot be woken."), action: String(localized: "Call 112"), url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
         SupportResource(title: String(localized: "113 Zelfmoordpreventie"), detail: String(localized: "If you might hurt yourself or cannot stay safe. Call 113 or 0800-0113 in the Netherlands."), action: String(localized: "Open 113.nl"), url: URL(string: "https://www.113.nl"), tags: ["crisis", "mental health", "suicide"]),
         SupportResource(title: String(localized: "GGD sexual health"), detail: String(localized: "STI testing, PrEP, PEP questions, vaccination, and sexual health support."), action: String(localized: "Open ggd.nl"), url: URL(string: "https://www.ggd.nl"), tags: ["sti", "pep", "prep", "ggd"]),
@@ -96,10 +97,35 @@ struct SupportResource: Identifiable {
     private static var genericGPDetail: String { String(localized: "Medication interactions, sleep, mental health, substance use, referrals, and urgent medical questions.") }
     private static var genericLGBTQDetail: String { String(localized: "LGBTQ+ listening ear, information, and referral support.") }
     private static var genericAssaultDetail: String { String(localized: "Support after sexual assault, coercion, or a consent concern.") }
+
+    /// Where to get a substance tested before it is taken.
+    ///
+    /// `DrugCheckingEducationView` explained what drug checking is and where to do
+    /// it was left as an exercise. Knowing the idea exists is no use at 9pm on a
+    /// Friday; a link to the service in your own country is.
+    ///
+    /// Only countries with a service that actually exists are listed. Ireland,
+    /// France and Australia are absent on purpose: no national programme this was
+    /// able to verify, and a plausible-looking link to a service that cannot test
+    /// anything is worse than saying nothing. Every URL below was checked live on
+    /// 8 September 2026.
+    private static var genericCheckingDetail: String { String(localized: "Get a substance tested before you take it. Strength and contents vary between batches, and testing is the only way to know what is in front of you.") }
+    private static var checkingTitle: String { String(localized: "Drug checking") }
+
+    private static func drugChecking(_ url: String) -> SupportResource {
+        SupportResource(
+            title: checkingTitle,
+            detail: genericCheckingDetail,
+            action: String(localized: "Find a testing service"),
+            url: URL(string: url),
+            tags: ["drugs", "harm reduction", "testing", "checking"]
+        )
+    }
     private static var gpTitle: String { String(localized: "GP or family doctor") }
     private static var gpAction: String { String(localized: "Call your GP") }
 
     static let belgium: [SupportResource] = [
+        drugChecking("https://www.modusvivendi-be.org"),
         SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
         SupportResource(title: "Zelfmoordlijn 1813", detail: genericCrisisDetail, action: "Call 1813", url: URL(string: "tel://1813"), tags: ["crisis", "mental health", "suicide"]),
         SupportResource(title: "Sensoa", detail: genericSTIDetail, action: "Open sensoa.be", url: URL(string: "https://www.sensoa.be"), tags: ["sti", "pep", "prep"]),
@@ -110,6 +136,7 @@ struct SupportResource: Identifiable {
     ]
 
     static let germany: [SupportResource] = [
+        drugChecking("https://www.drugchecking.berlin"),
         SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
         SupportResource(title: "TelefonSeelsorge", detail: genericCrisisDetail, action: "Call 0800 111 0 111", url: URL(string: "tel://08001110111"), tags: ["crisis", "mental health", "suicide"]),
         SupportResource(title: "Deutsche Aidshilfe", detail: genericSTIDetail, action: "Open aidshilfe.de", url: URL(string: "https://www.aidshilfe.de"), tags: ["sti", "pep", "prep"]),
@@ -120,6 +147,7 @@ struct SupportResource: Identifiable {
     ]
 
     static let unitedKingdom: [SupportResource] = [
+        drugChecking("https://wearetheloop.org"),
         SupportResource(title: "999", detail: genericEmergencyDetail, action: "Call 999", url: URL(string: "tel://999"), tags: ["crisis", "emergency", "panic"]),
         SupportResource(title: "Samaritans", detail: genericCrisisDetail, action: "Call 116 123", url: URL(string: "tel://116123"), tags: ["crisis", "mental health", "suicide"]),
         SupportResource(title: "NHS sexual health", detail: genericSTIDetail, action: "Open nhs.uk", url: URL(string: "https://www.nhs.uk/live-well/sexual-health/"), tags: ["sti", "pep", "prep"]),
@@ -140,6 +168,7 @@ struct SupportResource: Identifiable {
     ]
 
     static let spain: [SupportResource] = [
+        drugChecking("https://energycontrol.org"),
         SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
         SupportResource(title: "024", detail: genericCrisisDetail, action: "Call 024", url: URL(string: "tel://024"), tags: ["crisis", "mental health", "suicide"]),
         SupportResource(title: "Sanidad (salud sexual)", detail: genericSTIDetail, action: "Open sanidad.gob.es", url: URL(string: "https://www.sanidad.gob.es"), tags: ["sti", "pep", "prep"]),
@@ -150,6 +179,7 @@ struct SupportResource: Identifiable {
     ]
 
     static let unitedStates: [SupportResource] = [
+        drugChecking("https://dancesafe.org"),
         SupportResource(title: "911", detail: genericEmergencyDetail, action: "Call 911", url: URL(string: "tel://911"), tags: ["crisis", "emergency", "panic"]),
         SupportResource(title: "988 Suicide & Crisis Lifeline", detail: genericCrisisDetail, action: "Call 988", url: URL(string: "tel://988"), tags: ["crisis", "mental health", "suicide"]),
         SupportResource(title: "CDC GetTested", detail: genericSTIDetail, action: "Open gettested.cdc.gov", url: URL(string: "https://gettested.cdc.gov"), tags: ["sti", "pep", "prep"]),

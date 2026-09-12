@@ -36,7 +36,7 @@ final class SpotlightService {
         UserDefaults.standard.set(contentHash, forKey: key)
 
         let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
-        attributeSet.title = "Journal: \(entry.date.formatted(date: .abbreviated, time: .shortened))"
+        attributeSet.title = String(localized: "Journal: \(entry.date.formatted(date: .abbreviated, time: .shortened))")
 
         var parts: [String] = []
         if !entry.rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

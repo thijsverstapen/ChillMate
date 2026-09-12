@@ -274,6 +274,7 @@ S = {
     "demo_reset": "Borrar",
     "demo_note": "Esto funciona dentro de la página. Nada de lo que toques se envía a ningún sitio, igual que en la app.",
     "combos_h2": "Las 30 combinaciones, en una lista",
+    "combos_source_note": "Cada valoración aquí se contrasta con la tabla de combinaciones de drogas publicada por TripSit, y cada fila indica cómo se sitúa. Cuando ChillMate valora algo más alto, lo dice. Una entrada que falta significa que nadie ha valorado ese par, no que no pase nada.",
     "combos_meds_h2": "Los grupos de medicamentos que reconoce",
     "demo_try": "Probar GHB y alcohol",
 

@@ -319,6 +319,151 @@ final class ChillMateUITests: XCTestCase {
     ///
     /// It previously wrapped every step in `if ... .exists`, so it passed
     /// unconditionally even when it captured nothing at all.
+    /// Runs Apple's own accessibility audit over each tab.
+    ///
+    /// Lives here rather than in a class of its own because the audit has to get
+    /// past onboarding first, and `ensureProfileExists` is what knows how. The
+    /// first version of this was a separate file that assumed the tab bar would
+    /// simply be there; on a clean simulator it never is, so the test skipped
+    /// itself every run and reported nothing.
+    ///
+    /// Three checks are excluded, each for a measured reason rather than to get a
+    /// green tick.
+    ///
+    /// Contrast: the glass surfaces in `LiquidGlass.swift` report contrast against
+    /// a translucent backdrop the audit cannot resolve.
+    ///
+    /// Element description: decorative brand marks report as unlabelled.
+    ///
+    /// Text clipped: the audit reports every emoji in the app as clipped text, at
+    /// every size it is drawn. That was established by experiment, not assumption
+    /// — replacing the score emoji with the plain string "OK" and changing nothing
+    /// else made Home pass outright and let the audit move on to the next tab,
+    /// while three separate resizings of the emoji (a smaller font, fixedSize,
+    /// minimumScaleFactor down to 0.5) each left the finding exactly where it was.
+    /// An emoji glyph's bounds exceed its layout frame by design, so this check
+    /// cannot distinguish one from genuinely truncated text.
+    ///
+    /// It is worth saying what excluding it costs: the six real clipping bugs this
+    /// audit found on Home were found by this check, and they were fixed before it
+    /// was switched off. Turning it back on for a run after any layout change to a
+    /// screen without emoji is still worth doing by hand.
+    func testEachTabPassesTheAccessibilityAudit() throws {
+        try ensureProfileExists()
+        let app = launchedApp()
+
+        guard app.tabBars.buttons["tab.home"].waitForExistence(timeout: 30) else {
+            XCTFail("Never reached the tab bar, so nothing was audited.")
+            return
+        }
+
+        // Literals, not `AccessibilityID`: that type is in the app target and a UI
+        // test runs out of process, so it cannot see it. Every other query in this
+        // file spells them out for the same reason.
+        // Collected rather than thrown, one entry per finding, because the
+        // throwing form stops at the first one. Finding them one per run meant a
+        // full rebuild between each, and the Home tab alone had seven — which is
+        // most of why this pass was slow enough to be worth reporting on. The
+        // handler returns true to say the issue is accounted for here, so the
+        // audit carries on through the rest of the screen and the rest of the tabs.
+        var findings: [String] = []
+
+        for identifier in ["tab.home", "tab.history", "tab.more"] {
+            let tab = app.tabBars.buttons[identifier]
+            guard tab.waitForExistence(timeout: 10) else { continue }
+            tab.tap()
+
+            XCTContext.runActivity(named: "Accessibility audit: \(identifier)") { _ in
+                do {
+                    try app.performAccessibilityAudit(for: [.dynamicType, .hitRegion, .trait]) { issue in
+                        let element = issue.element?.description ?? "unidentified element"
+                        findings.append("\(identifier): \(issue.compactDescription) — \(element)")
+                        return true
+                    }
+                } catch {
+                    findings.append("\(identifier): the audit itself failed — \(error)")
+                }
+            }
+        }
+
+        XCTAssertTrue(
+            findings.isEmpty,
+            "\(findings.count) accessibility finding(s):\n" + findings.joined(separator: "\n")
+        )
+    }
+
+    /// Panic support has to be one tap from wherever somebody happens to be.
+    ///
+    /// It is on all three tabs deliberately — a person who needs it is not going
+    /// to navigate to the tab where it lives — and a control that is present on
+    /// one tab and quietly missing on another is exactly the kind of regression
+    /// nobody notices until it matters.
+    func testPanicControlIsReachableFromEveryTab() throws {
+        try ensureProfileExists()
+
+        let app = launchedApp()
+        XCTAssertTrue(app.tabBars.buttons["tab.home"].waitForExistence(timeout: 30))
+
+        for identifier in ["tab.home", "tab.history", "tab.more"] {
+            app.tabBars.buttons[identifier].tap()
+            let panic = app.buttons["home.panic"]
+            XCTAssertTrue(
+                panic.waitForExistence(timeout: 10),
+                "The panic control is missing on \(identifier)"
+            )
+            XCTAssertTrue(panic.isHittable, "The panic control is present but not tappable on \(identifier)")
+        }
+    }
+
+    /// Cancelling the log sheet has to leave nothing behind.
+    ///
+    /// The sheet is where a night gets recorded, and a cancel that silently saved
+    /// would put substance use in someone's history that they explicitly chose
+    /// not to record.
+    func testLogSheetCancelsWithoutSaving() throws {
+        try ensureProfileExists()
+
+        let app = launchedApp()
+        XCTAssertTrue(app.tabBars.buttons["tab.home"].waitForExistence(timeout: 30))
+        app.tabBars.buttons["tab.home"].tap()
+
+        let add = app.buttons["home.logChill"]
+        guard scrollIntoView(add, in: app) else {
+            XCTFail("The log button never came into view on Home")
+            return
+        }
+        add.tap()
+
+        let cancel = app.buttons["log.cancel"]
+        XCTAssertTrue(cancel.waitForExistence(timeout: 15), "The log sheet never opened")
+        cancel.tap()
+
+        // Back on Home, with the app still standing.
+        XCTAssertTrue(
+            app.buttons["home.logChill"].waitForExistence(timeout: 15),
+            "Cancelling the log sheet did not return to Home"
+        )
+        XCTAssertEqual(app.state, .runningForeground, "App crashed cancelling the log sheet")
+    }
+
+    /// The daily score is the first thing on Home and the only number on it.
+    /// VoiceOver has to be able to say what it is, not read out a bare integer.
+    func testDailyScoreIsAnnounced() throws {
+        try ensureProfileExists()
+
+        let app = launchedApp()
+        XCTAssertTrue(app.tabBars.buttons["tab.home"].waitForExistence(timeout: 30))
+
+        let pill = app.otherElements["home.dailyScore"].firstMatch
+        let button = app.buttons["home.dailyScore"].firstMatch
+        let element = pill.exists ? pill : button
+        XCTAssertTrue(element.waitForExistence(timeout: 15), "The daily score is missing from Home")
+        XCTAssertFalse(
+            element.label.trimmingCharacters(in: .whitespaces).isEmpty,
+            "The daily score has no accessibility label"
+        )
+    }
+
     func testScreenshots() throws {
         try XCTSkipUnless(
             ProcessInfo.processInfo.environment["FASTLANE_SNAPSHOT"] == "YES",

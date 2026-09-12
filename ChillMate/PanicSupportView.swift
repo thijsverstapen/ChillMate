@@ -4,6 +4,7 @@ import TipKit
 import UIKit
 
 struct PanicSupportView: View {
+    @Environment(\.services) private var services
     @Environment(\.dismiss) private var dismiss
     @AppStorage(DefaultsKey.trustedContactName) private var trustedContactName = ""
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
@@ -12,6 +13,9 @@ struct PanicSupportView: View {
     @State private var breathingTask: Task<Void, Never>?
     @State private var breathingStartedAt: Date?
     @AppStorage(DefaultsKey.healthKitMindfulWriteEnabled) private var healthKitMindfulWriteEnabled = false
+    /// The same switch the watch honours. It was only ever read on the watch, so
+    /// turning breathing haptics off left the phone tapping anyway.
+    @AppStorage(DefaultsKey.watchBreathingHaptics) private var breathingHaptics = true
     @State private var completedGroundingSteps: Set<Int> = []
 
     /// LocalizedStringResource, not String: `Text(someString)` renders verbatim,
@@ -21,13 +25,25 @@ struct PanicSupportView: View {
         let label: LocalizedStringResource
         let seconds: Double
         let expanded: Bool
+        /// A distinct feel per phase.
+        ///
+        /// Every phase used to fire the same soft tap, so with the screen dark or
+        /// your eyes shut — which is how this exercise is meant to be done — the
+        /// inhale and the exhale were indistinguishable. The exhale is the one
+        /// that settles a racing heart and it is the longest phase, so it gets the
+        /// firmest cue; the rest barely registers, which is the point of it.
+        let feedback: SensoryFeedback
     }
 
     private let breathingSteps: [BreathPhase] = [
-        BreathPhase(label: "Breathe in", seconds: 4, expanded: true),
-        BreathPhase(label: "Hold gently", seconds: 4, expanded: true),
-        BreathPhase(label: "Breathe out", seconds: 6, expanded: false),
-        BreathPhase(label: "Rest", seconds: 2, expanded: false)
+        BreathPhase(label: "Breathe in", seconds: 4, expanded: true,
+                    feedback: .impact(weight: .light, intensity: 0.7)),
+        BreathPhase(label: "Hold gently", seconds: 4, expanded: true,
+                    feedback: .impact(flexibility: .rigid, intensity: 0.4)),
+        BreathPhase(label: "Breathe out", seconds: 6, expanded: false,
+                    feedback: .impact(weight: .heavy, intensity: 1.0)),
+        BreathPhase(label: "Rest", seconds: 2, expanded: false,
+                    feedback: .impact(flexibility: .soft, intensity: 0.25))
     ]
 
     private var breathCircleIsExpanded: Bool {
@@ -54,7 +70,10 @@ struct PanicSupportView: View {
                             symbol: "lungs.fill",
                             tint: Color.chillPrimary
                         )
-                        .sensoryFeedback(.impact(flexibility: .soft), trigger: breathStep)
+                        .sensoryFeedback(trigger: breathStep) { _, step in
+                            guard isBreathing, breathingHaptics else { return nil }
+                            return breathingSteps[step].feedback
+                        }
 
                         TipView(ControlCentreTip())
 
@@ -101,6 +120,16 @@ struct PanicSupportView: View {
                                     ? Text(breathingSteps[breathStep].label)
                                     : Text("Not started")
                             )
+                            // A changed accessibilityValue is only read when the
+                            // element happens to hold focus, and this is an
+                            // exercise you do with your eyes closed. Announcing it
+                            // is the difference between a guide and a silent circle.
+                            .onChange(of: breathStep) { _, step in
+                                guard isBreathing else { return }
+                                AccessibilityNotification.Announcement(
+                                    String(localized: breathingSteps[step].label)
+                                ).post()
+                            }
 
                             Button(isBreathing ? "Stop breathing timer" : "Start breathing timer") {
                                 toggleBreathing()
@@ -255,7 +284,7 @@ struct PanicSupportView: View {
 
         Task {
             // Silent on failure. The session happened whether Health records it or not.
-            try? await HealthKitService.shared.saveMindfulMinutes(from: startedAt, to: .now)
+            try? await services.health.saveMindfulMinutes(from: startedAt, to: .now)
         }
     }
 

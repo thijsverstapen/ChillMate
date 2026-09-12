@@ -199,7 +199,7 @@ font-weight:800;max-width:19ch;margin:0}
       <li><strong>No third-party SDKs</strong> receiving your data, so no supply chain of analytics vendors.</li>
       <li><strong>Sync is Apple's.</strong> iCloud sync and iCloud Drive backups run in your own account under Apple's encryption.</li>
     </ul>
-    <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activity show on a locked screen. And whether the discreet notification wording ever leaks something it should not.</p>
+    <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID, and the second PIN that opens the app empty. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activities show on a locked screen, which since 5.0.0 includes a running dose and a check-in for the way home. And whether the discreet notification wording ever leaks something it should not.</p>
   </div>
 
   <div class="card">
@@ -218,7 +218,8 @@ font-weight:800;max-width:19ch;margin:0}
       <li>Whether the app really makes no network calls, on device, under instrumentation rather than by reading the source.</li>
       <li>The PIN derivation and Keychain handling, and whether the legacy migration path leaks anything.</li>
       <li>The encrypted backup format, and whether a backup file discloses anything without the key.</li>
-      <li>What the widgets, complications and Live Activity expose on a locked screen.</li>
+      <li>What the widgets, complications and Live Activities expose on a locked screen. Since 5.0.0 that includes a widget for a running dose and a check-in for the way home. The route check-in carries no destination at all, and the dose widget drops the substance name when discreet wording is on. Both of those are claims worth testing rather than believing.</li>
+      <li>Whether the duress PIN is genuinely indistinguishable from a real unlock: same screen, same timing, no failed attempt recorded, nothing anywhere saying which one was used.</li>
       <li>Whether discreet notification wording ever leaks a category it should not.</li>
     </ul>
     <p>Email <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>. I cannot pay, I can give you a build, answer questions quickly, and publish what you find whether or not it is flattering.</p>
@@ -253,7 +254,7 @@ font-weight:800;max-width:19ch;margin:0}
     <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    <span class="made">ChillMate 4.2.1 · made by one person in the Netherlands</span>
+    <span class="made">ChillMate 5.0.0 · made by one person in the Netherlands</span>
   </footer>
 
 </main>

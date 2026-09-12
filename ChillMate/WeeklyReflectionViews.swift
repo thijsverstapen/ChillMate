@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 // Weekly reflection views extracted from CareToolsView.swift as part of splitting that file.
 
@@ -116,7 +117,11 @@ private struct WeeklyReflectionMetric: View {
                 .glassSurface(radius: 16, tint: tint.opacity(0.12))
             VStack(alignment: .leading, spacing: 2) {
                 Text(value).font(.title3.weight(.bold)).foregroundStyle(Color.chillText).monospacedDigit()
-                Text(title).font(.caption.weight(.semibold)).foregroundStyle(Color.chillSecondary).lineLimit(1)
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .chillLineLimit(2, scale: 0.7)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
         }

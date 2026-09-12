@@ -85,14 +85,126 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
 
-      - name: Unit tests
+      # Once per shipped language, not once overall.
+      #
+      # The suite used to assert English literals, so it only ever proved
+      # anything about English, and this job could not reveal that because
+      # GitHub's runners are en_US. On a Dutch simulator 21 of these failed while
+      # the risk engine was behaving perfectly, and four more passed for the
+      # worst reason: they asserted an English fragment was absent, which holds
+      # trivially in every other language.
+      #
+      # The assertions are language-independent now, which is what makes running
+      # them per language worth the minutes: each pass exercises the engine
+      # against the catalog a user of that language actually reads, and
+      # SafetyTranslationTests checks the served strings really came from that
+      # language rather than falling back to English.
+      #
+      # One loop rather than a job matrix, because the build above is the
+      # expensive part and this reuses it; the five test passes are seconds each.
+      # The ChillMate scheme is iOS-only, so until now a Swift error in
+      # ChillMateWatchApp/ reached main without any pull request turning red.
+      # Xcode Cloud archives watchOS, but that runs after the fact.
+      #
+      # -target rather than -scheme because there is only one scheme in the
+      # project; -derivedDataPath is omitted deliberately, since xcodebuild
+      # rejects it without -scheme.
+      # The simulator builds arm64 and a device build asks for whatever ARCHS
+      # resolves to, so a whole class of problem is invisible to every other step
+      # here. That is not hypothetical: the iOS 26 SDK resolves ARCHS to
+      # "arm64 arm64e" unless a target says otherwise, and once the domain moved
+      # into a Swift package the app wanted an arm64e slice of a module that only
+      # builds arm64. Debug on the simulator was green the whole time; archiving
+      # failed with "Unable to resolve module dependency".
+      #
+      # Archive rather than build, because archiving is the thing that breaks: it
+      # embeds the extension and the watch app and links the package for real.
+      - name: Release archive for device
+        run: |
+          set -o pipefail
+          xcodebuild archive \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/ChillMate.xcarchive" \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | xcbeautify
+
+      # An arm64e slice would mean the package mismatch above had come back, and
+      # arm64e is a preview ABI a third-party app does not ship.
+      - name: The archive is arm64 and nothing else
+        run: |
+          binary="$RUNNER_TEMP/ChillMate.xcarchive/Products/Applications/ChillMate.app/ChillMate"
+          lipo -info "$binary"
+          if lipo -info "$binary" | grep -q arm64e; then
+            echo "::error::The archive contains an arm64e slice."
+            exit 1
+          fi
+
+      - name: Build the watch targets
+        run: |
+          set -o pipefail
+          for target in ChillMateWatchApp ChillMateWatchAppWidgetExtension; do
+            echo "::group::$target"
+            xcodebuild build \
+              -project ChillMate.xcodeproj \
+              -target "$target" \
+              -destination 'generic/platform=watchOS Simulator' \
+              CODE_SIGNING_ALLOWED=NO \
+              | xcbeautify
+            echo "::endgroup::"
+          done
+
+      - name: Unit tests (all five languages)
+        run: |
+          set -o pipefail
+          status=0
+          for lang in en nl de fr es; do
+            echo "::group::Unit tests ($lang)"
+            xcodebuild test-without-building \
+              -scheme "$SCHEME" \
+              -destination "$DESTINATION" \
+              -only-testing:ChillMateTests \
+              -skip-testing:ChillMateTests/PerformanceTests \
+              -testLanguage "$lang" \
+              -resultBundlePath "TestResults/UnitTests-$lang.xcresult" \
+              CODE_SIGNING_ALLOWED=NO \
+              | xcbeautify || status=1
+            echo "::endgroup::"
+          done
+          exit $status
+
+      # Once, not five times: these measure arithmetic, and arithmetic has no
+      # language. They are ceilings with an order of magnitude of headroom rather
+      # than benchmarks — a shared runner is slower and noisier than any laptop,
+      # and a budget tight enough to be interesting here would fail on load.
+      # What they catch is the shape of regression that is invisible on six test
+      # entries and unusable on three years of real ones.
+      #
+      # `-enablePerformanceTestsDiagnostics YES` is Apple's mechanism for getting
+      # Instruments data out of CI: when a measurement regresses it collects a
+      # trace and a memgraph and attaches them to the result bundle, which the
+      # upload step below already publishes. It costs nothing on a green run,
+      # because there is nothing to collect.
+      #
+      # It is the only mechanism available here. `xctrace record` against an iOS
+      # Simulator produces a trace directory containing no samples: CPU profiling
+      # wants a real process on real hardware, and a GitHub runner has no device
+      # attached. Three attempts, three empty traces and a hung recorder, so this
+      # is written down rather than left for somebody to rediscover.
+      - name: Performance and memory budgets
         run: |
           set -o pipefail
           xcodebuild test-without-building \
             -scheme "$SCHEME" \
             -destination "$DESTINATION" \
-            -only-testing:ChillMateTests \
-            -resultBundlePath TestResults/UnitTests.xcresult \
+            -only-testing:ChillMateTests/PerformanceTests \
+            -testLanguage en \
+            -enablePerformanceTestsDiagnostics YES \
+            -resultBundlePath TestResults/Performance.xcresult \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify
 
@@ -115,6 +227,7 @@ jobs:
             -only-testing:ChillMateUITests/ChillMateUITests/testLaunchesInEveryLanguage \
             -only-testing:ChillMateUITests/ChillMateUITests/testEachTabOpens \
             -only-testing:ChillMateUITests/ChillMateUITests/testLogSheetOpens \
+            -only-testing:ChillMateUITests/ChillMateUITests/testEachTabPassesTheAccessibilityAudit \
             -retry-tests-on-failure \
             -test-iterations 2 \
             -parallel-testing-enabled NO \

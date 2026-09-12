@@ -1,8 +1,10 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 struct DrugTimerView: View {
+    @Environment(\.services) private var services
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @AppStorage(DefaultsKey.drugTimerTrackedPeople) private var trackedPeopleData = Data("[]".utf8)
@@ -207,9 +209,15 @@ struct DrugTimerView: View {
                     }
 
                     if !pastTimers.isEmpty {
-                        LazyVStack(spacing: 12) {
-                            ForEach(pastTimers) { timer in
-                                DrugTimerCard(timer: timer, now: .now)
+                        // Also on a clock, which it was not before. The check-in
+                        // window ending is not the dose ending: a finished timer is
+                        // exactly when the comedown card has something to say, and
+                        // a static `.now` froze it at whatever the screen was built.
+                        TimelineView(.periodic(from: .now, by: 60)) { context in
+                            LazyVStack(spacing: 12) {
+                                ForEach(pastTimers) { timer in
+                                    DrugTimerCard(timer: timer, now: context.date)
+                                }
                             }
                         }
                     }
@@ -238,14 +246,14 @@ struct DrugTimerView: View {
         syncTimersToWatch()
 
         Task {
-            if (try? await NotificationService.shared.requestAuthorization()) == true {
-                NotificationService.shared.scheduleSessionCheckIns(
+            if (try? await services.notifications.requestAuthorization()) == true {
+                services.notifications.scheduleSessionCheckIns(
                     id: timer.id,
                     startsAt: timer.startedAt,
                     endsAt: timer.endsAt,
                     destination: .timers
                 )
-                NotificationService.shared.scheduleRedoseNudge(
+                services.notifications.scheduleRedoseNudge(
                     id: timer.id,
                     startsAt: timer.startedAt,
                     durationHours: timer.durationHours
@@ -260,8 +268,7 @@ struct DrugTimerView: View {
     }
 
     private func syncTimersToWatch() {
-        let all = modelContext.fetchLogging(FetchDescriptor<DrugDoseTimerRecord>())
-        WatchConnectivityService.shared.sendActiveTimers(all)
+        ActiveDoseTimer.broadcast(from: modelContext)
     }
 
     private func addTrackedPerson() {
@@ -368,6 +375,13 @@ private struct TimerPeopleManager: View {
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel(Text("Remove \(person)"))
+                            // The written label carries a name, so what a Voice
+                            // Control user has to say changes with the data. A
+                            // fixed alternative is the only reliable one.
+                            .accessibilityInputLabels([
+                                String(localized: "Remove"),
+                                String(localized: "Delete")
+                            ])
                         }
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillText)
@@ -470,6 +484,7 @@ private struct StaticEffectWindowSummary: View {
 }
 
 private struct DrugTimerCard: View {
+    @Environment(\.services) private var services
     @Environment(\.modelContext) private var modelContext
     @Bindable var timer: DrugDoseTimerRecord
     let now: Date
@@ -490,6 +505,20 @@ private struct DrugTimerCard: View {
 
     private var shouldShowRedoseNudge: Bool {
         timer.redoseNudgeIsActive(at: now) && redoseDecision == .undecided
+    }
+
+    /// The published curve for what this timer is tracking, where there is one.
+    ///
+    /// The timer's own duration is a wellbeing reminder window the user can move;
+    /// this is what the sources actually publish about the substance, which is a
+    /// different thing and outlives the timer by hours or days.
+    private var comedown: ComedownTimeline? {
+        guard let substance = Substance(rawValue: timer.substanceName) else { return nil }
+        return ComedownTimeline(
+            substance: substance,
+            route: AdministrationRoute(rawValue: timer.administrationRoute)?.referenceRoute,
+            startedAt: timer.startedAt
+        )
     }
 
     private var remainingText: String {
@@ -546,13 +575,11 @@ private struct DrugTimerCard: View {
                         title: "\(timer.substanceName) timer",
                         detail: timer.startedAt.formatted(date: .abbreviated, time: .shortened)
                     )
-                    NotificationService.shared.clearSessionCheckIns(id: timer.id)
-                    NotificationService.shared.clearRedoseNudge(id: timer.id)
+                    services.notifications.clearSessionCheckIns(id: timer.id)
+                    services.notifications.clearRedoseNudge(id: timer.id)
                     modelContext.delete(timer)
                     modelContext.saveChanges()
-                    WatchConnectivityService.shared.sendActiveTimers(
-                        modelContext.fetchLogging(FetchDescriptor<DrugDoseTimerRecord>())
-                    )
+                    ActiveDoseTimer.broadcast(from: modelContext)
                 } label: {
                     Image(systemName: "trash.fill")
                 }
@@ -563,6 +590,10 @@ private struct DrugTimerCard: View {
             if isActive {
                 ProgressView(value: progress)
                     .tint(progress >= 0.4 ? .orange : Color.chillSecondaryBlue)
+            }
+
+            if let comedown, comedown.isActive(at: now) {
+                ComedownPhaseCard(timeline: comedown, now: now)
             }
 
             if shouldShowRedoseNudge {

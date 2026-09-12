@@ -72,13 +72,9 @@ final class WatchConnectivityService: NSObject {
         // preserves that until the user changes them (plain `bool(forKey:)`
         // would report false for an unset key).
         func flag(_ key: String) -> Bool { d.object(forKey: key) as? Bool ?? true }
-        push([
-            "watchHydrationReminders": flag("watchHydrationReminders"),
-            "watchBreathingHaptics": flag("watchBreathingHaptics"),
-            "watchDiscreetCheckIns": flag("watchDiscreetCheckIns"),
-            "watchVisibleTimers": flag("watchVisibleTimers"),
-            "watchHeartRateWarnings": flag("watchHeartRateWarnings")
-        ])
+        // Built from the registry rather than listed here, so a key cannot be
+        // spelled one way at this end and another way on the watch.
+        push(Dictionary(uniqueKeysWithValues: WidgetSharedKey.watchSettingKeys.map { ($0, flag($0)) }))
     }
 
     func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool) {
@@ -110,6 +106,13 @@ final class WatchConnectivityService: NSObject {
         push(["hasBPM": bpm != nil, "latestBPM": bpm ?? 0])
     }
 
+    /// Relays heart-rate variability so the watch can tell dancing apart from
+    /// strain. The phone already reads this for the recovery score; before now it
+    /// never crossed to the device actually on the wrist.
+    func sendLatestHRV(_ ms: Double?) {
+        push([WidgetSharedKey.hasHRV: ms != nil, WidgetSharedKey.latestHRVms: ms ?? 0])
+    }
+
     /// Push everything the watch needs that lives outside SwiftData. Called on
     /// activation and whenever the app becomes active.
     func syncStandaloneState() {
@@ -133,7 +136,7 @@ final class WatchConnectivityService: NSObject {
         if payload["homeSafeReported"] as? Bool == true {
             UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.lastHomeSafeTimestamp)
             NotificationCenter.default.post(name: .watchDidReportHomeSafe, object: nil)
-            Task { await NotificationService.shared.clearSafetyCheckInsForTonight() }
+            Task { await Services.live.notifications.clearSafetyCheckInsForTonight() }
         }
         if payload["sosRequested"] as? Bool == true {
             NotificationCenter.default.post(name: .watchDidRequestSOS, object: nil)
@@ -149,7 +152,7 @@ extension WatchConnectivityService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard activationState == .activated else { return }
         Task { @MainActor in
-            WatchConnectivityService.shared.syncStandaloneState()
+            Services.live.watch.syncStandaloneState()
         }
     }
 
