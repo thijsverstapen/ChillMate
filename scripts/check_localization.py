@@ -417,6 +417,34 @@ RAW_VALUE_RENDER = re.compile(
 )
 
 
+def check_empty_labels(directory):
+    """A labelled control whose title is an empty literal.
+
+    `Picker("", selection:)` reads as "no title" to a person and as a title to
+    Xcode's extractor, which duly writes "" into the catalog on every build. The
+    catalog check rejects an empty key, but it can only name the catalog; this
+    names the line that keeps putting it there, which is the part you have to
+    change. Use the overload that takes no title at all, or `verbatim:`.
+    """
+    problems = []
+    for source in sorted((ROOT / directory).glob("*.swift")):
+        text = source.read_text()
+        for match in LABELLED_CALL.finditer(text):
+            argument = first_argument(text, match.end() - 1)
+            # The whole title, not a literal somewhere inside it. `Text(x ?? "")`
+            # coalesces to a String and takes the overload that does not
+            # localize, so its empty literal never reaches the catalog and is
+            # none of this check's business.
+            if argument is None or argument.strip() != '""':
+                continue
+            line = text[:match.start()].count("\n") + 1
+            problems.append(
+                f"{directory}/{source.name}:{line}: empty title literal — "
+                "use the overload with no title, or verbatim:"
+            )
+    return problems
+
+
 def check_raw_value_rendering(directory):
     """No enum rawValue may be rendered directly; use `localizedDisplayName`."""
     findings = []
@@ -650,6 +678,7 @@ for source_directory, source_catalog in SOURCE_CATALOGS:
     check_sources(source_directory, source_catalog)
     failures.extend(check_raw_value_rendering(source_directory))
     failures.extend(check_display_assignments(source_directory))
+    failures.extend(check_empty_labels(source_directory))
 
 failures.extend(check_notification_copy())
 

@@ -310,10 +310,15 @@ struct HistoryTabView: View {
                 DashboardBackdrop()
 
                 VStack(spacing: 0) {
-                    Picker("", selection: $segment) {
+                    // No title argument rather than an empty one: Xcode's
+                    // extractor reads a Picker's first argument as a localizable
+                    // title, so "" became a key in the catalog on every build.
+                    Picker(selection: $segment) {
                         ForEach(HistorySegment.allCases) { seg in
                             Text(seg.title).tag(seg)
                         }
+                    } label: {
+                        EmptyView()
                     }
                     .pickerStyle(.segmented)
                     .padding(.horizontal, 20)
