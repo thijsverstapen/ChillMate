@@ -344,7 +344,7 @@ private final class EncryptedBackupKeychain {
         }
 
         var keyBytes = [UInt8](repeating: 0, count: 32)
-        let status = unsafe keyBytes.withUnsafeMutableBytes { buffer in
+        let status = keyBytes.withUnsafeMutableBytes { buffer in
             guard let baseAddress = buffer.baseAddress else {
                 return errSecParam
             }
@@ -437,3 +437,15 @@ private extension UInt8 {
         return String([digits[Int(self >> 4)], digits[Int(self & 0x0F)]])
     }
 }
+
+/// Conformance declared here rather than beside the protocol: `CloudBackups`
+/// inherits `Sendable`, and Swift treats a Sendable conformance in another
+/// file as retroactive — a warning today and an error in a future language
+/// mode.
+extension ICloudBackupService: CloudBackups {}
+
+/// Conformance declared here rather than beside the protocol: `EncryptedBackups`
+/// inherits `Sendable`, and Swift treats a Sendable conformance in another
+/// file as retroactive — a warning today and an error in a future language
+/// mode.
+extension EncryptedBackupService: EncryptedBackups {}

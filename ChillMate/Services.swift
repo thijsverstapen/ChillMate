@@ -64,8 +64,6 @@ protocol NotificationScheduling: Sendable {
     func snoozeCurrentCheckIn()
 }
 
-extension NotificationService: NotificationScheduling {}
-
 extension NotificationScheduling {
     func scheduleInactivityReminders(from lastUse: Date = .now) {
         scheduleInactivityReminders(from: lastUse)
@@ -92,8 +90,6 @@ protocol HealthReading: Sendable {
     func sleepHoursAfterEntry(startDate: Date) async throws -> Double
 }
 
-extension HealthKitService: HealthReading {}
-
 /// What the phone tells the watch.
 ///
 /// Exactly the members the app reaches for, and no more: a protocol wide enough
@@ -109,8 +105,6 @@ protocol WatchRelaying: Sendable {
     func syncStandaloneState()
 }
 
-extension WatchConnectivityService: WatchRelaying {}
-
 /// Encrypted backups in the user's own iCloud Drive.
 ///
 /// Exactly the members the app reaches for, and no more: a protocol wide enough
@@ -123,8 +117,6 @@ protocol CloudBackups: Sendable {
     func saveLatestBackup(localContext: ModelContext) throws -> Date
     var statusLine: String { get }
 }
-
-extension ICloudBackupService: CloudBackups {}
 
 /// Sealing and opening the encrypted archive, and the on-device recovery snapshot.
 ///
@@ -139,8 +131,6 @@ protocol EncryptedBackups: Sendable {
     func restoreOnDeviceRecoverySnapshotIfNeeded(into context: ModelContext) throws -> ChillMateBackupImportSummary?
 }
 
-extension EncryptedBackupService: EncryptedBackups {}
-
 /// What ChillMate offers to Spotlight.
 ///
 /// Exactly the members the app reaches for, and no more: a protocol wide enough
@@ -152,8 +142,6 @@ protocol SpotlightIndexing: Sendable {
     func removeJournalEntry(_ entry: JournalEntry)
 }
 
-extension SpotlightService: SpotlightIndexing {}
-
 /// One location, when the user asks for one.
 ///
 /// Exactly the members the app reaches for, and no more: a protocol wide enough
@@ -162,8 +150,6 @@ extension SpotlightService: SpotlightIndexing {}
 protocol LocationLookup: Sendable {
     func currentLoggedLocation() async throws -> LoggedLocation
 }
-
-extension LocationLookupService: LocationLookup {}
 
 /// The set of services a piece of the app is running against.
 ///

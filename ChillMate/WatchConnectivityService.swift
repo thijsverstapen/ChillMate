@@ -189,3 +189,9 @@ extension Notification.Name {
     static let watchDidRequestSOS = Notification.Name("ChillMate.watchDidRequestSOS")
     static let watchDidReportHomeSafe = Notification.Name("ChillMate.watchDidReportHomeSafe")
 }
+
+/// Conformance declared here rather than beside the protocol: `WatchRelaying`
+/// inherits `Sendable`, and Swift treats a Sendable conformance in another
+/// file as retroactive — a warning today and an error in a future language
+/// mode.
+extension WatchConnectivityService: WatchRelaying {}
