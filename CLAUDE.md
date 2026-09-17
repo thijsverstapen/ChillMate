@@ -49,14 +49,22 @@ Two things about it are worth knowing before you add to it:
 
 ## Build and test
 
+Resolve the destination rather than typing a device name. An Xcode upgrade
+replaces the whole simulator lineup — 27 removed every iPhone 17 Pro and left no
+runtime installed at all, so every command below failed with "Unable to find a
+device matching the provided destination specifier" until one was downloaded
+(`xcodebuild -downloadPlatform iOS`). CI has used this script for that reason
+since it was written.
+
 ```bash
+DEST=$(python3 scripts/pick_simulator.py | tail -1)
+
 # Build
 xcodebuild build-for-testing -scheme ChillMate \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' CODE_SIGNING_ALLOWED=NO
+  -destination "$DEST" -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO
 
 # Unit tests. Pin the language or you inherit the simulator's.
-xcodebuild test-without-building -scheme ChillMate \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+xcodebuild test-without-building -scheme ChillMate -destination "$DEST" \
   -only-testing:ChillMateTests -testLanguage en CODE_SIGNING_ALLOWED=NO
 ```
 
