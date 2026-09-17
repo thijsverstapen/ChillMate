@@ -120,6 +120,16 @@ before pushing. They take seconds and are the first CI job.
   refuses `.rawValue` in a position a person will read, where
   `localizedDisplayName` is meant. Each of those rules exists because a string
   shipped in English through that exact hole.
+
+  **The key order in the catalog is Xcode's, and nothing else may re-sort it.**
+  Xcode collates the way a person reads — punctuation and accents near the
+  letters they resemble — and Python's `sort_keys=True` sorts by code point,
+  which is a different order. `add_strings.py` used to sort, so every build in
+  the IDE quietly reordered the file back: a near-five-thousand-line diff with
+  no content in it, easy to commit by accident on top of real work. It now keeps
+  the order the file already has and appends new keys at the end, which Xcode
+  files into place on the next build. If you write the catalog from a script,
+  preserve its order.
 - **Every `UserDefaults` key lives in `DefaultsKey`** (`ChillMate/DefaultsKeys.swift`).
   No string literals at call sites.
 - **No build artifacts tracked.** `DerivedData/`, `build/` and `*.log` are ignored.

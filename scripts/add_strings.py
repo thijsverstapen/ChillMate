@@ -64,13 +64,23 @@ def main() -> int:
         strings[key] = entry
         added += 1
 
-    catalog["strings"] = dict(sorted(strings.items()))
-    # Xcode's own formatting: a space before the colon, and keys sorted. Writing
-    # it any other way means the next build reformats the whole file, which for
-    # the app catalog is a forty-eight-thousand line diff sitting on top of
-    # whatever you actually changed.
+    catalog["strings"] = strings
+    # Xcode's formatting, and Xcode's key order.
+    #
+    # The space before the colon is Xcode's. The order is Xcode's too, and it is
+    # not Python's: Xcode collates the way a person reads, so punctuation and
+    # accents sort near the letters they resemble, while `sort_keys=True` sorts
+    # by code point and puts them in a different place entirely. Sorting here
+    # therefore did the opposite of what it was written to do — every build that
+    # touched the catalog reordered it back, which for the app catalog is a
+    # near-five-thousand-line diff sitting on top of whatever you actually
+    # changed, with no content in it at all.
+    #
+    # So: keep the order the file already has. `json.loads` preserves it, new
+    # keys land at the end, and the next build in Xcode files them where they
+    # belong. That single small diff is the whole cost, and it stays small.
     catalog_path.write_text(
-        json.dumps(catalog, indent=2, ensure_ascii=False, sort_keys=True, separators=(",", " : ")) + "\n"
+        json.dumps(catalog, indent=2, ensure_ascii=False, separators=(",", " : ")) + "\n"
     )
     print(f"{catalog_path.name}: added {added}, already present {skipped}")
     return 0
