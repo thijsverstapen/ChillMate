@@ -41,7 +41,13 @@ def needs_no_translation(key, entry):
     """
     if entry.get("shouldTranslate") is False:
         return True
-    return not SPECIFIER.sub("", key).strip()
+    # Letters or digits, not merely non-whitespace. `"%@: %@. %@"` is an
+    # accessibility label assembled from three already-translated pieces, and the
+    # colon and full stop between them are not words. The source-side check has
+    # always used this rule; the catalog side used `.strip()` and so demanded a
+    # translation of ": ." — the two disagreeing is how that key ended up
+    # reported as missing four languages it could never have.
+    return not re.sub(r"[\s\W]+", "", SPECIFIER.sub("", key))
 
 
 def is_translated(localizations, language):
@@ -156,16 +162,14 @@ LITERAL_PREFIXES = [
     # Shortcuts gallery, and none of them was under any gate — the titles happened
     # to be translated because somebody added them by hand.
     #
-    # `DisplayRepresentation` is included even though most of the app's are drug
-    # and brand names that read the same in five languages: "Unknown" and "Other"
-    # sit in the same list and do not, and they were reaching the Shortcuts
-    # parameter picker in English. A name that translates to itself costs one
-    # catalog entry; a name that does not and is unchecked costs a reader.
-    re.compile(r'\bIntentDescription\(\s*(?=")'),
+    # `DisplayRepresentation` and `IntentDescription` moved to LABELLED_CALLS,
+    # which reads the whole first argument instead of demanding a quote straight
+    # after the label. Both of the Focus filter's states are written as a ternary
+    # inside `DisplayRepresentation(title:)`, so a pattern anchored on the quote
+    # never saw them and they reached iOS Settings in English.
     re.compile(r'LocalizedStringResource\s*=\s*(?=")'),
     re.compile(r'\bshortTitle:\s*(?=")'),
     re.compile(r'\bParameter\(\s*title:\s*(?=")'),
-    re.compile(r'\bDisplayRepresentation\(\s*title:\s*(?=")'),
 ]
 
 # An App Intents parameter summary. `Summary("Check \\(\\.$first) with \\(\\.$second)")`
@@ -189,7 +193,8 @@ UNICODE_ESCAPE = re.compile(r"\\u\{([0-9A-Fa-f]+)\}")
 # So the first argument is extracted by bracket counting and every literal inside
 # it is checked, whatever shape it is in. Only the first: `Label("Log water",
 # systemImage: "drop.fill")` must not put an SF Symbol name under translation.
-LABELLED_CALLS = ("Text", "Label", "Button", "Picker", "Toggle", "TextField", "Stepper", "NavigationLink")
+LABELLED_CALLS = ("Text", "Label", "Button", "Picker", "Toggle", "TextField", "Stepper",
+                  "NavigationLink", "DisplayRepresentation", "IntentDescription")
 LABELLED_CALL = re.compile(r"\b(" + "|".join(LABELLED_CALLS) + r")\(")
 
 
@@ -485,6 +490,48 @@ def check_display_assignments(directory):
     return findings
 
 
+POSITIONAL = re.compile(r"%\d+\$")
+
+
+def check_duplicate_spellings(catalog_path, label):
+    """Two keys for one string, with the translations on the one nothing uses.
+
+    Xcode extracts `String(localized: "\\(a) and \\(b)")` as "%@ and %@". A key
+    written by hand as "%1$@ and %2$@" reads as the same string to a person and is
+    a different key to the runtime, so the app falls back to English while the
+    catalog shows four green translations.
+
+    Eleven keys were in that state, including the message that carries somebody's
+    location to a trusted contact. Nothing caught it, and the reason is worth
+    keeping in mind: the source-side check blanks placeholders before comparing,
+    which is what lets it match a literal to a key without knowing the argument
+    types, and is exactly what makes it blind to this. So the check belongs here,
+    on the catalog's own consistency, rather than there.
+    """
+    if not catalog_path.exists():
+        return []
+
+    strings = json.loads(catalog_path.read_text()).get("strings", {})
+    by_shape = {}
+    for key in strings:
+        by_shape.setdefault(SPECIFIER.sub("\x00", key), []).append(key)
+
+    findings = []
+    for keys in by_shape.values():
+        # `%@` and `%lld` reduce alike and are genuinely different keys. Only a
+        # positional and a plain spelling of one string is the bug.
+        positional = [k for k in keys if POSITIONAL.search(k)]
+        plain = [k for k in keys if not POSITIONAL.search(k)]
+        if not positional or not plain:
+            continue
+        for key in positional:
+            findings.append(
+                f"{label}: {key[:55]!r} is a second spelling of {plain[0][:55]!r}. "
+                "Xcode extracts the plain form, so this one is never looked up"
+            )
+    return findings
+
+
 def check_notification_copy():
     """No bare English sentence in the notification service."""
     source = ROOT / NOTIFICATION_SERVICE
@@ -605,6 +652,9 @@ for source_directory, source_catalog in SOURCE_CATALOGS:
     failures.extend(check_display_assignments(source_directory))
 
 failures.extend(check_notification_copy())
+
+for catalog_path in CATALOGS:
+    failures.extend(check_duplicate_spellings(catalog_path, catalog_path.name))
 
 if failures:
     print("\nLocalization check failed:")

@@ -65,7 +65,13 @@ def main() -> int:
         added += 1
 
     catalog["strings"] = dict(sorted(strings.items()))
-    catalog_path.write_text(json.dumps(catalog, indent=2, ensure_ascii=False) + "\n")
+    # Xcode's own formatting: a space before the colon, and keys sorted. Writing
+    # it any other way means the next build reformats the whole file, which for
+    # the app catalog is a forty-eight-thousand line diff sitting on top of
+    # whatever you actually changed.
+    catalog_path.write_text(
+        json.dumps(catalog, indent=2, ensure_ascii=False, sort_keys=True, separators=(",", " : ")) + "\n"
+    )
     print(f"{catalog_path.name}: added {added}, already present {skipped}")
     return 0
 
