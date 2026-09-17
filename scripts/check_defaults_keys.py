@@ -27,6 +27,10 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # legitimately write a raw key to set up or assert on stored state.
 TARGETS = [
     "ChillMate",
+    # The domain module. It should never read a defaults key at all — that is
+    # most of the point of the boundary — so checking it is cheap insurance that
+    # nobody reaches back across the line.
+    "ChillMateCore/Sources/ChillMateCore",
     "ChillMateWatchApp",
     "ChillMateWatchAppWidget",
     "ChillMateLiveActivityExtension",

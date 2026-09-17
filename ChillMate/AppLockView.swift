@@ -178,6 +178,20 @@ struct AppLockView<Content: View>: View {
         }
 
         if LocalSecurityService.verifyPINFromKeychain(pinCode) {
+            // Leaving duress mode is what the real PIN does, and it is the only
+            // thing that does it.
+            UserDefaults.standard.set(false, forKey: DefaultsKey.duressModeActive)
+            PINThrottle.recordSuccess()
+            lockoutRemaining = nil
+            isUnlocked = true
+            pinCode = ""
+            message = nil
+        } else if LocalSecurityService.verifyDuressPIN(pinCode) {
+            // Deliberately identical to the branch above, down to clearing the
+            // throttle. Anything that behaved differently — a pause, a different
+            // message, a failed attempt recorded — would tell somebody watching
+            // which PIN was entered, which is the whole thing this defends against.
+            UserDefaults.standard.set(true, forKey: DefaultsKey.duressModeActive)
             PINThrottle.recordSuccess()
             lockoutRemaining = nil
             isUnlocked = true
@@ -378,6 +392,8 @@ enum LocalSecurityService {
     private static let keychainService = "com.BIJTHIJS.ChillMate.pin-credentials"
     private static let keychainHashAccount = "pin-hash-v2"
     private static let keychainSaltAccount = "pin-salt-v2"
+    private static let duressHashAccount = "duress-hash-v1"
+    private static let duressSaltAccount = "duress-salt-v1"
 
     static func savePINToKeychain(pin: String) {
         let saltBytes = (0..<32).map { _ in UInt8.random(in: UInt8.min...UInt8.max) }
@@ -413,6 +429,61 @@ enum LocalSecurityService {
         }
 
         return false
+    }
+
+    // MARK: The duress PIN
+
+    /// A second PIN that opens the app on an empty store.
+    ///
+    /// The threat this exists for is not a stolen phone, which the ordinary PIN
+    /// already handles. It is being stood over and told to unlock — by a partner,
+    /// a border officer, someone who has just taken your phone off you. Refusing
+    /// is not always an option, and an app that visibly refuses is worse than one
+    /// that opens.
+    ///
+    /// So the duress PIN unlocks. It looks exactly like a successful unlock,
+    /// because anything else defeats the point: same screen, same timing, no
+    /// warning, nothing on screen that says which PIN was used. The app comes up
+    /// on a fresh in-memory store, so it looks like an app nobody has logged
+    /// anything into.
+    ///
+    /// **It never deletes anything.** Destroying data on a PIN entry would mean
+    /// somebody under stress could lose years of their history with one mistyped
+    /// digit, and there would be no way back. Duress mode is a view, not an
+    /// action: enter the real PIN next time and everything is where it was.
+    /// Anything logged while in duress mode evaporates with the in-memory store,
+    /// which is also the right outcome.
+    static func saveDuressPIN(_ pin: String) {
+        let saltData = Data((0..<32).map { _ in UInt8.random(in: UInt8.min...UInt8.max) })
+        keychainSave(data: pbkdf2Hash(pin: pin, salt: saltData), account: duressHashAccount)
+        keychainSave(data: saltData, account: duressSaltAccount)
+    }
+
+    static func verifyDuressPIN(_ pin: String) -> Bool {
+        guard !pin.isEmpty else { return false }
+        guard let storedHash = keychainRead(account: duressHashAccount),
+              let storedSalt = keychainRead(account: duressSaltAccount) else { return false }
+        return constantTimeEquals(pbkdf2Hash(pin: pin, salt: storedSalt), storedHash)
+    }
+
+    static func hasDuressPIN() -> Bool {
+        keychainRead(account: duressHashAccount) != nil
+    }
+
+    static func clearDuressPIN() {
+        keychainDelete(account: duressHashAccount)
+        keychainDelete(account: duressSaltAccount)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.duressModeActive)
+    }
+
+    /// Whether the app is currently showing the decoy store.
+    static var isInDuressMode: Bool {
+        UserDefaults.standard.bool(forKey: DefaultsKey.duressModeActive)
+    }
+
+    /// A duress PIN has to differ from the real one, or it can never be entered.
+    static func isAcceptableDuressPIN(_ pin: String) -> Bool {
+        isValidPIN(pin) && !verifyPINFromKeychain(pin)
     }
 
     static func hasPINCredentials() -> Bool {
@@ -470,7 +541,49 @@ enum LocalSecurityService {
         return digest.map(\.twoDigitHex).joined()
     }
 
+    /// Credential storage under unit tests.
+    ///
+    /// The unit-test host has no keychain-sharing entitlement, so `SecItemAdd`
+    /// fails silently there and every credential reads back as absent. That is why
+    /// none of the PIN save-and-verify path had any coverage: a test could write a
+    /// PIN, read nothing, and conclude the code was broken.
+    ///
+    /// `ChillMateModelContainer` already makes the same accommodation for CloudKit
+    /// for the same reason. This mirrors it: under tests the three primitives below
+    /// use a dictionary instead. It is unreachable in a shipped build — the
+    /// environment variable it keys on is set by XCTest and by nothing else.
+    private static let testCredentials = TestCredentialStore()
+
+    final class TestCredentialStore: @unchecked Sendable {
+        private let lock = NSLock()
+        private var items: [String: Data] = [:]
+
+        func save(_ data: Data, account: String) {
+            lock.lock(); defer { lock.unlock() }
+            items[account] = data
+        }
+
+        func read(_ account: String) -> Data? {
+            lock.lock(); defer { lock.unlock() }
+            return items[account]
+        }
+
+        func delete(_ account: String) {
+            lock.lock(); defer { lock.unlock() }
+            items[account] = nil
+        }
+    }
+
+    private static var isRunningUnitTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     private static func keychainSave(data: Data, account: String) {
+        if isRunningUnitTests {
+            testCredentials.save(data, account: account)
+            return
+        }
+
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,
@@ -484,6 +597,10 @@ enum LocalSecurityService {
     }
 
     private static func keychainRead(account: String) -> Data? {
+        if isRunningUnitTests {
+            return testCredentials.read(account)
+        }
+
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,
@@ -498,6 +615,11 @@ enum LocalSecurityService {
     }
 
     private static func keychainDelete(account: String) {
+        if isRunningUnitTests {
+            testCredentials.delete(account)
+            return
+        }
+
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: keychainService,

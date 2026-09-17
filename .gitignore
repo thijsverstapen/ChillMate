@@ -10,6 +10,10 @@ xcuserdata/
 *.xcuserstate
 *.xcscmblueprint
 
+# Xcode Cloud workflows, written into the project by the IDE. The build lives in
+# .github/workflows/ci.yml; a second, IDE-managed description of it would drift.
+ChillMate.xcodeproj/xcshareddata/xcodecloud/
+
 # macOS
 .DS_Store
 
@@ -46,3 +50,6 @@ TestResults/
 # Python bytecode from tools/
 __pycache__/
 *.pyc
+
+# Claude Code's local session state and per-machine settings
+.claude/

@@ -26,4 +26,12 @@ enum AccessibilityID {
     static let logSheet = "log.sheet"
     static let logSaveButton = "log.save"
     static let logCancelButton = "log.cancel"
+
+    // First-run setup
+    //
+    // The skip path needs an identifier because it is the one route through
+    // onboarding a UI test can take without reading English labels, and because
+    // it is the route somebody in a hurry takes.
+    static let setupSkipButton = "setup.skip"
+    static let setupQuickStartButton = "setup.quickStart"
 }

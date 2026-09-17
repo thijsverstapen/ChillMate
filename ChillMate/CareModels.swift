@@ -1,6 +1,7 @@
 import Foundation
 import ActivityKit
 import SwiftData
+import ChillMateCore
 
 @Model
 final class STDTestRecord {
@@ -318,6 +319,16 @@ final class RiskCheckRecord {
     var bloodPressureLevel: String = ""
     var warningsData: Data = Data("[]".utf8)
     var createdAt: Date = Date.now
+    /// The night this check was run for, when there was one to attach it to.
+    ///
+    /// Added in 5.0.0. Optional with a default, so it is an additive schema change
+    /// and existing rows read back as nil rather than needing a migration.
+    ///
+    /// Nil is a normal state, not a failure: a check run before anything is logged
+    /// has no entry to point at yet. The history screen therefore shows a check on
+    /// a day if it is linked *or* if it simply happened that day, which keeps those
+    /// checks visible without a backfill.
+    var nightEntryID: UUID?
 
     init(
         id: UUID = UUID(),
@@ -331,8 +342,10 @@ final class RiskCheckRecord {
         cardiacLevel: String = "",
         bloodPressureLevel: String = "",
         warnings: [String],
-        createdAt: Date = .now
+        createdAt: Date = .now,
+        nightEntryID: UUID? = nil
     ) {
+        self.nightEntryID = nightEntryID
         self.id = id
         self.medicationText = medicationText
         self.timing = timing.rawValue

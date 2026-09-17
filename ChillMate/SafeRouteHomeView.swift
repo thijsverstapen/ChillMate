@@ -5,9 +5,10 @@ import SwiftUI
 import UIKit
 
 struct SafeRouteHomeView: View {
+    @Environment(\.services) private var services
     @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
-    @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = "Please come get me, I’m not okay at this moment."
+    @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = TrustedContactDefaults.message
     @State private var destination = ""
     @State private var selectedRouteMode: RouteTransportMode = .transit
     @State private var routeSuggestions: [RouteSuggestion] = []
@@ -16,6 +17,8 @@ struct SafeRouteHomeView: View {
     @State private var currentLocation: LoggedLocation?
     @State private var message: String?
     @State private var isFetchingLocation = false
+    @State private var journeyMinutes = SafeRouteReminder.defaultMinutes
+    @State private var journeyArrival: Date?
 
     private var savedHomeAddress: String {
         profiles.first?.homeAddress.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -33,6 +36,9 @@ struct SafeRouteHomeView: View {
             .endEditingOnTap()
             .onChange(of: destination) { _, newValue in
                 searchDestinationSuggestions(for: newValue)
+            }
+            .task {
+                journeyArrival = SafeRouteLiveActivityController.expectedArrival
             }
     }
 
@@ -107,11 +113,12 @@ struct SafeRouteHomeView: View {
 
         Task {
             do {
-                let location = try await LocationLookupService.shared.currentLoggedLocation()
+                let location = try await services.location.currentLoggedLocation()
                 await MainActor.run {
                     currentLocation = location
                     isFetchingLocation = false
-                    openSMS(body: "\(trustedContactMessage)\n\nMy location: https://maps.apple.com/?ll=\(location.latitude),\(location.longitude)")
+                    let link = "https://maps.apple.com/?ll=\(location.latitude),\(location.longitude)"
+                    openSMS(body: String(localized: "\(trustedContactMessage)\n\nMy location: \(link)"))
                 }
             } catch {
                 await MainActor.run {
@@ -141,6 +148,93 @@ struct SafeRouteHomeView: View {
         let encodedBody = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         guard let url = URL(string: "sms:\(phone)&body=\(encodedBody)") else { return }
         UIApplication.shared.open(url)
+    }
+
+    /// A journey with a time on it, and one tap to close it out.
+    ///
+    /// The gap this fills is the walk itself. Everything else on this screen
+    /// happens before you leave — plan the route, send your location, open Maps —
+    /// and then the phone goes in a pocket and the app has nothing more to say
+    /// until you open it again. This says: you told it when you would be back, and
+    /// if that time passes without you saying anything, it says so.
+    ///
+    /// It does not message anybody on its own. Not here and not anywhere: the app
+    /// has never sent a message the user did not press send on, and a safety
+    /// feature that quietly texted a contact would be the first.
+    @ViewBuilder
+    private var journeyCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CareSectionTitle(title: String(localized: "On the way"), symbol: "figure.walk")
+
+            if let journeyArrival {
+                Text("Expected back around \(journeyArrival.formatted(date: .omitted, time: .shortened)). It is on your Lock Screen, so you can close it from there without unlocking.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button(action: markArrived) {
+                    Label("I'm home", systemImage: "house.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChillPillButtonStyle(prominent: true, tint: .chillMint))
+
+                Button(action: cancelJourney) {
+                    Label("Cancel the check-in", systemImage: "xmark.circle")
+                        .font(.subheadline.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChillPillButtonStyle(prominent: false))
+            } else {
+                Text("Say roughly how long you will be. ChillMate puts a check-in on your Lock Screen and nudges you if that time passes without you closing it. Nothing is sent to anybody.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Picker("How long", selection: $journeyMinutes) {
+                    ForEach(SafeRouteReminder.selectableMinutes, id: \.self) { minutes in
+                        Text("\(minutes) min").tag(minutes)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                Button(action: startJourney) {
+                    Label("Start the check-in", systemImage: "figure.walk")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(ChillPillButtonStyle(prominent: true))
+            }
+        }
+        .padding(16)
+        .glassSurface(radius: 28, tint: Color.chillAccentTeal.opacity(0.10), interactive: true)
+    }
+
+    private func startJourney() {
+        let arrival = Date.now.addingTimeInterval(Double(journeyMinutes) * 60)
+        journeyArrival = arrival
+        Task {
+            await SafeRouteLiveActivityController.start(expectedArrival: arrival)
+            if (try? await services.notifications.requestAuthorization()) == true {
+                services.notifications.scheduleSafeRouteCheck(expectedArrival: arrival)
+            }
+            // Read the truth back rather than trusting the optimistic set above:
+            // Live Activities can be switched off system-wide, and the card
+            // claiming to be running when nothing is would be worse than no card.
+            journeyArrival = SafeRouteLiveActivityController.expectedArrival
+        }
+    }
+
+    private func markArrived() {
+        journeyArrival = nil
+        services.notifications.clearSafeRouteCheck()
+        Task { await SafeRouteActivityAttributes.markArrived() }
+    }
+
+    private func cancelJourney() {
+        journeyArrival = nil
+        services.notifications.clearSafeRouteCheck()
+        Task { await SafeRouteLiveActivityController.end() }
     }
 
     /// Scrolling content, split out of a 149-line body.
@@ -269,6 +363,8 @@ struct SafeRouteHomeView: View {
                 }
                 .padding(16)
                 .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.10), interactive: true)
+
+                journeyCard
 
                 Button(role: .destructive, action: getMeHomeEmergencyFlow) {
                     Label("Get me home now", systemImage: "exclamationmark.triangle.fill")

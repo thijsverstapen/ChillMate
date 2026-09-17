@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import ChillMateCore
 
 // Plain (non-View) model, enum, and store types extracted from CareToolsView.swift
 // as the first increment of splitting that file into per-concern units. These types
@@ -28,12 +29,39 @@ enum EmergencyContactInfo {
     static func number(forCountry country: String) -> String {
         switch country {
         case "United Kingdom": return "999"
-        case "United States": return "911"
         case "Australia": return "000"
-        case "Netherlands", "Belgium", "Germany", "Ireland", "France", "Spain": return "112"
+
+        // Verified against Wikipedia's list of emergency telephone numbers,
+        // 11 September 2026. Only countries with one unambiguous number are
+        // listed. Colombia, Chile and South Africa each route differently
+        // depending on the service and the network, and guessing on their behalf
+        // would be worse than the manual override they fall back to.
+        case "United States", "Canada", "Mexico", "Argentina": return "911"
+
+        case "Netherlands", "Belgium", "Germany", "Ireland", "France", "Spain",
+             "Austria", "Switzerland", "Luxembourg", "Portugal", "Italy",
+             "Sweden", "Denmark", "Norway", "Poland": return "112"
+
         default: return "112"
         }
     }
+
+    /// The countries the picker offers, in the order it offers them.
+    ///
+    /// Ordered by where ChillMate is actually used rather than alphabetically: the
+    /// five languages it ships in first, then the rest of the countries whose
+    /// number is unambiguous. "Other" is added by the picker and falls through to
+    /// 112, which connects on GSM networks in most of the world.
+    ///
+    /// Anyone whose country is not here, or whose country routes differently by
+    /// service, sets a number by hand in Settings — which is also the right answer
+    /// for someone travelling.
+    static let selectableCountries = [
+        "Netherlands", "Belgium", "Germany", "France", "Spain",
+        "United Kingdom", "Ireland", "Austria", "Switzerland", "Luxembourg",
+        "Portugal", "Italy", "Sweden", "Denmark", "Norway", "Poland",
+        "United States", "Canada", "Mexico", "Argentina", "Australia",
+    ]
 
     /// The user's manual override, trimmed; empty when they have not set one.
     static func override(in defaults: UserDefaults = .standard) -> String {
@@ -208,46 +236,26 @@ enum CareToolCatalog {
         case .groupBefore, .groupDuring, .groupAfter, .groupPatterns:
             // Groups describe themselves via CareToolGroup; fall back gracefully.
             return CareToolGroup.homeGroups.first { $0.page == page }?.cardDefinition
-                ?? CareToolDefinition(page: page, title: page.rawValue, subtitle: "", symbol: "square.grid.2x2.fill", tint: Color.chillPrimary)
+                ?? CareToolDefinition(page: page, title: page.localizedDisplayName, subtitle: "", symbol: "square.grid.2x2.fill", tint: Color.chillPrimary)
         }
     }
 }
 
-enum CombinationTiming: String, CaseIterable, Identifiable {
-    case sameSession = "Same session"
-    case withinSixHours = "6 h"
-    case withinDay = "24 h"
-
-    var id: String { rawValue }
-}
-
-enum RiskLevel {
-    case lower
-    case caution
-    case high
-
-    var label: String {
-        switch self {
-        case .lower:
-            String(localized: "No known")
-        case .caution:
-            String(localized: "Caution")
-        case .high:
-            String(localized: "High")
-        }
-    }
-
-    var tint: Color {
-        switch self {
-        case .lower:
-            Color.chillMint
-        case .caution:
-            .orange
-        case .high:
-            .red
-        }
+/// What goes to a trusted contact when somebody asks for help.
+///
+/// The text was an English literal repeated as the `@AppStorage` default in
+/// three separate files, which meant a Dutch user's request for help left the
+/// phone in English — to a Dutch contact, who may not read it, in the one
+/// message in the app where being understood is the entire point.
+///
+/// Computed rather than stored: `String(localized:)` resolves against the
+/// bundle at read time, and all three declarations have to agree.
+enum TrustedContactDefaults {
+    static var message: String {
+        String(localized: "Please come get me, I’m not okay at this moment.")
     }
 }
+
 
 struct RecentlyDeletedItem: Codable, Identifiable {
     var id = UUID()

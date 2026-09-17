@@ -36,7 +36,7 @@ final class SpotlightService {
         UserDefaults.standard.set(contentHash, forKey: key)
 
         let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
-        attributeSet.title = "Journal: \(entry.date.formatted(date: .abbreviated, time: .shortened))"
+        attributeSet.title = String(localized: "Journal: \(entry.date.formatted(date: .abbreviated, time: .shortened))")
 
         var parts: [String] = []
         if !entry.rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -71,3 +71,9 @@ final class SpotlightService {
         CSSearchableIndex.default().deleteSearchableItems(withDomainIdentifiers: [domainIdentifier])
     }
 }
+
+/// Conformance declared here rather than beside the protocol: `SpotlightIndexing`
+/// inherits `Sendable`, and Swift treats a Sendable conformance in another
+/// file as retroactive — a warning today and an error in a future language
+/// mode.
+extension SpotlightService: SpotlightIndexing {}

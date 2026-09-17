@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import ChillMateCore
 
 @Model
 final class NightEntry {
@@ -617,6 +618,13 @@ final class TriggerTagRecord {
         self.name = name
         self.sortIndex = sortIndex
     }
+}
+
+/// `NightPatterns` works over this rather than over the model, so the pattern
+/// arithmetic does not need SwiftData to compile. `skippedNight` is the stored
+/// name and `isSkipped` is the one the protocol asks for.
+extension NightEntry: LoggedNight {
+    var isSkipped: Bool { skippedNight }
 }
 
 enum ChillTrigger: String, CaseIterable, Identifiable, Codable {

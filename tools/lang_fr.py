@@ -274,6 +274,7 @@ S = {
     "demo_reset": "Effacer",
     "demo_note": "Tout se passe dans cette page. Rien de ce que vous touchez n'est envoyé où que ce soit, exactement comme dans l'app.",
     "combos_h2": "Les 30 associations, en une seule liste",
+    "combos_source_note": "Chaque évaluation ici est comparée au tableau des combinaisons de drogues publié par TripSit, et chaque ligne indique comment elle se situe. Quand ChillMate évalue plus haut, c'est précisé. Une entrée absente signifie que personne n'a évalué cette paire, pas qu'il ne se passe rien.",
     "combos_meds_h2": "Les groupes de médicaments reconnus",
     "demo_try": "Essayer GHB et alcool",
 

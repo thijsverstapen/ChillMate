@@ -508,3 +508,9 @@ enum HealthKitError: LocalizedError {
         }
     }
 }
+
+/// Conformance declared here rather than beside the protocol: `HealthReading`
+/// inherits `Sendable`, and Swift treats a Sendable conformance in another
+/// file as retroactive — a warning today and an error in a future language
+/// mode.
+extension HealthKitService: HealthReading {}

@@ -161,17 +161,21 @@ private struct SafetyAutopilotContext {
             result.append(SafetyAutopilotAction(
                 priority: .urgent,
                 title: String(localized: "PEP window is active"),
-                detail: "It has been less than 72 hours since a log that may include HIV exposure. Contact a sexual-health service, your doctor, an out-of-hours clinic, or a hospital now. About \(hours) hours remain.",
+                detail: String(localized: "It has been less than 72 hours since a log that may include HIV exposure. Contact a sexual-health service, your doctor, an out-of-hours clinic, or a hospital now. About \(hours) hours remain."),
                 symbol: "cross.case.circle.fill"
             ))
         }
 
         if let timer = activeTimer {
-            let progress = Int((timer.effectProgress(at: now) * 100).rounded())
+            // Formatted rather than a bare "%", which is not where every locale
+            // puts the sign and not always without a space before it.
+            let progress = timer.effectProgress(at: now).formatted(.percent.precision(.fractionLength(0)))
             result.append(SafetyAutopilotAction(
                 priority: timer.redoseNudgeIsActive(at: now) ? .caution : .support,
-                title: timer.redoseNudgeIsActive(at: now) ? "Pause before continuing" : "Check-in is active",
-                detail: "\(timer.substanceName) check-in is \(progress)% through. Check water, food, body temperature, support, and whether you still feel safe.",
+                title: timer.redoseNudgeIsActive(at: now)
+                    ? String(localized: "Pause before continuing")
+                    : String(localized: "Check-in is active"),
+                detail: String(localized: "\(timer.substanceName) check-in is \(progress) through. Check water, food, body temperature, support, and whether you still feel safe."),
                 symbol: "timer.circle.fill"
             ))
         }
@@ -218,7 +222,7 @@ private struct SafetyAutopilotContext {
             result.append(SafetyAutopilotAction(
                 priority: .caution,
                 title: String(localized: "Something may have changed"),
-                detail: "Risky logs increased from \(riskTrend.previous) to \(riskTrend.recent). Look at stress, loneliness, money, housing, conflict, boredom, or breakup patterns.",
+                detail: String(localized: "Risky logs increased from \(riskTrend.previous) to \(riskTrend.recent). Look at stress, loneliness, money, housing, conflict, boredom, or breakup patterns."),
                 symbol: "waveform.path.ecg"
             ))
         }
@@ -297,12 +301,12 @@ private struct SafetyStatusMetric: View {
             Text(value)
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .chillLineLimit(1, scale: 0.7)
             Text(title)
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(Color.chillSecondary)
-                .lineLimit(1)
+                .chillLineLimit(2, scale: 0.7)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity)
         .frame(minHeight: 74)

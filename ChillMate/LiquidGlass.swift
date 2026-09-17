@@ -330,6 +330,18 @@ struct GlassSurfaceModifier: ViewModifier {
     /// sheets and full-screen covers, which get a fresh environment.
     @AppStorage(DefaultsKey.highContrastMode) private var highContrastMode = false
 
+    /// Settings > Accessibility > Reduce Transparency, on the device.
+    ///
+    /// 784 lines of this file are translucency, and the app honoured Reduce Motion
+    /// carefully while ignoring its sibling entirely. Someone who has asked the
+    /// system to stop blurring things was still reading white text through frosted
+    /// material over a moving gradient, on every card in the app.
+    ///
+    /// The material is what gets replaced, not the layout: an opaque surface in
+    /// the app's own dark tone, so nothing shifts position and the app still looks
+    /// like itself.
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
     let radius: CGFloat
     let tint: Color
     let interactive: Bool
@@ -358,13 +370,22 @@ struct GlassSurfaceModifier: ViewModifier {
             : (interactive
                 ? [.white.opacity(0.30), .white.opacity(0.08)]
                 : [.white.opacity(0.12), .white.opacity(0.12)])
-        let edgeWidth: CGFloat = highContrastMode ? 1.5 : (interactive ? 0.75 : 0.5)
+        // Without the material, the edge is the only thing separating one
+        // container from the next, so it firms up too.
+        let edgeWidth: CGFloat = highContrastMode ? 1.5 : (reduceTransparency ? 1.0 : (interactive ? 0.75 : 0.5))
 
         return content
             .background {
                 ZStack {
-                    shape.fill(.ultraThinMaterial)
-                    shape.fill(surface)
+                    if reduceTransparency {
+                        // No material at all: a solid surface the text sits on,
+                        // rather than a blur of whatever happens to be behind it.
+                        shape.fill(Color.chillSurfaceDark)
+                        shape.fill(highContrastMode ? Color.black.opacity(0.45) : .clear)
+                    } else {
+                        shape.fill(.ultraThinMaterial)
+                        shape.fill(surface)
+                    }
                 }
             }
             .environment(\.colorScheme, .dark)

@@ -274,6 +274,7 @@ S = {
     "demo_reset": "Wissen",
     "demo_note": "Dit draait in de pagina zelf. Wat je aantikt gaat nergens heen, precies zoals in de app.",
     "combos_h2": "Alle 30 combinaties, in één lijst",
+    "combos_source_note": "Elke inschatting hier wordt vergeleken met de gepubliceerde drugscombinatiekaart van TripSit, en bij elke regel staat hoe die zich verhoudt. Waar ChillMate iets hoger inschat, staat dat erbij. Een ontbrekende regel betekent dat niemand die combinatie heeft beoordeeld, niet dat er niets gebeurt.",
     "combos_meds_h2": "De medicijngroepen die hij herkent",
     "demo_try": "Probeer GHB en alcohol",
 

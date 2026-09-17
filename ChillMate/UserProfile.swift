@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import ChillMateCore
 
 @Model
 final class UserProfile {
@@ -125,3 +126,7 @@ enum SexualRole: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 }
+
+/// `MedicationRiskDatabase` matches against names; this is the whole of what it
+/// needs, so the matcher does not have to know what a profile is.
+extension ProfileMedication: SavedMedication {}

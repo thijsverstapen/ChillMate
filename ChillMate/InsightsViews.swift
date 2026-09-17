@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 // Private insights views extracted from CareToolsView.swift as part of splitting that file.
 
@@ -79,6 +80,13 @@ private struct PrivateInsightsSections: View {
     var body: some View {
         Group {
             InsightMetricGrid(entries: recentEntries, timers: timers, journals: journals, windowDays: windowDays)
+            // Placed directly under the counts because it is the answer to the
+            // question the counts raise and do not answer: sixteen what, when,
+            // and is that more than last month?
+            //
+            // Given the unwindowed list on purpose — the comparison needs the
+            // window before this one.
+            NightPatternsCard(patterns: NightPatterns(entries: entries, windowDays: windowDays))
             InsightMilestoneCard(
                 currentStreak: ChillInsightCalculator.recoveryStreakDays(entries: entries),
                 longestStreak: ChillInsightCalculator.longestClearStreak(entries: entries)
@@ -87,9 +95,12 @@ private struct PrivateInsightsSections: View {
             TrendListCard(title: String(localized: "What led to it?"), emptyText: String(localized: "Add trigger tags in logs to build this map."), counts: ChillInsightCalculator.triggerCounts(entries: recentEntries), tint: Color.chillSecondaryBlue)
             TrendListCard(title: String(localized: "What changed?"), emptyText: String(localized: "When risky logs increase, reasons you tag will appear here."), counts: ChillInsightCalculator.changeReasonCounts(entries: recentEntries), tint: .orange)
             TrendListCard(title: String(localized: "Substances"), emptyText: String(localized: "No substances logged in the selected window."), counts: ChillInsightCalculator.substanceCounts(entries: recentEntries), tint: Color.chillPrimary)
+
             InsightSleepCorrelationCard(
                 substanceAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: true),
-                clearAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: false)
+                clearAvg: ChillInsightCalculator.averageSleep(entries: recentEntries, substanceNights: false),
+                substanceNights: ChillInsightCalculator.sleptNightCount(entries: recentEntries, substanceNights: true),
+                clearNights: ChillInsightCalculator.sleptNightCount(entries: recentEntries, substanceNights: false)
             )
             PersonalBaselineCard(entries: recentEntries, timers: timers, windowDays: windowDays)
         }
@@ -182,6 +193,14 @@ private struct PersonalBaselineCard: View {
         return values.reduce(0, +) / Double(values.count)
     }
 
+    private func hours(_ value: Double) -> String {
+        "\(value.formatted(.number.precision(.fractionLength(1)))) h"
+    }
+
+    private var activeWeeks: Int {
+        ChillInsightCalculator.consecutiveActiveWeeks(entries: entries)
+    }
+
     private var lateTimers: Int {
         timers.filter { Calendar.current.component(.hour, from: $0.startedAt) >= 2 && Calendar.current.component(.hour, from: $0.startedAt) <= 6 }.count
     }
@@ -190,7 +209,11 @@ private struct PersonalBaselineCard: View {
         VStack(alignment: .leading, spacing: 10) {
             CareSectionTitle(title: String(localized: "Your baseline"), symbol: "person.text.rectangle.fill")
             InsightWindowCaption(days: windowDays)
-            InsightLine(title: String(localized: "Average logged sleep"), value: averageSleep == 0 ? "Not enough data" : "\(averageSleep.formatted(.number.precision(.fractionLength(1)))) h")
+            InsightLine(title: String(localized: "Average logged sleep"), value: averageSleep == 0 ? String(localized: "Not enough data") : hours(averageSleep))
+            InsightLine(
+                title: String(localized: "Weeks in a row with use"),
+                value: activeWeeks == 0 ? String(localized: "None") : String(localized: "\(activeWeeks) weeks")
+            )
             InsightLine(title: String(localized: "Late timer starts"), value: "\(lateTimers)")
             InsightLine(title: String(localized: "Memory gaps"), value: "\(entries.filter(\.reportedMemoryGap).count)")
             Text("Baseline means “usual for you,” not “good” or “bad.” The app uses this to show when something changes.")
@@ -379,6 +402,49 @@ extension ChillInsightCalculator {
     }
 
     /// Average recorded sleep after substance nights vs clear nights.
+    /// Consecutive weeks, counting back from this one, that contain at least one
+    /// substance night.
+    ///
+    /// Frequency is the thing tolerance actually tracks, and it is the one pattern
+    /// these logs can see clearly without asking anyone to weigh anything. Counted
+    /// in weeks rather than nights because a weekend is the unit people plan in.
+    ///
+    /// Stops at the first clear week rather than counting totals: "four weekends
+    /// in a row" is a pattern someone can recognise about themselves, where "17
+    /// nights in 90 days" is a statistic about a stranger.
+    static func consecutiveActiveWeeks(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
+        let active = Set(entries.filter { !$0.skippedNight && !$0.substances.isEmpty }.compactMap {
+            calendar.dateInterval(of: .weekOfYear, for: $0.date)?.start
+        })
+        guard !active.isEmpty else { return 0 }
+
+        guard var week = calendar.dateInterval(of: .weekOfYear, for: now)?.start else { return 0 }
+        // This week may not have happened yet; start from the most recent week
+        // that did, so a clear Monday does not read as a broken streak.
+        if !active.contains(week) {
+            guard let previous = calendar.date(byAdding: .weekOfYear, value: -1, to: week) else { return 0 }
+            week = previous
+        }
+
+        var count = 0
+        // Bounded so a corrupt date cannot spin here; two years of weeks is well
+        // past anything the 1,000-row query can hold.
+        while active.contains(week), count < 104 {
+            count += 1
+            guard let previous = calendar.date(byAdding: .weekOfYear, value: -1, to: week) else { break }
+            week = previous
+        }
+        return count
+    }
+
+    /// How many logged nights an average is drawn from, so a card can say when it
+    /// does not have enough to conclude anything.
+    static func sleptNightCount(entries: [NightEntry], substanceNights: Bool) -> Int {
+        entries.filter {
+            $0.sleptYet && $0.sleepHours > 0 && (substanceNights ? !$0.substances.isEmpty : $0.substances.isEmpty)
+        }.count
+    }
+
     static func averageSleep(entries: [NightEntry], substanceNights: Bool) -> Double? {
         let matching = entries.filter {
             $0.sleptYet && $0.sleepHours > 0 && (substanceNights ? !$0.substances.isEmpty : $0.substances.isEmpty)
@@ -469,6 +535,18 @@ private struct InsightHeatmapCard: View {
 private struct InsightSleepCorrelationCard: View {
     let substanceAvg: Double?
     let clearAvg: Double?
+    /// How many logged nights each average rests on.
+    let substanceNights: Int
+    let clearNights: Int
+
+    /// Three nights is not a pattern.
+    ///
+    /// Stating that is the finding, not a disclaimer: an app that draws a
+    /// confident conclusion from two entries teaches people to distrust the ones
+    /// it draws from two hundred.
+    private var hasEnoughToConclude: Bool {
+        substanceNights >= 3 && clearNights >= 3
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -477,7 +555,12 @@ private struct InsightSleepCorrelationCard: View {
             row(label: String(localized: "After substance nights"), hours: substanceAvg, tint: .orange)
             row(label: String(localized: "After clear nights"), hours: clearAvg, tint: Color.chillMint)
 
-            if let substanceAvg, let clearAvg, clearAvg - substanceAvg >= 0.5 {
+            if !hasEnoughToConclude {
+                Text("Based on \(substanceNights) substance nights and \(clearNights) clear ones. Three of each is the least this can say anything from.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else if let substanceAvg, let clearAvg, clearAvg - substanceAvg >= 0.5 {
                 Text("You tend to sleep about \((clearAvg - substanceAvg).formatted(.number.precision(.fractionLength(0...1)))) hours more after a clear night.")
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
@@ -500,5 +583,96 @@ private struct InsightSleepCorrelationCard: View {
                 .font(.subheadline.weight(.bold).monospacedDigit())
                 .foregroundStyle(Color.chillSecondary)
         }
+    }
+}
+
+
+/// What the logs say about shape rather than volume.
+///
+/// Descriptive only: a busiest weekday, a direction against the previous window,
+/// and the pairing that comes up most. Nothing here infers anything about the
+/// person, and nothing is presented as good or bad — the same framing
+/// `PersonalBaselineCard` sets a few cards further down.
+///
+/// Shows nothing at all below `NightPatterns.minimumNights`. A single Saturday is
+/// not a pattern, and dressing one up as a finding is exactly what would make
+/// this screen untrustworthy.
+private struct NightPatternsCard: View {
+    let patterns: NightPatterns
+
+    private var weekdayName: String? {
+        guard let busiest = patterns.busiest else { return nil }
+        let symbols = Calendar.current.standaloneWeekdaySymbols
+        let index = busiest.weekday - 1
+        return symbols.indices.contains(index) ? symbols[index] : nil
+    }
+
+    var body: some View {
+        if patterns.hasAnythingToSay {
+            VStack(alignment: .leading, spacing: 12) {
+                CareSectionTitle(title: String(localized: "Patterns"), symbol: "chart.dots.scatter")
+
+                if let busiest = patterns.busiest, let weekdayName {
+                    NightPatternLine(
+                        symbol: "calendar",
+                        text: String(localized: "\(weekdayName) is your most logged day, \(busiest.count) of \(patterns.loggedNights) nights."),
+                        tint: Color.chillSecondaryBlue
+                    )
+                }
+
+                if let change = patterns.change, !change.isFlat {
+                    NightPatternLine(
+                        symbol: change.difference > 0 ? "arrow.up.right" : "arrow.down.right",
+                        text: change.difference > 0
+                            ? String(localized: "\(change.current) logged nights, up from \(change.previous) in the period before.")
+                            : String(localized: "\(change.current) logged nights, down from \(change.previous) in the period before."),
+                        tint: change.difference > 0 ? .orange : Color.chillMint
+                    )
+                }
+
+                if let pairing = patterns.pairing {
+                    NightPatternLine(
+                        symbol: "link",
+                        text: String(localized: "\(pairing.first) and \(pairing.second) appear together most often, on \(pairing.nights) nights."),
+                        tint: Color.chillPrimary
+                    )
+                }
+
+                Text("These describe what you logged. They are not a judgement, and they are not advice.")
+                    .font(.caption2)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.07))
+        }
+    }
+}
+
+
+/// One observation in the patterns card: a symbol, a sentence, and room for the
+/// sentence to wrap, which the title/value shape of `InsightLine` does not have.
+private struct NightPatternLine: View {
+    let symbol: String
+    let text: String
+    let tint: Color
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: symbol)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(tint)
+                .frame(width: 22)
+                .accessibilityHidden(true)
+
+            Text(text)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(Color.chillText)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Spacer(minLength: 0)
+        }
+        .accessibilityElement(children: .combine)
     }
 }

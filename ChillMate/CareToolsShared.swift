@@ -61,8 +61,7 @@ struct ToolRow: View {
                         Text(title)
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(Color.chillText)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .chillLineLimit(1, scale: 0.8)
                         if isHighlighted {
                             Text("Now")
                                 .font(.caption2.weight(.heavy))
@@ -75,8 +74,7 @@ struct ToolRow: View {
                     Text(hint ?? subtitle)
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(hint == nil ? Color.chillSecondary : tint)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .chillLineLimit(1, scale: 0.7)
                 }
 
                 Spacer(minLength: 0)

@@ -2,6 +2,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 import TipKit
+import ChillMateCore
 
 struct CombinationRiskCheckerView: View {
     @Environment(\.dismiss) private var dismiss
@@ -15,7 +16,16 @@ struct CombinationRiskCheckerView: View {
     @State private var medicationTakenAt = Date.now
     @State private var medicationEffectHours = 8.0
     @State private var timing: CombinationTiming = .sameSession
+    @State private var substanceSearch = ""
     @State private var isShowingDiscardWarning = false
+
+    /// The grid's contents: everything selectable that answers to the search, plus
+    /// anything already selected so a filter cannot hide a choice you have made.
+    private var matchingSubstances: [Substance] {
+        let selectable = Substance.allCases.filter { $0 != .unknown && $0 != .other }
+        guard !substanceSearch.trimmingCharacters(in: .whitespaces).isEmpty else { return selectable }
+        return selectable.filter { $0.matches(substanceSearch) || selectedSubstances.contains($0) }
+    }
 
     private var assessment: CombinationAssessment {
         CombinationAssessment(
@@ -194,15 +204,52 @@ struct CombinationRiskCheckerView: View {
             VStack(alignment: .leading, spacing: 14) {
                 CareSectionTitle(title: String(localized: "Substances"), symbol: "square.grid.2x2.fill")
 
+                // Fourteen chips is enough to scan past what you are looking for,
+                // and two of them arrived in 5.0.0. The field matches street names
+                // as well as display names, because "ket" and "G" are what people
+                // type — see `Substance.aliases`.
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .accessibilityHidden(true)
+
+                    TextField("Search substances", text: $substanceSearch)
+                        .textFieldStyle(.plain)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                        .foregroundStyle(Color.chillText)
+
+                    if !substanceSearch.isEmpty {
+                        Button {
+                            substanceSearch = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(Color.chillSecondary)
+                        }
+                        .buttonStyle(ChillPlainButtonStyle())
+                        .accessibilityLabel(String(localized: "Clear search"))
+                        .accessibilityInputLabels([String(localized: "Clear")])
+                    }
+                }
+                .padding(12)
+                .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
+
+                if matchingSubstances.isEmpty {
+                    Text("Nothing matches that. It may still be worth checking the two you do know.")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 118), spacing: 10)], spacing: 10) {
-                    ForEach(Substance.allCases.filter { $0 != .unknown && $0 != .other }) { substance in
+                    ForEach(matchingSubstances) { substance in
                         Button {
                             toggle(substance)
                         } label: {
                             Label(substance.localizedDisplayName, systemImage: substance.symbolName)
                                 .font(.caption.weight(.bold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.75)
+                                .chillLineLimit(1, scale: 0.75)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 10)
                         }
@@ -217,6 +264,8 @@ struct CombinationRiskCheckerView: View {
             }
             .padding(16)
             .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
+
+            SelectedSubstanceTimingCard(substances: selectedSubstances)
 
             RiskAssessmentPanel(assessment: assessment)
 
@@ -251,6 +300,19 @@ struct CombinationRiskCheckerView: View {
         }
     }
 
+    /// The night entry this check belongs to, if one has been logged for today.
+    ///
+    /// Matched on the calendar day, which is the same rule the rest of the app
+    /// uses to decide whether tonight is already logged. A check run before the
+    /// night is logged finds nothing and stays unlinked — the history screen picks
+    /// those up by date instead.
+    private func tonightsEntryID() -> UUID? {
+        var descriptor = FetchDescriptor<NightEntry>(sortBy: [SortDescriptor(\.date, order: .reverse)])
+        descriptor.fetchLimit = 40
+        let recent = (try? modelContext.fetch(descriptor)) ?? []
+        return recent.first { Calendar.current.isDate($0.date, inSameDayAs: .now) }?.id
+    }
+
     private func saveRiskCheck() {
         let record = RiskCheckRecord(
             medicationText: medicationSummaryForSaving,
@@ -262,7 +324,8 @@ struct CombinationRiskCheckerView: View {
             respiratoryLevel: assessment.respiratoryRisk.label,
             cardiacLevel: assessment.cardiacRisk.label,
             bloodPressureLevel: assessment.bloodPressureRisk.label,
-            warnings: assessment.interactionWarnings
+            warnings: assessment.interactionWarnings,
+            nightEntryID: tonightsEntryID()
         )
         modelContext.insert(record)
         modelContext.saveChanges()
@@ -348,6 +411,17 @@ private struct RiskPill: View {
 private struct RiskAssessmentPanel: View {
     let assessment: CombinationAssessment
 
+    /// The worst rating anything in this assessment carries.
+    ///
+    /// Used only to fire a haptic when it changes. Severity was carried entirely
+    /// by the colour of a capsule, which is no use in a dark room, at arm's
+    /// length, to anyone colour-blind, or to someone who is not looking at the
+    /// screen because they are looking at their friend. A distinct knock when the
+    /// answer turns critical reaches all four.
+    private var highestLevel: SubstanceInteraction.Level? {
+        assessment.interactionFindings.compactMap(\.level).max()
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             CareSectionTitle(title: String(localized: "Assessment"), symbol: "waveform.path.ecg")
@@ -396,6 +470,13 @@ private struct RiskAssessmentPanel: View {
         }
         .padding(16)
         .glassSurface(radius: 28, tint: .orange.opacity(0.10), interactive: true)
+        .sensoryFeedback(trigger: highestLevel) { _, level in
+            switch level {
+            case .critical: .warning
+            case .serious: .impact(weight: .medium)
+            default: nil
+            }
+        }
     }
 }
 
@@ -404,53 +485,65 @@ private struct RiskLevelRow: View {
     let level: RiskLevel
     let detail: String
 
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Text(level.label)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.white)
-                .frame(width: 72)
-                .padding(.vertical, 8)
-                .background(Capsule().fill(level.tint))
+    /// The badge was pinned to 72 points wide. "High-risk combination" does not
+    /// fit 72 points at the accessibility text sizes, and a fixed frame does not
+    /// grow, so the rating — the most important word in the row — was the first
+    /// thing to be clipped for the people who most need to read it.
+    ///
+    /// Width is now a floor rather than a ceiling, and past the accessibility
+    /// threshold the row stops being a row: the badge sits above the text instead
+    /// of squeezing it into a sliver of the screen.
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
-                Text(detail)
-                    .font(.caption)
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+    private var badge: some View {
+        Label(level.label, systemImage: level.symbol)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(.white)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(minWidth: 72)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
+            .background(Capsule().fill(level.tint))
+    }
+
+    private var text: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    badge
+                    text
+                }
+            } else {
+                HStack(alignment: .top, spacing: 12) {
+                    badge
+                    text
+                }
             }
         }
+        // One element, stating the rating before the thing it rates. Read as three
+        // separate fragments, a swipe landed on a bare "Significant risk" with no
+        // way back to which risk it belonged to.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("\(title): \(level.label). \(detail)"))
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
         .glassSurface(radius: 20, tint: level.tint.opacity(0.08))
     }
 }
 
-/// One row of the assessment's warning list, carrying the severity its source
-/// rated it at.
-///
-/// The screen draws on two sources that cannot see each other's inputs: the preset
-/// chain in `CombinationAssessment`, which is the only place medication
-/// interactions live, and `SubstanceInteractionChecker`, whose curated table rates
-/// substance pairs. Carrying an explicit level on both is what lets the merge
-/// compare them.
-///
-/// It also replaces the badge this screen used to show, which was picked by
-/// searching the warning text for English words such as "avoid" or "dangerous".
-/// That guess collapsed to the mildest badge for every non-English user, and it
-/// stamped the "nothing matched" line with a risk badge because that sentence
-/// happens to contain the word "can".
-struct InteractionFinding: Identifiable, Hashable {
-    let text: String
-    /// Nil only on the "nothing matched" line, which is informational and gets no
-    /// severity badge.
-    let level: SubstanceInteraction.Level?
-
-    var id: String { text }
-}
 
 private struct RiskWarningLine: View {
     let finding: InteractionFinding
@@ -488,437 +581,125 @@ private struct RiskWarningLine: View {
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
+        // The badge and the sentence were two elements, so VoiceOver read the
+        // severity as a stray phrase before an unrelated warning, and swiping
+        // through a long list lost track of which rating belonged to which line.
+        // Combining them states the rating and the warning as one thing, which is
+        // also the only way the severity reaches anyone who cannot see the colour
+        // of the capsule.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityDescription)
+    }
+
+    private var accessibilityDescription: String {
+        guard let level = finding.level else { return finding.text }
+        return "\(level.label): \(finding.text)"
     }
 }
 
-/// A hazard both warning sources can describe, used to keep the merged list from
-/// saying the same thing twice in two different voices.
+
+
+
+/// When each selected substance comes up, peaks and finishes.
 ///
-/// Only the preset lines a curated table entry can genuinely stand in for are
-/// classified. Anything unclassified on either side is always kept, so a table row
-/// added later can never silently swallow a preset warning.
-private enum HazardTopic: Hashable {
-    /// GHB or GBL stacked with another depressant.
-    case ghbDepressantStack
-    /// Poppers with Viagra or Kamagra.
-    case poppersWithErectileMedication
-    /// Two or more of MDMA, 3-MMC and cocaine.
-    case stimulantStack
-    /// Alcohol with cocaine.
-    case alcoholWithCocaine
+/// The figures were already in `SubstanceReference`, but only on the drug
+/// information page — a screen you go to when you are curious, not the one you
+/// open when you are deciding something. This is the screen where the decision
+/// gets made, so the timing belongs here too.
+///
+/// It leads on the onset window because that is where the harm is. The common
+/// sequence behind an overdose is not misreading a dose, it is taking a second
+/// one before the first has arrived — which is why the onset row is the one with
+/// the sentence attached and the others are bare numbers.
+struct SelectedSubstanceTimingCard: View {
+    let substances: Set<Substance>
 
-    /// Classifies a curated table entry, or returns nil when no preset line covers
-    /// the same ground.
-    init?(_ substances: Set<Substance>) {
-        let stimulants: Set<Substance> = [.mdma, .threeMMC, .cocaine]
+    /// One entry per substance per route, so a substance whose routes behave
+    /// differently shows both rather than one standing in for the other.
+    private var timed: [(substance: Substance, timing: SubstanceReference.Timing)] {
+        substances
+            .sorted { $0.rawValue < $1.rawValue }
+            .flatMap { substance in
+                (substance.reference?.timings ?? []).map { (substance, $0) }
+            }
+    }
 
-        if substances.contains(.ghb) || substances.contains(.gbl),
-           substances.contains(.alcohol) || substances.contains(.ketamine) {
-            self = .ghbDepressantStack
-        } else if substances.contains(.poppers),
-                  substances.contains(.viagra) || substances.contains(.kamagra) {
-            self = .poppersWithErectileMedication
-        } else if substances == [.cocaine, .alcohol] {
-            self = .alcoholWithCocaine
-        } else if substances.count >= 2, substances.isSubset(of: stimulants) {
-            self = .stimulantStack
-        } else {
-            return nil
+    var body: some View {
+        if !timed.isEmpty {
+            VStack(alignment: .leading, spacing: 14) {
+                CareSectionTitle(title: String(localized: "Timing"), symbol: "clock.badge.exclamationmark.fill")
+
+                Text("Most overdoses are a second dose taken before the first arrived. Give it the onset time before you decide anything.")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Color.chillText)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                ForEach(Array(timed.enumerated()), id: \.offset) { _, entry in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Label(
+                            entry.timing.route.map { "\(entry.substance.localizedDisplayName) — \($0.label)" }
+                                ?? entry.substance.localizedDisplayName,
+                            systemImage: entry.substance.symbolName
+                        )
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(Color.chillText)
+
+                        HStack(alignment: .top, spacing: 10) {
+                            TimingFigure(label: String(localized: "Comes up"), value: entry.timing.onsetText, isLead: true)
+                            TimingFigure(label: String(localized: "Peaks"), value: entry.timing.peakText, isLead: false)
+                            TimingFigure(label: String(localized: "Lasts"), value: entry.timing.totalText, isLead: false)
+                        }
+
+                        // Planning a night around "lasts" alone is how a Saturday
+                        // costs a Tuesday. The after-effects window is the figure
+                        // that makes the rest of the week legible.
+                        if let after = entry.timing.afterEffectsText {
+                            Text("After effects reported for another \(after) once it is over.")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        if let redose = entry.substance.reference?.redoseGuidance {
+                            Text(redose)
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                    .background(entry.substance.tint.opacity(0.10), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .accessibilityElement(children: .combine)
+                }
+
+                Text("Figures are commonly reported ranges, not a promise. Anything taken on a full stomach, snorted rather than swallowed, or of unknown strength will not follow them.")
+                    .font(.caption2)
+                    .foregroundStyle(Color.chillSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(16)
+            .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
         }
     }
 }
 
-private extension RiskLevel {
-    var severity: Int {
-        switch self {
-        case .lower:
-            0
-        case .caution:
-            1
-        case .high:
-            2
+private struct TimingFigure: View {
+    let label: String
+    let value: String
+    /// The onset column, which is the one that matters and is drawn to say so.
+    let isLead: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(Color.chillSecondary)
+            Text(value)
+                .font(isLead ? .subheadline.weight(.heavy) : .caption.weight(.bold))
+                .foregroundStyle(isLead ? Color.chillText : Color.chillText.opacity(0.85))
         }
-    }
-
-    static func highest(_ levels: RiskLevel...) -> RiskLevel {
-        levels.max { $0.severity < $1.severity } ?? .lower
-    }
-}
-
-/// Internal rather than private so the tests can assert on what the risk checker
-/// screen actually produces for a selection. The interaction table used to be
-/// verified in isolation, which let a green suite coexist with a screen that never
-/// consulted it.
-struct CombinationAssessment {
-    let substances: [Substance]
-    let medicationText: String
-    let timing: CombinationTiming
-
-    private var substanceSet: Set<Substance> {
-        Set(substances)
-    }
-
-    var medicationMatches: [MedicationRiskMatch] {
-        MedicationRiskDatabase.matches(in: medicationText)
-    }
-
-    var matchedMedicationSummary: String {
-        medicationMatches
-            .map { "\($0.category.label) (\($0.matchedTerm))" }
-            .joined(separator: ", ")
-    }
-
-    private var serotonergicSubstances: [Substance] {
-        substances.filter { [.mdma, .threeMMC, .cocaine, .psychedelics].contains($0) }
-    }
-
-    private var stimulants: [Substance] {
-        substances.filter { [.mdma, .threeMMC, .cocaine].contains($0) }
-    }
-
-    private var hasGHBLike: Bool {
-        substanceSet.contains(.ghb) || substanceSet.contains(.gbl)
-    }
-
-    private var hasErectileMedication: Bool {
-        substanceSet.contains(.viagra) || substanceSet.contains(.kamagra)
-    }
-
-    private func hasMedicationCategory(_ category: MedicationRiskCategory) -> Bool {
-        medicationMatches.contains { $0.category == category }
-    }
-
-    var serotoninRisk: RiskLevel {
-        if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
-            return .high
-        }
-
-        if hasMedicationCategory(.serotonergic) && serotonergicSubstances.count >= 2 {
-            return .high
-        }
-
-        if hasMedicationCategory(.serotonergic) && !serotonergicSubstances.isEmpty {
-            return .caution
-        }
-
-        return serotonergicSubstances.count >= 2 ? .high : (!serotonergicSubstances.isEmpty ? .caution : .lower)
-    }
-
-    var dehydrationRisk: RiskLevel {
-        let stimulantLevel: RiskLevel = stimulants.isEmpty ? .lower : (timing == .withinDay ? .caution : .high)
-        let alcoholLevel: RiskLevel = substanceSet.contains(.alcohol) ? .caution : .lower
-        let combinationLevel: RiskLevel = substanceSet.contains(.alcohol) && !stimulants.isEmpty ? .high : .lower
-        return RiskLevel.highest(stimulantLevel, alcoholLevel, combinationLevel)
-    }
-
-    var stimulantOverloadRisk: RiskLevel {
-        let stimulantMedicationCount = hasMedicationCategory(.stimulantMedication) ? 1 : 0
-        let totalStimulants = stimulants.count + stimulantMedicationCount
-
-        if totalStimulants >= 2 {
-            return .high
-        }
-
-        if totalStimulants == 1 {
-            return timing == .sameSession ? .caution : .lower
-        }
-
-        return .lower
-    }
-
-    /// Substances that slow breathing. Medication the user typed is folded in
-    /// through `hasMedicationCategory`, so a prescribed sedative or opioid counts
-    /// as another depressant on the pile.
-    private var depressants: [Substance] {
-        substances.filter { [.ghb, .gbl, .alcohol, .ketamine].contains($0) }
-    }
-
-    private var depressantMedicationCount: Int {
-        (hasMedicationCategory(.sedative) ? 1 : 0) + (hasMedicationCategory(.opioid) ? 1 : 0)
-    }
-
-    /// Breathing slowing or stopping. This is the hazard behind most fatal
-    /// outcomes involving the substances ChillMate tracks, and nothing on this
-    /// screen used to name it.
-    var respiratoryRisk: RiskLevel {
-        let total = depressants.count + depressantMedicationCount
-
-        // GHB and GBL have a narrow margin on their own; anything else sedating
-        // on top of them is the pattern that stops people breathing.
-        if hasGHBLike && total >= 2 {
-            return .high
-        }
-
-        if total >= 2 {
-            return .high
-        }
-
-        if total == 1 {
-            return hasGHBLike || timing == .sameSession ? .caution : .lower
-        }
-
-        return .lower
-    }
-
-    /// Strain on the heart: stimulants driving rate and pressure up, and
-    /// vasodilators swinging pressure the other way.
-    var cardiacRisk: RiskLevel {
-        let stimulantCount = stimulants.count + (hasMedicationCategory(.stimulantMedication) ? 1 : 0)
-        let hasPoppers = substanceSet.contains(.poppers)
-
-        if stimulantCount >= 1 && hasPoppers {
-            return .high
-        }
-
-        if stimulantCount >= 2 {
-            return .high
-        }
-
-        if stimulantCount == 1 && hasErectileMedication {
-            return .caution
-        }
-
-        if stimulantCount == 1 {
-            return timing == .sameSession ? .caution : .lower
-        }
-
-        return hasPoppers ? .caution : .lower
-    }
-
-    /// A sudden drop in blood pressure. The poppers and erection-medication pair
-    /// is the well-known one, but nitrates and alpha blockers reach it too.
-    var bloodPressureRisk: RiskLevel {
-        let hasPoppers = substanceSet.contains(.poppers)
-
-        if hasPoppers && (hasErectileMedication || hasMedicationCategory(.nitrateLike)) {
-            return .high
-        }
-
-        if hasErectileMedication && (hasMedicationCategory(.nitrateLike) || hasMedicationCategory(.alphaBlocker)) {
-            return .high
-        }
-
-        if hasPoppers && substanceSet.contains(.alcohol) {
-            return .caution
-        }
-
-        if hasPoppers || hasErectileMedication {
-            return .caution
-        }
-
-        return .lower
-    }
-
-    var respiratoryDetail: String {
-        switch respiratoryRisk {
-        case .high:
-            String(localized: "More than one thing that slows breathing is selected. Signs to watch for: snoring or gurgling, slow or shallow breaths, blue lips, or someone who cannot be woken. Put them on their side and call emergency services. Do not leave them to sleep it off.")
-        case .caution:
-            String(localized: "One thing that slows breathing is selected. Keep the dose low, leave long gaps, and stay with someone who knows what you took.")
-        case .lower:
-            String(localized: "Nothing selected is a known breathing depressant, though amount and other medication still matter.")
-        }
-    }
-
-    var cardiacDetail: String {
-        switch cardiacRisk {
-        case .high:
-            String(localized: "This mix puts real strain on the heart, either by stacking stimulants or by swinging blood pressure up and down. Chest pain, a heart rate that will not settle, or breathlessness at rest all mean stop and get help.")
-        case .caution:
-            String(localized: "Something selected raises heart rate or moves blood pressure. Sit down if your heart races, and give yourself long breaks.")
-        case .lower:
-            String(localized: "No obvious pattern of heart strain is selected.")
-        }
-    }
-
-    var bloodPressureDetail: String {
-        switch bloodPressureRisk {
-        case .high:
-            String(localized: "This combination can drop blood pressure suddenly and severely. That means fainting, and at worst a stroke or cardiac arrest. Do not combine these. If someone collapses, lie them flat, raise their legs, and call emergency services.")
-        case .caution:
-            String(localized: "Something selected widens blood vessels and lowers blood pressure. Sit or lie down before using it, and stand up slowly afterwards.")
-        case .lower:
-            String(localized: "No obvious blood pressure drop is selected.")
-        }
-    }
-
-    var serotoninDetail: String {
-        switch serotoninRisk {
-        case .high:
-            String(localized: "You've selected a medication or substance mix that can affect serotonin, a brain chemical involved in mood and body function. Signs to watch for: confusion, fever, agitation, shaking, sweating, or diarrhea. Get help if these appear.")
-        case .caution:
-            String(localized: "One of your selections can affect serotonin levels. Risk can increase with repeated use, heat, dehydration, or other medication.")
-        case .lower:
-            String(localized: "No known serotonin-related combination is selected.")
-        }
-    }
-
-    var dehydrationDetail: String {
-        switch dehydrationRisk {
-        case .high:
-            String(localized: "Stimulants, alcohol, heat, dancing, and long sessions can push dehydration and overheating risk up.")
-        case .caution:
-            String(localized: "Hydration and cooling matter, especially if sleep, food, or breaks have been limited.")
-        case .lower:
-            String(localized: "No strong dehydration pattern is selected, but check water, food, temperature, and rest.")
-        }
-    }
-
-    var stimulantDetail: String {
-        switch stimulantOverloadRisk {
-        case .high:
-            String(localized: "More than one stimulant pattern is selected, including possible prescribed stimulant medication. Heart rate, anxiety, jaw tension, overheating, and pressure to continue can stack.")
-        case .caution:
-            String(localized: "A stimulant is selected in the current timing window. Pause, rest, and give your body time.")
-        case .lower:
-            String(localized: "No obvious stimulant stacking is selected.")
-        }
-    }
-
-    /// Every interaction warning this screen shows, in the order it shows them.
-    ///
-    /// Two sources feed it. The preset chain in `presetFindings(supersededBy:)` is
-    /// the only one that can see the medication the user typed, so it leads and
-    /// stays intact. The curated `SubstanceInteractionChecker` table rates
-    /// substance pairs and knows nothing about medication, so its rows follow in
-    /// their own most severe first order.
-    ///
-    /// Until 4.2.1 the table was never consulted here at all. A pairing the table
-    /// rates serious, alcohol with ketamine being the plainest example, matched no
-    /// preset branch and so fell through to the "nothing matched" line below, which
-    /// told the user there was nothing worth knowing about a depressant stack.
-    var interactionFindings: [InteractionFinding] {
-        let rated = SubstanceInteractionChecker.warnings(for: substanceSet)
-
-        // Highest rating the table gave each hazard the preset chain also
-        // describes. A preset line only steps aside for a table row that covers its
-        // hazard at least as severely, so merging can add detail but can never
-        // soften a warning the user would otherwise have seen.
-        var ratedTopics: [HazardTopic: SubstanceInteraction.Level] = [:]
-        for interaction in rated {
-            guard let topic = HazardTopic(interaction.substances) else { continue }
-            ratedTopics[topic] = max(ratedTopics[topic] ?? interaction.level, interaction.level)
-        }
-
-        // Belt and braces against the same sentence arriving from both sources:
-        // the topic rules above should already prevent it, but a duplicate row here
-        // would also collide in SwiftUI, which identifies these rows by their text.
-        var seenText: Set<String> = []
-        let merged = (presetFindings(supersededBy: ratedTopics)
-            + rated.map { InteractionFinding(text: $0.warning, level: $0.level) })
-            .filter { seenText.insert($0.text).inserted }
-
-        guard merged.isEmpty else { return merged }
-
-        return [
-            InteractionFinding(
-                text: String(localized: "No known major preset warning matched. Unknown amount, contents, health conditions, and medication changes can still matter."),
-                level: nil
-            )
-        ]
-    }
-
-    /// Flat warning text in display order. `RiskCheckRecord` stores plain strings,
-    /// so a saved check keeps exactly the wording the user was shown.
-    var interactionWarnings: [String] {
-        interactionFindings.map(\.text)
-    }
-
-    /// The hand-written preset chain, unchanged in content and order, minus any
-    /// line the curated table already covers at an equal or higher rating.
-    ///
-    /// Severities are stated here rather than guessed from the wording, so the
-    /// merge has something to compare. They match the badge colours these lines
-    /// already carried, with the one deliberate exception noted at the GHB branch.
-    private func presetFindings(supersededBy ratedTopics: [HazardTopic: SubstanceInteraction.Level]) -> [InteractionFinding] {
-        var findings: [InteractionFinding] = []
-
-        func add(_ text: String, _ level: SubstanceInteraction.Level, superseding topic: HazardTopic? = nil) {
-            if let topic, let rated = ratedTopics[topic], rated >= level { return }
-            findings.append(InteractionFinding(text: text, level: level))
-        }
-
-        if hasMedicationCategory(.nitrateLike) && (hasErectileMedication || substanceSet.contains(.poppers)) {
-            add(String(localized: "Nitrates, nicorandil, or riociguat with Viagra, Kamagra, or poppers can cause a severe blood pressure drop. Do not combine."), .critical)
-        }
-
-        if hasMedicationCategory(.alphaBlocker) && hasErectileMedication {
-            add(String(localized: "Alpha blockers with Viagra or Kamagra can increase dizziness or fainting risk. Check with a clinician before combining."), .serious)
-        }
-
-        if hasGHBLike {
-            if substanceSet.contains(.alcohol) || substanceSet.contains(.ketamine) || hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid) {
-                // Rated critical rather than the middle badge this line used to
-                // show. It describes the depressant stacking mechanism that has
-                // killed people, and the table rates the same pairing critical.
-                //
-                // It can only stand aside for the table when the other depressant is
-                // a substance. Sedative and opioid medication is invisible to the
-                // table, so whenever one of those matched, this is the only line
-                // that speaks for it.
-                let sedatingMedication = hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)
-                add(
-                    String(localized: "GHB/GBL with alcohol, ketamine, sedatives, or opioids can cause unconsciousness or breathing problems."),
-                    .critical,
-                    superseding: sedatingMedication ? nil : .ghbDepressantStack
-                )
-            } else {
-                add(String(localized: "GHB/GBL effects can be hard to predict and can become serious quickly."), .serious)
-            }
-        }
-
-        if substanceSet.contains(.poppers) {
-            if substanceSet.contains(.viagra) || substanceSet.contains(.kamagra) {
-                add(
-                    String(localized: "Poppers with Viagra or Kamagra can drop blood pressure sharply. Avoid this combination."),
-                    .critical,
-                    superseding: .poppersWithErectileMedication
-                )
-            } else {
-                add(String(localized: "Poppers can drop blood pressure sharply, especially with Viagra, Kamagra, or similar medication."), .serious)
-            }
-        }
-
-        if (hasMedicationCategory(.sedative) || hasMedicationCategory(.opioid)) &&
-            (substanceSet.contains(.alcohol) || substanceSet.contains(.ketamine) || substanceSet.contains(.cannabis) || hasGHBLike) {
-            add(String(localized: "Sedatives or opioids with alcohol, ketamine, cannabis, or GHB/GBL can make breathing, memory, and consent clarity worse."), .serious)
-        }
-
-        if stimulants.count >= 2 {
-            // Every pairing that can trigger this line has its own table row, and
-            // those name the specific two substances, so this generic summary always
-            // gives way when the table speaks.
-            add(
-                String(localized: "Multiple stimulants can stack heart strain, anxiety, and overheating."),
-                .serious,
-                superseding: .stimulantStack
-            )
-        }
-
-        if hasMedicationCategory(.stimulantMedication) && !stimulants.isEmpty {
-            add(String(localized: "Prescribed stimulant medication with MDMA, 3MMC, or cocaine can increase stimulant overload risk."), .serious)
-        }
-
-        if hasMedicationCategory(.maoi) && !serotonergicSubstances.isEmpty {
-            add(String(localized: "Certain antidepressants (MAOIs) with MDMA, 3-MMC, cocaine, or psychedelics can be dangerous. Avoid this and get professional advice."), .critical)
-        } else if hasMedicationCategory(.serotonergic) && !serotonergicSubstances.isEmpty {
-            add(String(localized: "Some antidepressants or mood medication can interact with MDMA, 3-MMC, cocaine, or psychedelics."), .serious)
-        }
-
-        if hasMedicationCategory(.ritonavirBooster) && (hasErectileMedication || substanceSet.contains(.mdma) || substanceSet.contains(.threeMMC)) {
-            add(String(localized: "Ritonavir or cobicistat can raise levels of some substances and erectile dysfunction medication. Ask a clinician or pharmacist."), .serious)
-        }
-
-        if substanceSet.contains(.alcohol) && substanceSet.contains(.cocaine) {
-            // The table entry for this pair names cocaethylene and why it matters,
-            // so it supersedes this line rather than repeating it.
-            add(
-                String(localized: "Alcohol and cocaine together can increase strain on the heart and reduce judgment."),
-                .serious,
-                superseding: .alcoholWithCocaine
-            )
-        }
-
-        return findings
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }

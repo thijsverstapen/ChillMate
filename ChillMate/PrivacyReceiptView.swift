@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import ChillMateCore
 
 struct PrivacyReceiptView: View {
     @Environment(\.dismiss) private var dismiss
@@ -10,6 +11,16 @@ struct PrivacyReceiptView: View {
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
     @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
+
+    /// Built outside the view body: nesting `String(localized:)` inside an
+    /// interpolation inside another `String(localized:)` is legal Swift and
+    /// unreadable, and it defeats the localization gate's literal scanner, which
+    /// stops at the first inner quote.
+    private var lockStatus: String {
+        let faceID = requiresFaceID ? String(localized: "on") : String(localized: "off")
+        let pin = requiresPIN ? String(localized: "on") : String(localized: "off")
+        return String(localized: "Face ID: \(faceID). PIN: \(pin).")
+    }
 
     var body: some View {
         Group {
@@ -26,11 +37,21 @@ struct PrivacyReceiptView: View {
                         )
 
                         PrivacyReceiptRow(title: String(localized: "Saved on this iPhone"), detail: String(localized: "Profile, logs, timers, STI tests, plans, risk checks, journal entries, trusted contact, and preferences."), symbol: "iphone", isEnabled: true)
-                        PrivacyReceiptRow(title: String(localized: "Encrypted files"), detail: "Strong iPhone file protection is \(localEncryptionEnabled ? "on" : "available but off in settings").", symbol: "lock.doc.fill", isEnabled: localEncryptionEnabled)
-                        PrivacyReceiptRow(title: String(localized: "App lock"), detail: "Face ID: \(requiresFaceID ? "on" : "off"). PIN: \(requiresPIN ? "on" : "off").", symbol: "faceid", isEnabled: requiresFaceID || requiresPIN)
-                        PrivacyReceiptRow(title: String(localized: "Apple Health"), detail: healthKitAutoSync ? "ChillMate can read and write only the Health categories you allowed." : "Apple Health sync is off.", symbol: "heart.text.square.fill", isEnabled: healthKitAutoSync)
-                        PrivacyReceiptRow(title: String(localized: "Notifications"), detail: notificationsEnabled ? "Notifications are on. Discreet lock-screen wording is \(discreetNotifications ? "on" : "off")." : "Notifications are off.", symbol: "bell.badge.fill", isEnabled: notificationsEnabled)
-                        PrivacyReceiptRow(title: String(localized: "iCloud backup"), detail: iCloudBackupEnabled ? "Encrypted backup files can be saved to iCloud Drive." : "iCloud backup is off. Local encrypted recovery stays on this iPhone.", symbol: "icloud.fill", isEnabled: iCloudBackupEnabled)
+                        PrivacyReceiptRow(title: String(localized: "Encrypted files"), detail: localEncryptionEnabled
+                                ? String(localized: "Strong iPhone file protection is on.")
+                                : String(localized: "Strong iPhone file protection is available, but off in settings."), symbol: "lock.doc.fill", isEnabled: localEncryptionEnabled)
+                        PrivacyReceiptRow(title: String(localized: "App lock"), detail: lockStatus, symbol: "faceid", isEnabled: requiresFaceID || requiresPIN)
+                        PrivacyReceiptRow(title: String(localized: "Apple Health"), detail: healthKitAutoSync
+                                ? String(localized: "ChillMate can read and write only the Health categories you allowed.")
+                                : String(localized: "Apple Health sync is off."), symbol: "heart.text.square.fill", isEnabled: healthKitAutoSync)
+                        PrivacyReceiptRow(title: String(localized: "Notifications"), detail: notificationsEnabled
+                                ? (discreetNotifications
+                                    ? String(localized: "Notifications are on, with discreet lock-screen wording.")
+                                    : String(localized: "Notifications are on, showing full wording on the lock screen."))
+                                : String(localized: "Notifications are off."), symbol: "bell.badge.fill", isEnabled: notificationsEnabled)
+                        PrivacyReceiptRow(title: String(localized: "iCloud backup"), detail: iCloudBackupEnabled
+                                ? String(localized: "Encrypted backup files can be saved to iCloud Drive.")
+                                : String(localized: "iCloud backup is off. Local encrypted recovery stays on this iPhone."), symbol: "icloud.fill", isEnabled: iCloudBackupEnabled)
 
                         Text("More privacy tools")
                             .font(.caption.weight(.bold))
@@ -117,8 +138,7 @@ private struct PrivacyReceiptRow: View {
                 Text(detail)
                     .font(.caption.weight(.semibold))
                     .foregroundStyle(Color.chillSecondary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.82)
+                    .chillLineLimit(2, scale: 0.82)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }

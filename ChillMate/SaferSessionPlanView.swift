@@ -3,6 +3,7 @@ import SwiftData
 import SwiftUI
 
 struct SaferSessionPlanView: View {
+    @Environment(\.services) private var services
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query(ChillMateQueries.recentPlansByCreation) private var plans: [SaferSessionPlan]
@@ -291,16 +292,16 @@ struct SaferSessionPlanView: View {
         modelContext.saveChanges()
 
         Task {
-            if (try? await NotificationService.shared.requestAuthorization()) == true {
-                NotificationService.shared.scheduleSaferPlanReminders(planID: plan.id, endingAt: plan.endingDate)
-                NotificationService.shared.scheduleSessionCheckIns(
+            if (try? await services.notifications.requestAuthorization()) == true {
+                services.notifications.scheduleSaferPlanReminders(planID: plan.id, endingAt: plan.endingDate)
+                services.notifications.scheduleSessionCheckIns(
                     id: plan.id,
                     startsAt: plan.plannedDate,
                     endsAt: plan.endingDate,
                     destination: .saferPlan
                 )
                 if prepRemindersEnabled {
-                    NotificationService.shared.schedulePrepReminders(planID: plan.id, plannedSexAt: plan.plannedDate)
+                    services.notifications.schedulePrepReminders(planID: plan.id, plannedSexAt: plan.plannedDate)
                 }
             }
         }

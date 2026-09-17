@@ -6,6 +6,7 @@ import SwiftUI
 import UIKit
 
 struct STDTestsView: View {
+    @Environment(\.services) private var services
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Query(ChillMateQueries.recentTests) private var tests: [STDTestRecord]
@@ -197,8 +198,8 @@ struct STDTestsView: View {
         modelContext.saveChanges()
 
         Task {
-            if (try? await NotificationService.shared.requestAuthorization()) == true {
-                NotificationService.shared.scheduleSTDResultReminder(testID: record.id, dueDate: record.resultsDueDate)
+            if (try? await services.notifications.requestAuthorization()) == true {
+                services.notifications.scheduleSTDResultReminder(testID: record.id, dueDate: record.resultsDueDate)
             }
         }
 
