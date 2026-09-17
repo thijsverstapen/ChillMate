@@ -3,29 +3,39 @@ import Testing
 import ChillMateCore
 @testable import ChillMate
 
+/// The pairs added in 4.2.1, with the severity each is documented at.
+///
+/// Hoisted out of the `@Test` attribute with its type written down. Inline, the
+/// seventeen tuple literals are a single expression for the type checker to
+/// solve, and Swift 6.3 gives up on it: "unable to type-check this expression in
+/// reasonable time". Spelled here, each element takes its type from the array and
+/// the solve stays linear. Anything this list grows past belongs here too.
+private let documentedNewPairs: [(Set<Substance>, SubstanceInteraction.Level)] = [
+    (Set<Substance>([.cocaine, .alcohol]), SubstanceInteraction.Level.serious),
+    (Set<Substance>([.mdma, .alcohol]), SubstanceInteraction.Level.serious),
+    (Set<Substance>([.threeMMC, .alcohol]), SubstanceInteraction.Level.serious),
+    (Set<Substance>([.cannabis, .alcohol]), SubstanceInteraction.Level.caution),
+    (Set<Substance>([.ghb, .poppers]), SubstanceInteraction.Level.serious),
+    (Set<Substance>([.gbl, .poppers]), SubstanceInteraction.Level.serious),
+    (Set<Substance>([.mdma, .ketamine]), SubstanceInteraction.Level.caution),
+    (Set<Substance>([.psychedelics, .mdma]), SubstanceInteraction.Level.serious),
+    (Set<Substance>([.psychedelics, .cocaine]), SubstanceInteraction.Level.caution),
+    (Set<Substance>([.psychedelics, .threeMMC]), SubstanceInteraction.Level.caution),
+    (Set<Substance>([.viagra, .cocaine]), SubstanceInteraction.Level.serious),
+    (Set<Substance>([.kamagra, .cocaine]), SubstanceInteraction.Level.serious),
+    (Set<Substance>([.viagra, .mdma]), SubstanceInteraction.Level.caution),
+    (Set<Substance>([.kamagra, .mdma]), SubstanceInteraction.Level.caution),
+    (Set<Substance>([.viagra, .threeMMC]), SubstanceInteraction.Level.caution),
+    (Set<Substance>([.kamagra, .threeMMC]), SubstanceInteraction.Level.caution),
+    (Set<Substance>([.viagra, .kamagra]), SubstanceInteraction.Level.serious),
+]
+
 /// Covers the combinations added in 4.2.1, and the structural properties the
 /// checker has to keep regardless of what the table contains.
 struct SubstanceInteractionCoverageTests {
 
-    @Test("Combinations added in 4.2.1 are present at their documented severity", .tags(.safety), arguments: [
-        (Set<Substance>([.cocaine, .alcohol]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.mdma, .alcohol]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.threeMMC, .alcohol]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.cannabis, .alcohol]), SubstanceInteraction.Level.caution),
-        (Set<Substance>([.ghb, .poppers]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.gbl, .poppers]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.mdma, .ketamine]), SubstanceInteraction.Level.caution),
-        (Set<Substance>([.psychedelics, .mdma]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.psychedelics, .cocaine]), SubstanceInteraction.Level.caution),
-        (Set<Substance>([.psychedelics, .threeMMC]), SubstanceInteraction.Level.caution),
-        (Set<Substance>([.viagra, .cocaine]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.kamagra, .cocaine]), SubstanceInteraction.Level.serious),
-        (Set<Substance>([.viagra, .mdma]), SubstanceInteraction.Level.caution),
-        (Set<Substance>([.kamagra, .mdma]), SubstanceInteraction.Level.caution),
-        (Set<Substance>([.viagra, .threeMMC]), SubstanceInteraction.Level.caution),
-        (Set<Substance>([.kamagra, .threeMMC]), SubstanceInteraction.Level.caution),
-        (Set<Substance>([.viagra, .kamagra]), SubstanceInteraction.Level.serious),
-    ])
+    @Test("Combinations added in 4.2.1 are present at their documented severity",
+          .tags(.safety), arguments: documentedNewPairs)
     func newPairsPresent(combo: Set<Substance>, expected: SubstanceInteraction.Level) throws {
         let match = try #require(
             SubstanceInteractionChecker.warnings(for: combo).first { $0.substances == combo },
