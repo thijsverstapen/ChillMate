@@ -1248,9 +1248,20 @@ def source_checksum() -> tuple[str, int, str]:
     # writing. A claim that shrinks when code moves is not a claim.
     targets = ("ChillMate", "ChillMateWatchApp", "ChillMateWatchAppWidget",
                "ChillMateLiveActivityExtension", "ChillMateCore")
-    swift = sorted(f for target in targets
-                   for f in ROOT.glob(f"{target}/**/*.swift")
-                   if "DerivedData" not in str(f))
+    # Tracked files, not whatever is sitting in the working copy, because of the
+    # sentence this digest is printed under: recompute it from the same files.
+    # The reader has a clone, and a clone holds what git tracks and nothing else.
+    # Globbing counted 47 byte-identical " 2.swift" duplicates that macOS had
+    # left lying around, 18 of them inside these targets. The count went from 105
+    # to 123 and the published digest became one that nobody with a clone could
+    # ever reproduce — which is the only thing the digest is for.
+    try:
+        listed = git(["ls-files", "--", *targets]).splitlines()
+        swift = sorted(ROOT / line for line in listed if line.endswith(".swift"))
+    except Exception:
+        swift = sorted(f for target in targets
+                       for f in ROOT.glob(f"{target}/**/*.swift")
+                       if "DerivedData" not in str(f))
     digest = hashlib.sha256()
     for path in swift:
         digest.update(path.relative_to(ROOT).as_posix().encode())
@@ -1659,7 +1670,7 @@ def build_privacy_nl():
 
 
 RELEASES = [
-    ("5.0.0", "500", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [
+    ("5.0.0", "501", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [
         "Benzodiazepines and methamphetamine can now be logged and checked. Until now there was no way to tell ChillMate about either, so GHB with a benzo returned no warning at all. Twenty-five new rated combinations between them.",
         "Every combination is now compared with TripSit's published drug combination chart, and each warning says how it compares. That comparison found four ChillMate was rating too low: GHB, GBL and alcohol each with ketamine, and MDMA with 3-MMC, are all at the highest severity now.",
         "The risk checker shows when each thing you selected comes up, peaks and finishes, leading with onset, because most overdoses are a second dose taken before the first arrived.",
@@ -1808,6 +1819,20 @@ def build_checker(lang):
 
 # The newest release's date, so "last updated" cannot drift from what shipped.
 UPDATED = RELEASES[0][2]
+
+# The newest entry describes the release that is in the project right now, so it
+# is the one place a typed version and build can still go stale. `_shipping_version`
+# exists because they did: the whole site advertised 4.2.1 while 5.0.0 was in the
+# project. It reads the project, and this refuses to build when the changelog
+# disagrees with it — which is what happened when the build went to 501 and this
+# table stayed on 500, leaving the changelog and the privacy page each naming a
+# different build of the same release.
+if (RELEASES[0][0], RELEASES[0][1]) != (VERSION, BUILD):
+    raise SystemExit(
+        f"changelog says {RELEASES[0][0]} build {RELEASES[0][1]}, "
+        f"project says {VERSION} build {BUILD} — update RELEASES[0] in this file"
+    )
+
 
 
 def build_changelog():
