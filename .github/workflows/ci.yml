@@ -57,13 +57,19 @@ jobs:
     # to sit above the worst realistic case rather than the typical one.
     #
     # Raised from 60 after a run was killed at exactly that: 11 minutes of build,
-    # device archive and watch targets, then the five-language loop still going at
-    # 49. Nothing had failed — the job simply no longer fits. The suite grew to
-    # 625 tests, the archive step is 5 of those 11 minutes, and a shared macOS
-    # runner is several times slower than the laptop this takes 24 minutes on.
-    # 90 sits above the extrapolated worst case with room to spare; the honest
-    # alternative is a matrix of five one-language jobs, which finishes in about a
-    # third of the wall clock and costs roughly double the runner minutes.
+    # device archive and watch targets, then the five-language loop still going
+    # at 49. Nothing had failed.
+    #
+    # The cause is runner variance, not the suite outgrowing the budget — the
+    # very next run, same commit range and same runner label, finished the whole
+    # job in 40 minutes with the five languages taking 21. So the typical case
+    # fits inside 60 with room, and the bad case is more than twice that. A
+    # ceiling has to clear the worst case rather than the usual one, which is the
+    # entire argument for 90.
+    #
+    # The alternative, if an hour of waiting ever costs more than the minutes do:
+    # a matrix of five one-language jobs finishes in about a third of the wall
+    # clock and costs roughly double the runner time, which on macOS is a bill.
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
