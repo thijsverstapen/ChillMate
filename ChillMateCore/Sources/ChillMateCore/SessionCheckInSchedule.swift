@@ -22,6 +22,14 @@ public enum SessionCheckInSchedule {
     /// The gap between check-ins.
     public static let interval: TimeInterval = 90 * 60
 
+    /// The earliest a check-in will ever land, used only to rescue a session too
+    /// short to receive one at all.
+    ///
+    /// Twenty minutes is far inside the ninety the normal cadence uses, which is
+    /// deliberate: it applies when the alternative is silence, not when the
+    /// alternative is a check-in at ninety.
+    public static let shortSessionFloor: TimeInterval = 20 * 60
+
     /// A ceiling, so a timer set to an absurd length cannot schedule hundreds of
     /// notifications. iOS keeps 64 pending notifications per app and silently
     /// drops the rest, which would quietly cost the user their *other* reminders
@@ -37,11 +45,30 @@ public enum SessionCheckInSchedule {
     ///   - endsAt: when the session's window closes.
     ///   - now: the current moment.
     public static func checkInDates(startsAt: Date, endsAt: Date, now: Date = .now) -> [Date] {
+        let begin = max(now, startsAt)
+        let window = endsAt.timeIntervalSince(begin)
+        guard window > 0 else { return [] }
+
         var dates: [Date] = []
-        var date = max(now, startsAt).addingTimeInterval(firstCheckInDelay)
+        var date = begin.addingTimeInterval(firstCheckInDelay)
         while date < endsAt, dates.count < maximumCheckIns {
             dates.append(date)
             date = date.addingTimeInterval(interval)
+        }
+
+        // A session shorter than the first delay used to receive nothing at all:
+        // the first check-in was placed at ninety minutes, the loop asked whether
+        // that was still inside the window, and for an hour-long session it was
+        // not. Somebody who set a short timer got silence from a feature whose
+        // whole job is to check on them.
+        //
+        // This only ever adds, and only when the normal cadence produced nothing,
+        // so no session is checked on less often than before.
+        if dates.isEmpty {
+            let offset = max(shortSessionFloor, window / 2)
+            if offset < window {
+                dates.append(begin.addingTimeInterval(offset))
+            }
         }
         return dates
     }
