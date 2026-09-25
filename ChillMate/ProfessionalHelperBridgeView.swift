@@ -10,17 +10,31 @@ struct ProfessionalHelperBridgeView: View {
     @Query(ChillMateQueries.recentTimers) private var timers: [DrugDoseTimerRecord]
     @Query(ChillMateQueries.recentTests) private var stiTests: [STDTestRecord]
     @Query(ChillMateQueries.recentRiskChecks) private var riskChecks: [RiskCheckRecord]
+    /// Only read when the person asks for a draft; the counts above never use it.
+    @Query(ChillMateQueries.recentJournalEntries) private var journals: [JournalEntry]
 
     @State private var pdfURL: URL?
 
+    /// The drafted paragraph, once generated. Editable, because the point is that
+    /// the words are the person's before a clinician reads them.
+    @State private var ownWords = ""
+    @State private var isDrafting = false
+    @State private var includeOwnWords = false
+
     private var summary: String {
-        HelperSummary.text(
+        let counts = HelperSummary.text(
             profile: profiles.first,
             entries: entries,
             timers: timers,
             stiTests: stiTests,
             riskChecks: riskChecks
         )
+        let note = ownWords.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard includeOwnWords, !note.isEmpty else { return counts }
+        // Under its own heading, so a clinician can see which part is a count and
+        // which part is the person speaking. The two are not the same kind of
+        // claim and should not read as one block.
+        return counts + "\n\n" + String(localized: "In my own words") + "\n" + note
     }
 
     var body: some View {
@@ -46,6 +60,47 @@ struct ProfessionalHelperBridgeView: View {
                             .padding(16)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .glassSurface(radius: 26, tint: .black.opacity(0.04))
+
+                        // Drafted from the person's own journal, on their phone,
+                        // and editable before it goes anywhere. The summary above
+                        // is counts; this is the one part that is somebody
+                        // speaking, so it is opt-in and it is theirs to change.
+                        if OnDeviceAffirmationService.isAvailable {
+                            VStack(alignment: .leading, spacing: 10) {
+                                CareSectionTitle(title: String(localized: "In my own words"), symbol: "quote.bubble")
+
+                                if ownWords.isEmpty {
+                                    Button {
+                                        Task { await draftOwnWords() }
+                                    } label: {
+                                        Label(
+                                            String(localized: "Draft this from my journal"),
+                                            systemImage: isDrafting ? "hourglass" : "text.badge.plus"
+                                        )
+                                        .font(.subheadline.weight(.bold))
+                                    }
+                                    .buttonStyle(ChillPlainButtonStyle())
+                                    .disabled(isDrafting)
+                                } else {
+                                    TextEditor(text: $ownWords)
+                                        .frame(minHeight: 120)
+                                        .font(.callout)
+                                        .scrollContentBackground(.hidden)
+                                        .padding(8)
+                                        .glassSurface(radius: 16, tint: .black.opacity(0.04))
+
+                                    Toggle(String(localized: "Include this in the summary"), isOn: $includeOwnWords)
+                                        .font(.subheadline.weight(.semibold))
+                                }
+
+                                Text("Written on this device from what you wrote, then yours to change. Nobody has checked it, and it is not medical advice.")
+                                    .font(.caption2.weight(.semibold))
+                                    .foregroundStyle(Color.chillTertiary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding(14)
+                            .glassSurface(radius: 24, tint: Color.chillMint.opacity(0.08))
+                        }
 
                         ShareLink(item: summary) {
                             Label("Share private summary", systemImage: "square.and.arrow.up.fill")
@@ -77,6 +132,21 @@ struct ProfessionalHelperBridgeView: View {
                     summary: summary
                 )
             }
+        }
+    }
+
+    /// Reads the recent journal entries and drafts a paragraph, leaving it in the
+    /// editor rather than in the summary.
+    private func draftOwnWords() async {
+        isDrafting = true
+        defer { isDrafting = false }
+        let texts = journals
+            .sorted { $0.date > $1.date }
+            .prefix(20)
+            .map(\.searchableText)
+            .filter { !$0.isEmpty }
+        if let drafted = await OnDeviceAffirmationService.draftHelperNote(fromJournal: Array(texts)) {
+            ownWords = drafted
         }
     }
 }
@@ -119,4 +189,5 @@ enum HealthSummaryPDF {
             return nil
         }
     }
+
 }

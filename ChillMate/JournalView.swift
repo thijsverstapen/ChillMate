@@ -23,6 +23,7 @@ struct JournalView: View {
     @State private var isShowingMorePrompts = false
     @State private var isEditing = false
     @State private var isShowingMonthCalendar = false
+    @State private var isShowingSearch = false
     @State private var journalHaptic: SensoryFeedback?
     @State private var journalHapticTick = 0
 
@@ -84,6 +85,21 @@ struct JournalView: View {
                                     .foregroundStyle(Color.chillText)
 
                                 Spacer(minLength: 0)
+
+                                Button {
+                                    isShowingSearch = true
+                                } label: {
+                                    Image(systemName: "magnifyingglass")
+                                        .font(.subheadline.weight(.bold))
+                                        .foregroundStyle(Color.chillPrimary)
+                                        .frame(width: 34, height: 34)
+                                        .background(Color.chillPrimary.opacity(0.14), in: Circle())
+                                        .contentShape(Circle())
+                                }
+                                .buttonStyle(ChillPlainButtonStyle())
+                                .disabled(mode == .editing)
+                                .opacity(mode == .editing ? 0.4 : 1)
+                                .accessibilityLabel(Text("Search your journal"))
 
                                 Button {
                                     isShowingMonthCalendar = true
@@ -191,6 +207,12 @@ struct JournalView: View {
             }
             .sheet(isPresented: $isShowingMonthCalendar) {
                 JournalMonthCalendarSheet(date: $date)
+            }
+            // Picking a result moves the journal to that day, which is the whole
+            // point of the search: you are looking for what you wrote, and what
+            // you want next is to be standing on it.
+            .sheet(isPresented: $isShowingSearch) {
+                JournalSearchView(selectedDate: $date)
             }
     }
 

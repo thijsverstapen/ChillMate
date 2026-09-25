@@ -71467,6 +71467,986 @@
           }
         }
       }
+    },
+    "Search your journal" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Durchsuch dein Tagebuch"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busca en tu diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cherche dans ton journal"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoek in je dagboek"
+          }
+        }
+      }
+    },
+    "What do you remember writing?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Woran erinnerst du dich, geschrieben zu haben?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué recuerdas haber escrito?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De quoi te souviens-tu avoir écrit ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat weet je nog dat je opschreef?"
+          }
+        }
+      }
+    },
+    "Search for a word or a phrase you remember writing." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Such nach einem Wort oder Satz, an den du dich erinnerst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Busca una palabra o frase que recuerdes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cherche un mot ou une phrase dont tu te souviens."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoek op een woord of zin die je nog weet."
+          }
+        }
+      }
+    },
+    "No entries match that." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dazu passt kein Eintrag."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ninguna entrada coincide."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune entrée ne correspond."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Daar komt geen notitie mee overeen."
+          }
+        }
+      }
+    },
+    "Nothing written yet. Entries you write will be searchable here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast noch nichts geschrieben. Was du schreibst, findest du hier wieder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todavía no has escrito nada. Lo que escribas se podrá buscar aquí."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu n’as encore rien écrit. Ce que tu écris sera consultable ici."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt nog niets geschreven. Wat je schrijft, kun je hier terugzoeken."
+          }
+        }
+      }
+    },
+    "How your writing has felt" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wie sich dein Schreiben angefühlt hat"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cómo ha sonado lo que escribes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le ton de ce que tu écris"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoe je schrijven aanvoelde"
+          }
+        }
+      }
+    },
+    "Recent entries" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neuere Einträge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entradas recientes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrées récentes"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recente notities"
+          }
+        }
+      }
+    },
+    "Earlier entries" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frühere Einträge"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entradas anteriores"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entrées plus anciennes"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eerdere notities"
+          }
+        }
+      }
+    },
+    "Not enough to read" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu wenig zum Lesen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay suficiente para leer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas assez à lire"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te weinig om te lezen"
+          }
+        }
+      }
+    },
+    "Mostly warm" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überwiegend warm"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre todo cálido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plutôt chaleureux"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overwegend warm"
+          }
+        }
+      }
+    },
+    "Mostly heavy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überwiegend schwer"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sobre todo pesado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plutôt lourd"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Overwegend zwaar"
+          }
+        }
+      }
+    },
+    "Mixed" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemischt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitigé"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemengd"
+          }
+        }
+      }
+    },
+    "Read from %1$lld of %2$lld entries. Very short ones are left out." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus %1$lld von %2$lld Einträgen gelesen. Sehr kurze bleiben außen vor."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leído de %1$lld de %2$lld entradas. Las muy cortas se dejan fuera."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lu à partir de %1$lld entrées sur %2$lld. Les très courtes sont ignorées."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelezen uit %1$lld van %2$lld notities. Hele korte blijven buiten beschouwing."
+          }
+        }
+      }
+    },
+    "Not enough written yet to compare. This needs a few entries on each side, long enough to read." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch zu wenig geschrieben, um zu vergleichen. Dafür braucht es auf beiden Seiten ein paar Einträge, die lang genug sind."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todavía no has escrito lo suficiente para comparar. Hacen falta unas cuantas entradas a cada lado, lo bastante largas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas encore assez écrit pour comparer. Il faut quelques entrées de chaque côté, assez longues pour être lues."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog te weinig geschreven om te vergelijken. Hiervoor zijn aan beide kanten een paar notities nodig die lang genoeg zijn."
+          }
+        }
+      }
+    },
+    "This device cannot run Apple Intelligence, so there is no written summary here. Everything else on this page still works." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieses Gerät kann Apple Intelligence nicht ausführen, deshalb gibt es hier keine geschriebene Zusammenfassung. Alles andere auf dieser Seite funktioniert weiterhin."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Este dispositivo no puede ejecutar Apple Intelligence, así que aquí no hay resumen escrito. Todo lo demás de esta página sigue funcionando."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cet appareil ne peut pas faire tourner Apple Intelligence, donc il n’y a pas de résumé écrit ici. Le reste de cette page fonctionne normalement."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit apparaat kan Apple Intelligence niet draaien, dus hier staat geen geschreven samenvatting. De rest van deze pagina werkt gewoon."
+          }
+        }
+      }
+    },
+    "Turn on Apple Intelligence in your device settings and a short written summary will appear here." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schalte Apple Intelligence in deinen Geräteeinstellungen ein, dann erscheint hier eine kurze geschriebene Zusammenfassung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa Apple Intelligence en los ajustes de tu dispositivo y aquí aparecerá un breve resumen escrito."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active Apple Intelligence dans les réglages de ton appareil et un court résumé écrit apparaîtra ici."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zet Apple Intelligence aan in je apparaatinstellingen, dan verschijnt hier een korte geschreven samenvatting."
+          }
+        }
+      }
+    },
+    "Apple Intelligence is still getting ready. The written summary will appear once it is." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence wird noch vorbereitet. Sobald das fertig ist, erscheint die geschriebene Zusammenfassung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence todavía se está preparando. El resumen escrito aparecerá en cuanto esté listo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence se prépare encore. Le résumé écrit apparaîtra dès que ce sera prêt."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Intelligence is nog bezig met voorbereiden. Zodra dat klaar is, verschijnt de geschreven samenvatting."
+          }
+        }
+      }
+    },
+    "A written summary is not available on this device. Everything else on this page still works." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine geschriebene Zusammenfassung ist auf diesem Gerät nicht verfügbar. Alles andere auf dieser Seite funktioniert weiterhin."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En este dispositivo no hay resumen escrito. Todo lo demás de esta página sigue funcionando."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un résumé écrit n’est pas disponible sur cet appareil. Le reste de cette page fonctionne normalement."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een geschreven samenvatting is niet beschikbaar op dit apparaat. De rest van deze pagina werkt gewoon."
+          }
+        }
+      }
+    },
+    "From what you wrote" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus dem, was du geschrieben hast"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De lo que escribiste"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D’après ce que tu as écrit"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uit wat je schreef"
+          }
+        }
+      }
+    },
+    "Sleep: %@ hours" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlaf: %@ Stunden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sueño: %@ horas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sommeil : %@ heures"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slaap: %@ uur"
+          }
+        }
+      }
+    },
+    "You have slept since" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du hast seitdem geschlafen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has dormido desde entonces"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu as dormi depuis"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je hebt sindsdien geslapen"
+          }
+        }
+      }
+    },
+    "A gap in your memory of the night" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Lücke in deiner Erinnerung an die Nacht"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un vacío en tu recuerdo de la noche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un trou dans ton souvenir de la nuit"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een gat in je herinnering aan de nacht"
+          }
+        }
+      }
+    },
+    "Add to your night log" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu deinem Nachtprotokoll hinzufügen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir a tu registro de la noche"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter à ton journal de nuit"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toevoegen aan je nachtlog"
+          }
+        }
+      }
+    },
+    "Added to your night log." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zu deinem Nachtprotokoll hinzugefügt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadido a tu registro de la noche."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouté à ton journal de nuit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toegevoegd aan je nachtlog."
+          }
+        }
+      }
+    },
+    "Read from your own words on this device. Check it before you add it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus deinen eigenen Worten auf diesem Gerät gelesen. Prüf es, bevor du es hinzufügst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leído de tus propias palabras en este dispositivo. Compruébalo antes de añadirlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lu à partir de tes propres mots sur cet appareil. Vérifie avant d’ajouter."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelezen uit je eigen woorden op dit apparaat. Controleer het voordat je het toevoegt."
+          }
+        }
+      }
+    },
+    "Add these: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diese hinzufügen: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir estos: %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter ceux-ci : %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voeg deze toe: %@"
+          }
+        }
+      }
+    },
+    "In my own words" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In meinen eigenen Worten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En mis propias palabras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans mes propres mots"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In mijn eigen woorden"
+          }
+        }
+      }
+    },
+    "Draft this from my journal" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus meinem Tagebuch entwerfen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redactar esto desde mi diario"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rédiger ça à partir de mon journal"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijf dit uit mijn dagboek"
+          }
+        }
+      }
+    },
+    "Include this in the summary" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das in die Zusammenfassung aufnehmen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Incluir esto en el resumen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inclure ça dans le résumé"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neem dit op in de samenvatting"
+          }
+        }
+      }
+    },
+    "Written on this device from what you wrote, then yours to change. Nobody has checked it, and it is not medical advice." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf diesem Gerät aus dem geschrieben, was du geschrieben hast, und danach deins zum Ändern. Niemand hat es geprüft, und es ist keine medizinische Beratung."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escrito en este dispositivo a partir de lo que escribiste, y luego tuyo para cambiarlo. Nadie lo ha revisado y no es consejo médico."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écrit sur cet appareil à partir de ce que tu as écrit, puis à toi de le modifier. Personne ne l’a vérifié, et ce n’est pas un avis médical."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Op dit apparaat geschreven uit wat jij schreef, en daarna van jou om aan te passen. Niemand heeft het gecontroleerd en het is geen medisch advies."
+          }
+        }
+      }
+    },
+    "Logged night" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erfasste Nacht"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noche registrada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuit enregistrée"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gelogde nacht"
+          }
+        }
+      }
+    },
+    "Count my logged nights" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meine erfassten Nächte zählen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contar mis noches registradas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compter mes nuits enregistrées"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tel mijn gelogde nachten"
+          }
+        }
+      }
+    },
+    "Days to look back" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tage zurückblicken"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Días hacia atrás"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nombre de jours à remonter"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aantal dagen terugkijken"
+          }
+        }
+      }
+    },
+    "Counts how many nights you have logged recently. Says nothing about what was logged." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zählt, wie viele Nächte du zuletzt erfasst hast. Sagt nichts darüber, was erfasst wurde."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuenta cuántas noches has registrado últimamente. No dice nada sobre qué se registró."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compte le nombre de nuits que tu as enregistrées récemment. Ne dit rien sur ce qui a été enregistré."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telt hoeveel nachten je recent hebt gelogd. Zegt niets over wát er gelogd is."
+          }
+        }
+      }
+    },
+    "%1$lld nights logged in the last %2$lld days, %3$lld of them with nothing recorded." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld Nächte in den letzten %2$lld Tagen erfasst, %3$lld davon ohne Eintrag."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld noches registradas en los últimos %2$lld días, %3$lld de ellas sin nada anotado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld nuits enregistrées ces %2$lld derniers jours, dont %3$lld sans rien de noté."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld nachten gelogd in de afgelopen %2$lld dagen, %3$lld daarvan zonder iets genoteerd."
+          }
+        }
+      }
     }
   },
   "version" : "1.1"
