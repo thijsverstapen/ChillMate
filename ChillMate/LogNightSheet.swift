@@ -331,7 +331,7 @@ struct LogNightSheet: View {
     /// The last tracked night that actually recorded something, if there is one.
     private var lastTrackedEntry: NightEntry? {
         recentEntries
-            .filter { !$0.skippedNight && !$0.substances.isEmpty }
+            .filter { !$0.skippedNight && $0.hasSubstances }
             .max { $0.date < $1.date }
     }
 
@@ -391,7 +391,7 @@ struct LogNightSheet: View {
             selectedSubstances.insert(.other)
             otherSubstance = first
         }
-        didInjectDrugs = !entry.injectionSubstances.isEmpty
+        didInjectDrugs = entry.hasInjectionSubstances
         injectedSubstances = entry.injectionSubstances
         saveHaptic += 1
     }

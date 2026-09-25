@@ -39,7 +39,7 @@ enum HelperSummary {
 
         let recentEntries = entries.filter { $0.date >= cutoff }
         let recentTimers = timers.filter { $0.startedAt >= cutoff }
-        let risky = recentEntries.filter { !$0.skippedNight && $0.hadSex && !$0.substances.isEmpty }
+        let risky = recentEntries.filter { !$0.skippedNight && $0.hadSex && $0.hasSubstances }
         let memoryGaps = recentEntries.filter(\.reportedMemoryGap)
         // Windowed like every other figure under the heading. These two were
         // counted over the whole array, so they reported an all-time total under a

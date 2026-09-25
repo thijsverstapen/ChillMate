@@ -875,7 +875,7 @@ enum HealthWarning {
         let cutoff = calendar.date(byAdding: .day, value: -21, to: now) ?? now
         var count = 0
         for entry in entries where entry.date >= cutoff && entry.hadSex && !entry.skippedNight {
-            if !entry.substances.isEmpty {
+            if entry.hasSubstances {
                 count += 1
             }
         }

@@ -144,7 +144,7 @@ private struct CalendarDaySummary {
             if entry.skippedNight {
                 hasSkipped = true
             }
-            if !entry.substances.isEmpty {
+            if entry.hasSubstances {
                 hasSubstances = true
             }
         }

@@ -742,7 +742,7 @@ private struct ReductionGoalProgressCard: View {
     private var currentMonthCount: Int {
         let start = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: .now)) ?? .now
         return entries.filter { entry in
-            entry.date >= start && !entry.skippedNight && (substanceOnly ? !entry.substances.isEmpty : entry.hadSex || !entry.substances.isEmpty)
+            entry.date >= start && !entry.skippedNight && (substanceOnly ? entry.hasSubstances : entry.hadSex || entry.hasSubstances)
         }.count
     }
 
@@ -1012,7 +1012,7 @@ private struct DailyRecoveryScore {
         var hasEverLoggedSubstances = !latestSubstances.isEmpty
         if !hasEverLoggedSubstances {
             for entry in entries where !entry.skippedNight {
-                if !entry.substances.isEmpty {
+                if entry.hasSubstances {
                     hasEverLoggedSubstances = true
                     break
                 }
