@@ -37,8 +37,15 @@ struct StoreCompatibilityTests {
         if let override = ProcessInfo.processInfo.environment["CHILLMATE_STORE_PATH"] {
             return URL(fileURLWithPath: override)
         }
+        // A stable name inside the test host's own container, not a fresh one per
+        // run and not a path on the host machine. The test process is sandboxed,
+        // so a host path is unwritable, and a per-run name means the suite can
+        // only ever meet a store its own schema just wrote — which is the one
+        // case that cannot fail. The simulator keeps this between runs, so
+        // running the suite before and after a schema change is a real
+        // cross-version check.
         return URL(fileURLWithPath: NSTemporaryDirectory())
-            .appendingPathComponent("ChillMateStoreCompatibility-\(UUID().uuidString).store")
+            .appendingPathComponent("ChillMateStoreCompatibility.store")
     }
 
     private func container(at url: URL) throws -> ModelContainer {
@@ -89,9 +96,9 @@ struct StoreCompatibilityTests {
         )
         #expect(journals.isEmpty == false, "the store lost its journal entries")
 
-        // Only clean up a store this run created for itself.
-        if !existed && ProcessInfo.processInfo.environment["CHILLMATE_STORE_PATH"] == nil {
-            try? FileManager.default.removeItem(at: url)
-        }
+        // Deliberately left on disk. Deleting it would reset the check to
+        // "a schema can read what it just wrote", which is the one thing that
+        // cannot fail, and would throw away the only artefact that makes the
+        // next run a cross-version test.
     }
 }

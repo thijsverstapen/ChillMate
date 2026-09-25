@@ -220,7 +220,17 @@ children, and guards against a sync race. Follow its shape.
 5. **Remember the backups.** `EncryptedBackupService` writes a versioned payload, so a
    schema change means a restore path for the old shape too. A backup taken on the
    previous version has to keep restoring.
-6. **The watch and the widgets read the same container.** A schema change is not done
+6. **An index is not a migration, and existing stores never receive one.**
+   `#Index` on a fresh store creates the index. On a store that already exists
+   it does nothing: the store opens cleanly, keeps every row, and is left
+   without the index. Checked in 5.1.0 by writing a store with a build that had
+   no indexes and opening it with one that did — zero date indexes afterwards,
+   against all eight on a fresh install. The likely cause is that Core Data does
+   not count an index-only change as a model change, so it never migrates and
+   never runs the DDL; that is unproven. Either way, adding an index helps new
+   installs only, which is backwards from where the cost is. Getting it onto
+   existing stores needs a real versioned migration, tested the same way.
+7. **The watch and the widgets read the same container.** A schema change is not done
    until they build against it.
 
 ## The backup key
