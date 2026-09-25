@@ -136,7 +136,7 @@ before pushing. They take seconds and are the first CI job.
 
 ## Tests
 
-619 unit tests. CI runs the whole suite once per language, so an assertion that only
+625 unit tests. CI runs the whole suite once per language, so an assertion that only
 holds in English fails four times over.
 
 - **Never assert an English literal against localized output.** Name the line through
