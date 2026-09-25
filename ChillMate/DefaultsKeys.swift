@@ -100,6 +100,9 @@ enum DefaultsKey {
 
     // MARK: Backup & recovery
     static let iCloudBackupEnabled = "iCloudBackupEnabled"
+    /// "on" or "off", or absent on an install from before 5.1.0 that has not
+    /// been asked. See `ICloudSyncPreference`.
+    static let iCloudSyncChoice = "iCloudSyncChoice"
     static let lastICloudBackupTimestamp = "lastICloudBackupTimestamp"
     static let lastICloudRestoreTimestamp = "lastICloudRestoreTimestamp"
     static let lastICloudBackupStatus = "lastICloudBackupStatus"

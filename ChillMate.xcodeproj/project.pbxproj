@@ -124,6 +124,9 @@
 		AAB100000000000000000020 /* JournalMoodTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000020 /* JournalMoodTrend.swift */; };
 		AAB100000000000000000022 /* JournalNightDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000022 /* JournalNightDraft.swift */; };
 		AAB100000000000000000023 /* LoggedNightEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000023 /* LoggedNightEntity.swift */; };
+		AAB100000000000000000024 /* ICloudSyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000024 /* ICloudSyncPreference.swift */; };
+		AAB100000000000000000040 /* ICloudSyncDecisionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003E /* ICloudSyncDecisionView.swift */; };
+		AAB100000000000000000041 /* ICloudSyncCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003F /* ICloudSyncCard.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -313,6 +316,9 @@
 		AAF100000000000000000020 /* JournalMoodTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalMoodTrend.swift; sourceTree = "<group>"; };
 		AAF100000000000000000022 /* JournalNightDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalNightDraft.swift; sourceTree = "<group>"; };
 		AAF100000000000000000023 /* LoggedNightEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggedNightEntity.swift; sourceTree = "<group>"; };
+		AAF100000000000000000024 /* ICloudSyncPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSyncPreference.swift; sourceTree = "<group>"; };
+		AAF10000000000000000003E /* ICloudSyncDecisionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSyncDecisionView.swift; sourceTree = "<group>"; };
+		AAF10000000000000000003F /* ICloudSyncCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSyncCard.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -404,6 +410,9 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF10000000000000000003F /* ICloudSyncCard.swift */,
+				AAF10000000000000000003E /* ICloudSyncDecisionView.swift */,
+				AAF100000000000000000024 /* ICloudSyncPreference.swift */,
 				AAF100000000000000000023 /* LoggedNightEntity.swift */,
 				AAF100000000000000000022 /* JournalNightDraft.swift */,
 				AAF100000000000000000020 /* JournalMoodTrend.swift */,
@@ -817,6 +826,9 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000041 /* ICloudSyncCard.swift in Sources */,
+				AAB100000000000000000040 /* ICloudSyncDecisionView.swift in Sources */,
+				AAB100000000000000000024 /* ICloudSyncPreference.swift in Sources */,
 				AAB100000000000000000023 /* LoggedNightEntity.swift in Sources */,
 				AAB100000000000000000022 /* JournalNightDraft.swift in Sources */,
 				AAB100000000000000000020 /* JournalMoodTrend.swift in Sources */,

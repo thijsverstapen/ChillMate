@@ -72447,6 +72447,678 @@
           }
         }
       }
+    },
+    "iCloud sync" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-Synchronisierung"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización con iCloud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation iCloud"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud-synchronisatie"
+          }
+        }
+      }
+    },
+    "A copy of everything is kept in your private iCloud, so your history can move to a new iPhone or come back after reinstalling. Unless you have turned on Advanced Data Protection, Apple holds the keys to it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Kopie von allem wird in deiner privaten iCloud aufbewahrt, damit dein Verlauf auf ein neues iPhone mitkommt oder nach einer Neuinstallation zurückkommt. Solange du den erweiterten Datenschutz nicht eingeschaltet hast, hat Apple die Schlüssel dazu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se guarda una copia sincronizada de todo en tu iCloud privado, para que tu historial pueda pasar a un iPhone nuevo o volver tras reinstalar. Salvo que hayas activado la Protección de datos avanzada, Apple tiene las claves."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une copie de tout est conservée dans ton iCloud privé, pour que ton historique puisse passer sur un nouvel iPhone ou revenir après une réinstallation. Sauf si tu as activé la Protection avancée des données, Apple en détient les clés."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er wordt een kopie van alles bewaard in je privé-iCloud, zodat je geschiedenis mee kan naar een nieuwe iPhone of terugkomt na opnieuw installeren. Tenzij je Geavanceerde gegevensbescherming hebt aangezet, heeft Apple de sleutels ervan."
+          }
+        }
+      }
+    },
+    "Off. Everything stays on this iPhone. Turn it on to keep a copy in your private iCloud, so your history can move to a new iPhone." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus. Alles bleibt auf diesem iPhone. Schalte es ein, um eine Kopie in deiner privaten iCloud aufzubewahren, damit dein Verlauf auf ein neues iPhone mitkommen kann."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado. Todo se queda en este iPhone. Actívalo para guardar una copia sincronizada en tu iCloud privado, para que tu historial pueda pasar a un iPhone nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivé. Tout reste sur cet iPhone. Active-le pour conserver une copie dans ton iCloud privé, pour que ton historique puisse passer sur un nouvel iPhone."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uit. Alles blijft op deze iPhone. Zet het aan om een kopie in je privé-iCloud te bewaren, zodat je geschiedenis mee kan naar een nieuwe iPhone."
+          }
+        }
+      }
+    },
+    "Takes effect after you close ChillMate from the app switcher and open it again." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wirkt, nachdem du ChillMate im App-Umschalter schließt und wieder öffnest."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se aplica cuando cierres ChillMate desde el selector de apps y lo vuelvas a abrir."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prend effet une fois ChillMate fermé depuis le sélecteur d’apps puis rouvert."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordt actief nadat je ChillMate via de appkiezer sluit en weer opent."
+          }
+        }
+      }
+    },
+    "Turning this off does not delete what is already in iCloud. You can remove it in iOS Settings, under your iCloud storage." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das Ausschalten löscht nicht, was schon in iCloud liegt. Du kannst es in den iOS-Einstellungen unter deinem iCloud-Speicher entfernen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivarlo no borra lo que ya está en iCloud. Puedes eliminarlo en los ajustes de iOS, en tu almacenamiento de iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le désactiver ne supprime pas ce qui est déjà dans iCloud. Tu peux le supprimer dans les réglages d’iOS, dans ton stockage iCloud."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uitzetten verwijdert niet wat al in iCloud staat. Je kunt dat verwijderen in de iOS-instellingen, bij je iCloud-opslag."
+          }
+        }
+      }
+    },
+    "Your data and iCloud" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Daten und iCloud"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus datos e iCloud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tes données et iCloud"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je gegevens en iCloud"
+          }
+        }
+      }
+    },
+    "One choice before you carry on." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Entscheidung, bevor es weitergeht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una elección antes de seguir."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un choix avant de continuer."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eén keuze voordat je verdergaat."
+          }
+        }
+      }
+    },
+    "Until now, whenever you were signed into iCloud, ChillMate kept a copy of your data in your private iCloud without asking you first. That copy is how your history can move to a new iPhone. From this version it is your choice, and it stays your choice." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bisher hat ChillMate, sobald du bei iCloud angemeldet warst, eine Kopie deiner Daten in deiner privaten iCloud aufbewahrt, ohne dich vorher zu fragen. Über diese Kopie kann dein Verlauf auf ein neues iPhone mitkommen. Ab dieser Version entscheidest du, und das bleibt so."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hasta ahora, siempre que tenías la sesión iniciada en iCloud, ChillMate guardaba una copia sincronizada de tus datos en tu iCloud privado sin preguntarte antes. Esa copia es lo que permite que tu historial pase a un iPhone nuevo. A partir de esta versión es tu elección, y lo seguirá siendo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jusqu’ici, dès que tu utilisais iCloud, ChillMate conservait une copie de tes données dans ton iCloud privé sans te le demander d’abord. C’est grâce à cette copie que ton historique peut passer sur un nouvel iPhone. À partir de cette version, c’est ton choix, et ça le reste."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tot nu toe bewaarde ChillMate, zodra je bij iCloud was ingelogd, een kopie van je gegevens in je privé-iCloud zonder het je eerst te vragen. Via die kopie kan je geschiedenis mee naar een nieuwe iPhone. Vanaf deze versie is het jouw keuze, en dat blijft zo."
+          }
+        }
+      }
+    },
+    "Keep everything on this iPhone" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles auf diesem iPhone behalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mantener todo en este iPhone"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout garder sur cet iPhone"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles op deze iPhone houden"
+          }
+        }
+      }
+    },
+    "Nothing new is copied to iCloud. The copy already there is not deleted by this. You can remove it in iOS Settings, under your iCloud storage." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es wird nichts Neues in iCloud kopiert. Die Kopie, die schon dort liegt, wird dadurch nicht gelöscht. Du kannst sie in den iOS-Einstellungen unter deinem iCloud-Speicher entfernen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se copia nada nuevo a iCloud. Lo que ya está allí no se borra con esto. Puedes eliminarlo en los ajustes de iOS, en tu almacenamiento de iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus rien de nouveau n’est copié dans iCloud. La copie déjà présente n’est pas supprimée pour autant. Tu peux la supprimer dans les réglages d’iOS, dans ton stockage iCloud."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er wordt niets nieuws naar iCloud gekopieerd. De kopie die er al staat, wordt hierdoor niet verwijderd. Je kunt die verwijderen in de iOS-instellingen, bij je iCloud-opslag."
+          }
+        }
+      }
+    },
+    "Keep the iCloud copy" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die iCloud-Kopie behalten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seguir sincronizando con iCloud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garder la copie iCloud"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De iCloud-kopie houden"
+          }
+        }
+      }
+    },
+    "Your history can move to a new iPhone or come back after reinstalling. Apple stores it, and unless you have turned on Advanced Data Protection, Apple holds the keys to it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Verlauf kann auf ein neues iPhone mitkommen oder nach einer Neuinstallation zurückkommen. Apple speichert ihn, und solange du den erweiterten Datenschutz nicht eingeschaltet hast, hat Apple die Schlüssel dazu."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu historial puede pasar a un iPhone nuevo o volver tras reinstalar. Apple lo guarda y, salvo que hayas activado la Protección de datos avanzada, Apple tiene las claves."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton historique peut passer sur un nouvel iPhone ou revenir après une réinstallation. Apple le stocke, et sauf si tu as activé la Protection avancée des données, Apple en détient les clés."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je geschiedenis kan mee naar een nieuwe iPhone of terugkomen na opnieuw installeren. Apple bewaart hem, en tenzij je Geavanceerde gegevensbescherming hebt aangezet, heeft Apple de sleutels ervan."
+          }
+        }
+      }
+    },
+    "You can change this at any time in Settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst das jederzeit in den Einstellungen ändern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes cambiarlo en cualquier momento en Ajustes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu peux changer ça à tout moment dans les Réglages."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt dit altijd wijzigen in Instellingen."
+          }
+        }
+      }
+    },
+    "A copy of everything is kept in your private iCloud." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Kopie von allem wird in deiner privaten iCloud aufbewahrt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se guarda una copia sincronizada de todo en tu iCloud privado."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une copie de tout est conservée dans ton iCloud privé."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er wordt een kopie van alles bewaard in je privé-iCloud."
+          }
+        }
+      }
+    },
+    "Off. Nothing is copied to iCloud." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus. Es wird nichts in iCloud kopiert."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactivado. No se copia nada a iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Désactivé. Rien n’est copié dans iCloud."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uit. Er wordt niets naar iCloud gekopieerd."
+          }
+        }
+      }
+    },
+    "To keep a copy in your private iCloud only if you turn on iCloud sync. Unless you use Advanced Data Protection, Apple holds the keys to that copy." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um nur dann eine Kopie in deiner privaten iCloud aufzubewahren, wenn du die iCloud-Synchronisierung einschaltest. Solange du keinen erweiterten Datenschutz nutzt, hat Apple die Schlüssel zu dieser Kopie."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para guardar una copia sincronizada en tu iCloud privado solo si activas la sincronización con iCloud. Salvo que uses la Protección de datos avanzada, Apple tiene las claves de esa copia."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour conserver une copie dans ton iCloud privé uniquement si tu actives la synchronisation iCloud. Sauf si tu utilises la Protection avancée des données, Apple détient les clés de cette copie."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om alleen een kopie in je privé-iCloud te bewaren als je iCloud-synchronisatie aanzet. Tenzij je Geavanceerde gegevensbescherming gebruikt, heeft Apple de sleutels van die kopie."
+          }
+        }
+      }
+    },
+    "You can confirm your age in two private ways. The date of birth you enter stays on this device unless you turn on iCloud sync. The optional Apple Account check returns only a yes-or-no \"18 or older\" answer from Apple; it never shares your birthdate or name with the app." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst dein Alter auf zwei private Arten bestätigen. Das von dir eingegebene Geburtsdatum bleibt auf diesem Gerät, es sei denn, du schaltest die iCloud-Synchronisierung ein. Die optionale Prüfung über dein Apple-Konto liefert nur eine Ja-oder-Nein-Antwort \"18 oder älter\" von Apple; sie teilt der App niemals dein Geburtsdatum oder deinen Namen mit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puedes confirmar tu edad de dos formas privadas. La fecha de nacimiento que introduces se queda en este dispositivo, salvo que actives la sincronización con iCloud. La comprobación opcional con tu Apple Account solo devuelve una respuesta de sí o no \"18 o más\" de Apple; nunca comparte tu fecha de nacimiento ni tu nombre con la app."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu peux confirmer ton âge de deux façons privées. La date de naissance que tu saisis reste sur cet appareil, sauf si tu actives la synchronisation iCloud. La vérification facultative via ton compte Apple ne renvoie qu'une réponse oui ou non \"18 ans ou plus\" d'Apple ; elle ne partage jamais ta date de naissance ni ton nom avec l'app."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je kunt je leeftijd op twee privémanieren bevestigen. De geboortedatum die je invult, blijft op dit apparaat, tenzij je iCloud-synchronisatie aanzet. De optionele controle via je Apple Account geeft alleen een ja-of-nee-antwoord \"18 of ouder\" van Apple; je geboortedatum of naam wordt nooit met de app gedeeld."
+          }
+        }
+      }
+    },
+    "Your profile stays on this device unless you turn on iCloud sync. Filling it in later makes the timers and the combination checker more useful to you, and nothing in the app is locked behind it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Profil bleibt auf diesem Gerät, es sei denn, du schaltest die iCloud-Synchronisierung ein. Wenn du es später ausfüllst, werden die Timer und der Kombinationscheck für dich nützlicher, und nichts in der App ist dahinter weggesperrt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu perfil se queda en este dispositivo, salvo que actives la sincronización con iCloud. Rellenarlo más tarde hace que los temporizadores y la comprobación de combinaciones te sean más útiles, y no hay nada en la app bloqueado detrás."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton profil reste sur cet appareil, sauf si tu actives la synchronisation iCloud. Le remplir plus tard rend les minuteurs et la vérification des combinaisons plus utiles pour toi, et rien dans l'app n'est verrouillé derrière."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je profiel blijft op dit apparaat, tenzij je iCloud-synchronisatie aanzet. Als je het later invult, worden de timers en de combinatiecheck nuttiger voor jou, en er zit niets in de app achter slot en grendel."
+          }
+        }
+      }
+    },
+    "Sync and encrypted backup" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisierung und verschlüsseltes Backup"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronización y copia de seguridad cifrada"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation et sauvegarde chiffrée"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisatie en versleutelde back-up"
+          }
+        }
+      }
+    },
+    "Automatic encrypted snapshot" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatischer verschlüsselter Schnappschuss"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instantánea cifrada automática"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Instantané chiffré automatique"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatische versleutelde momentopname"
+          }
+        }
+      }
+    },
+    "Face ID or PIN is on" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID oder PIN ist an"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID o el PIN está activado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID ou le code est activé"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face ID of pincode staat aan"
+          }
+        }
+      }
+    },
+    "No extra app lock is on" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keine zusätzliche App-Sperre ist an"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay ningún bloqueo de la app adicional activado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun verrouillage de l’app supplémentaire n’est activé"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er staat geen extra app-slot aan"
+          }
+        }
+      }
+    },
+    "Discreet text is on" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diskreter Text ist an"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El texto discreto está activado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le texte discret est activé"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discrete tekst staat aan"
+          }
+        }
+      }
+    },
+    "Detailed text may show" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ausführlicher Text kann angezeigt werden"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puede mostrarse el texto detallado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le texte détaillé peut s’afficher"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gedetailleerde tekst kan zichtbaar zijn"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

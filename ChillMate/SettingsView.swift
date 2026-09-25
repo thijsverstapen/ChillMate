@@ -38,7 +38,11 @@ enum SettingsSectionPage: String, CaseIterable, Identifiable {
     case privacyDashboard = "Privacy dashboard"
     case permissions = "Permissions"
     case notifications = "Notifications"
-    case iCloud = "iCloud backup"
+    // Was "iCloud backup". The page now holds iCloud sync as well, and the app
+    // tells people they can change sync "in Settings" — a page named only for
+    // the backup hid the one switch they were sent to find. The raw value is an
+    // identifier and a catalog lookup, never stored, so renaming it is safe.
+    case iCloud = "iCloud"
     case accessibility = "Accessibility"
     case appearance = "Appearance"
     case watch = "Apple Watch"
@@ -99,7 +103,7 @@ enum SettingsSectionPage: String, CaseIterable, Identifiable {
         case .notifications:
             String(localized: "Check-ins and affirmations")
         case .iCloud:
-            String(localized: "Encrypted backup and restore")
+            String(localized: "Sync and encrypted backup")
         case .accessibility:
             String(localized: "Readable, calm, and one-handed app behavior")
         case .appearance:
@@ -514,6 +518,8 @@ struct SettingsView: View {
                         notificationsSectionContent
 
                     case .iCloud:
+                        ICloudSyncCard()
+
                         ICloudBackupCard(
                             isEnabled: $iCloudBackupEnabled,
                             status: lastICloudBackupStatus,
