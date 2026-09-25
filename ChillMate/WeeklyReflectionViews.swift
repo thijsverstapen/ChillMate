@@ -32,7 +32,7 @@ struct WeeklyReflectionView: View {
                         PageHeader(title: String(localized: "Weekly reflection"), subtitle: String(localized: "A quick look at the last 7 days, made for noticing patterns without judging yourself."), symbol: "calendar.badge.clock", tint: Color.chillIconPurple)
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                             WeeklyReflectionMetric(title: String(localized: "Chills"), value: "\(recentEntries.filter { !$0.skippedNight }.count)", symbol: "heart.text.square.fill", tint: Color.chillIconPink)
-                            WeeklyReflectionMetric(title: String(localized: "Substance logs"), value: "\(recentEntries.filter { !$0.substances.isEmpty }.count)", symbol: "pills.fill", tint: Color.chillSecondaryBlue)
+                            WeeklyReflectionMetric(title: String(localized: "Substance logs"), value: "\(recentEntries.filter { $0.hasSubstances }.count)", symbol: "pills.fill", tint: Color.chillSecondaryBlue)
                             WeeklyReflectionMetric(title: String(localized: "Journals"), value: "\(recentJournals.count)", symbol: "book.closed.fill", tint: Color.chillIconPurple)
                             WeeklyReflectionMetric(title: String(localized: "Memory gaps"), value: "\(recentEntries.filter(\.reportedMemoryGap).count)", symbol: "questionmark.circle.fill", tint: Color.chillIconOrange)
                         }
@@ -62,6 +62,22 @@ struct WeeklyReflectionView: View {
                             .padding(14)
                             .glassSurface(radius: 24, tint: Color.chillMint.opacity(0.08))
                             .task { await generateReflectionIfNeeded() }
+                        } else if let absence = OnDeviceAffirmationService.absence {
+                            // The section used to vanish, which reads as a thing
+                            // that does not exist rather than one that could.
+                            // Two of the three reasons are the reader's to act
+                            // on, and the third is worth knowing rather than
+                            // wondering about.
+                            VStack(alignment: .leading, spacing: 10) {
+                                CareSectionTitle(title: String(localized: "This week, in a few words"), symbol: "sparkles.rectangle.stack.fill")
+
+                                Text(absence.explanation)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(Color.chillSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            .padding(14)
+                            .glassSurface(radius: 24, tint: Color.chillMint.opacity(0.08))
                         }
 
                         VStack(alignment: .leading, spacing: 10) {
@@ -93,7 +109,7 @@ struct WeeklyReflectionView: View {
 
         aiReflection = await OnDeviceAffirmationService.generateWeeklyReflection(
             chillCount: recentEntries.filter { !$0.skippedNight }.count,
-            substanceLogCount: recentEntries.filter { !$0.substances.isEmpty }.count,
+            substanceLogCount: recentEntries.filter { $0.hasSubstances }.count,
             journalCount: recentJournals.count,
             memoryGapCount: recentEntries.filter(\.reportedMemoryGap).count,
             averageSleepHours: averageSleep,
