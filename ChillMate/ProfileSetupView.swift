@@ -123,7 +123,7 @@ struct AgeVerificationInfo: View {
             if isExpanded {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("ChillMate is an adults-only wellbeing app. It includes harm-reduction, sexual-health, and substance-safety information written for people 18 and older, so it checks your age before creating a profile.")
-                    Text("You can confirm your age in two private ways. The date of birth you enter stays on this device. The optional Apple Account check returns only a yes-or-no \"18 or older\" answer from Apple; it never shares your birthdate or name with the app.")
+                    Text("You can confirm your age in two private ways. The date of birth you enter stays on this device unless you turn on iCloud sync. The optional Apple Account check returns only a yes-or-no \"18 or older\" answer from Apple; it never shares your birthdate or name with the app.")
                     Text("Your age is used only on this device to unlock ChillMate. It is never sent to the developer, never uploaded, and never shared. You can leave the Apple check off and simply use your date of birth.")
                 }
                 .font(.caption)
@@ -1159,7 +1159,7 @@ private struct QuickStartSheet: View {
                         .opacity(canStart ? 1 : 0.55)
                         .accessibilityIdentifier(AccessibilityID.setupQuickStartButton)
 
-                        Text("Your profile lives on this device and nowhere else. Filling it in later makes the timers and the combination checker more useful to you, and nothing in the app is locked behind it.")
+                        Text("Your profile stays on this device unless you turn on iCloud sync. Filling it in later makes the timers and the combination checker more useful to you, and nothing in the app is locked behind it.")
                             .font(.caption)
                             .foregroundStyle(Color.chillSecondary)
                             .fixedSize(horizontal: false, vertical: true)

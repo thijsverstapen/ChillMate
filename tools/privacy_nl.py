@@ -51,7 +51,7 @@ SECTIONS = [
         <caption>Gecontroleerd op ChillMate {version} (build {build}), over alle 82 Swift-bestanden in de repository.</caption>
         <thead><tr><th scope="col">Wat</th><th scope="col">Gaat waarheen</th><th scope="col">Wanneer</th></tr></thead>
         <tbody>
-          <tr><td>iCloud-synchronisatie (CloudKit)</td><td>Je eigen privé-iCloud-database</td><td>Alleen als je iCloud aanzet. Apple bewaart het, en ik kan er niet bij.</td></tr>
+          <tr><td>iCloud-synchronisatie (CloudKit)</td><td>Je eigen privé-iCloud-database</td><td>Alleen als je iCloud-synchronisatie aanzet in de instellingen van ChillMate. Apple bewaart het, en ik kan er niet bij.</td></tr>
           <tr><td>Versleuteld back-upbestand</td><td>Je eigen iCloud Drive</td><td>Alleen als je back-ups aanzet, of zelf een bestand exporteert.</td></tr>
           <tr><td>Apple Watch-spiegeling</td><td>Je eigen horloge, rechtstreeks</td><td>Als je een horloge koppelt. Toestel naar toestel, via Watch Connectivity.</td></tr>
           <tr><td>Apple Gezondheid</td><td>Blijft op het toestel</td><td>Alleen de categorieën die jij toestaat. HealthKit is lokale opslag, geen dienst.</td></tr>
@@ -140,7 +140,8 @@ SECTIONS = [
 
     ("where", "cloud", "var(--amber)", "Waar je gegevens worden bewaard", """
     <p><strong>Op je iPhone.</strong> In de privéopslag van de app, beschermd door de bestandsbeveiliging van iOS. Zet je het aan, dan komt daar een extra appvergrendeling bovenop, met Face ID of een pincode.</p>
-    <p><strong>Optioneel iCloud.</strong> Als je iCloud-back-up of -synchronisatie aanzet, bewaart ChillMate je gegevens in <em>jouw eigen</em> privé-iCloud-account via CloudKit en iCloud Drive van Apple. Apple versleutelt het, en alleen jij kunt erbij. Ik heb er geen enkele toegang toe.</p>
+    <p><strong>Optioneel iCloud.</strong> Beide iCloud-functies staan uit tenzij je ze aanzet, en ze zijn verschillend beveiligd. <strong>iCloud-synchronisatie</strong> bewaart een kopie van je gegevens in <em>jouw eigen</em> privé-iCloud-account via CloudKit van Apple, zodat je geschiedenis mee kan naar een nieuwe iPhone. Tenzij je Geavanceerde gegevensbescherming van Apple hebt aangezet, heeft Apple de sleutels van die kopie. Ik kan er helemaal niet bij. <strong>De versleutelde back-up</strong> wordt op je iPhone versleuteld voordat hij in iCloud Drive wordt bewaard, met een sleutel die het apparaat nooit verlaat, zodat Apple en ik hem geen van beiden kunnen lezen.</p>
+    <p><strong>Wat er in 5.1.0 veranderde.</strong> Vóór versie 5.1.0 stond iCloud-synchronisatie aan voor iedereen die bij iCloud was ingelogd, zonder het te vragen, terwijl deze pagina het beschreef als iets wat je zelf aanzet. Dat klopte niet. Als je ChillMate vóór 5.1.0 gebruikte, vraagt de app je nu één keer of je de iCloud-kopie wilt houden, en nieuwe installaties beginnen met synchronisatie uit. Uitzetten stopt nieuwe kopieën, maar verwijdert de kopie die er al staat niet. Die kun je weghalen in de iOS-instellingen, bij je iCloud-opslag.</p>
     <p><strong>Geen servers van mij.</strong> Er bestaat nergens een ChillMate-server die je persoonlijke gegevens ontvangt of bewaart.</p>
 """),
 
@@ -169,7 +170,7 @@ SECTIONS = [
     ("control", "lock", "var(--purple)", "Jouw beheer en verwijdering", """
     <ul>
       <li>Je kunt logboekitems, plannen, herinneringen, timers, dagboekitems en je hele account vanuit de app verwijderen.</li>
-      <li>De app verwijderen wist de lokale gegevens van je iPhone. iCloud-gegevens kun je weghalen via iCloud-instellingen of via de back-upinstellingen in de app.</li>
+      <li>De app verwijderen wist de lokale gegevens van je iPhone. De kopie van iCloud-synchronisatie kun je weghalen in de iOS-instellingen, bij je iCloud-opslag, en back-upbestanden via de back-upinstellingen in de app.</li>
       <li>De iOS-toestemmingen voor Gezondheid, Locatie, Meldingen, Contacten en Foto's blijven altijd beschikbaar in de Instellingen-app.</li>
     </ul>
     <p>ChillMate verzamelt je gegevens niet op een server. Er is dus geen profiel op afstand om op te vragen, te corrigeren of te laten wissen. Je hebt alles al zelf in handen. Woon je in de EU of EER, dan regel je je AVG-rechten (inzage, correctie, wissen, overdraagbaarheid, bezwaar) rechtstreeks met deze knoppen op je toestel.</p>

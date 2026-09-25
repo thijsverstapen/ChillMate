@@ -115,15 +115,28 @@ struct PrivacyTimelineView: View {
     @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
     @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
     @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
+    @AppStorage(DefaultsKey.iCloudSyncChoice) private var iCloudSyncChoice: String?
 
     private var rows: [PrivacyTimelineRowModel] {
         [
+            // Until 5.1.0 this listed the iCloud backup and not iCloud sync, which
+            // was the one actually copying everything. A state, not an event, so
+            // it carries no date — like the app lock and notification rows.
+            PrivacyTimelineRowModel(
+                title: String(localized: "iCloud sync"),
+                detail: ICloudSyncPreference.isMirroringNow(storedChoice: iCloudSyncChoice)
+                    ? String(localized: "A copy of everything is kept in your private iCloud.")
+                    : String(localized: "Off. Nothing is copied to iCloud."),
+                date: nil,
+                symbol: "arrow.triangle.2.circlepath.icloud",
+                tint: Color.chillPrimary
+            ),
             PrivacyTimelineRowModel(title: String(localized: "iCloud backup"), detail: iCloudBackupEnabled ? statusText(lastICloudBackupStatus, fallback: String(localized: "Enabled")) : String(localized: "Off"), date: date(from: lastICloudBackupTimestamp), symbol: "icloud.and.arrow.up.fill", tint: Color.chillSecondaryBlue),
             PrivacyTimelineRowModel(title: String(localized: "iCloud restore"), detail: String(localized: "Latest restore attempt"), date: date(from: lastICloudRestoreTimestamp), symbol: "icloud.and.arrow.down.fill", tint: Color.chillIconTeal),
-            PrivacyTimelineRowModel(title: String(localized: "iPhone recovery backup"), detail: statusText(lastOnDeviceRecoveryStatus, fallback: "Automatic encrypted snapshot"), date: date(from: lastOnDeviceRecoverySnapshotTimestamp), symbol: "externaldrive.fill.badge.checkmark", tint: Color.chillMint),
+            PrivacyTimelineRowModel(title: String(localized: "iPhone recovery backup"), detail: statusText(lastOnDeviceRecoveryStatus, fallback: String(localized: "Automatic encrypted snapshot")), date: date(from: lastOnDeviceRecoverySnapshotTimestamp), symbol: "externaldrive.fill.badge.checkmark", tint: Color.chillMint),
             PrivacyTimelineRowModel(title: String(localized: "Recovery restore"), detail: String(localized: "Recovered after reinstall when available"), date: date(from: lastOnDeviceRecoveryRestoreTimestamp), symbol: "arrow.counterclockwise.circle.fill", tint: Color.chillIconPurple),
-            PrivacyTimelineRowModel(title: String(localized: "App lock"), detail: requiresFaceID || requiresPIN ? "Face ID or PIN is on" : "No extra app lock is on", date: nil, symbol: "lock.shield.fill", tint: Color.chillMint),
-            PrivacyTimelineRowModel(title: String(localized: "Notifications"), detail: discreetNotifications ? "Discreet text is on" : "Detailed text may show", date: nil, symbol: "bell.badge.fill", tint: Color.chillIconAmber),
+            PrivacyTimelineRowModel(title: String(localized: "App lock"), detail: requiresFaceID || requiresPIN ? String(localized: "Face ID or PIN is on") : String(localized: "No extra app lock is on"), date: nil, symbol: "lock.shield.fill", tint: Color.chillMint),
+            PrivacyTimelineRowModel(title: String(localized: "Notifications"), detail: discreetNotifications ? String(localized: "Discreet text is on") : String(localized: "Detailed text may show"), date: nil, symbol: "bell.badge.fill", tint: Color.chillIconAmber),
             PrivacyTimelineRowModel(title: String(localized: "Last opened"), detail: String(localized: "Latest app activity saved locally"), date: date(from: lastAppUseTimestamp), symbol: "iphone", tint: Color.chillSecondaryBlue)
         ]
     }

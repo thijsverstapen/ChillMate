@@ -1319,7 +1319,7 @@ def build_privacy():
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
         <tbody>
-          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn iCloud on. Apple holds it, and I cannot read it.</td></tr>
+          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn on iCloud sync in ChillMate's settings. Apple holds it, and I cannot read it.</td></tr>
           <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
           <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
@@ -1442,7 +1442,8 @@ def build_privacy():
   <div class="card">
     <h2 id="where">{icon("cloud", style="color:var(--amber)")}Where your data is&nbsp;stored</h2>
     <p><strong>On your iPhone.</strong> Data is kept in the app's private storage, protected by iOS file protection and, if you enable it, an extra app lock (Face ID or PIN).</p>
-    <p><strong>Optional iCloud.</strong> If you turn on iCloud backup or sync, ChillMate stores your data in <em>your own</em> private iCloud account through Apple's CloudKit and iCloud Drive. Apple encrypts it, and only you can reach it. I have no access to it at all.</p>
+    <p><strong>Optional iCloud.</strong> Both iCloud features are off unless you turn them on, and they are protected differently. <strong>iCloud sync</strong> keeps a copy of your data in <em>your own</em> private iCloud account through Apple's CloudKit, so your history can move to a new iPhone. Unless you have turned on Apple's Advanced Data Protection, Apple holds the keys to that copy. I have no access to it at all. <strong>The encrypted backup</strong> is encrypted on your iPhone before it is saved to iCloud Drive, with a key that never leaves the device, so neither Apple nor I can read it.</p>
+    <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, iCloud sync was on for everyone signed into iCloud, without asking, while this page described it as something you turn on. That was wrong. If you used ChillMate before 5.1.0, the app now asks you once whether to keep the iCloud copy, and new installs start with it off. Turning it off stops new copies but does not delete the one already there. You can remove that in iOS Settings, under your iCloud storage.</p>
     <p><strong>No servers of mine.</strong> There is no ChillMate server anywhere that receives or stores your personal information.</p>
   </div>
 
@@ -1475,7 +1476,7 @@ def build_privacy():
     <h2 id="control">{icon("lock", style="color:var(--purple)")}Your control and&nbsp;deletion</h2>
     <ul>
       <li>You can delete logs, plans, reminders, timers, journal entries, and your whole account from inside the app.</li>
-      <li>Deleting the app removes its local data from your iPhone. iCloud data can be removed from iCloud settings or from within the app's backup controls.</li>
+      <li>Deleting the app removes its local data from your iPhone. The iCloud sync copy can be removed in iOS Settings, under your iCloud storage, and backup files from the app's backup controls.</li>
       <li>iOS permission controls for Health, Location, Notifications, Contacts, and Photos remain available in the Settings app at any time.</li>
     </ul>
     <p>Because ChillMate does not collect your data on a server, there is no remote profile to ask for, correct, or erase. You already hold all of it. If you are in the EU or EEA, your GDPR rights (access, correction, erasure, portability, objection) are met directly by these controls on your phone.</p>
@@ -1670,7 +1671,8 @@ def build_privacy_nl():
 
 
 RELEASES = [
-    ("5.1.0", "510", "2026-09-25", "September 2026", "The app reads what you wrote", [
+    ("5.1.0", "510", "2026-09-25", "September 2026", "The app reads what you wrote, and iCloud becomes your choice", [
+        "iCloud sync is now something you choose. Until this version, anyone signed into iCloud had a copy of their ChillMate data kept in their private iCloud database from the first launch, without being asked \u2014 while the app, its onboarding and this site all described it as something you turn on. It was your own iCloud and I could never read it, but that was wrong. New installs now start with it off. If you used ChillMate before, it asks you once, before it opens, whether to keep that copy; turning it off stops new copies but does not delete the one already in iCloud, which you can remove in iOS Settings. The Privacy screen now shows it as its own line, and the privacy page says what changed.",
         "The journal has a search box. It matches on meaning rather than letters, so looking for \u201cfelt anxious\u201d finds the night you wrote \u201cfeeling anxious\u201d. It reads your entries on the phone and nothing is sent anywhere.",
         "A new card in Insights shows how your own writing has read over time, recent entries against earlier ones. Entries too short to judge are left out and it says how many it could read, because a flat line drawn through unreadable text is worse than no line.",
         "The risk checker takes a sentence. Type \u201ca couple of beers and a bit of ket\u201d and it offers the same selection tapping would have made. It only ever picks from substances the app already knows, and the rating still comes from the same table \u2014 nothing about the severity is guessed.",
@@ -2012,7 +2014,7 @@ def build_security():
       <li><strong>No server.</strong> There is no API, no database and no admin panel to attack, because none exist.</li>
       <li><strong>No accounts.</strong> No password reset flow, no session tokens, no account takeover.</li>
       <li><strong>No third-party SDKs</strong> receiving your data, so no supply chain of analytics vendors.</li>
-      <li><strong>Sync is Apple's.</strong> iCloud sync and iCloud Drive backups run in your own account under Apple's encryption.</li>
+      <li><strong>Sync is Apple's, and off by default.</strong> iCloud sync runs in your own account under Apple's encryption, and only if you turn it on. Backups to iCloud Drive are encrypted on the device first, with a key that never leaves it.</li>
     </ul>
     <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID, and the second PIN that opens the app empty. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activities show on a locked screen, which since 5.0.0 includes a running dose and a check-in for the way home. And whether the discreet notification wording ever leaks something it should not.</p>
   </div>
