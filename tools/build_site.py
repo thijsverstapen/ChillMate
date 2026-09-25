@@ -1670,6 +1670,18 @@ def build_privacy_nl():
 
 
 RELEASES = [
+    ("5.1.0", "510", "2026-09-25", "September 2026", "The app reads what you wrote", [
+        "The journal has a search box. It matches on meaning rather than letters, so looking for \u201cfelt anxious\u201d finds the night you wrote \u201cfeeling anxious\u201d. It reads your entries on the phone and nothing is sent anywhere.",
+        "A new card in Insights shows how your own writing has read over time, recent entries against earlier ones. Entries too short to judge are left out and it says how many it could read, because a flat line drawn through unreadable text is worse than no line.",
+        "The risk checker takes a sentence. Type \u201ca couple of beers and a bit of ket\u201d and it offers the same selection tapping would have made. It only ever picks from substances the app already knows, and the rating still comes from the same table \u2014 nothing about the severity is guessed.",
+        "Write your journal and the app can offer to fill in the night log from it: hours slept, whether you have slept since, whether you described a gap in your memory. It never fills anything in by itself, and it never touches which substances were logged \u2014 those stay yours to tap.",
+        "The helper summary can carry a paragraph in your own words, drafted from your journal and then yours to edit before anyone reads it. It sits under its own heading so a professional can see which part is a count and which part is you speaking.",
+        "Every warning in the risk checker now says where its rating comes from: matching TripSit\u2019s chart, rated above it deliberately, or not on it at all. The wording for that already existed and had never been shown, so every warning had been arriving with the same apparent authority.",
+        "Fixed: a session shorter than ninety minutes received no check-in at all. The first one was placed at ninety minutes and then tested against a window that had already closed, so an hour-long timer got silence from the feature whose whole job is to check on you.",
+        "Siri can count your logged nights. It reports how many, never what \u2014 what you logged is not something that should be readable from a lock screen.",
+        "The weekly reflection now says why there is no written summary when Apple Intelligence is off or unavailable, instead of the section quietly disappearing.",
+        "Long histories are faster. The stored data is indexed on the dates everything is sorted by, and the check for whether a night had anything logged no longer sorts a list to answer yes or no.",
+    ]),
     ("5.0.0", "501", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [
         "Benzodiazepines and methamphetamine can now be logged and checked. Until now there was no way to tell ChillMate about either, so GHB with a benzo returned no warning at all. Twenty-five new rated combinations between them.",
         "Every combination is now compared with TripSit's published drug combination chart, and each warning says how it compares. That comparison found four ChillMate was rating too low: GHB, GBL and alcohol each with ketamine, and MDMA with 3-MMC, are all at the highest severity now.",

@@ -182,6 +182,24 @@ font-weight:800;max-width:19ch;margin:0}
   <p class="lede">Every release, in the order it shipped. The full release notes for each version, in all five languages, live in the repository.</p>
 
   <div class="card">
+    <h2 id="v5-1-0"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-tag"/></svg>5.1.0 · The app reads what you wrote
+      <a class="anchor" href="#v5-1-0" aria-label="Link to 5.1.0">#</a></h2>
+    <p class="meta">Build 510 · September 2026</p>
+    <ul>
+        <li>The journal has a search box. It matches on meaning rather than letters, so looking for “felt anxious” finds the night you wrote “feeling anxious”. It reads your entries on the phone and nothing is sent anywhere.</li>
+        <li>A new card in Insights shows how your own writing has read over time, recent entries against earlier ones. Entries too short to judge are left out and it says how many it could read, because a flat line drawn through unreadable text is worse than no line.</li>
+        <li>The risk checker takes a sentence. Type “a couple of beers and a bit of ket” and it offers the same selection tapping would have made. It only ever picks from substances the app already knows, and the rating still comes from the same table — nothing about the severity is guessed.</li>
+        <li>Write your journal and the app can offer to fill in the night log from it: hours slept, whether you have slept since, whether you described a gap in your memory. It never fills anything in by itself, and it never touches which substances were logged — those stay yours to tap.</li>
+        <li>The helper summary can carry a paragraph in your own words, drafted from your journal and then yours to edit before anyone reads it. It sits under its own heading so a professional can see which part is a count and which part is you speaking.</li>
+        <li>Every warning in the risk checker now says where its rating comes from: matching TripSit’s chart, rated above it deliberately, or not on it at all. The wording for that already existed and had never been shown, so every warning had been arriving with the same apparent authority.</li>
+        <li>Fixed: a session shorter than ninety minutes received no check-in at all. The first one was placed at ninety minutes and then tested against a window that had already closed, so an hour-long timer got silence from the feature whose whole job is to check on you.</li>
+        <li>Siri can count your logged nights. It reports how many, never what — what you logged is not something that should be readable from a lock screen.</li>
+        <li>The weekly reflection now says why there is no written summary when Apple Intelligence is off or unavailable, instead of the section quietly disappearing.</li>
+        <li>Long histories are faster. The stored data is indexed on the dates everything is sorted by, and the check for whether a night had anything logged no longer sorts a list to answer yes or no.</li>
+    </ul>
+  </div>
+
+  <div class="card">
     <h2 id="v5-0-0"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-tag"/></svg>5.0.0 · Two substances it could not name, and the day it never mentioned
       <a class="anchor" href="#v5-0-0" aria-label="Link to 5.0.0">#</a></h2>
     <p class="meta">Build 501 · September 2026</p>
@@ -268,7 +286,7 @@ font-weight:800;max-width:19ch;margin:0}
     <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    <span class="made">ChillMate 5.0.0 · made by one person in the Netherlands</span>
+    <span class="made">ChillMate 5.1.0 · made by one person in the Netherlands</span>
   </footer>
 
 </main>
