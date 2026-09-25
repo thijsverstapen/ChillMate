@@ -77,6 +77,7 @@ struct WeeklyReflectionView: View {
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                             .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .glassSurface(radius: 24, tint: Color.chillMint.opacity(0.08))
                         }
 

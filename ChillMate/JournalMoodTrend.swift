@@ -86,6 +86,11 @@ struct JournalMoodTrendCard: View {
             }
         }
         .padding(16)
+        // Every sibling card in Insights has this, and without it the card sized
+        // to its own text and stopped short of the column — visibly narrower than
+        // the card above it. Found by looking at the running app; nothing in the
+        // suite measures whether a card is as wide as its neighbours.
+        .frame(maxWidth: .infinity, alignment: .leading)
         .glassSurface(radius: 24, tint: Color.chillIconPurple.opacity(0.08))
         .task(id: texts) {
             summary = JournalMoodSummary.make(newestFirst: texts)
