@@ -121,6 +121,15 @@ before pushing. They take seconds and are the first CI job.
   `localizedDisplayName` is meant. Each of those rules exists because a string
   shipped in English through that exact hole.
 
+  **Reusing an existing key means reading its translations, not just its
+  spelling.** The gate checks that a literal has a key and that the key has all
+  five languages. It cannot check that the key means the same thing in your
+  context. `Select %@` is fully translated and its Spanish is `Seleccionar a %@`
+  — the personal *a*, because it was written for choosing a contact. Reused for
+  a list of substances it reads "Seleccionar a Alcohol". A green gate on a reused
+  key proves the key exists, nothing more; open the catalog and read the four
+  translations before borrowing one.
+
   **The key order in the catalog is Xcode's, and nothing else may re-sort it.**
   Xcode collates the way a person reads — punctuation and accents near the
   letters they resemble — and Python's `sort_keys=True` sorts by code point,
