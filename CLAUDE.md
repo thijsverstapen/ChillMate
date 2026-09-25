@@ -101,8 +101,9 @@ command with `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`.
 
 ## Conventions the CI gates enforce
 
-Run `python3 scripts/check_localization.py` and `python3 scripts/check_defaults_keys.py`
-before pushing. They take seconds and are the first CI job.
+Run `python3 scripts/check_localization.py`, `python3 scripts/check_defaults_keys.py`
+and `python3 scripts/check_orphan_views.py` before pushing. They take seconds and
+are the first CI job.
 
 - **Every user-facing string is localized into all five languages.** Adding a
   `String(localized:)` means adding the key to `ChillMate/Localizable.xcstrings` with
@@ -141,6 +142,12 @@ before pushing. They take seconds and are the first CI job.
   preserve its order.
 - **Every `UserDefaults` key lives in `DefaultsKey`** (`ChillMate/DefaultsKeys.swift`).
   No string literals at call sites.
+- **Every view is on a screen.** `check_orphan_views.py` refuses a SwiftUI
+  view referenced nowhere. A view that computes the right thing and is shown to
+  nobody passes every test there is — `JournalNightDraftCard` was an entire
+  5.1.0 feature, tested and translated, on no screen, and was found only by
+  running the app. Fifteen older orphans are allowlisted in the script; shrink
+  that list, never grow it without a reason written beside the name.
 - **No build artifacts tracked.** `DerivedData/`, `build/` and `*.log` are ignored.
 
 ## Tests

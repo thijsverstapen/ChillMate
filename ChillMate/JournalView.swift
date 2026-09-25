@@ -142,6 +142,20 @@ struct JournalView: View {
                                     }
                                     .accessibilityLabel("Delete entry")
                                 }
+
+                                // Offered once the day is saved, not while it is being
+                                // written: reading a half-finished sentence would offer
+                                // half a night. It renders nothing when the model is
+                                // unavailable or finds nothing, so on most devices and
+                                // in the Simulator this is invisible by design.
+                                //
+                                // This card was built, tested and translated in the
+                                // first pass and then placed on no screen at all — the
+                                // same shape as the corroboration card B2 revived. It
+                                // was found by running the app, not by the suite, which
+                                // tests the logic around the model and cannot see
+                                // whether anything shows the result.
+                                JournalNightDraftCard(text: entry.searchableText, date: entry.date)
                             } else {
                                 // ── Editable form (new entry, or editing an existing one) ──
                                 JournalPromptField(title: String(localized: "What do you remember?"), text: $rememberClearly)

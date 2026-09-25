@@ -43,6 +43,12 @@ jobs:
       - name: No UserDefaults keys outside the registry
         run: python3 scripts/check_defaults_keys.py
 
+      # A view that is built, tested and translated and then shown on no screen
+      # passes every other check here. It happened twice in 5.1.0, once to a
+      # whole feature, and both were found only by running the app.
+      - name: No view that no screen shows
+        run: python3 scripts/check_orphan_views.py
+
   build-test:
     name: Build and test
     # Must ship Xcode 26 or newer. ChillMate.xcodeproj is saved in project format
