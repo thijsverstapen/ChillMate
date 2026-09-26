@@ -80,6 +80,9 @@ enum DefaultsKey {
     /// Set once Spotlight has confirmed that every journal entry earlier versions
     /// indexed is gone. See `SpotlightService.removeJournalIndexIfNeeded`.
     static let spotlightJournalRemoved = "spotlightJournalRemoved"
+
+    /// The `StoreIndexRepair.revision` whose indexes this install's store has.
+    static let storeIndexRevision = "storeIndexRevision"
     static let lastKnownHRVms = "lastKnownHRVms"
     static let lastDailyRecoveryScore = "lastDailyRecoveryScore"
     static let reductionGoalSessions = "reductionGoalSessions"

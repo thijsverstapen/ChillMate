@@ -129,6 +129,7 @@
 		AAB100000000000000000041 /* ICloudSyncCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003F /* ICloudSyncCard.swift */; };
 		AAB100000000000000000042 /* SleepBackfill.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000040 /* SleepBackfill.swift */; };
 		AAB100000000000000000043 /* HealthLegacyCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000041 /* HealthLegacyCleanup.swift */; };
+		AAB100000000000000000044 /* StoreIndexRepair.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000042 /* StoreIndexRepair.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -323,6 +324,7 @@
 		AAF10000000000000000003F /* ICloudSyncCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSyncCard.swift; sourceTree = "<group>"; };
 		AAF100000000000000000040 /* SleepBackfill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepBackfill.swift; sourceTree = "<group>"; };
 		AAF100000000000000000041 /* HealthLegacyCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthLegacyCleanup.swift; sourceTree = "<group>"; };
+		AAF100000000000000000042 /* StoreIndexRepair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreIndexRepair.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -414,6 +416,7 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF100000000000000000042 /* StoreIndexRepair.swift */,
 				AAF100000000000000000041 /* HealthLegacyCleanup.swift */,
 				AAF100000000000000000040 /* SleepBackfill.swift */,
 				AAF10000000000000000003F /* ICloudSyncCard.swift */,
@@ -832,6 +835,7 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000044 /* StoreIndexRepair.swift in Sources */,
 				AAB100000000000000000043 /* HealthLegacyCleanup.swift in Sources */,
 				AAB100000000000000000042 /* SleepBackfill.swift in Sources */,
 				AAB100000000000000000041 /* ICloudSyncCard.swift in Sources */,
