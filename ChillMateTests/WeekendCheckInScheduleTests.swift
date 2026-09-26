@@ -71,6 +71,10 @@ struct WeekendCheckInScheduleTests {
     /// The quiet window must never reach a check-in of the following night.
     @Test("Quiet lasts less than the gap between two nights")
     func quietWindowIsShorterThanADay() {
-        #expect(WeekendCheckInSchedule.quietAfterHomeSafe < 24 * 60 * 60 - 2.5 * 60 * 60)
+        // Saturday 04:00 to Sunday 01:30, the shortest gap between two nights'
+        // check-ins. Typed outside the macro: literal arithmetic inside #expect
+        // took Xcode 26's type checker past its time limit on CI.
+        let gapBetweenNights: TimeInterval = 21.5 * 60 * 60
+        #expect(WeekendCheckInSchedule.quietAfterHomeSafe < gapBetweenNights)
     }
 }
