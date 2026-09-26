@@ -253,26 +253,22 @@ struct LogNightSheet: View {
 
         if healthKitAutoSync {
             let snapshot = HealthLogSnapshot(entry: entry)
+            let sleepReadAllowed = healthKitSleepReadEnabled
             Task {
-                try? await services.health.save(snapshot)
+                try? await services.health.save(snapshot, sleepReadAllowed: sleepReadAllowed)
             }
         }
 
+        // A night logged the morning after already has its sleep in Health. This
+        // used to read sixteen hours from the start of the night the moment it was
+        // saved — usually before anybody had slept, so it found nothing, and when
+        // it did find something it could be half a night. The backfill waits until
+        // the sleep is over, and also runs whenever the app is opened.
         if isTracked, !sleptYet, healthKitSleepReadEnabled {
-            let entryRef = entry
             let ctx = modelContext
+            let services = services
             Task {
-                if let hours = try? await services.health.sleepHoursAfterEntry(startDate: entryRef.startDate),
-                   hours > 0 {
-                    await MainActor.run {
-                        entryRef.sleptYet = true
-                        entryRef.sleepHours = hours
-                        ctx.saveChanges()
-                        if hours >= 7 {
-                            services.notifications.schedulePositiveSleepNotification(hours: hours)
-                        }
-                    }
-                }
+                await SleepBackfill.run(context: ctx, services: services)
             }
         }
 

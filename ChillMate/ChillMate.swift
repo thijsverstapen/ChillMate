@@ -89,6 +89,10 @@ struct ChillMateApp: App {
             ChillTips.configure()
             TypedRecordsMigration.runIfNeeded()
             DataRetentionSweep.runIfNeeded()
+            Task {
+                await HealthLegacyCleanup.runIfNeeded(services: services)
+                await SleepBackfill.run(services: services)
+            }
         }
         .onContinueUserActivity(CSSearchableItemActionType) { activity in
             guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
@@ -104,6 +108,9 @@ struct ChillMateApp: App {
                 recordAppUse()
                 refreshLiveActivities()
                 services.watch.syncStandaloneState()
+                // Somebody who slept since the app was last in front finds the
+                // night filled in when they come back to it.
+                Task { await SleepBackfill.run(services: services) }
             }
 
             refreshPrivacyAndNotificationState()
@@ -264,6 +271,12 @@ enum LocalizedEnumStrings {
     /// String Catalog (so they are translated and never flagged stale), even though
     /// they are rendered at runtime via `localizedDisplayName` rather than literals.
     static let anchors: [String] = [
+        // HealthKitPermissionScope
+        String(localized: "Sexual activity"),
+        String(localized: "Sleep"),
+        String(localized: "Heart rate"),
+        String(localized: "Heart rate variability"),
+        String(localized: "Mindful minutes"),
         String(localized: "Prefer not to say"),
         String(localized: "24 h"),
         String(localized: "3MMC"),
@@ -333,9 +346,7 @@ enum LocalizedEnumStrings {
         String(localized: "Grounded"),
         String(localized: "HIV"),
         String(localized: "HPV"),
-        String(localized: "HRV read/write"),
         String(localized: "Health"),
-        String(localized: "Heart rate read/write"),
         String(localized: "Heartbreak"),
         String(localized: "Hepatitis B"),
         String(localized: "Hepatitis C"),
@@ -394,10 +405,8 @@ enum LocalizedEnumStrings {
         String(localized: "Relationship"),
         String(localized: "Safety review"),
         String(localized: "Same session"),
-        String(localized: "Sexual activity read/write"),
         String(localized: "Shaky"),
         String(localized: "Side"),
-        String(localized: "Sleep read/write"),
         String(localized: "Smoked"),
         String(localized: "Sniffed"),
         String(localized: "Social pressure"),
@@ -417,7 +426,6 @@ enum LocalizedEnumStrings {
         String(localized: "Versatile"),
         String(localized: "Viagra"),
         String(localized: "Work pressure"),
-        String(localized: "Workout read/write"),
         String(localized: "iCloud backup")
     ]
 }

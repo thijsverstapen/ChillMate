@@ -198,10 +198,10 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 111 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/733858c"><code>733858c</code></a>, whose combined SHA-256 begins <code>df063694142d2bbe</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 114 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/6cc5c38"><code>6cc5c38</code></a>, whose combined SHA-256 begins <code>5faa3acbc7935d5f</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
-        <caption>Checked against ChillMate 5.1.0 (build 510), across all 111 Swift files in the app targets and the domain package.</caption>
+        <caption>Checked against ChillMate 5.1.0 (build 510), across all 114 Swift files in the app targets and the domain package.</caption>
         <thead>
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
@@ -209,7 +209,7 @@ font-weight:800;max-width:19ch;margin:0}
           <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn on iCloud sync in ChillMate's settings. Apple holds it, and I cannot read it.</td></tr>
           <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
-          <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
+          <tr><td>Apple Health</td><td>Apple Health on your iPhone</td><td>Only the categories you approve. ChillMate writes when a night happened and how long you slept, never what you took or what you wrote.</td></tr>
           <tr><td>An optional donation</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
           <tr><td>A link you tap</td><td>Safari, to that site</td><td>Only on your tap. ChillMate does not fetch those pages itself.</td></tr>
           <tr><td>A call or message you send</td><td>Your phone app, your messages app</td><td>Only on your tap, and you see the message before it goes.</td></tr>
@@ -279,9 +279,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>26 changes since this page first existed.</caption>
+        <caption>27 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-09-25</td><td>Make every sentence about where data goes true, and say what changed</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/6cc5c38"><code>6cc5c38</code></a></td></tr>
           <tr><td>2026-09-25</td><td>Release 5.1.0 as build 510, and make the changelog prove it agrees with the project</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/11ef50f"><code>11ef50f</code></a></td></tr>
           <tr><td>2026-09-18</td><td>Fingerprint the code a reader can actually clone, and follow the build to 501</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/e9ba6d1"><code>e9ba6d1</code></a></td></tr>
           <tr><td>2026-09-12</td><td>Give the domain its own module, and stop reaching for seven singletons</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c94b013"><code>c94b013</code></a></td></tr>
@@ -328,7 +329,7 @@ font-weight:800;max-width:19ch;margin:0}
     <ul>
       <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
       <li>Private logs, sleep notes, health-related entries and test reminders, plans, journal entries, check-ins, and emergency-card details.</li>
-      <li>Optional information you choose to add from Apple Health, Contacts, Photos, or Location Services.</li>
+      <li>Sleep, heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.</li>
     </ul>
     <p>Some of the entries you choose to add are health-related and sensitive. They are stored only on your device, under your control.</p>
   </div>
@@ -337,7 +338,7 @@ font-weight:800;max-width:19ch;margin:0}
     <h2 id="use"><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-lock"/></svg>How your information is&nbsp;used</h2>
     <ul>
       <li>To show your private overview, reminders, follow-ups, emergency shortcuts, and wellbeing reflections.</li>
-      <li>To sync with Apple Health only for the categories you approve in iOS settings.</li>
+      <li>To sync with Apple Health only for the categories you approve. What goes to Apple Health is when a night happened and how long you slept, never what you took or what you wrote.</li>
       <li>To create encrypted backups only when you turn backup features on.</li>
     </ul>
     <p>All of this happens on your phone. ChillMate never sends what you write to me.</p>
@@ -372,12 +373,14 @@ font-weight:800;max-width:19ch;margin:0}
     <h2 id="permissions"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-shield"/></svg>Device&nbsp;permissions</h2>
     <p>Each permission is optional and only used for the purpose you grant it:</p>
     <ul>
-      <li><strong>Apple Health.</strong> Read and write only the categories you allow (such as sleep, heart rate, HRV, and workouts).</li>
+      <li><strong>Apple Health.</strong> Only the categories you allow. ChillMate reads your sleep to fill in how long you slept after a night, and heart rate and HRV for your recovery score. It writes when a night happened, how long you slept, breathing sessions, and your aftercare mood.</li>
       <li><strong>Contacts.</strong> Only to let you pick a trusted contact. The lookup happens on your device.</li>
       <li><strong>Photos.</strong> Only to set a profile picture you choose.</li>
       <li><strong>Location.</strong> Only to attach a location to a log or include your current location in an emergency message you send.</li>
       <li><strong>Notifications.</strong> For the reminders and check-ins you turn on. Discreet wording can be enabled so lock-screen text stays vague.</li>
     </ul>
+    <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, each night ChillMate wrote to Apple Health also carried what you took, whether a condom was used, whether you were penetrated, and your note. Other apps allowed to read your sleep or sexual activity could read those too, and so could Health's own export. That was wrong. ChillMate no longer writes them, and 5.1.0 swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Apple Health, it cannot reach those entries. You can delete everything ChillMate wrote from the Health app, where it lists ChillMate among your apps.</p>
+    <p>5.1.0 also asks for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote.</p>
   </div>
 
   <div class="card">

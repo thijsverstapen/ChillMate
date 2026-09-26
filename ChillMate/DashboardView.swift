@@ -1032,7 +1032,7 @@ private struct DailyRecoveryScore {
                 Factor(name: String(localized: "Substances"), caption: String(localized: "no substance use logged")),
                 Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
                 Factor(name: String(localized: "Symptoms"), caption: String(localized: "starts after activation")),
-                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available"),
+                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : String(localized: "not available")),
             Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available")),
                 Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available"))
             ]
@@ -1057,14 +1057,14 @@ private struct DailyRecoveryScore {
         label = Self.label(for: total)
         emoji = Self.emoji(for: total)
         factors = [
-            Factor(name: String(localized: "Sleep"), caption: latest?.sleptYet == true ? "\(latest?.sleepHours.formatted(.number.precision(.fractionLength(0...1))) ?? "0") h" : "not logged"),
-            Factor(name: String(localized: "Hydration"), caption: latest?.aftercareDrankWater == true ? "checked" : "unknown"),
-            Factor(name: String(localized: "Food"), caption: latest?.aftercareAteFood == true ? "checked" : "unknown"),
-            Factor(name: String(localized: "Substances"), caption: latestSubstances.isEmpty ? "clear" : "logged"),
+            Factor(name: String(localized: "Sleep"), caption: latest?.sleptYet == true ? "\(latest?.sleepHours.formatted(.number.precision(.fractionLength(0...1))) ?? "0") h" : String(localized: "not logged")),
+            Factor(name: String(localized: "Hydration"), caption: latest?.aftercareDrankWater == true ? String(localized: "checked") : String(localized: "unknown")),
+            Factor(name: String(localized: "Food"), caption: latest?.aftercareAteFood == true ? String(localized: "checked") : String(localized: "unknown")),
+            Factor(name: String(localized: "Substances"), caption: latestSubstances.isEmpty ? String(localized: "clear") : String(localized: "logged")),
             Factor(name: String(localized: "Anxiety"), caption: Self.anxietyCaption(latest, symptoms: latestSymptoms ?? [])),
             Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
-            Factor(name: String(localized: "Symptoms"), caption: (latestSymptoms ?? []).isEmpty ? "none" : "\((latestSymptoms ?? []).count) selected"),
-            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available"),
+            Factor(name: String(localized: "Symptoms"), caption: (latestSymptoms ?? []).isEmpty ? String(localized: "none") : String(localized: "\((latestSymptoms ?? []).count) selected")),
+            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : String(localized: "not available")),
             Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available"))
         ]
     }

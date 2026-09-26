@@ -1322,7 +1322,7 @@ def build_privacy():
           <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn on iCloud sync in ChillMate's settings. Apple holds it, and I cannot read it.</td></tr>
           <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
-          <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
+          <tr><td>Apple Health</td><td>Apple Health on your iPhone</td><td>Only the categories you approve. ChillMate writes when a night happened and how long you slept, never what you took or what you wrote.</td></tr>
           <tr><td>An optional donation</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
           <tr><td>A link you tap</td><td>Safari, to that site</td><td>Only on your tap. ChillMate does not fetch those pages itself.</td></tr>
           <tr><td>A call or message you send</td><td>Your phone app, your messages app</td><td>Only on your tap, and you see the message before it goes.</td></tr>
@@ -1415,7 +1415,7 @@ def build_privacy():
     <ul>
       <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
       <li>Private logs, sleep notes, health-related entries and test reminders, plans, journal entries, check-ins, and emergency-card details.</li>
-      <li>Optional information you choose to add from Apple Health, Contacts, Photos, or Location Services.</li>
+      <li>Sleep, heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.</li>
     </ul>
     <p>Some of the entries you choose to add are health-related and sensitive. They are stored only on your device, under your control.</p>
   </div>
@@ -1424,7 +1424,7 @@ def build_privacy():
     <h2 id="use">{icon("lock", style="color:var(--purple)")}How your information is&nbsp;used</h2>
     <ul>
       <li>To show your private overview, reminders, follow-ups, emergency shortcuts, and wellbeing reflections.</li>
-      <li>To sync with Apple Health only for the categories you approve in iOS settings.</li>
+      <li>To sync with Apple Health only for the categories you approve. What goes to Apple Health is when a night happened and how long you slept, never what you took or what you wrote.</li>
       <li>To create encrypted backups only when you turn backup features on.</li>
     </ul>
     <p>All of this happens on your phone. ChillMate never sends what you write to me.</p>
@@ -1459,12 +1459,14 @@ def build_privacy():
     <h2 id="permissions">{icon("shield", style="color:var(--primary)")}Device&nbsp;permissions</h2>
     <p>Each permission is optional and only used for the purpose you grant it:</p>
     <ul>
-      <li><strong>Apple Health.</strong> Read and write only the categories you allow (such as sleep, heart rate, HRV, and workouts).</li>
+      <li><strong>Apple Health.</strong> Only the categories you allow. ChillMate reads your sleep to fill in how long you slept after a night, and heart rate and HRV for your recovery score. It writes when a night happened, how long you slept, breathing sessions, and your aftercare mood.</li>
       <li><strong>Contacts.</strong> Only to let you pick a trusted contact. The lookup happens on your device.</li>
       <li><strong>Photos.</strong> Only to set a profile picture you choose.</li>
       <li><strong>Location.</strong> Only to attach a location to a log or include your current location in an emergency message you send.</li>
       <li><strong>Notifications.</strong> For the reminders and check-ins you turn on. Discreet wording can be enabled so lock-screen text stays vague.</li>
     </ul>
+    <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, each night ChillMate wrote to Apple Health also carried what you took, whether a condom was used, whether you were penetrated, and your note. Other apps allowed to read your sleep or sexual activity could read those too, and so could Health's own export. That was wrong. ChillMate no longer writes them, and 5.1.0 swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Apple Health, it cannot reach those entries. You can delete everything ChillMate wrote from the Health app, where it lists ChillMate among your apps.</p>
+    <p>5.1.0 also asks for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote.</p>
   </div>
 
   <div class="card">
@@ -1673,6 +1675,10 @@ def build_privacy_nl():
 RELEASES = [
     ("5.1.0", "510", "2026-09-25", "September 2026", "The app reads what you wrote, and iCloud becomes your choice", [
         "iCloud sync is now something you choose. Until this version, anyone signed into iCloud had a copy of their ChillMate data kept in their private iCloud database from the first launch, without being asked \u2014 while the app, its onboarding and this site all described it as something you turn on. It was your own iCloud and I could never read it, but that was wrong. New installs now start with it off. If you used ChillMate before, it asks you once, before it opens, whether to keep that copy; turning it off stops new copies but does not delete the one already in iCloud, which you can remove in iOS Settings. The Privacy screen now shows it as its own line, and the privacy page says what changed.",
+        "Nights written to Apple Health no longer carry anything about the night. Until this version, every sleep and sexual-activity entry ChillMate wrote there also carried what you took, whether a condom was used, whether you were penetrated, and your note. Any app allowed to read that part of Health could read them, and Health's own export included them. This version stops writing them, and swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Health, it cannot reach those entries, and the privacy page says how to delete them yourself.",
+        "ChillMate asks Apple Health for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote. Resting heart rate now comes with heart rate, and breathing sessions from panic support have a switch at last, so they can reach Health at all.",
+        "Sleep fills itself in. ChillMate used to read your sleep only at the moment you saved a night, which is usually before you have slept. It now looks again once you are up, and whenever you open the app, and it never overwrites a number you typed. A night recorded by both a watch and a sleep app used to count twice; it counts once now.",
+        "Sleep you type in is written to Apple Health only when nothing else recorded that night, so a watch's record no longer gets a second copy beside it.",
         "The journal has a search box. It matches on meaning rather than letters, so looking for \u201cfelt anxious\u201d finds the night you wrote \u201cfeeling anxious\u201d. It reads your entries on the phone and nothing is sent anywhere.",
         "A new card in Insights shows how your own writing has read over time, recent entries against earlier ones. Entries too short to judge are left out and it says how many it could read, because a flat line drawn through unreadable text is worse than no line.",
         "The risk checker takes a sentence. Type \u201ca couple of beers and a bit of ket\u201d and it offers the same selection tapping would have made. It only ever picks from substances the app already knows, and the rating still comes from the same table \u2014 nothing about the severity is guessed.",
@@ -1682,6 +1688,7 @@ RELEASES = [
         "Fixed: a session shorter than ninety minutes received no check-in at all. The first one was placed at ninety minutes and then tested against a window that had already closed, so an hour-long timer got silence from the feature whose whole job is to check on you.",
         "Siri can count your logged nights. It reports how many, never what \u2014 what you logged is not something that should be readable from a lock screen.",
         "The weekly reflection now says why there is no written summary when Apple Intelligence is off or unavailable, instead of the section quietly disappearing.",
+        "Fixed: most of the recovery card's small print, such as \"not logged\" and \"none\", was in English whichever language you chose.",
         "Long histories are faster. The stored data is indexed on the dates everything is sorted by, and the check for whether a night had anything logged no longer sorts a list to answer yes or no.",
     ]),
     ("5.0.0", "501", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [

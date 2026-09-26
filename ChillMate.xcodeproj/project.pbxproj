@@ -127,6 +127,8 @@
 		AAB100000000000000000024 /* ICloudSyncPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000024 /* ICloudSyncPreference.swift */; };
 		AAB100000000000000000040 /* ICloudSyncDecisionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003E /* ICloudSyncDecisionView.swift */; };
 		AAB100000000000000000041 /* ICloudSyncCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000003F /* ICloudSyncCard.swift */; };
+		AAB100000000000000000042 /* SleepBackfill.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000040 /* SleepBackfill.swift */; };
+		AAB100000000000000000043 /* HealthLegacyCleanup.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000041 /* HealthLegacyCleanup.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -319,6 +321,8 @@
 		AAF100000000000000000024 /* ICloudSyncPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSyncPreference.swift; sourceTree = "<group>"; };
 		AAF10000000000000000003E /* ICloudSyncDecisionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSyncDecisionView.swift; sourceTree = "<group>"; };
 		AAF10000000000000000003F /* ICloudSyncCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSyncCard.swift; sourceTree = "<group>"; };
+		AAF100000000000000000040 /* SleepBackfill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SleepBackfill.swift; sourceTree = "<group>"; };
+		AAF100000000000000000041 /* HealthLegacyCleanup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthLegacyCleanup.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -410,6 +414,8 @@
 		A11B00000000000000000020 /* ChillMate */ = {
 			isa = PBXGroup;
 			children = (
+				AAF100000000000000000041 /* HealthLegacyCleanup.swift */,
+				AAF100000000000000000040 /* SleepBackfill.swift */,
 				AAF10000000000000000003F /* ICloudSyncCard.swift */,
 				AAF10000000000000000003E /* ICloudSyncDecisionView.swift */,
 				AAF100000000000000000024 /* ICloudSyncPreference.swift */,
@@ -826,6 +832,8 @@
 		A11B00000000000000000024 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
+				AAB100000000000000000043 /* HealthLegacyCleanup.swift in Sources */,
+				AAB100000000000000000042 /* SleepBackfill.swift in Sources */,
 				AAB100000000000000000041 /* ICloudSyncCard.swift in Sources */,
 				AAB100000000000000000040 /* ICloudSyncDecisionView.swift in Sources */,
 				AAB100000000000000000024 /* ICloudSyncPreference.swift in Sources */,
@@ -1290,9 +1298,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSContactsUsageDescription = "ChillMate can let you add a person from Contacts to a private log or STI warning shortcut.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "ChillMate uses Face ID to help protect your sensitive information.";
-				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate reads your sleep to fill in how long you slept after a night, and your heart rate and heart rate variability for your recovery score and your Apple Watch.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ChillMate writes sexual activity and sleep for the nights you log, your breathing sessions, and your aftercare mood. Nothing about what you took or what you wrote goes with them.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "ChillMate uses your location if you choose to add it to a private log entry.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ChillMate uses your location if you choose to add it to a private log entry.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
@@ -1335,9 +1342,8 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSContactsUsageDescription = "ChillMate can let you add a person from Contacts to a private log or STI warning shortcut.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "ChillMate uses Face ID to help protect your sensitive information.";
-				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate reads your sleep to fill in how long you slept after a night, and your heart rate and heart rate variability for your recovery score and your Apple Watch.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ChillMate writes sexual activity and sleep for the nights you log, your breathing sessions, and your aftercare mood. Nothing about what you took or what you wrote goes with them.";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "ChillMate uses your location if you choose to add it to a private log entry.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ChillMate uses your location if you choose to add it to a private log entry.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;

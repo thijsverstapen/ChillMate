@@ -54,7 +54,7 @@ SECTIONS = [
           <tr><td>iCloud-synchronisatie (CloudKit)</td><td>Je eigen privé-iCloud-database</td><td>Alleen als je iCloud-synchronisatie aanzet in de instellingen van ChillMate. Apple bewaart het, en ik kan er niet bij.</td></tr>
           <tr><td>Versleuteld back-upbestand</td><td>Je eigen iCloud Drive</td><td>Alleen als je back-ups aanzet, of zelf een bestand exporteert.</td></tr>
           <tr><td>Apple Watch-spiegeling</td><td>Je eigen horloge, rechtstreeks</td><td>Als je een horloge koppelt. Toestel naar toestel, via Watch Connectivity.</td></tr>
-          <tr><td>Apple Gezondheid</td><td>Blijft op het toestel</td><td>Alleen de categorieën die jij toestaat. HealthKit is lokale opslag, geen dienst.</td></tr>
+          <tr><td>Apple Gezondheid</td><td>Apple Gezondheid op je iPhone</td><td>Alleen de categorieën die jij toestaat. ChillMate schrijft wanneer een nacht was en hoe lang je sliep, nooit wat je nam of wat je schreef.</td></tr>
           <tr><td>Een optionele donatie</td><td>Apple In-App Purchase</td><td>Alleen als jij erop tikt. Apple verwerkt de betaling; ik zie nooit je kaartgegevens.</td></tr>
           <tr><td>Een link waar je op tikt</td><td>Safari, naar die site</td><td>Alleen op jouw tik. ChillMate haalt die pagina's niet zelf op.</td></tr>
           <tr><td>Een gesprek of bericht dat jij stuurt</td><td>Je telefoon-app, je berichten-app</td><td>Alleen op jouw tik, en je ziet het bericht voordat het weggaat.</td></tr>
@@ -116,7 +116,7 @@ SECTIONS = [
     <ul>
       <li>Je profiel, foto, notities over medicijnen, vertrouwenscontact, thuisadres, instellingen en voorkeuren.</li>
       <li>Privélogboek, slaapnotities, gezondheidsgerelateerde invoer en testherinneringen, plannen, dagboekitems, check-ins en gegevens voor je noodkaart.</li>
-      <li>Optionele informatie die je zelf toevoegt vanuit Apple Gezondheid, Contacten, Foto's of Locatievoorzieningen.</li>
+      <li>Slaap, hartslag en HRV uit Apple Gezondheid als je die aanzet, en wat je zelf toevoegt uit Contacten, Foto's of Locatievoorzieningen.</li>
     </ul>
     <p>Een deel van wat je toevoegt is gezondheidsgerelateerd en gevoelig. Het staat alleen op je toestel, onder jouw beheer.</p>
 """),
@@ -124,7 +124,7 @@ SECTIONS = [
     ("use", "lock", "var(--purple)", "Hoe je gegevens gebruikt worden", """
     <ul>
       <li>Om je privéoverzicht, herinneringen, opvolging, noodsnelkoppelingen en reflecties te tonen.</li>
-      <li>Om te synchroniseren met Apple Gezondheid, alleen voor de categorieën die je in iOS goedkeurt.</li>
+      <li>Om alleen de categorieën die je goedkeurt met Apple Gezondheid te synchroniseren. Naar Apple Gezondheid gaat wanneer een nacht was en hoe lang je sliep, nooit wat je nam of wat je schreef.</li>
       <li>Om versleutelde back-ups te maken, alleen als je back-upfuncties aanzet.</li>
     </ul>
     <p>Dit gebeurt allemaal op je toestel. ChillMate stuurt nooit iets van wat je schrijft naar mij.</p>
@@ -155,12 +155,14 @@ SECTIONS = [
     ("permissions", "shield", "var(--primary)", "Toestemmingen op je toestel", """
     <p>Elke toestemming is optioneel en wordt alleen gebruikt waarvoor je hem geeft:</p>
     <ul>
-      <li><strong>Apple Gezondheid.</strong> Lezen en schrijven van alleen de categorieën die je toestaat (zoals slaap, hartslag, HRV en workouts).</li>
+      <li><strong>Apple Gezondheid.</strong> Alleen de categorieën die je toestaat. ChillMate leest je slaap om in te vullen hoe lang je na een nacht sliep, en hartslag en HRV voor je herstelscore. Het schrijft wanneer een nacht was, hoe lang je sliep, ademhalingssessies en je stemming in de nazorg.</li>
       <li><strong>Contacten.</strong> Alleen om een vertrouwenscontact te kunnen kiezen. Het opzoeken gebeurt op je toestel.</li>
       <li><strong>Foto's.</strong> Alleen om een profielfoto in te stellen die jij kiest.</li>
       <li><strong>Locatie.</strong> Alleen om een locatie aan een log te hangen of je huidige locatie mee te sturen in een noodbericht dat jij verstuurt.</li>
       <li><strong>Meldingen.</strong> Voor de herinneringen en check-ins die je aanzet. Discrete formulering kan aan, zodat de tekst op je vergrendelscherm vaag blijft.</li>
     </ul>
+    <p><strong>Wat er in 5.1.0 veranderde.</strong> Vóór versie 5.1.0 stond bij elke nacht die ChillMate naar Apple Gezondheid schreef ook wat je nam, of er een condoom werd gebruikt, of je gepenetreerd werd, en je notitie. Andere apps die je slaap of seksuele activiteit mogen lezen, konden dat ook lezen, en het zat in de export van Gezondheid zelf. Dat klopte niet. ChillMate schrijft ze niet meer, en 5.1.0 vervangt elk item dat het schreef door een kopie zonder die gegevens. Heb je ChillMate de toegang tot Apple Gezondheid afgenomen, dan kan het die items niet bereiken. Je kunt alles wat ChillMate schreef verwijderen in de Gezondheid-app, waar ChillMate bij je apps staat.</p>
+    <p>5.1.0 vraagt ook om minder. Het vraagt niet meer om workouts of ademfrequentie te lezen, die het nooit gebruikte, of om hartslag, HRV of workouts te schrijven, wat het nooit deed.</p>
 """),
 
     ("payments", "tag", "var(--mint)", "Betalingen en donaties", """

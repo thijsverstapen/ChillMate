@@ -50,7 +50,7 @@ struct PrivacyReceiptView: View {
                                 : String(localized: "Strong iPhone file protection is available, but off in settings."), symbol: "lock.doc.fill", isEnabled: localEncryptionEnabled)
                         PrivacyReceiptRow(title: String(localized: "App lock"), detail: lockStatus, symbol: "faceid", isEnabled: requiresFaceID || requiresPIN)
                         PrivacyReceiptRow(title: String(localized: "Apple Health"), detail: healthKitAutoSync
-                                ? String(localized: "ChillMate can read and write only the Health categories you allowed.")
+                                ? String(localized: "Writes when your nights happened and how long you slept, and nothing else about them. Reads only the categories you allowed.")
                                 : String(localized: "Apple Health sync is off."), symbol: "heart.text.square.fill", isEnabled: healthKitAutoSync)
                         PrivacyReceiptRow(title: String(localized: "Notifications"), detail: notificationsEnabled
                                 ? (discreetNotifications

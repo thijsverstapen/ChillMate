@@ -8790,35 +8790,6 @@
         }
       }
     },
-    "Apple Health Sync is connected for logs, sleep, heart rate, HRV, and workouts." : {
-      "comment" : "Confirmation during first-run setup after granting Apple Health access",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Apple-Health-Synchronisierung ist verbunden für Einträge, Schlaf, Herzfrequenz, HRV und Workouts."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La sincronización con Apple Salud está conectada para registros, sueño, frecuencia cardiaca, VFC y entrenamientos."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La synchronisation avec Apple Santé est connectée pour les entrées, le sommeil, la fréquence cardiaque, la VFC et les entraînements."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple Health-synchronisatie is verbonden voor logs, slaap, hartslag, HRV en workouts."
-          }
-        }
-      }
-    },
     "Apple Health sync is off." : {
       "comment" : "Privacy receipt row",
       "localizations" : {
@@ -14907,35 +14878,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ChillMate noemt combinaties niet veilig. Het toont risicosignalen en bronlinks om je te helpen beter geïnformeerde keuzes te maken."
-          }
-        }
-      }
-    },
-    "ChillMate can read and write only the Health categories you allowed." : {
-      "comment" : "Privacy receipt row",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate liest und schreibt nur die Health-Kategorien, die du erlaubt hast."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate solo lee y escribe las categorías de Salud que has permitido."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate ne lit et n’écrit que les catégories Santé que tu as autorisées."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate leest en schrijft alleen de Health-categorieën die je hebt toegestaan."
           }
         }
       }
@@ -27472,34 +27414,6 @@
         }
       }
     },
-    "Heart rate read/write" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Herzfrequenz lesen/schreiben"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lectura/escritura de frecuencia cardíaca"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lecture/écriture de fréquence cardiaque"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hartslag lezen/schrijven"
-          }
-        }
-      }
-    },
     "Heart strain" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -28928,34 +28842,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "HRV"
-          }
-        }
-      }
-    },
-    "HRV read/write" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HRV lesen/schreiben"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lectura/escritura de HRV"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lecture/écriture de HRV"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "HRV lezen/schrijven"
           }
         }
       }
@@ -36870,41 +36756,6 @@
         }
       }
     },
-    "Mindful minutes write" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Achtsame Minuten schreiben"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mindful minutes write"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Escritura de minutos de consciencia plena"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Écriture des minutes de pleine conscience"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mindful-minuten schrijven"
-          }
-        }
-      }
-    },
     "Minimal" : {
       "localizations" : {
         "de" : {
@@ -42908,34 +42759,6 @@
         }
       }
     },
-    "Optional information you choose to add from Apple Health, Contacts, Photos, or Location Services." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Optionale Informationen, die du aus Apple Health, Kontakten, Fotos oder Ortungsdiensten hinzufügst."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Información opcional que eliges añadir desde Apple Health, Contactos, Fotos o Localización."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Informations facultatives que tu choisis d'ajouter depuis Apple Health, Contacts, Photos ou Localisation."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Optionele informatie die je zelf kiest toe te voegen uit Apple Health, Contacten, Foto's of Locatievoorzieningen."
-          }
-        }
-      }
-    },
     "Optional, but helpful. You can call or message this person from Emergency, Panic support, and Safe Route." : {
       "localizations" : {
         "de" : {
@@ -46055,62 +45878,6 @@
         }
       }
     },
-    "Prepare heart-rate signals for safer check-ins and Watch support." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereite Herzfrequenzsignale für sicherere Check-ins und Watch-Unterstützung vor."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prepara las señales de frecuencia cardíaca para check-ins más seguros y soporte del Watch."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prépare les signaux de fréquence cardiaque pour des check-ins plus sûrs et la prise en charge du Watch."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereid hartslagsignalen voor voor veiligere check-ins en Watch-ondersteuning."
-          }
-        }
-      }
-    },
-    "Prepare HRV as a future recovery-score input." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereite HRV als zukünftige Eingabe für die Erholungs-Punktzahl vor."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prepara la HRV como futura entrada de la puntuación de recuperación."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prépare la HRV comme future donnée du score de rétablissement."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bereid HRV voor als toekomstige invoer voor de herstelscore."
-          }
-        }
-      }
-    },
     "Prepare private talking points for a GP, sexual-health service, therapist, addiction-care worker, or trusted professional. You decide whether to share it." : {
       "localizations" : {
         "de" : {
@@ -47689,69 +47456,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bereik dit zonder te ontgrendelen"
-          }
-        }
-      }
-    },
-    "Read resting heart rate and breathing rate as recovery signals." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ruhepuls und Atemfrequenz als Erholungssignale lesen."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Read resting heart rate and breathing rate as recovery signals."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Leer la frecuencia cardíaca en reposo y la respiratoria como señales de recuperación."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lire la fréquence cardiaque au repos et la fréquence respiratoire comme signaux de récupération."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lees rusthartslag en ademhalingsfrequentie als herstelsignalen."
-          }
-        }
-      }
-    },
-    "Read sleep for aftercare and write sleep from saved logs." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Liest Schlaf für die Nachsorge und schreibt Schlaf aus gespeicherten Einträgen."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lee el sueño para los cuidados posteriores y escribe el sueño desde los registros guardados."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lit le sommeil pour les soins après et écrit le sommeil à partir des journaux enregistrés."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lees slaap voor nazorg en schrijf slaap vanuit opgeslagen logs."
           }
         }
       }
@@ -49350,34 +49054,6 @@
         }
       }
     },
-    "Request read/write access for logs, sleep, heart rate, HRV, and workouts." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fordert Lese-/Schreibzugriff für Einträge, Schlaf, Herzfrequenz, HRV und Workouts an."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solicita acceso de lectura/escritura para registros, sueño, frecuencia cardíaca, HRV y entrenamientos."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demande l'accès en lecture/écriture pour les journaux, le sommeil, la fréquence cardiaque, la HRV et les entraînements."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vraag lees-/schrijftoegang voor logs, slaap, hartslag, HRV en workouts."
-          }
-        }
-      }
-    },
     "Require Face ID to open ChillMate and protect your local data." : {
       "localizations" : {
         "de" : {
@@ -49677,41 +49353,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rusthartslag"
-          }
-        }
-      }
-    },
-    "Resting heart rate and breathing" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ruhepuls und Atmung"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resting heart rate and breathing"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frecuencia cardíaca en reposo y respiración"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fréquence cardiaque au repos et respiration"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rusthartslag en ademhaling"
           }
         }
       }
@@ -51133,34 +50774,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Risicocheck opslaan"
-          }
-        }
-      }
-    },
-    "Save sex and sleep entries to Apple Health after each log." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Speichert Sex- und Schlafeinträge nach jedem Eintrag in Apple Health."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guarda las entradas de sexo y sueño en Apple Health después de cada registro."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enregistre les entrées de sexe et de sommeil dans Apple Health après chaque journal."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sla seks- en slaapitems op in Apple Health na elke log."
           }
         }
       }
@@ -53100,34 +52713,6 @@
         }
       }
     },
-    "Sexual activity read/write" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sexuelle Aktivität lesen/schreiben"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lectura/escritura de actividad sexual"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lecture/écriture de l'activité sexuelle"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seksuele activiteit lezen/schrijven"
-          }
-        }
-      }
-    },
     "Sexual health & STI testing" : {
       "localizations" : {
         "de" : {
@@ -54553,34 +54138,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Slaappatronen"
-          }
-        }
-      }
-    },
-    "Sleep read/write" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schlaf lesen/schreiben"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lectura/escritura de sueño"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lecture/écriture du sommeil"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Slaap lezen/schrijven"
           }
         }
       }
@@ -61398,34 +60955,6 @@
         }
       }
     },
-    "To sync with Apple Health only for categories you approve in iOS settings." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Um nur für die in den iOS-Einstellungen genehmigten Kategorien mit Apple Health zu synchronisieren."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Para sincronizar con Apple Health solo en las categorías que apruebes en los ajustes de iOS."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pour synchroniser avec Apple Health uniquement pour les catégories que tu approuves dans les réglages iOS."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Om te synchroniseren met Apple Health, alleen voor categorieën die je goedkeurt in de iOS-instellingen."
-          }
-        }
-      }
-    },
     "Today is saved" : {
       "localizations" : {
         "de" : {
@@ -63280,34 +62809,6 @@
         }
       }
     },
-    "Use Apple Health sexual activity access for Chill log export." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nutze den Apple Health-Zugriff auf sexuelle Aktivität für den Export der Chill-Einträge."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usa el acceso a la actividad sexual de Apple Health para exportar los registros de Chill."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utilise l'accès à l'activité sexuelle d'Apple Health pour exporter les journaux de Chill."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gebruik Apple Health-toegang tot seksuele activiteit voor Chill-logexport."
-          }
-        }
-      }
-    },
     "Use ChillMate as a private wellbeing and reflection tool." : {
       "localizations" : {
         "de" : {
@@ -63737,34 +63238,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gebruik vage tekst op het toegangsscherm en toon details pas na het openen van ChillMate."
-          }
-        }
-      }
-    },
-    "Use workout context later to avoid false stress alerts." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nutze den Workout-Kontext später, um falsche Stress-Warnungen zu vermeiden."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Usa el contexto del entrenamiento más adelante para evitar falsas alertas de estrés."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utilise le contexte d'entraînement plus tard pour éviter les fausses alertes de stress."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gebruik workoutcontext later om valse stresswaarschuwingen te voorkomen."
           }
         }
       }
@@ -66009,34 +65482,6 @@
         }
       }
     },
-    "Workout read/write" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Workouts lesen/schreiben"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lectura/escritura de entrenamientos"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lecture/écriture des entraînements"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Workout lezen/schrijven"
-          }
-        }
-      }
-    },
     "Works for" : {
       "comment" : "A label that describes how long a medication is expected to work.",
       "isCommentAutoGenerated" : true,
@@ -66225,41 +65670,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wow, heel erg bedankt"
-          }
-        }
-      }
-    },
-    "Write breathing sessions from panic support as mindful minutes." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atemsitzungen aus der Panikhilfe als achtsame Minuten schreiben."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Write breathing sessions from panic support as mindful minutes."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guardar las sesiones de respiración del apoyo ante el pánico como minutos de consciencia plena."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Écrire les séances de respiration de l'aide en cas de panique comme minutes de pleine conscience."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schrijf ademhalingssessies uit paniekhulp weg als mindful-minuten."
           }
         }
       }
@@ -73119,6 +72529,692 @@
           }
         }
       }
+    },
+    "Sexual activity" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sexuelle Aktivität"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actividad sexual"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activité sexuelle"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seksuele activiteit"
+          }
+        }
+      },
+      "comment" : "Apple Health category name in Settings."
+    },
+    "Heart rate" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herzfrequenz"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frecuencia cardiaca"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fréquence cardiaque"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hartslag"
+          }
+        }
+      },
+      "comment" : "Apple Health category name in Settings."
+    },
+    "Heart rate variability" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herzfrequenzvariabilität"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variabilidad de la frecuencia cardiaca"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variabilité de la fréquence cardiaque"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hartslagvariabiliteit"
+          }
+        }
+      },
+      "comment" : "Apple Health category name in Settings."
+    },
+    "Mindful minutes" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achtsamkeitsminuten"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minutos de atención plena"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minutes de pleine conscience"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindfulnessminuten"
+          }
+        }
+      },
+      "comment" : "Apple Health category name in Settings."
+    },
+    "Writes when it happened, from nights you save. Nothing else about the night." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert aus den Nächten, die du einträgst, nur, wann es war. Sonst nichts über die Nacht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda cuándo ocurrió, de las noches que registras. Nada más sobre la noche."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre le moment où c’est arrivé, pour les nuits que tu notes. Rien d’autre sur la nuit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijft wanneer het gebeurde, van nachten die je opslaat. Verder niets over de nacht."
+          }
+        }
+      },
+      "comment" : "Caption under the Sexual activity switch in Settings."
+    },
+    "Reads your sleep to fill in how long you slept after a night. Writes sleep you type in only when Apple Health has none for that night." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest deinen Schlaf, um einzutragen, wie lange du nach einer Nacht geschlafen hast. Schlaf, den du selbst eingibst, wird nur gespeichert, wenn Apple Health für diese Nacht keinen hat."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lee tu sueño para anotar cuánto dormiste después de una noche. Guarda el sueño que escribes tú solo si Apple Health no tiene ninguno para esa noche."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lit ton sommeil pour indiquer combien de temps tu as dormi après une nuit. N’enregistre le sommeil que tu saisis que si Apple Health n’en a aucun pour cette nuit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leest je slaap om in te vullen hoe lang je na een nacht hebt geslapen. Schrijft slaap die je zelf invult alleen als Apple Health voor die nacht niets heeft."
+          }
+        }
+      },
+      "comment" : "Caption under the Sleep switch in Settings."
+    },
+    "Reads your heart rate for your Apple Watch, and your resting heart rate to show beside your recovery score." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest deine Herzfrequenz für deine Apple Watch und deinen Ruhepuls, der neben deiner Erholungs-Punktzahl steht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lee tu frecuencia cardiaca para tu Apple Watch, y tu frecuencia cardiaca en reposo para mostrarla junto a tu puntuación de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lit ta fréquence cardiaque pour ton Apple Watch, et ta fréquence cardiaque au repos pour l’afficher à côté de ton score de rétablissement."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leest je hartslag voor je Apple Watch, en je rusthartslag om naast je herstelscore te tonen."
+          }
+        }
+      },
+      "comment" : "Caption under the Heart rate switch in Settings."
+    },
+    "Reads heart rate variability, which is part of your daily recovery score." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liest die Herzfrequenzvariabilität, die in deine tägliche Erholungs-Punktzahl einfließt."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lee la variabilidad de la frecuencia cardiaca, que forma parte de tu puntuación de recuperación diaria."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lit la variabilité de la fréquence cardiaque, qui fait partie de ton score de rétablissement quotidien."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leest hartslagvariabiliteit, die meetelt in je dagelijkse herstelscore."
+          }
+        }
+      },
+      "comment" : "Caption under the Heart rate variability switch in Settings."
+    },
+    "Writes breathing sessions of a minute or longer from panic support as mindful minutes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert Atemübungen aus der Panik-Hilfe, die eine Minute oder länger dauern, als Achtsamkeitsminuten."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda como minutos de atención plena las sesiones de respiración de un minuto o más del apoyo de pánico."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre les séances de respiration d’une minute ou plus du soutien en cas de panique comme minutes de pleine conscience."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijft ademhalingssessies van een minuut of langer uit paniekhulp weg als mindfulnessminuten."
+          }
+        }
+      },
+      "comment" : "Caption under the Mindful minutes switch in Settings."
+    },
+    "Saves when each night happened, and how long you slept, to Apple Health. Nothing else about the night goes with it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert in Apple Health, wann jede Nacht war und wie lange du geschlafen hast. Sonst geht nichts über die Nacht mit."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda en Apple Health cuándo fue cada noche y cuánto dormiste. Nada más sobre la noche va con ello."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre dans Apple Health quand chaque nuit a eu lieu et combien de temps tu as dormi. Rien d’autre sur la nuit n’y est joint."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zet in Apple Health wanneer elke nacht was en hoe lang je sliep. Verder gaat er niets over de nacht mee."
+          }
+        }
+      },
+      "comment" : "Caption under the Add logs to Apple Health switch in Settings."
+    },
+    "Apple Health is connected for your logs, sleep, heart rate and HRV." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Health ist für deine Einträge, deinen Schlaf, deine Herzfrequenz und HRV verbunden."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Health está conectado para tus registros, tu sueño, tu frecuencia cardiaca y tu HRV."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Health est connecté pour tes entrées, ton sommeil, ta fréquence cardiaque et ta HRV."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Health is gekoppeld voor je logs, slaap, hartslag en HRV."
+          }
+        }
+      },
+      "comment" : "Onboarding, after Apple Health access is granted."
+    },
+    "Saves when your nights happened, fills in how long you slept, and reads heart rate and HRV for your recovery score." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert, wann deine Nächte waren, trägt ein, wie lange du geschlafen hast, und liest Herzfrequenz und HRV für deine Erholungs-Punktzahl."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda cuándo fueron tus noches, anota cuánto dormiste y lee la frecuencia cardiaca y la HRV para tu puntuación de recuperación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre quand tes nuits ont eu lieu, indique combien de temps tu as dormi et lit ta fréquence cardiaque et ta HRV pour ton score de rétablissement."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slaat op wanneer je nachten waren, vult in hoe lang je sliep en leest hartslag en HRV voor je herstelscore."
+          }
+        }
+      },
+      "comment" : "Onboarding, under the Apple Health Sync row."
+    },
+    "not logged" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nicht erfasst"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "sin registrar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "non enregistré"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "niet gelogd"
+          }
+        }
+      },
+      "comment" : "Recovery card: no sleep figure for the latest night."
+    },
+    "checked" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "abgehakt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "marcado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "coché"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "afgevinkt"
+          }
+        }
+      },
+      "comment" : "Recovery card: water or food ticked off in aftercare."
+    },
+    "unknown" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "unbekannt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "desconocido"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "inconnu"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "onbekend"
+          }
+        }
+      },
+      "comment" : "Recovery card: water or food not ticked off in aftercare."
+    },
+    "clear" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "keine"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ninguna"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aucune"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "geen"
+          }
+        }
+      },
+      "comment" : "Recovery card: no substances on the latest night."
+    },
+    "logged" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "erfasst"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "registradas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "enregistrées"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gelogd"
+          }
+        }
+      },
+      "comment" : "Recovery card: substances were logged on the latest night."
+    },
+    "none" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "keine"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ninguno"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "aucun"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "geen"
+          }
+        }
+      },
+      "comment" : "Recovery card: no symptoms selected."
+    },
+    "%lld selected" : {
+      "localizations" : {
+        "de" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld ausgewählt"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld ausgewählt"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld seleccionado"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld seleccionados"
+                }
+              }
+            }
+          }
+        },
+        "fr" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld sélectionné"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld sélectionnés"
+                }
+              }
+            }
+          }
+        },
+        "nl" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld geselecteerd"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld geselecteerd"
+                }
+              }
+            }
+          }
+        }
+      },
+      "comment" : "Recovery card: how many symptoms were selected."
+    },
+    "Sleep, heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schlaf, Herzfrequenz und HRV aus Apple Health, wenn du sie einschaltest, und alles, was du aus Kontakten, Fotos oder Ortungsdiensten hinzufügst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sueño, frecuencia cardiaca y HRV de Apple Health si los activas, y lo que elijas añadir desde Contactos, Fotos o Localización."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le sommeil, la fréquence cardiaque et la HRV d’Apple Health si tu les actives, et ce que tu choisis d’ajouter depuis Contacts, Photos ou Localisation."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slaap, hartslag en HRV uit Apple Health als je die aanzet, en wat je zelf toevoegt uit Contacten, Foto's of Locatievoorzieningen."
+          }
+        }
+      },
+      "comment" : "In-app privacy policy, What ChillMate can save."
+    },
+    "To sync with Apple Health only for the categories you approve. What goes to Apple Health is when a night happened and how long you slept, never what you took or what you wrote." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um nur für die Kategorien, die du erlaubst, mit Apple Health zu synchronisieren. In Apple Health landet, wann eine Nacht war und wie lange du geschlafen hast, nie, was du genommen oder geschrieben hast."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para sincronizar con Apple Health solo las categorías que apruebes. A Apple Health va cuándo fue una noche y cuánto dormiste, nunca lo que tomaste ni lo que escribiste."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour synchroniser avec Apple Health uniquement les catégories que tu approuves. Ce qui va dans Apple Health, c’est quand une nuit a eu lieu et combien de temps tu as dormi, jamais ce que tu as pris ni ce que tu as écrit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om alleen de categorieën die je goedkeurt met Apple Health te synchroniseren. Naar Apple Health gaat wanneer een nacht was en hoe lang je sliep, nooit wat je nam of wat je schreef."
+          }
+        }
+      },
+      "comment" : "In-app privacy policy, How it is used."
+    },
+    "Writes when your nights happened and how long you slept, and nothing else about them. Reads only the categories you allowed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speichert, wann deine Nächte waren und wie lange du geschlafen hast, sonst nichts darüber. Liest nur die Kategorien, die du erlaubt hast."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guarda cuándo fueron tus noches y cuánto dormiste, y nada más sobre ellas. Solo lee las categorías que has permitido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistre quand tes nuits ont eu lieu et combien de temps tu as dormi, et rien d’autre à leur sujet. Ne lit que les catégories que tu as autorisées."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijft wanneer je nachten waren en hoe lang je sliep, en verder niets daarover. Leest alleen de categorieën die je hebt toegestaan."
+          }
+        }
+      },
+      "comment" : "Privacy receipt, Apple Health row when sync is on."
     }
   },
   "version" : "1.1"

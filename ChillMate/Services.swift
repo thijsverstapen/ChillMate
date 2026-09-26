@@ -76,18 +76,19 @@ extension NotificationScheduling {
 /// to cover the whole class would be a second copy of it to keep in step.
 @MainActor
 protocol HealthReading: Sendable {
+    func asleepIntervals(in window: DateInterval, excludingOwnSamples: Bool) async throws -> [DateInterval]
     func latestHRV() async throws -> Double?
     func latestHeartRate() async throws -> Double?
     func latestRestingHeartRate() async throws -> Double?
+    func removeLegacyMetadata(matching nights: [HealthLogSnapshot]) async throws -> Bool
     func requestAuthorization() async throws
     // Two overloads on the concrete type: one asks for everything, one asks for
     // a named set. Both are called, so both are here.
     func requestAuthorization(scopes: Set<HealthKitPermissionScope>) async throws
-    func save(_ snapshot: HealthLogSnapshot) async throws
+    func save(_ snapshot: HealthLogSnapshot, sleepReadAllowed: Bool) async throws
     func saveMindfulMinutes(from startDate: Date, to endDate: Date) async throws
     func saveStateOfMind(date: Date, mood: AftercareMood) async throws
     func sleepHours(from startDate: Date, to endDate: Date) async throws -> Double
-    func sleepHoursAfterEntry(startDate: Date) async throws -> Double
 }
 
 /// What the phone tells the watch.

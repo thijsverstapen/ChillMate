@@ -145,7 +145,6 @@ struct ProfileSetupView: View {
     @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthKitSleepReadWriteEnabled = false
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
-    @AppStorage(DefaultsKey.healthKitWorkoutReadEnabled) private var healthKitWorkoutReadEnabled = false
     // Defaults to the language the app actually resolved, not a hard "en".
     // LocalizationService seeds the stored key at launch on every device whose
     // language ChillMate ships, so this fallback only matters on a device set to
@@ -917,15 +916,19 @@ struct ProfileSetupView: View {
 
         Task {
             do {
-                try await services.health.requestAuthorization(scopes: Set(HealthKitPermissionScope.allCases))
+                // Exactly what the switches below turn on. This used to ask for every
+                // category, including breathing sessions and resting heart rate that
+                // nothing here enabled.
+                try await services.health.requestAuthorization(scopes: [
+                    .sexualActivityWrite, .sleepReadWrite, .heartRateRead, .heartRateVariabilityRead
+                ])
                 await MainActor.run {
                     healthKitAutoSync = true
                     healthKitSexualActivityWriteEnabled = true
                     healthKitSleepReadWriteEnabled = true
                     healthKitHeartRateReadEnabled = true
                     healthKitHRVReadEnabled = true
-                    healthKitWorkoutReadEnabled = true
-                    permissionMessage = String(localized: "Apple Health Sync is connected for logs, sleep, heart rate, HRV, and workouts.")
+                    permissionMessage = String(localized: "Apple Health is connected for your logs, sleep, heart rate and HRV.")
                     isCheckingPermissions = false
                 }
             } catch {
@@ -935,7 +938,6 @@ struct ProfileSetupView: View {
                     healthKitSleepReadWriteEnabled = false
                     healthKitHeartRateReadEnabled = false
                     healthKitHRVReadEnabled = false
-                    healthKitWorkoutReadEnabled = false
                     permissionMessage = error.localizedDescription
                     isCheckingPermissions = false
                 }
@@ -1485,7 +1487,7 @@ private struct ProfilePermissionsPage: View {
 
                 PermissionSetupCard(
                     title: String(localized: "Apple Health Sync"),
-                    subtitle: String(localized: "Request read/write access for logs, sleep, heart rate, HRV, and workouts."),
+                    subtitle: String(localized: "Saves when your nights happened, fills in how long you slept, and reads heart rate and HRV for your recovery score."),
                     symbol: "heart.text.square.fill",
                     isOn: healthKitAutoSync,
                     action: requestHealth

@@ -135,42 +135,6 @@
         }
       }
     },
-    "NSHealthClinicalHealthRecordsShareUsageDescription" : {
-      "comment" : "Shown when requesting access to clinical health records.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate kann Schlafdaten und Angaben zu sexueller Aktivität mit Apple Health synchronisieren, damit dein Tracking nützlicher und persönlicher wird."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate puede sincronizar datos de sueño y registros de actividad sexual con Apple Salud para que tu seguimiento sea más útil y personalizado."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate peut synchroniser vos données de sommeil et d'activité sexuelle avec Apple Santé pour un suivi plus utile et personnalisé."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate kan slaapgegevens en seksuele activiteit synchroniseren met Apple Gezondheid, zodat je bijhouden nuttiger en persoonlijker wordt."
-          }
-        }
-      }
-    },
     "NSHealthShareUsageDescription" : {
       "comment" : "Shown when requesting permission to read from Apple Health.",
       "extractionState" : "manual",
@@ -178,31 +142,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate kann Schlafdaten und Angaben zu sexueller Aktivität mit Apple Health synchronisieren, damit dein Tracking nützlicher und persönlicher wird."
+            "value" : "ChillMate liest deinen Schlaf, um einzutragen, wie lange du nach einer Nacht geschlafen hast, und deine Herzfrequenz und Herzfrequenzvariabilität für deine Erholungs-Punktzahl und deine Apple Watch."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized."
+            "value" : "ChillMate reads your sleep to fill in how long you slept after a night, and your heart rate and heart rate variability for your recovery score and your Apple Watch."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate puede sincronizar datos de sueño y registros de actividad sexual con Apple Salud para que tu seguimiento sea más útil y personalizado."
+            "value" : "ChillMate lee tu sueño para anotar cuánto dormiste después de una noche, y tu frecuencia cardiaca y su variabilidad para tu puntuación de recuperación y tu Apple Watch."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate peut synchroniser vos données de sommeil et d'activité sexuelle avec Apple Santé pour un suivi plus utile et personnalisé."
+            "value" : "ChillMate lit ton sommeil pour indiquer combien de temps tu as dormi après une nuit, ainsi que ta fréquence cardiaque et sa variabilité pour ton score de rétablissement et ton Apple Watch."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate kan slaapgegevens en seksuele activiteit synchroniseren met Apple Gezondheid, zodat je bijhouden nuttiger en persoonlijker wordt."
+            "value" : "ChillMate leest je slaap om in te vullen hoe lang je na een nacht hebt geslapen, en je hartslag en hartslagvariabiliteit voor je herstelscore en je Apple Watch."
           }
         }
       }
@@ -214,31 +178,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate kann Schlafdaten und Angaben zu sexueller Aktivität mit Apple Health synchronisieren, damit dein Tracking nützlicher und persönlicher wird."
+            "value" : "ChillMate speichert sexuelle Aktivität und Schlaf für die Nächte, die du einträgst, deine Atemübungen und deine Stimmung in der Nachsorge. Nichts darüber, was du genommen oder geschrieben hast, geht mit."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate can sync sleep data and sexual activity logs with Apple Health to make tracking more useful and personalized."
+            "value" : "ChillMate writes sexual activity and sleep for the nights you log, your breathing sessions, and your aftercare mood. Nothing about what you took or what you wrote goes with them."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate puede sincronizar datos de sueño y registros de actividad sexual con Apple Salud para que tu seguimiento sea más útil y personalizado."
+            "value" : "ChillMate guarda la actividad sexual y el sueño de las noches que registras, tus sesiones de respiración y tu estado de ánimo en los cuidados posteriores. Nada sobre lo que tomaste ni lo que escribiste va con ellos."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate peut synchroniser vos données de sommeil et d'activité sexuelle avec Apple Santé pour un suivi plus utile et personnalisé."
+            "value" : "ChillMate enregistre l’activité sexuelle et le sommeil des nuits que tu notes, tes séances de respiration et ton humeur dans les soins après. Rien sur ce que tu as pris ni sur ce que tu as écrit n’y est joint."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate kan slaapgegevens en seksuele activiteit synchroniseren met Apple Gezondheid, zodat je bijhouden nuttiger en persoonlijker wordt."
+            "value" : "ChillMate schrijft seksuele activiteit en slaap voor de nachten die je logt, je ademhalingssessies en je stemming in de nazorg. Niets over wat je nam of wat je schreef gaat mee."
           }
         }
       }

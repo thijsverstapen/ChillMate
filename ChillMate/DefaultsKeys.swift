@@ -71,9 +71,11 @@ enum DefaultsKey {
     static let healthKitSleepReadWriteEnabled = "healthKitSleepReadWriteEnabled"
     static let healthKitHeartRateReadEnabled = "healthKitHeartRateReadEnabled"
     static let healthKitHRVReadEnabled = "healthKitHRVReadEnabled"
-    static let healthKitWorkoutReadEnabled = "healthKitWorkoutReadEnabled"
-    static let healthKitVitalsReadEnabled = "healthKitVitalsReadEnabled"
     static let healthKitMindfulWriteEnabled = "healthKitMindfulWriteEnabled"
+
+    /// Set once every sample an earlier version wrote into Apple Health with the
+    /// night's details in its metadata has been replaced. See `HealthLegacyCleanup`.
+    static let healthLegacyMetadataRemoved = "healthLegacyMetadataRemoved"
     static let lastKnownHRVms = "lastKnownHRVms"
     static let lastDailyRecoveryScore = "lastDailyRecoveryScore"
     static let reductionGoalSessions = "reductionGoalSessions"
