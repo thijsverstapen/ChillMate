@@ -248,35 +248,6 @@ struct DailyScorePalette {
     }
 }
 
-// Kept as typealias so any remaining call-sites continue to compile.
-typealias TestingOnlyNoticeCard = SafetyNoticeCard
-
-struct SafetyNoticeCard: View {
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "checkmark.shield.fill")
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(Color.chillIconOrange)
-                .frame(width: 30, height: 30)
-                .glassSurface(radius: 15, tint: Color.chillIconOrange.opacity(0.12))
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Safety notice")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.chillText)
-
-                Text("ChillMate is a private reflection and wellbeing tool. It does not diagnose, treat, recommend substance use, or give dosage advice. For urgent help, use emergency services or Support.")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .glassSurface(radius: 22, tint: Color.chillVisibleOrange.opacity(0.08), interactive: true)
-    }
-}
-
 struct MedicalSafetyDisclaimerCard: View {
     var compact = false
 
@@ -304,15 +275,6 @@ struct MedicalSafetyDisclaimerCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(compact ? 12 : 14)
         .glassSurface(radius: compact ? 20 : 24, tint: Color.chillVisibleOrange.opacity(0.08), interactive: true)
-    }
-}
-
-struct LiquidGlassGroup<Content: View>: View {
-    var spacing: CGFloat = 18
-    @ViewBuilder var content: () -> Content
-
-    var body: some View {
-        content()
     }
 }
 

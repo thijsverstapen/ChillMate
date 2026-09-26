@@ -146,13 +146,14 @@ are the first CI job.
   view referenced nowhere. A view that computes the right thing and is shown to
   nobody passes every test there is — `JournalNightDraftCard` was an entire
   5.1.0 feature, tested and translated, on no screen, and was found only by
-  running the app. Fifteen older orphans are allowlisted in the script; shrink
-  that list, never grow it without a reason written beside the name.
+  running the app. The allowlist in the script is empty since 5.1.0, when the
+  fifteen older orphans were deleted; keep it that way, and never add to it
+  without a reason written beside the name.
 - **No build artifacts tracked.** `DerivedData/`, `build/` and `*.log` are ignored.
 
 ## Tests
 
-625 unit tests. CI runs the whole suite once per language, so an assertion that only
+About 790 unit tests. CI runs the whole suite once per language, so an assertion that only
 holds in English fails four times over.
 
 - **Never assert an English literal against localized output.** Name the line through

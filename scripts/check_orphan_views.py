@@ -22,10 +22,9 @@ puts nothing in front of anyone, and it is exactly how an orphan hides —
 `typealias TestingOnlyNoticeCard = SafetyNoticeCard` mentioned it, and nothing
 mentioned the alias.
 
-`KNOWN_ORPHANS` is what was already orphaned when the check arrived. Each is
-either superseded or waiting on a decision, and shrinking the list — by
-deleting the view, or by showing it — is the point. Adding to it needs a reason
-written next to the name.
+`KNOWN_ORPHANS` held what was already orphaned when the check arrived, fifteen
+views, all deleted in 5.1.0. Adding to it needs a reason written next to the
+name.
 """
 
 import re
@@ -39,32 +38,15 @@ TARGETS = (
     "ChillMateLiveActivityExtension",
 )
 
-KNOWN_ORPHANS = {
-    # Superseded by the provenance line in the risk checker's own finding row,
-    # which is where warnings are actually shown.
-    "SubstanceInteractionCard",
-    # Superseded by the onboarding "What ChillMate is not" disclaimer and the
-    # "Not medical advice" card on Home. Last touched in the App Store Review
-    # fix, so confirm those are what satisfied Review before deleting it.
-    "SafetyNoticeCard",
-    # Orphaned before 5.1.0 and not yet looked at individually.
-    "CalendarOverviewButton",
-    "DailyScoreStatusPill",
-    "ProfileToolbarIcon",
-    "RecoveryStreakBadge",
-    "SkippedNightCard",
-    "SubstanceOverview",
-    "TimelineSection",
-    "JournalEntryCard",
-    "MiniMetricBubble",
-    "ProfileIntroTile",
-    "ProfileMeasurementStepper",
-    "ProfileSetupHeroCard",
-    "ProfileSetupStepperRow",
-}
+# Empty since 5.1.0, when the fifteen views orphaned before this check existed
+# were deleted. Anything added here needs its reason written beside it.
+KNOWN_ORPHANS: set[str] = set()
 
+# Generic parameters are allowed between the name and the colon. Without them a
+# view like `struct LiquidGlassGroup<Content: View>: View` was never seen, and it
+# sat unused for as long as the check had existed.
 DECLARATION = re.compile(
-    r"^(?:private |fileprivate )?struct (\w+)\s*:\s*[^{]*\bView\b", re.MULTILINE
+    r"^(?:private |fileprivate )?struct (\w+)(?:<[^>{]*>)?\s*:\s*[^{]*\bView\b", re.MULTILINE
 )
 
 

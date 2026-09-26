@@ -1692,6 +1692,7 @@ RELEASES = [
         "Fixed: most of the recovery card's small print, such as \"not logged\" and \"none\", was in English whichever language you chose.",
         "Fixed: saying you were home safe from the watch quieted the rest of the night's check-ins only until the app was next opened, which put them all back. It also removed every later weekend's check-ins until then.",
         "The Apple Watch Safety screen no longer has the button that opened the emergency page on your iPhone. Calling emergency services, or your trusted contact, from the watch works as before.",
+        "The app is about 2.7 MB smaller. A setting meant only for testing had been left on in every release since the first, and the launch image was stored twice, one copy unused. Twenty pieces of screen that nothing ever showed are gone too.",
         "Long histories are faster. The stored data is indexed on the dates everything is sorted by, and the check for whether a night had anything logged no longer sorts a list to answer yes or no.",
     ]),
     ("5.0.0", "501", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [

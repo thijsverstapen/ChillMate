@@ -456,28 +456,6 @@ private struct ProfileEditView: View {
     }
 }
 
-private struct ProfileMeasurementStepper: View {
-    let title: String
-    @Binding var value: Double
-    let range: ClosedRange<Double>
-    let unit: String
-
-    var body: some View {
-        Stepper(value: $value, in: range, step: 1) {
-            HStack {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
-                Spacer()
-                Text("\(Int(value.rounded())) \(unit)")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-        }
-        .tint(Color.chillPrimary)
-    }
-}
-
 private struct ProfileMedicationEditor: View {
     @Environment(\.modelContext) private var modelContext
     @Bindable var profile: UserProfile
