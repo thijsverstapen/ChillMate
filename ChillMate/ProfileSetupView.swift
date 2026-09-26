@@ -123,7 +123,7 @@ struct AgeVerificationInfo: View {
             if isExpanded {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("ChillMate is an adults-only wellbeing app. It includes harm-reduction, sexual-health, and substance-safety information written for people 18 and older, so it checks your age before creating a profile.")
-                    Text("You can confirm your age in two private ways. The date of birth you enter stays on this device. The optional Apple Account check returns only a yes-or-no \"18 or older\" answer from Apple; it never shares your birthdate or name with the app.")
+                    Text("You can confirm your age in two private ways. The date of birth you enter stays on this device unless you turn on iCloud sync. The optional Apple Account check returns only a yes-or-no \"18 or older\" answer from Apple; it never shares your birthdate or name with the app.")
                     Text("Your age is used only on this device to unlock ChillMate. It is never sent to the developer, never uploaded, and never shared. You can leave the Apple check off and simply use your date of birth.")
                 }
                 .font(.caption)
@@ -145,7 +145,6 @@ struct ProfileSetupView: View {
     @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthKitSleepReadWriteEnabled = false
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
-    @AppStorage(DefaultsKey.healthKitWorkoutReadEnabled) private var healthKitWorkoutReadEnabled = false
     // Defaults to the language the app actually resolved, not a hard "en".
     // LocalizationService seeds the stored key at launch on every device whose
     // language ChillMate ships, so this fallback only matters on a device set to
@@ -917,15 +916,19 @@ struct ProfileSetupView: View {
 
         Task {
             do {
-                try await services.health.requestAuthorization(scopes: Set(HealthKitPermissionScope.allCases))
+                // Exactly what the switches below turn on. This used to ask for every
+                // category, including breathing sessions and resting heart rate that
+                // nothing here enabled.
+                try await services.health.requestAuthorization(scopes: [
+                    .sexualActivityWrite, .sleepReadWrite, .heartRateRead, .heartRateVariabilityRead
+                ])
                 await MainActor.run {
                     healthKitAutoSync = true
                     healthKitSexualActivityWriteEnabled = true
                     healthKitSleepReadWriteEnabled = true
                     healthKitHeartRateReadEnabled = true
                     healthKitHRVReadEnabled = true
-                    healthKitWorkoutReadEnabled = true
-                    permissionMessage = String(localized: "Apple Health Sync is connected for logs, sleep, heart rate, HRV, and workouts.")
+                    permissionMessage = String(localized: "Apple Health is connected for your logs, sleep, heart rate and HRV.")
                     isCheckingPermissions = false
                 }
             } catch {
@@ -935,7 +938,6 @@ struct ProfileSetupView: View {
                     healthKitSleepReadWriteEnabled = false
                     healthKitHeartRateReadEnabled = false
                     healthKitHRVReadEnabled = false
-                    healthKitWorkoutReadEnabled = false
                     permissionMessage = error.localizedDescription
                     isCheckingPermissions = false
                 }
@@ -1159,7 +1161,7 @@ private struct QuickStartSheet: View {
                         .opacity(canStart ? 1 : 0.55)
                         .accessibilityIdentifier(AccessibilityID.setupQuickStartButton)
 
-                        Text("Your profile lives on this device and nowhere else. Filling it in later makes the timers and the combination checker more useful to you, and nothing in the app is locked behind it.")
+                        Text("Your profile stays on this device unless you turn on iCloud sync. Filling it in later makes the timers and the combination checker more useful to you, and nothing in the app is locked behind it.")
                             .font(.caption)
                             .foregroundStyle(Color.chillSecondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -1485,7 +1487,7 @@ private struct ProfilePermissionsPage: View {
 
                 PermissionSetupCard(
                     title: String(localized: "Apple Health Sync"),
-                    subtitle: String(localized: "Request read/write access for logs, sleep, heart rate, HRV, and workouts."),
+                    subtitle: String(localized: "Saves when your nights happened, fills in how long you slept, and reads heart rate and HRV for your recovery score."),
                     symbol: "heart.text.square.fill",
                     isOn: healthKitAutoSync,
                     action: requestHealth

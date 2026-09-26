@@ -423,16 +423,28 @@ extension SubstanceReference.Unit {
 
 extension SubstanceReference.Timing {
     /// "30–45 min", or "1.5–2.5 h" once a bound passes an hour.
+    ///
+    /// Both ends at most one decimal. The lower bound always had that limit and
+    /// the upper did not, so a range whose top converts to a repeating fraction
+    /// printed it in full: 140 minutes of swallowed ketamine read "1–2,333333 hr"
+    /// on the risk checker. Found by looking at the running app; no test looked
+    /// at the rendered string.
+    ///
+    /// This is display precision for a duration and nothing more — the stored
+    /// minutes are untouched. The dose formatter above deliberately keeps its
+    /// precision: rounding how long something lasts is harmless, rounding how
+    /// much of it someone takes is not.
     public static func describe(_ bounds: ClosedRange<Double>) -> String {
+        let oneDecimal = FloatingPointFormatStyle<Double>.number.precision(.fractionLength(0...1))
         if bounds.upperBound >= 60 {
-            let lower = (bounds.lowerBound / 60).formatted(.number.precision(.fractionLength(0...1)))
+            let lower = (bounds.lowerBound / 60).formatted(oneDecimal)
             let upper = Measurement(value: bounds.upperBound / 60, unit: UnitDuration.hours)
-                .formatted(.measurement(width: .abbreviated, usage: .asProvided))
+                .formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: oneDecimal))
             return bounds.lowerBound == bounds.upperBound ? upper : "\(lower)–\(upper)"
         }
-        let lower = bounds.lowerBound.formatted(.number.precision(.fractionLength(0...1)))
+        let lower = bounds.lowerBound.formatted(oneDecimal)
         let upper = Measurement(value: bounds.upperBound, unit: UnitDuration.minutes)
-            .formatted(.measurement(width: .abbreviated, usage: .asProvided))
+            .formatted(.measurement(width: .abbreviated, usage: .asProvided, numberFormatStyle: oneDecimal))
         return bounds.lowerBound == bounds.upperBound ? upper : "\(lower)–\(upper)"
     }
 

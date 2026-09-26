@@ -19,57 +19,100 @@ struct ChillMateApp: App {
     /// `LocalSecurityService.saveDuressPIN`.
     @AppStorage(DefaultsKey.duressModeActive) private var duressMode = false
 
+    /// "on", "off", or nil for an install from before 5.1.0 that has not been
+    /// asked. See `ICloudSyncPreference`.
+    @AppStorage(DefaultsKey.iCloudSyncChoice) private var iCloudSyncChoice: String?
+
+    /// Settles a fresh install as off before anything reads the choice, so only an
+    /// install that already has a store is ever asked.
+    init() {
+        ICloudSyncPreference.resolveAtLaunch(storeExists: ICloudSyncPreference.defaultStoreExists)
+    }
+
     var body: some Scene {
         WindowGroup {
-            // Single onboarding path: AppLockView → AppHomeView.
-            // AppHomeView shows ProfileSetupView when no UserProfile exists,
-            // which is the sole first-run onboarding experience.
-            AppLockView {
-                AppHomeView()
+            // The store's CloudKit setting is fixed when the container is built,
+            // and `mainTree` builds it. So an install that has not answered sees
+            // the question first and the container is not created until it has —
+            // otherwise the first session after updating would sync on a setting
+            // nobody chose.
+            //
+            // Parsed, not compared with nil: a stored value that is neither answer
+            // must be asked again, and a raw nil check would let it through to a
+            // container that treats it as undecided and mirrors.
+            if iCloudSyncChoice.flatMap(ICloudSyncPreference.Choice.init(rawValue:)) == nil {
+                ICloudSyncDecisionView { choice in
+                    iCloudSyncChoice = choice.rawValue
+                }
+                .preferredColorScheme(.dark)
+                .environment(\.locale, LocalizationService.effectiveLocale)
+            } else {
+                mainTree
             }
-            // Keyed on duress mode so unlocking with the duress PIN rebuilds the
-            // tree against the empty store, and the real PIN rebuilds it back.
-            // Without the key SwiftUI keeps the container it was handed at launch.
-            .id(duressMode)
-            .modelContainer(ChillMateModelContainer.container())
-            .preferredColorScheme(.dark)
-            // Dates, numbers and measurements follow the chosen language right away.
-            // Catalog string lookup is bound to the bundle resolved at process start,
-            // so that part lands on the next launch (the picker says so).
-            // Resolves to the untouched system locale when no language was chosen,
-            // so a user's region and 24-hour-time preference survive.
-            .environment(\.locale, LocalizationService.effectiveLocale)
-            // Publishes the combined system + in-app reduce-motion preference to
-            // every descendant, including sheets and covers.
-            .chillMotionPreference()
-            .onAppear {
+        }
+    }
+
+    /// The app itself, and where its UI first creates the model container.
+    ///
+    /// Not the only caller: Siri intents and `LoggedNightQuery` call
+    /// `ChillMateModelContainer.container()` without any UI, which is why an
+    /// undecided install keeps its old behaviour rather than being asked there.
+    @ViewBuilder
+    private var mainTree: some View {
+        // Single onboarding path: AppLockView → AppHomeView.
+        // AppHomeView shows ProfileSetupView when no UserProfile exists,
+        // which is the sole first-run onboarding experience.
+        AppLockView {
+            AppHomeView()
+        }
+        // Keyed on duress mode so unlocking with the duress PIN rebuilds the
+        // tree against the empty store, and the real PIN rebuilds it back.
+        // Without the key SwiftUI keeps the container it was handed at launch.
+        .id(duressMode)
+        .modelContainer(ChillMateModelContainer.container())
+        .preferredColorScheme(.dark)
+        // Dates, numbers and measurements follow the chosen language right away.
+        // Catalog string lookup is bound to the bundle resolved at process start,
+        // so that part lands on the next launch (the picker says so).
+        // Resolves to the untouched system locale when no language was chosen,
+        // so a user's region and 24-hour-time preference survive.
+        .environment(\.locale, LocalizationService.effectiveLocale)
+        // Publishes the combined system + in-app reduce-motion preference to
+        // every descendant, including sheets and covers.
+        .chillMotionPreference()
+        .onAppear {
+            adoptControlDestination()
+            recordAppUse()
+            refreshPrivacyAndNotificationState()
+            services.watch.activate()
+            services.spotlight.indexTools()
+            ChillTips.configure()
+            TypedRecordsMigration.runIfNeeded()
+            DataRetentionSweep.runIfNeeded()
+            Task {
+                await services.spotlight.removeJournalIndexIfNeeded(defaults: .standard)
+                await HealthLegacyCleanup.runIfNeeded(services: services)
+                await SleepBackfill.run(services: services)
+            }
+        }
+        .onContinueUserActivity(CSSearchableItemActionType) { activity in
+            guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
+            if id == SpotlightService.riskCheckerItemID {
+                UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: DefaultsKey.pendingAppDestination)
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
                 adoptControlDestination()
                 recordAppUse()
-                refreshPrivacyAndNotificationState()
-                services.watch.activate()
-                services.spotlight.indexTools()
-                ChillTips.configure()
-                TypedRecordsMigration.runIfNeeded()
-                DataRetentionSweep.runIfNeeded()
+                refreshLiveActivities()
+                services.watch.syncStandaloneState()
+                // Somebody who slept since the app was last in front finds the
+                // night filled in when they come back to it.
+                Task { await SleepBackfill.run(services: services) }
             }
-            .onContinueUserActivity(CSSearchableItemActionType) { activity in
-                guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
-                if id == SpotlightService.riskCheckerItemID {
-                    UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: DefaultsKey.pendingAppDestination)
-                } else if id.hasPrefix("journal-") {
-                    UserDefaults.standard.set(NotificationDestination.journal.rawValue, forKey: DefaultsKey.pendingAppDestination)
-                }
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
-                    adoptControlDestination()
-                    recordAppUse()
-                    refreshLiveActivities()
-                    services.watch.syncStandaloneState()
-                }
 
-                refreshPrivacyAndNotificationState()
-            }
+            refreshPrivacyAndNotificationState()
         }
     }
 
@@ -227,6 +270,12 @@ enum LocalizedEnumStrings {
     /// String Catalog (so they are translated and never flagged stale), even though
     /// they are rendered at runtime via `localizedDisplayName` rather than literals.
     static let anchors: [String] = [
+        // HealthKitPermissionScope
+        String(localized: "Sexual activity"),
+        String(localized: "Sleep"),
+        String(localized: "Heart rate"),
+        String(localized: "Heart rate variability"),
+        String(localized: "Mindful minutes"),
         String(localized: "Prefer not to say"),
         String(localized: "24 h"),
         String(localized: "3MMC"),
@@ -296,9 +345,7 @@ enum LocalizedEnumStrings {
         String(localized: "Grounded"),
         String(localized: "HIV"),
         String(localized: "HPV"),
-        String(localized: "HRV read/write"),
         String(localized: "Health"),
-        String(localized: "Heart rate read/write"),
         String(localized: "Heartbreak"),
         String(localized: "Hepatitis B"),
         String(localized: "Hepatitis C"),
@@ -357,10 +404,8 @@ enum LocalizedEnumStrings {
         String(localized: "Relationship"),
         String(localized: "Safety review"),
         String(localized: "Same session"),
-        String(localized: "Sexual activity read/write"),
         String(localized: "Shaky"),
         String(localized: "Side"),
-        String(localized: "Sleep read/write"),
         String(localized: "Smoked"),
         String(localized: "Sniffed"),
         String(localized: "Social pressure"),
@@ -380,7 +425,6 @@ enum LocalizedEnumStrings {
         String(localized: "Versatile"),
         String(localized: "Viagra"),
         String(localized: "Work pressure"),
-        String(localized: "Workout read/write"),
         String(localized: "iCloud backup")
     ]
 }

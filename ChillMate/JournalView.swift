@@ -23,6 +23,7 @@ struct JournalView: View {
     @State private var isShowingMorePrompts = false
     @State private var isEditing = false
     @State private var isShowingMonthCalendar = false
+    @State private var isShowingSearch = false
     @State private var journalHaptic: SensoryFeedback?
     @State private var journalHapticTick = 0
 
@@ -86,6 +87,21 @@ struct JournalView: View {
                                 Spacer(minLength: 0)
 
                                 Button {
+                                    isShowingSearch = true
+                                } label: {
+                                    Image(systemName: "magnifyingglass")
+                                        .font(.subheadline.weight(.bold))
+                                        .foregroundStyle(Color.chillPrimary)
+                                        .frame(width: 34, height: 34)
+                                        .background(Color.chillPrimary.opacity(0.14), in: Circle())
+                                        .contentShape(Circle())
+                                }
+                                .buttonStyle(ChillPlainButtonStyle())
+                                .disabled(mode == .editing)
+                                .opacity(mode == .editing ? 0.4 : 1)
+                                .accessibilityLabel(Text("Search your journal"))
+
+                                Button {
                                     isShowingMonthCalendar = true
                                 } label: {
                                     Image(systemName: "calendar")
@@ -126,6 +142,20 @@ struct JournalView: View {
                                     }
                                     .accessibilityLabel("Delete entry")
                                 }
+
+                                // Offered once the day is saved, not while it is being
+                                // written: reading a half-finished sentence would offer
+                                // half a night. It renders nothing when the model is
+                                // unavailable or finds nothing, so on most devices and
+                                // in the Simulator this is invisible by design.
+                                //
+                                // This card was built, tested and translated in the
+                                // first pass and then placed on no screen at all — the
+                                // same shape as the corroboration card B2 revived. It
+                                // was found by running the app, not by the suite, which
+                                // tests the logic around the model and cannot see
+                                // whether anything shows the result.
+                                JournalNightDraftCard(text: entry.searchableText, date: entry.date)
                             } else {
                                 // ── Editable form (new entry, or editing an existing one) ──
                                 JournalPromptField(title: String(localized: "What do you remember?"), text: $rememberClearly)
@@ -192,6 +222,12 @@ struct JournalView: View {
             .sheet(isPresented: $isShowingMonthCalendar) {
                 JournalMonthCalendarSheet(date: $date)
             }
+            // Picking a result moves the journal to that day, which is the whole
+            // point of the search: you are looking for what you wrote, and what
+            // you want next is to be standing on it.
+            .sheet(isPresented: $isShowingSearch) {
+                JournalSearchView(selectedDate: $date)
+            }
     }
 
     private func loadPhotos(_ items: [PhotosPickerItem]) {
@@ -219,7 +255,6 @@ struct JournalView: View {
             entry.feelsGoodAbout = feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines)
             entry.photos = photoData
             modelContext.saveChanges()
-            services.spotlight.indexJournalEntry(entry)
         } else {
             let entry = JournalEntry(
                 date: date,
@@ -232,7 +267,6 @@ struct JournalView: View {
             )
             modelContext.insert(entry)
             modelContext.saveChanges()
-            services.spotlight.indexJournalEntry(entry)
         }
 
         // Saved → drop back to the read-only overview for the day.
@@ -255,7 +289,6 @@ struct JournalView: View {
         guard let entry = selectedJournalEntry else { return }
         journalHaptic = .warning
         journalHapticTick += 1
-        services.spotlight.removeJournalEntry(entry)
         modelContext.delete(entry)
         modelContext.saveChanges()
         isEditing = false
@@ -574,67 +607,3 @@ private struct JournalPromptField: View {
     }
 }
 
-private struct JournalEntryCard: View {
-    @Environment(\.modelContext) private var modelContext
-    let entry: JournalEntry
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(entry.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
-
-                Spacer()
-
-                Button(role: .destructive) {
-                    RecentlyDeletedStore.record(
-                        kind: "Journal",
-                        title: String(localized: "Journal entry"),
-                        detail: entry.date.formatted(date: .abbreviated, time: .omitted)
-                    )
-                    modelContext.delete(entry)
-                    modelContext.saveChanges()
-                } label: {
-                    Image(systemName: "trash.fill")
-                }
-                .buttonStyle(ChillPlainButtonStyle())
-                .foregroundStyle(Color.chillSecondary)
-                .accessibilityLabel(String(localized: "Delete journal entry"))
-            }
-
-            JournalLine(title: String(localized: "Clear memory"), value: entry.rememberClearly)
-            JournalLine(title: String(localized: "Uncomfortable"), value: entry.uncomfortableMoments)
-            JournalLine(title: String(localized: "Consent"), value: entry.consentConcerns)
-            JournalLine(title: String(localized: "Regrets"), value: entry.regrets)
-            JournalLine(title: String(localized: "Good"), value: entry.feelsGoodAbout)
-
-            if !entry.photos.isEmpty {
-                Text("\(entry.photos.count) picture\(entry.photos.count == 1 ? "" : "s")")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillPrimary)
-            }
-        }
-        .padding(16)
-        .glassSurface(radius: 24, tint: .black.opacity(0.04))
-    }
-}
-
-private struct JournalLine: View {
-    let title: String
-    let value: String
-
-    var body: some View {
-        if !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
-                Text(value)
-                    .font(.caption)
-                    .foregroundStyle(Color.chillText)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
-}

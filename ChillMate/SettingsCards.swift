@@ -228,7 +228,7 @@ struct GranularHealthKitPermissionsCard: View {
     @Binding var sleepReadWrite: Bool
     @Binding var heartRateRead: Bool
     @Binding var hrvRead: Bool
-    @Binding var workoutRead: Bool
+    @Binding var mindfulWrite: Bool
     let requestScope: (HealthKitPermissionScope) -> Void
 
     var body: some View {
@@ -246,7 +246,9 @@ struct GranularHealthKitPermissionsCard: View {
             HealthPermissionToggleLine(scope: .sleepReadWrite, isOn: $sleepReadWrite, requestScope: requestScope)
             HealthPermissionToggleLine(scope: .heartRateRead, isOn: $heartRateRead, requestScope: requestScope)
             HealthPermissionToggleLine(scope: .heartRateVariabilityRead, isOn: $hrvRead, requestScope: requestScope)
-            HealthPermissionToggleLine(scope: .workoutRead, isOn: $workoutRead, requestScope: requestScope)
+            // Had no switch at all, so panic support's breathing sessions, which
+            // check this setting, could never reach Health.
+            HealthPermissionToggleLine(scope: .mindfulWrite, isOn: $mindfulWrite, requestScope: requestScope)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)

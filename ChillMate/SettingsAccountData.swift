@@ -335,7 +335,11 @@ enum AccountDataDeletion {
             "healthKitSleepReadWriteEnabled",
             "healthKitHeartRateReadEnabled",
             "healthKitHRVReadEnabled",
+            "healthKitMindfulWriteEnabled",
+            // No longer written; cleared so a reset leaves nothing behind from
+            // versions that had them.
             "healthKitWorkoutReadEnabled",
+            "healthKitVitalsReadEnabled",
             "notificationsEnabled",
             "dailyAffirmationsEnabled",
             "discreetNotifications",

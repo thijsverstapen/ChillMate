@@ -86,12 +86,26 @@ enum ChillMateModelContainer {
         let schema = appSchema
         let configuration = ModelConfiguration(
             schema: schema,
-            cloudKitDatabase: isRunningUITests ? .none : .private("iCloud.com.codex.ChillMate")
+            cloudKitDatabase: cloudKitDatabase
         )
 
         let container = try ModelContainer(for: schema, migrationPlan: ChillMateMigrationPlan.self, configurations: [configuration])
         LocalSecurityService.applyFileProtection()
         return container
+    }
+
+    /// Whether this container mirrors to the private CloudKit database.
+    ///
+    /// Was `.private` unconditionally until 5.1.0 — see `ICloudSyncPreference` for
+    /// what that meant and why it now asks. UI tests stay `.none` for the reason
+    /// given on `isRunningUITests`, and that check comes first so a UI test run
+    /// can never be switched into mirroring by a stored preference.
+    @MainActor
+    private static var cloudKitDatabase: ModelConfiguration.CloudKitDatabase {
+        if isRunningUITests { return .none }
+        let mirrors = ICloudSyncPreference.mirrorsToCloudKit(choice: ICloudSyncPreference.choice())
+        ICloudSyncPreference.appliedThisSession = mirrors ? .on : .off
+        return mirrors ? .private("iCloud.com.codex.ChillMate") : .none
     }
 
     private static func ensureApplicationSupportDirectory() throws {

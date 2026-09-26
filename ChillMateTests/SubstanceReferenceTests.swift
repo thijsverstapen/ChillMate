@@ -192,6 +192,73 @@ struct SubstanceReferenceTests {
         let long = SubstanceReference.Timing.describe(180...360)
         #expect(long.contains("180") == false, "A six-hour span is still being written in minutes: \(long)")
     }
+
+    /// The longest run of digits after a decimal separator, whichever separator
+    /// the run's locale uses. Language-independent on purpose: the suite runs in
+    /// five, and "2,333333" and "2.333333" are the same failure.
+    private func longestFraction(in text: String) -> Int {
+        var longest = 0
+        var current = 0
+        var afterSeparator = false
+        var previousWasDigit = false
+        for character in text {
+            if character.isNumber {
+                if afterSeparator { current += 1; longest = max(longest, current) }
+                previousWasDigit = true
+            } else if (character == "." || character == ","), previousWasDigit {
+                afterSeparator = true
+                current = 0
+                previousWasDigit = false
+            } else {
+                afterSeparator = false
+                current = 0
+                previousWasDigit = false
+            }
+        }
+        return longest
+    }
+
+    /// 140 minutes of swallowed ketamine rendered as "1–2,333333 hr" on the risk
+    /// checker. The lower bound of every range was limited to one decimal and the
+    /// upper bound was not, so any top that converts to a repeating fraction of an
+    /// hour printed in full. Asserted over every substance and every route rather
+    /// than the one case that was seen, because the next one will be a different
+    /// substance.
+    @Test("No timing prints more than one decimal", .tags(.safety), arguments: Substance.allCases)
+    func timingsAreNotOverPrecise(substance: Substance) {
+        for timing in substance.reference?.timings ?? [] {
+            let route = timing.route.map { " (\($0))" } ?? ""
+            var texts = [timing.onsetText, timing.peakText, timing.totalText]
+            if let after = timing.afterEffectsText { texts.append(after) }
+            for text in texts {
+                #expect(longestFraction(in: text) <= 1,
+                        "\(substance.rawValue)\(route) renders \(text.debugDescription)")
+            }
+        }
+    }
+
+    /// The other half of the timing fix, and the reason it stopped where it did.
+    ///
+    /// The dose formatter sits directly above the timing one and looks like the
+    /// same bug waiting to happen. It is not, and it must not be "fixed" the same
+    /// way: rounding how long something lasts is harmless, rounding how much of it
+    /// somebody takes is not. A quarter of a gram rounded to one decimal becomes
+    /// 0.3 g — twenty per cent more than the source says.
+    @Test("Dose figures keep their precision", .tags(.safety))
+    func dosesAreNotRounded() {
+        let dose = SubstanceReference.Unit.grams.measurement(0.25)
+        #expect(longestFraction(in: dose) >= 2,
+                "a quarter of a gram rendered as \(dose.debugDescription)")
+        #expect(dose.contains("3") == false,
+                "a quarter of a gram was rounded up: \(dose.debugDescription)")
+    }
+
+    /// The exact range that shipped broken, pinned so the fix cannot drift.
+    @Test("A repeating fraction of an hour is rounded for display")
+    func repeatingFractionIsRounded() {
+        let text = SubstanceReference.Timing.describe(60...140)
+        #expect(longestFraction(in: text) <= 1, "rendered \(text.debugDescription)")
+    }
 }
 
 /// Frequency is what tolerance actually tracks, and the only pattern these logs

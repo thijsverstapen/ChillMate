@@ -1,4 +1,5 @@
 import XCTest
+import SwiftData
 import ChillMateCore
 @testable import ChillMate
 
@@ -130,6 +131,140 @@ final class PerformanceTests: XCTestCase {
         assertUnder(1.0, "patterns over \(entries.count) entries") {
             _ = NightPatterns(entries: entries, windowDays: 30, now: Self.now, calendar: Self.calendar)
         }
+    }
+
+    // MARK: - Opening the store
+
+    /// What the app pays before it can draw anything.
+    ///
+    /// **This is not launch time**, and should not be quoted as it. A real launch
+    /// budget needs `XCTApplicationLaunchMetric` in the UI bundle, and the UI
+    /// bundle is advisory in CI — a number that cannot fail the build is not a
+    /// budget. This measures the part of launch that can be gated here: building
+    /// the schema and opening a store on disk with three years in it.
+    ///
+    /// It is the dominant cost of a SwiftData launch, it grows with the schema,
+    /// and it is what a new `@Model`, a new index or a migration stage lands on.
+    @MainActor
+    func testOpeningAStoreWithThreeYearsInIt() throws {
+        let url = try seededStoreURL()
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        measure {
+            _ = try? ModelContainer(
+                for: Self.fullSchema,
+                configurations: [ModelConfiguration(url: url)]
+            )
+        }
+    }
+
+    @MainActor
+    func testOpeningAStoreIsInsideItsBudget() throws {
+        let url = try seededStoreURL()
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        assertUnder(2.0, "opening a store of \(Self.entryCount) nights") {
+            _ = try? ModelContainer(
+                for: Self.fullSchema,
+                configurations: [ModelConfiguration(url: url)]
+            )
+        }
+    }
+
+    /// Every model the app registers, so the measurement covers the schema the
+    /// app actually opens rather than a convenient subset of it.
+    private static let fullSchema = Schema([
+        NightEntry.self,
+        LoggedSubstanceRecord.self,
+        PartnerDetailRecord.self,
+        TriggerTagRecord.self,
+        UserProfile.self,
+        STDTestRecord.self,
+        DrugDoseTimerRecord.self,
+        SaferSessionPlan.self,
+        JournalEntry.self,
+        RiskCheckRecord.self
+    ])
+
+    /// A store on disk holding the same three years the rest of this file uses.
+    @MainActor
+    private func seededStoreURL() throws -> URL {
+        let url = URL(fileURLWithPath: NSTemporaryDirectory())
+            .appendingPathComponent("ChillMateLaunch-\(UUID().uuidString).store")
+        let context = ModelContext(try ModelContainer(
+            for: Self.fullSchema,
+            configurations: [ModelConfiguration(url: url)]
+        ))
+        for entry in entries {
+            context.insert(entry)
+        }
+        try context.save()
+        return url
+    }
+
+    // MARK: - Reading a night's substances
+
+    /// `entry.substances` is not stored: every read filters, sorts, dedupes and
+    /// maps a relationship. The filters that decide which nights the insights,
+    /// the helper summary and the weekly reflection count all used to call it
+    /// once per entry, purely to ask whether the list was empty.
+    ///
+    /// `hasSubstances` answers that without the ordering. This is the measurement
+    /// that says whether the swap was worth making, and the budget is what stops
+    /// the cheap path quietly regressing into the expensive one.
+    func testEmptinessCheckOverThreeYears() {
+        measure {
+            _ = entries.filter(\.hasSubstances).count
+        }
+    }
+
+    func testEmptinessCheckIsInsideItsBudget() {
+        assertUnder(0.5, "emptiness over \(entries.count) entries") {
+            _ = entries.filter(\.hasSubstances).count
+        }
+    }
+
+    /// The same count through the list, kept as the comparison. If this ever
+    /// stops being the slower of the two, `hasSubstances` has lost its reason to
+    /// exist and the call sites should go back to the obvious spelling.
+    ///
+    /// Measured over many rounds, alternating, after a warm-up. The first version
+    /// of this timed one run of each with the cheap one first, so it paid every
+    /// first-touch cost and handed the other warm data — and duly reported that
+    /// the optimisation was not an optimisation. A benchmark that can be wrong in
+    /// the flattering direction is worse than none.
+    func testEmptinessViaTheListIsTheSlowerPath() {
+        // Warm both paths so neither pays for the other's first touch.
+        _ = entries.filter(\.hasSubstances).count
+        _ = entries.filter { !$0.substances.isEmpty }.count
+
+        var cheap: TimeInterval = 0
+        var full: TimeInterval = 0
+        for round in 0..<10 {
+            // Alternate which goes first, so a systematic ordering effect cancels
+            // instead of accumulating into the answer.
+            if round.isMultiple(of: 2) {
+                cheap += duration { _ = entries.filter(\.hasSubstances).count }
+                full += duration { _ = entries.filter { !$0.substances.isEmpty }.count }
+            } else {
+                full += duration { _ = entries.filter { !$0.substances.isEmpty }.count }
+                cheap += duration { _ = entries.filter(\.hasSubstances).count }
+            }
+        }
+
+        XCTAssertLessThanOrEqual(
+            cheap, full,
+            "hasSubstances (\(cheap)s over 10 rounds) is no longer cheaper than reading the list (\(full)s)"
+        )
+        print("emptiness check: hasSubstances \(cheap)s vs list \(full)s over 10 rounds")
+    }
+
+    /// Wall-clock for one run of a block. Deliberately not `measure`, which
+    /// reports rather than returns.
+    private func duration(_ body: () -> Void) -> TimeInterval {
+        let start = Date()
+        body()
+        return Date().timeIntervalSince(start)
     }
 
     /// The sheet a clinician reads, built from the whole history every time the

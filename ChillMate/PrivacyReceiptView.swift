@@ -11,6 +11,14 @@ struct PrivacyReceiptView: View {
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
     @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
+    @AppStorage(DefaultsKey.iCloudSyncChoice) private var iCloudSyncChoice: String?
+
+    /// What the store is doing right now, not what Settings will do after a restart.
+    /// This screen describes what is kept, and a switch that has not taken effect
+    /// yet has not changed that — so it reads the session's value first.
+    private var iCloudSyncOn: Bool {
+        ICloudSyncPreference.isMirroringNow(storedChoice: iCloudSyncChoice)
+    }
 
     /// Built outside the view body: nesting `String(localized:)` inside an
     /// interpolation inside another `String(localized:)` is legal Swift and
@@ -42,13 +50,19 @@ struct PrivacyReceiptView: View {
                                 : String(localized: "Strong iPhone file protection is available, but off in settings."), symbol: "lock.doc.fill", isEnabled: localEncryptionEnabled)
                         PrivacyReceiptRow(title: String(localized: "App lock"), detail: lockStatus, symbol: "faceid", isEnabled: requiresFaceID || requiresPIN)
                         PrivacyReceiptRow(title: String(localized: "Apple Health"), detail: healthKitAutoSync
-                                ? String(localized: "ChillMate can read and write only the Health categories you allowed.")
+                                ? String(localized: "Writes when your nights happened and how long you slept, and nothing else about them. Reads only the categories you allowed.")
                                 : String(localized: "Apple Health sync is off."), symbol: "heart.text.square.fill", isEnabled: healthKitAutoSync)
                         PrivacyReceiptRow(title: String(localized: "Notifications"), detail: notificationsEnabled
                                 ? (discreetNotifications
                                     ? String(localized: "Notifications are on, with discreet lock-screen wording.")
                                     : String(localized: "Notifications are on, showing full wording on the lock screen."))
                                 : String(localized: "Notifications are off."), symbol: "bell.badge.fill", isEnabled: notificationsEnabled)
+                        // Until 5.1.0 this screen had a row for the iCloud backup and none
+                        // for iCloud sync, so the only iCloud line on "what ChillMate keeps"
+                        // read "off" while the store was mirrored to CloudKit.
+                        PrivacyReceiptRow(title: String(localized: "iCloud sync"), detail: iCloudSyncOn
+                                ? String(localized: "A copy of everything is kept in your private iCloud.")
+                                : String(localized: "Off. Nothing is copied to iCloud."), symbol: "arrow.triangle.2.circlepath.icloud", isEnabled: iCloudSyncOn)
                         PrivacyReceiptRow(title: String(localized: "iCloud backup"), detail: iCloudBackupEnabled
                                 ? String(localized: "Encrypted backup files can be saved to iCloud Drive.")
                                 : String(localized: "iCloud backup is off. Local encrypted recovery stays on this iPhone."), symbol: "icloud.fill", isEnabled: iCloudBackupEnabled)

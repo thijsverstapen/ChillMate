@@ -197,7 +197,7 @@ font-weight:800;max-width:19ch;margin:0}
       <li><strong>No server.</strong> There is no API, no database and no admin panel to attack, because none exist.</li>
       <li><strong>No accounts.</strong> No password reset flow, no session tokens, no account takeover.</li>
       <li><strong>No third-party SDKs</strong> receiving your data, so no supply chain of analytics vendors.</li>
-      <li><strong>Sync is Apple's.</strong> iCloud sync and iCloud Drive backups run in your own account under Apple's encryption.</li>
+      <li><strong>Sync is Apple's, and off by default.</strong> iCloud sync runs in your own account under Apple's encryption, and only if you turn it on. Backups to iCloud Drive are encrypted on the device first, with a key that never leaves it.</li>
     </ul>
     <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID, and the second PIN that opens the app empty. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activities show on a locked screen, which since 5.0.0 includes a running dose and a check-in for the way home. And whether the discreet notification wording ever leaks something it should not.</p>
   </div>
@@ -254,7 +254,7 @@ font-weight:800;max-width:19ch;margin:0}
     <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    <span class="made">ChillMate 5.0.0 · made by one person in the Netherlands</span>
+    <span class="made">ChillMate 5.1.0 · made by one person in the Netherlands</span>
   </footer>
 
 </main>

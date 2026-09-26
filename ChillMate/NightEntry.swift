@@ -4,6 +4,12 @@ import ChillMateCore
 
 @Model
 final class NightEntry {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    // Six descriptors sort by date and the calendar pages through it.
+    #Index<NightEntry>([\.date])
+
     var id: UUID = UUID()
     var date: Date = Date.now
     var startDate: Date = Date.now
@@ -286,6 +292,28 @@ final class NightEntry {
             replaceSubstanceRecords(with: newValue, isInjection: false)
             markContentChanged()
         }
+    }
+
+    /// Whether anything was logged, without paying for the ordering.
+    ///
+    /// `substances` has to filter, sort, dedupe and map a SwiftData relationship
+    /// before it can answer anything, and most callers only ask whether the list
+    /// is empty. One of them is a computed property on a view, evaluated for
+    /// every entry on every render, so the sort ran once per night per frame to
+    /// produce a Bool that never needed it.
+    ///
+    /// The answer is the same one `substances.isEmpty == false` gives: typed
+    /// records win when there are any, and a row that predates the migration
+    /// still answers from its blob.
+    var hasSubstances: Bool {
+        if (substanceRecords ?? []).contains(where: { !$0.isInjection }) { return true }
+        return !NightEntry.decode(substancesData).isEmpty
+    }
+
+    /// The injection counterpart of `hasSubstances`, on the same terms.
+    var hasInjectionSubstances: Bool {
+        if (substanceRecords ?? []).contains(where: \.isInjection) { return true }
+        return !NightEntry.decode(injectionSubstancesData).isEmpty
     }
 
     var injectionSubstances: [String] {

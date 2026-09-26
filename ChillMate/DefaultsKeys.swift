@@ -71,9 +71,15 @@ enum DefaultsKey {
     static let healthKitSleepReadWriteEnabled = "healthKitSleepReadWriteEnabled"
     static let healthKitHeartRateReadEnabled = "healthKitHeartRateReadEnabled"
     static let healthKitHRVReadEnabled = "healthKitHRVReadEnabled"
-    static let healthKitWorkoutReadEnabled = "healthKitWorkoutReadEnabled"
-    static let healthKitVitalsReadEnabled = "healthKitVitalsReadEnabled"
     static let healthKitMindfulWriteEnabled = "healthKitMindfulWriteEnabled"
+
+    /// Set once every sample an earlier version wrote into Apple Health with the
+    /// night's details in its metadata has been replaced. See `HealthLegacyCleanup`.
+    static let healthLegacyMetadataRemoved = "healthLegacyMetadataRemoved"
+
+    /// Set once Spotlight has confirmed that every journal entry earlier versions
+    /// indexed is gone. See `SpotlightService.removeJournalIndexIfNeeded`.
+    static let spotlightJournalRemoved = "spotlightJournalRemoved"
     static let lastKnownHRVms = "lastKnownHRVms"
     static let lastDailyRecoveryScore = "lastDailyRecoveryScore"
     static let reductionGoalSessions = "reductionGoalSessions"
@@ -100,6 +106,9 @@ enum DefaultsKey {
 
     // MARK: Backup & recovery
     static let iCloudBackupEnabled = "iCloudBackupEnabled"
+    /// "on" or "off", or absent on an install from before 5.1.0 that has not
+    /// been asked. See `ICloudSyncPreference`.
+    static let iCloudSyncChoice = "iCloudSyncChoice"
     static let lastICloudBackupTimestamp = "lastICloudBackupTimestamp"
     static let lastICloudRestoreTimestamp = "lastICloudRestoreTimestamp"
     static let lastICloudBackupStatus = "lastICloudBackupStatus"

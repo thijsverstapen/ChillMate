@@ -469,7 +469,7 @@ struct DashboardView: View {
 /// Inbound relays from the watch app.
 ///
 /// Grouped into one modifier so the dashboard's modifier chain reads as
-/// intent rather than three near-identical NotificationCenter subscriptions.
+/// intent rather than near-identical NotificationCenter subscriptions.
 private struct WatchRelayObservers: ViewModifier {
     let quickSkip: () -> Void
     let logHydration: () -> Void
@@ -481,14 +481,6 @@ private struct WatchRelayObservers: ViewModifier {
             }
             .onReceive(NotificationCenter.default.publisher(for: .watchDidLogHydration)) { _ in
                 logHydration()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestSOS)) { _ in
-                // "Ping my phone" from the Watch Safety screen routes this phone
-                // straight to the country-aware emergency page.
-                UserDefaults.standard.set(
-                    NotificationDestination.emergency.rawValue,
-                    forKey: DefaultsKey.pendingAppDestination
-                )
             }
     }
 }
@@ -653,87 +645,6 @@ private struct HeaderSummaryView: View {
     }
 }
 
-private struct DailyScoreStatusPill: View {
-    let score: DailyRecoveryScore
-
-    var body: some View {
-        VStack(spacing: 3) {
-            // The inactive state puts an emoji here in place of the score. An emoji
-            // is roughly square and does not shrink into its line box the way a
-            // digit does, so at the larger text sizes it outgrows this card and is
-            // drawn clipped. It gets a smaller size with headroom, the same
-            // treatment as `StatTile`, rather than the digit's 26pt.
-                // Hidden from accessibility, and not only to quiet the audit.
-                //
-                // The emoji stands in for a score that does not exist yet; the
-                // label beside it is what says so, and VoiceOver reading "smiling
-                // face with open mouth" before "Log to activate" is noise in front
-                // of the instruction. Hiding it also settles a finding no amount of
-                // resizing could: `performAccessibilityAudit` reports emoji as
-                // clipped text whatever size they are drawn at, because an emoji
-                // glyph's bounds exceed its layout frame by design. Replacing the
-                // emoji with plain text made the finding disappear at every size,
-                // which is what identified it as a property of the glyph rather
-                // than of this layout.
-            Text(score.isActive ? "\(score.value)" : score.emoji)
-                .font(.system(size: score.isActive ? 24 : 18, weight: .bold))
-                .monospacedDigit()
-                .foregroundStyle(Color.chillText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .accessibilityHidden(!score.isActive)
-
-            Text("Daily score")
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(Color.chillText)
-                .chillLineLimit(2, scale: 0.7)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Text(score.isActive ? score.label : String(localized: "Log a Chill to activate your daily score"))
-                .chillScaledFont(size: 9, weight: .semibold, relativeTo: .caption2)
-                .foregroundStyle(Color.chillSecondary)
-                .multilineTextAlignment(.center)
-                .lineLimit(score.isActive ? 1 : 3)
-                .minimumScaleFactor(0.72)
-        }
-        .frame(width: 106)
-        .frame(minHeight: 82)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 10)
-        .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(score.isActive ? "Daily score \(score.value), \(score.label)" : "Daily score inactive. Make a substance-related log to activate daily score.")
-        .accessibilityIdentifier(AccessibilityID.dailyScorePill)
-    }
-}
-
-private struct ProfileToolbarIcon: View {
-    let profileImage: UIImage?
-
-    var body: some View {
-        Group {
-            if let profileImage {
-                Image(uiImage: profileImage)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(Color.chillText)
-                    .padding(3)
-            }
-        }
-        .frame(width: 26, height: 26)
-        .clipShape(Circle())
-        .overlay {
-            Circle()
-                .stroke(.white.opacity(0.55), lineWidth: 1)
-        }
-        .accessibilityHidden(true)
-    }
-}
-
 private struct ReductionGoalProgressCard: View {
     let goal: Int
     let substanceOnly: Bool
@@ -742,7 +653,7 @@ private struct ReductionGoalProgressCard: View {
     private var currentMonthCount: Int {
         let start = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: .now)) ?? .now
         return entries.filter { entry in
-            entry.date >= start && !entry.skippedNight && (substanceOnly ? !entry.substances.isEmpty : entry.hadSex || !entry.substances.isEmpty)
+            entry.date >= start && !entry.skippedNight && (substanceOnly ? entry.hasSubstances : entry.hadSex || entry.hasSubstances)
         }.count
     }
 
@@ -799,179 +710,6 @@ private struct ReductionGoalProgressCard: View {
     }
 }
 
-private struct RecoveryStreakBadge: View {
-    let days: Int
-    let dailyScoreIsActive: Bool
-    let openCalendar: () -> Void
-
-    private var milestone: Int {
-        switch days {
-        case 0..<30:   return 30
-        case 30..<90:  return 90
-        case 90..<180: return 180
-        case 180..<365: return 365
-        default:        return 365
-        }
-    }
-
-    private var progress: Double {
-        guard milestone > 0 else { return 1 }
-        return min(1, Double(days) / Double(milestone))
-    }
-
-    private var tint: Color {
-        switch days {
-        case 0...2:
-            .red
-        case 3...6:
-            .orange
-        case 7...13:
-            .yellow
-        case 14...29:
-            Color.chillMint
-        case 30...89:
-            .green
-        default:
-            .cyan
-        }
-    }
-
-    private var emoji: String {
-        guard dailyScoreIsActive else {
-            return "😄"
-        }
-
-        switch days {
-        case 0...2:
-            return "😢"
-        case 3...6:
-            return "🙁"
-        case 7...13:
-            return "🙂"
-        case 14...29:
-            return "😊"
-        case 30...89:
-            return "😄"
-        default:
-            return "🌟"
-        }
-    }
-
-    private var displayText: String {
-        if days >= 365 * 4 {
-            return String(localized: "4+ years")
-        }
-
-        if days >= 365 {
-            let years = days / 365
-            let remainingDays = days % 365
-            if remainingDays == 0 {
-                return years == 1
-                    ? String(localized: "\(years) year")
-                    : String(localized: "\(years) years")
-            }
-            return years == 1
-                ? String(localized: "\(years) year, \(remainingDays) d")
-                : String(localized: "\(years) years, \(remainingDays) d")
-        }
-
-        return days == 1
-            ? String(localized: "\(days) day")
-            : String(localized: "\(days) days")
-    }
-
-    private var isMilestoneDay: Bool {
-        [30, 90, 180, 365].contains(days)
-    }
-
-    @State private var isShowingMilestoneShare = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Button(action: openCalendar) {
-                VStack(alignment: .leading, spacing: 14) {
-                    HStack(alignment: .center, spacing: 12) {
-                        Text(emoji)
-                            .chillScaledFont(size: 30, relativeTo: .title)
-                            .frame(width: 48, height: 48)
-                            .glassSurface(radius: 24, tint: tint.opacity(0.16))
-
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(displayText)
-                                .chillScaledFont(size: 30, weight: .bold, relativeTo: .title)
-                                .foregroundStyle(Color.chillText)
-                                .chillLineLimit(1, scale: 0.72)
-
-                            Text(String(localized: "without logged substance use"))
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(Color.chillSecondary)
-                        }
-
-                        Spacer()
-                    }
-
-                    GeometryReader { proxy in
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .fill(.black.opacity(0.10))
-                            Capsule()
-                                .fill(.linearGradient(colors: [.red, .orange, .yellow, Color.chillMint, .green], startPoint: .leading, endPoint: .trailing))
-                                .frame(width: max(12, proxy.size.width * progress))
-                        }
-                    }
-                    .frame(height: 10)
-
-                    Text(encouragement)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.chillSecondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(18)
-                .glassSurface(radius: 30, tint: tint.opacity(0.12), interactive: true)
-            }
-            .buttonStyle(ChillPlainButtonStyle())
-            .accessibilityLabel("Open calendar for recovery streak")
-
-            if isMilestoneDay || days >= 30 {
-                Button {
-                    isShowingMilestoneShare = true
-                } label: {
-                    Label("Share \(displayText) milestone", systemImage: "square.and.arrow.up")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(tint)
-                        .frame(maxWidth: .infinity)
-                        .padding(10)
-                        .glassSurface(radius: 18, tint: tint.opacity(0.10), interactive: true)
-                }
-                .buttonStyle(ChillPlainButtonStyle())
-            }
-        }
-        .sheet(isPresented: $isShowingMilestoneShare) {
-            MilestoneShareSheet(days: days, emoji: emoji, tint: tint)
-                .presentationDetents([.medium])
-                .presentationDragIndicator(.visible)
-        }
-        .sensoryFeedback(trigger: isShowingMilestoneShare) { _, presented in presented ? .impact(weight: .medium) : nil }
-    }
-
-    private var encouragement: String {
-        switch days {
-        case 0...2:
-            String(localized: "Start gentle. One steady choice already counts.")
-        case 3...6:
-            String(localized: "You are creating space for recovery.")
-        case 7...29:
-            String(localized: "A full week changes how your body can rest.")
-        case 30...89:
-            String(localized: "Strong streak. Your body is building real recovery.")
-        case 90...364:
-            String(localized: "Three months of steady choices. That is significant.")
-        default:
-            String(localized: "Over a year of sustained recovery. Remarkable consistency.")
-        }
-    }
-}
-
 private struct DailyRecoveryScore {
     let isActive: Bool
     let value: Int
@@ -1012,7 +750,7 @@ private struct DailyRecoveryScore {
         var hasEverLoggedSubstances = !latestSubstances.isEmpty
         if !hasEverLoggedSubstances {
             for entry in entries where !entry.skippedNight {
-                if !entry.substances.isEmpty {
+                if entry.hasSubstances {
                     hasEverLoggedSubstances = true
                     break
                 }
@@ -1032,7 +770,7 @@ private struct DailyRecoveryScore {
                 Factor(name: String(localized: "Substances"), caption: String(localized: "no substance use logged")),
                 Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
                 Factor(name: String(localized: "Symptoms"), caption: String(localized: "starts after activation")),
-                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available"),
+                Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : String(localized: "not available")),
             Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available")),
                 Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available"))
             ]
@@ -1057,14 +795,14 @@ private struct DailyRecoveryScore {
         label = Self.label(for: total)
         emoji = Self.emoji(for: total)
         factors = [
-            Factor(name: String(localized: "Sleep"), caption: latest?.sleptYet == true ? "\(latest?.sleepHours.formatted(.number.precision(.fractionLength(0...1))) ?? "0") h" : "not logged"),
-            Factor(name: String(localized: "Hydration"), caption: latest?.aftercareDrankWater == true ? "checked" : "unknown"),
-            Factor(name: String(localized: "Food"), caption: latest?.aftercareAteFood == true ? "checked" : "unknown"),
-            Factor(name: String(localized: "Substances"), caption: latestSubstances.isEmpty ? "clear" : "logged"),
+            Factor(name: String(localized: "Sleep"), caption: latest?.sleptYet == true ? "\(latest?.sleepHours.formatted(.number.precision(.fractionLength(0...1))) ?? "0") h" : String(localized: "not logged")),
+            Factor(name: String(localized: "Hydration"), caption: latest?.aftercareDrankWater == true ? String(localized: "checked") : String(localized: "unknown")),
+            Factor(name: String(localized: "Food"), caption: latest?.aftercareAteFood == true ? String(localized: "checked") : String(localized: "unknown")),
+            Factor(name: String(localized: "Substances"), caption: latestSubstances.isEmpty ? String(localized: "clear") : String(localized: "logged")),
             Factor(name: String(localized: "Anxiety"), caption: Self.anxietyCaption(latest, symptoms: latestSymptoms ?? [])),
             Factor(name: String(localized: "Streak"), caption: "\(recoveryStreakDays) d"),
-            Factor(name: String(localized: "Symptoms"), caption: (latestSymptoms ?? []).isEmpty ? "none" : "\((latestSymptoms ?? []).count) selected"),
-            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : "not available"),
+            Factor(name: String(localized: "Symptoms"), caption: (latestSymptoms ?? []).isEmpty ? String(localized: "none") : String(localized: "\((latestSymptoms ?? []).count) selected")),
+            Factor(name: String(localized: "HRV"), caption: latestHRVms > 0 ? "\(Int(latestHRVms)) ms" : String(localized: "not available")),
             Factor(name: String(localized: "Resting heart rate"), caption: latestRestingBPM > 0 ? "\(Int(latestRestingBPM)) bpm" : String(localized: "not available"))
         ]
     }
@@ -1366,117 +1104,6 @@ private struct BreathingOrb: View {
                     endPoint: .bottomTrailing
                 )
             )
-    }
-}
-
-private struct MilestoneShareSheet: View {
-    let days: Int
-    let emoji: String
-    let tint: Color
-
-    @Environment(\.dismiss) private var dismiss
-    @State private var renderedImage: Image?
-
-    private var milestoneText: String {
-        if days >= 365 {
-            let years = days / 365
-            return years == 1
-                ? String(localized: "\(years) year")
-                : String(localized: "\(years) years")
-        }
-        return String(localized: "\(days) days")
-    }
-
-    private var cardView: some View {
-        VStack(spacing: 18) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.black.opacity(0.88), Color.black.opacity(0.72)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 28, style: .continuous)
-                            .stroke(tint.opacity(0.36), lineWidth: 1)
-                    )
-
-                VStack(spacing: 16) {
-                    Text(emoji)
-                        .chillScaledFont(size: 52, relativeTo: .largeTitle)
-
-                    Text(milestoneText)
-                        .chillScaledFont(size: 36, weight: .black, relativeTo: .largeTitle, design: .rounded)
-                        .foregroundStyle(.white)
-
-                    Text(String(localized: "without logged substance use"))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white.opacity(0.62))
-
-                    HStack(spacing: 6) {
-                        ChillMateBrandMark(size: 18)
-                        Text("ChillMate")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(.white.opacity(0.54))
-                    }
-                }
-                .padding(28)
-            }
-            .frame(width: 300, height: 300)
-        }
-    }
-
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.84).ignoresSafeArea()
-
-            VStack(spacing: 20) {
-                Text(String(localized: "Share milestone"))
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(Color.chillText)
-
-                cardView
-                    .frame(width: 300, height: 300)
-
-                Text(String(localized: "Sharing this image reveals only your streak: no substances, dates, or other details."))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 24)
-
-                if let img = renderedImage {
-                    ShareLink(item: img, preview: SharePreview("\(milestoneText) milestone", image: img)) {
-                        Label(String(localized: "Share milestone card"), systemImage: "square.and.arrow.up")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(ChillPillButtonStyle(prominent: true))
-                    .padding(.horizontal, 28)
-                } else {
-                    Button(String(localized: "Prepare card")) {
-                        renderCard()
-                    }
-                    .buttonStyle(ChillPillButtonStyle(prominent: true))
-                    .padding(.horizontal, 28)
-                }
-
-                Button(String(localized: "Done")) { dismiss() }
-                    .foregroundStyle(Color.chillSecondary)
-                    .padding(.bottom, 12)
-            }
-        }
-        .onAppear { renderCard() }
-    }
-
-    private func renderCard() {
-        let renderer = ImageRenderer(content: cardView.frame(width: 300, height: 300))
-        renderer.scale = 3
-        if let uiImage = renderer.uiImage {
-            renderedImage = Image(uiImage: uiImage)
-        }
     }
 }
 
@@ -1873,6 +1500,9 @@ private struct MetricsGrid: View {
                 }
                 .buttonStyle(ChillPlainButtonStyle())
                 .accessibilityLabel(dailyScore.isActive ? Text("Today’s score \(dailyScore.value). Tap to see the breakdown.") : Text("Daily score not active yet. Log a night to activate."))
+                // The identifier used to sit on a pill no screen showed, so the UI
+                // test that checks this is announced could never find it.
+                .accessibilityIdentifier(AccessibilityID.dailyScorePill)
             }
 
             if showDetails {
@@ -2139,28 +1769,6 @@ private struct MetricCard: View {
     }
 }
 
-private struct SubstanceOverview: View {
-    let counts: [(name: String, count: Int)]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionTitle(title: String(localized: "Substance tags"), symbol: "chart.bar.xaxis")
-
-            if counts.isEmpty {
-                EmptyGlassState(text: String(localized: "No substance tags in the past 3 months."))
-            } else {
-                VStack(spacing: 12) {
-                    ForEach(counts.prefix(6), id: \.name) { item in
-                        SubstanceBar(name: item.name, count: item.count, maxCount: counts.first?.count ?? 1)
-                    }
-                }
-                .padding(16)
-                .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
-            }
-        }
-    }
-}
-
 struct DrugDoseHistoryGraph: View {
     let rows: [DoseHistoryRow]
     let monthDays: [Date]
@@ -2330,132 +1938,6 @@ struct SubstanceBar: View {
                 .scrollIndicators(.hidden)
             }
             .frame(height: 9)
-        }
-    }
-}
-
-private struct SkippedNightCard: View {
-    let statuses: [NightStatus]
-    @Binding var isExpanded: Bool
-    let markSkipped: (Date) -> Void
-
-    private var missingStatuses: [NightStatus] {
-        statuses.filter { $0.entry == nil }
-    }
-
-    var body: some View {
-        LiquidGlassGroup(spacing: 14) {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .firstTextBaseline) {
-                    SectionTitle(title: String(localized: "Skipped Chill check"), symbol: "checklist")
-                    Spacer()
-                    Button {
-                        isExpanded.toggle()
-                    } label: {
-                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                            .font(.headline)
-                            .frame(width: 34, height: 34)
-                    }
-                    .buttonStyle(ChillPlainButtonStyle())
-                    .glassSurface(radius: 17, tint: .black.opacity(0.05), interactive: true)
-                    .accessibilityLabel(isExpanded ? "Collapse skipped Chill check" : "Expand skipped Chill check")
-                }
-
-                if missingStatuses.isEmpty {
-                    Text("Every Chill in the last 14 days has either a log or a skipped check-in.")
-                        .font(.callout)
-                        .foregroundStyle(Color.chillSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                } else {
-                    Text(missingSummary)
-                        .font(.callout)
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                }
-
-                if isExpanded {
-                    VStack(spacing: 10) {
-                        ForEach(statuses.prefix(10)) { status in
-                            NightStatusRow(status: status, markSkipped: markSkipped)
-                        }
-                    }
-                }
-            }
-            .padding(18)
-            .glassSurface(radius: 30, tint: .indigo.opacity(0.10))
-        }
-    }
-
-    private var missingSummary: AttributedString {
-        var summary = AttributedString("\(missingStatuses.count) recent Chills have no entry. Open the check to mark skipped Chills.")
-        if let range = summary.range(of: "\(missingStatuses.count)") {
-            summary[range].inlinePresentationIntent = .stronglyEmphasized
-        }
-        return summary
-    }
-
-}
-
-private struct NightStatusRow: View {
-    let status: NightStatus
-    let markSkipped: (Date) -> Void
-
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: status.symbol)
-                .font(.system(size: 15, weight: .bold))
-                .foregroundStyle(status.tint)
-                .frame(width: 32, height: 32)
-                .glassSurface(radius: 16, tint: status.tint.opacity(0.16))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(status.date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
-
-                Text(status.detailText)
-                    .font(.caption)
-                    .foregroundStyle(Color.chillSecondary)
-                    .lineLimit(2)
-            }
-
-            Spacer(minLength: 10)
-
-            if status.entry == nil {
-                Button {
-                    markSkipped(status.date)
-                } label: {
-                    Text("Skip")
-                        .font(.caption.weight(.bold))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                }
-                .buttonStyle(ChillPlainButtonStyle())
-                .glassSurface(radius: 16, tint: .indigo.opacity(0.20), interactive: true)
-            }
-        }
-        .padding(10)
-        .glassSurface(radius: 20, tint: .black.opacity(0.04))
-    }
-}
-
-private struct TimelineSection: View {
-    let entries: [NightEntry]
-    let delete: (NightEntry) -> Void
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionTitle(title: String(localized: "Timeline"), symbol: "calendar")
-
-            if entries.isEmpty {
-                EmptyGlassState(text: String(localized: "No entries in the past 3 months."))
-            } else {
-                LazyVStack(spacing: 12) {
-                    ForEach(entries) { entry in
-                        TimelineRow(entry: entry, delete: delete)
-                    }
-                }
-            }
         }
     }
 }

@@ -37,6 +37,34 @@ public struct InteractionFinding: Identifiable, Hashable {
     /// Nil only on the "nothing matched" line, which is informational and gets no
     /// severity badge.
     public let level: SubstanceInteraction.Level?
+
+    /// Where a table row's rating comes from, and nil for every line that is not
+    /// a table row.
+    ///
+    /// `SubstanceInteraction.Corroboration` and the card that displays it both
+    /// already existed; nothing rendered them, because the screen shows
+    /// `InteractionFinding` and the provenance stopped at the type boundary. So
+    /// every warning reached the reader carrying the same apparent authority,
+    /// when they do not all rest on the same thing: some match a published chart,
+    /// some sit deliberately above it, and the ones involving poppers or
+    /// sildenafil are not on it at all.
+    ///
+    /// Nil on the preset lines on purpose. They are ChillMate's own wording for a
+    /// hazard the chart does not describe, and labelling them with a chart verdict
+    /// would claim a source they do not have.
+    public let corroboration: SubstanceInteraction.Corroboration?
+
+    public init(
+        id: String,
+        text: String,
+        level: SubstanceInteraction.Level?,
+        corroboration: SubstanceInteraction.Corroboration? = nil
+    ) {
+        self.id = id
+        self.text = text
+        self.level = level
+        self.corroboration = corroboration
+    }
 }
 
 /// The branches of the preset chain, as identifiers rather than sentences.
@@ -335,7 +363,14 @@ public struct CombinationAssessment {
         // would also collide in SwiftUI, which identifies these rows by their text.
         var seenText: Set<String> = []
         var merged = (presetFindings(supersededBy: ratedTopics)
-            + rated.map { InteractionFinding(id: "table.\($0.id)", text: $0.warning, level: $0.level) })
+            + rated.map {
+                InteractionFinding(
+                    id: "table.\($0.id)",
+                    text: $0.warning,
+                    level: $0.level,
+                    corroboration: $0.corroboration
+                )
+            })
             .filter { seenText.insert($0.text).inserted }
 
         // Typing a medication we cannot place is not the same as typing nothing,

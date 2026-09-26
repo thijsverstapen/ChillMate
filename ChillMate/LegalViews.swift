@@ -26,7 +26,7 @@ struct PrivacyPolicyView: View {
                             rows: [
                                 String(localized: "Your profile, photo, medication notes, trusted contact, home address, settings, and preferences."),
                                 String(localized: "Private logs, sleep notes, STI test records, plans, journal entries, risk checks, check-ins, and emergency-card details."),
-                                String(localized: "Optional information you choose to add from Apple Health, Contacts, Photos, or Location Services.")
+                                String(localized: "Sleep, heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.")
                             ]
                         )
 
@@ -35,8 +35,12 @@ struct PrivacyPolicyView: View {
                             symbol: "lock.shield.fill",
                             rows: [
                                 String(localized: "To show your private overview, reminders, aftercare prompts, STI follow-ups, emergency shortcuts, and wellbeing reflections."),
-                                String(localized: "To sync with Apple Health only for categories you approve in iOS settings."),
-                                String(localized: "To create encrypted backups only when backup features are enabled.")
+                                String(localized: "To sync with Apple Health only for the categories you approve. What goes to Apple Health is when a night happened and how long you slept, never what you took or what you wrote."),
+                                String(localized: "To create encrypted backups only when backup features are enabled."),
+                                // Absent until 5.1.0, while the store was mirrored to CloudKit
+                                // for everyone signed into iCloud. Leaving it out said the
+                                // opposite by omission.
+                                String(localized: "To keep a copy in your private iCloud only if you turn on iCloud sync. Unless you use Advanced Data Protection, Apple holds the keys to that copy.")
                             ]
                         )
 

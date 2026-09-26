@@ -5,6 +5,11 @@ import ChillMateCore
 
 @Model
 final class STDTestRecord {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    #Index<STDTestRecord>([\.testDate])
+
     var id: UUID = UUID()
     var testDate: Date = Date.now
     var oralResult: String = STDResultStatus.pending.rawValue
@@ -75,6 +80,12 @@ enum STDResultStatus: String, CaseIterable, Identifiable {
 
 @Model
 final class DrugDoseTimerRecord {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    // Sorted and filtered on the same property, which is the case an index helps most.
+    #Index<DrugDoseTimerRecord>([\.startedAt])
+
     var id: UUID = UUID()
     var substanceName: String = Substance.cannabis.rawValue
     var startedAt: Date = Date.now
@@ -155,6 +166,14 @@ enum AdministrationRoute: String, CaseIterable, Identifiable {
 
 @Model
 final class SaferSessionPlan {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    // Two separate indexes, not one compound index over the pair: the two
+    // descriptors sort by these independently, and a compound index only
+    // serves its leading column.
+    #Index<SaferSessionPlan>([\.plannedDate], [\.createdAt])
+
     var id: UUID = UUID()
     var plannedDate: Date = Date.now
     var endingDate: Date = Date.now.addingTimeInterval(4 * 60 * 60)
@@ -256,6 +275,12 @@ final class SaferSessionPlan {
 
 @Model
 final class JournalEntry {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    // Sorted and filtered on the same property.
+    #Index<JournalEntry>([\.date])
+
     var id: UUID = UUID()
     var date: Date = Date.now
     var rememberClearly: String = ""
@@ -305,6 +330,11 @@ final class JournalEntry {
 
 @Model
 final class RiskCheckRecord {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    #Index<RiskCheckRecord>([\.createdAt])
+
     var id: UUID = UUID()
     var medicationText: String = ""
     var timing: String = CombinationTiming.sameSession.rawValue

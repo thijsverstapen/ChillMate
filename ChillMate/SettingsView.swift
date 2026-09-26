@@ -38,7 +38,11 @@ enum SettingsSectionPage: String, CaseIterable, Identifiable {
     case privacyDashboard = "Privacy dashboard"
     case permissions = "Permissions"
     case notifications = "Notifications"
-    case iCloud = "iCloud backup"
+    // Was "iCloud backup". The page now holds iCloud sync as well, and the app
+    // tells people they can change sync "in Settings" — a page named only for
+    // the backup hid the one switch they were sent to find. The raw value is an
+    // identifier and a catalog lookup, never stored, so renaming it is safe.
+    case iCloud = "iCloud"
     case accessibility = "Accessibility"
     case appearance = "Appearance"
     case watch = "Apple Watch"
@@ -99,7 +103,7 @@ enum SettingsSectionPage: String, CaseIterable, Identifiable {
         case .notifications:
             String(localized: "Check-ins and affirmations")
         case .iCloud:
-            String(localized: "Encrypted backup and restore")
+            String(localized: "Sync and encrypted backup")
         case .accessibility:
             String(localized: "Readable, calm, and one-handed app behavior")
         case .appearance:
@@ -131,8 +135,6 @@ struct SettingsView: View {
     @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthKitSleepReadWriteEnabled = false
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
-    @AppStorage(DefaultsKey.healthKitWorkoutReadEnabled) private var healthKitWorkoutReadEnabled = false
-    @AppStorage(DefaultsKey.healthKitVitalsReadEnabled) private var healthKitVitalsReadEnabled = false
     @AppStorage(DefaultsKey.healthKitMindfulWriteEnabled) private var healthKitMindfulWriteEnabled = false
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
@@ -496,7 +498,7 @@ struct SettingsView: View {
                     case .permissions:
                         SettingsToggleCard(
                             title: String(localized: "Add logs to Apple Health"),
-                            caption: String(localized: "Save sex and sleep entries to Apple Health after each log."),
+                            caption: String(localized: "Saves when each night happened, and how long you slept, to Apple Health. Nothing else about the night goes with it."),
                             symbol: "heart.text.square.fill",
                             isOn: $healthKitAutoSync
                         )
@@ -506,7 +508,7 @@ struct SettingsView: View {
                             sleepReadWrite: $healthKitSleepReadWriteEnabled,
                             heartRateRead: $healthKitHeartRateReadEnabled,
                             hrvRead: $healthKitHRVReadEnabled,
-                            workoutRead: $healthKitWorkoutReadEnabled,
+                            mindfulWrite: $healthKitMindfulWriteEnabled,
                             requestScope: requestHealthScope
                         )
 
@@ -514,6 +516,8 @@ struct SettingsView: View {
                         notificationsSectionContent
 
                     case .iCloud:
+                        ICloudSyncCard()
+
                         ICloudBackupCard(
                             isEnabled: $iCloudBackupEnabled,
                             status: lastICloudBackupStatus,
@@ -760,12 +764,8 @@ struct SettingsView: View {
             healthKitHeartRateReadEnabled = enabled
         case .heartRateVariabilityRead:
             healthKitHRVReadEnabled = enabled
-        case .vitalsRead:
-            healthKitVitalsReadEnabled = enabled
         case .mindfulWrite:
             healthKitMindfulWriteEnabled = enabled
-        case .workoutRead:
-            healthKitWorkoutReadEnabled = enabled
         }
     }
 

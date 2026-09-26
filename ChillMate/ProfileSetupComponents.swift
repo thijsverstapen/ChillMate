@@ -5,69 +5,6 @@ import SwiftUI
 /// Split out of `ProfileSetupView.swift` unchanged. They were already internal
 /// rather than private, which is what made them the obvious seam.
 
-struct ProfileSetupHeroCard: View {
-    let contentWidth: CGFloat
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .top) {
-                ZStack {
-                    Circle()
-                        .fill(.white.opacity(0.18))
-                        .frame(width: 64, height: 64)
-
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 28, weight: .bold))
-                        .foregroundStyle(.white)
-                }
-
-                Spacer()
-
-                Text("Private")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.white.opacity(0.86))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(.white.opacity(0.14), in: Capsule())
-            }
-
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Let’s make it yours")
-                    .chillScaledFont(size: 36, weight: .bold, relativeTo: .largeTitle)
-                    .foregroundStyle(.white)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Text("Add the details that help ChillMate feel personal, useful, and clear. Nothing has to be perfect right away.")
-                    .font(.callout)
-                    .lineSpacing(2)
-                    .foregroundStyle(.white.opacity(0.80))
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .padding(22)
-        .frame(width: contentWidth, alignment: .leading)
-        .background {
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.24),
-                            Color.chillPrimary.opacity(0.20),
-                            Color.black.opacity(0.08)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .stroke(.white.opacity(0.26), lineWidth: 1)
-        }
-        .shadow(color: .black.opacity(0.16), radius: 24, y: 14)
-    }
-}
-
 struct ProfileSetupSectionHeader: View {
     let eyebrow: String
     let title: String
@@ -127,33 +64,6 @@ struct ProfileSetupTextField: View {
                     .tint(Color.chillPrimary)
                     .lineLimit(axis == .vertical ? 1...4 : 1...1)
             }
-        }
-        .padding(.vertical, 8)
-    }
-}
-
-struct ProfileSetupStepperRow: View {
-    let title: String
-    @Binding var value: Int
-    let range: ClosedRange<Int>
-    let systemImage: String
-
-    var body: some View {
-        HStack(spacing: 12) {
-            ProfileSetupIcon(systemImage: systemImage)
-
-            Stepper(value: $value, in: range) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title)
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Color.chillMint)
-
-                    Text("\(value) years old")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(Color.chillText)
-                }
-            }
-            .tint(.chillPrimary)
         }
         .padding(.vertical, 8)
     }

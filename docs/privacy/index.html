@@ -180,7 +180,7 @@ font-weight:800;max-width:19ch;margin:0}
 
   <h1>Privacy&nbsp;Policy</h1>
   <p class="lede">ChillMate keeps your information on your iPhone, where you control it. There are no servers collecting your data. There are no ad or analytics trackers. Nothing about you is ever sold or shared.</p>
-  <p class="meta">Last updated: 2026-09-11 · Applies to the ChillMate iOS app and this website.</p>
+  <p class="meta">Last updated: 2026-09-25 · Applies to the ChillMate iOS app and this website.</p>
 
   <div class="card">
     <h2 id="short"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-shield"/></svg>The short&nbsp;version
@@ -198,18 +198,18 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 105 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/04d5a1b"><code>04d5a1b</code></a>, whose combined SHA-256 begins <code>62ca4d5cc6ff3055</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 117 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/5fab06b"><code>5fab06b</code></a>, whose combined SHA-256 begins <code>d2cc194dfe40b68a</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
-        <caption>Checked against ChillMate 5.0.0 (build 501), across all 105 Swift files in the app targets and the domain package.</caption>
+        <caption>Checked against ChillMate 5.1.0 (build 510), across all 117 Swift files in the app targets and the domain package.</caption>
         <thead>
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
         <tbody>
-          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn iCloud on. Apple holds it, and I cannot read it.</td></tr>
+          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn on iCloud sync in ChillMate's settings. Apple holds it, and I cannot read it.</td></tr>
           <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
-          <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
+          <tr><td>Apple Health</td><td>Apple Health on your iPhone</td><td>Only the categories you approve. ChillMate writes when a night happened and how long you slept, never what you took or what you wrote.</td></tr>
           <tr><td>An optional donation</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
           <tr><td>A link you tap</td><td>Safari, to that site</td><td>Only on your tap. ChillMate does not fetch those pages itself.</td></tr>
           <tr><td>A call or message you send</td><td>Your phone app, your messages app</td><td>Only on your tap, and you see the message before it goes.</td></tr>
@@ -279,9 +279,14 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>24 changes since this page first existed.</caption>
+        <caption>29 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-09-26</td><td>Remove the watch&#x27;s Ping my phone button</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/5fab06b"><code>5fab06b</code></a></td></tr>
+          <tr><td>2026-09-26</td><td>Stop telling other apps what somebody took, and fill in their sleep once they are up</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c4627d6"><code>c4627d6</code></a></td></tr>
+          <tr><td>2026-09-25</td><td>Make every sentence about where data goes true, and say what changed</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/6cc5c38"><code>6cc5c38</code></a></td></tr>
+          <tr><td>2026-09-25</td><td>Release 5.1.0 as build 510, and make the changelog prove it agrees with the project</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/11ef50f"><code>11ef50f</code></a></td></tr>
+          <tr><td>2026-09-18</td><td>Fingerprint the code a reader can actually clone, and follow the build to 501</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/e9ba6d1"><code>e9ba6d1</code></a></td></tr>
           <tr><td>2026-09-12</td><td>Give the domain its own module, and stop reaching for seven singletons</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c94b013"><code>c94b013</code></a></td></tr>
           <tr><td>2026-09-12</td><td>Keep the Lock Screen&#x27;s own counsel, and write down what the gate found</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/053e5e4"><code>053e5e4</code></a></td></tr>
           <tr><td>2026-09-11</td><td>Tell the site what actually shipped, and stop it guessing the version</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/e1f2170"><code>e1f2170</code></a></td></tr>
@@ -326,7 +331,7 @@ font-weight:800;max-width:19ch;margin:0}
     <ul>
       <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
       <li>Private logs, sleep notes, health-related entries and test reminders, plans, journal entries, check-ins, and emergency-card details.</li>
-      <li>Optional information you choose to add from Apple Health, Contacts, Photos, or Location Services.</li>
+      <li>Sleep, heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.</li>
     </ul>
     <p>Some of the entries you choose to add are health-related and sensitive. They are stored only on your device, under your control.</p>
   </div>
@@ -335,7 +340,7 @@ font-weight:800;max-width:19ch;margin:0}
     <h2 id="use"><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-lock"/></svg>How your information is&nbsp;used</h2>
     <ul>
       <li>To show your private overview, reminders, follow-ups, emergency shortcuts, and wellbeing reflections.</li>
-      <li>To sync with Apple Health only for the categories you approve in iOS settings.</li>
+      <li>To sync with Apple Health only for the categories you approve. What goes to Apple Health is when a night happened and how long you slept, never what you took or what you wrote.</li>
       <li>To create encrypted backups only when you turn backup features on.</li>
     </ul>
     <p>All of this happens on your phone. ChillMate never sends what you write to me.</p>
@@ -353,7 +358,9 @@ font-weight:800;max-width:19ch;margin:0}
   <div class="card">
     <h2 id="where"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-cloud"/></svg>Where your data is&nbsp;stored</h2>
     <p><strong>On your iPhone.</strong> Data is kept in the app's private storage, protected by iOS file protection and, if you enable it, an extra app lock (Face ID or PIN).</p>
-    <p><strong>Optional iCloud.</strong> If you turn on iCloud backup or sync, ChillMate stores your data in <em>your own</em> private iCloud account through Apple's CloudKit and iCloud Drive. Apple encrypts it, and only you can reach it. I have no access to it at all.</p>
+    <p><strong>Not in iPhone search.</strong> Until version 5.1.0, saving a journal entry also put its text into iPhone search. Anyone holding your unlocked phone could read it there without getting past the app lock. ChillMate no longer does this, and 5.1.0 removes what was already there.</p>
+    <p><strong>Optional iCloud.</strong> Both iCloud features are off unless you turn them on, and they are protected differently. <strong>iCloud sync</strong> keeps a copy of your data in <em>your own</em> private iCloud account through Apple's CloudKit, so your history can move to a new iPhone. Unless you have turned on Apple's Advanced Data Protection, Apple holds the keys to that copy. I have no access to it at all. <strong>The encrypted backup</strong> is encrypted on your iPhone before it is saved to iCloud Drive, with a key that never leaves the device, so neither Apple nor I can read it.</p>
+    <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, iCloud sync was on for everyone signed into iCloud, without asking, while this page described it as something you turn on. That was wrong. If you used ChillMate before 5.1.0, the app now asks you once whether to keep the iCloud copy, and new installs start with it off. Turning it off stops new copies but does not delete the one already there. You can remove that in iOS Settings, under your iCloud storage.</p>
     <p><strong>No servers of mine.</strong> There is no ChillMate server anywhere that receives or stores your personal information.</p>
   </div>
 
@@ -369,12 +376,14 @@ font-weight:800;max-width:19ch;margin:0}
     <h2 id="permissions"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-shield"/></svg>Device&nbsp;permissions</h2>
     <p>Each permission is optional and only used for the purpose you grant it:</p>
     <ul>
-      <li><strong>Apple Health.</strong> Read and write only the categories you allow (such as sleep, heart rate, HRV, and workouts).</li>
+      <li><strong>Apple Health.</strong> Only the categories you allow. ChillMate reads your sleep to fill in how long you slept after a night, and heart rate and HRV for your recovery score. It writes when a night happened, how long you slept, breathing sessions, and your aftercare mood.</li>
       <li><strong>Contacts.</strong> Only to let you pick a trusted contact. The lookup happens on your device.</li>
       <li><strong>Photos.</strong> Only to set a profile picture you choose.</li>
       <li><strong>Location.</strong> Only to attach a location to a log or include your current location in an emergency message you send.</li>
       <li><strong>Notifications.</strong> For the reminders and check-ins you turn on. Discreet wording can be enabled so lock-screen text stays vague.</li>
     </ul>
+    <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, each night ChillMate wrote to Apple Health also carried what you took, whether a condom was used, whether you were penetrated, and your note. Other apps allowed to read your sleep or sexual activity could read those too, and so could Health's own export. That was wrong. ChillMate no longer writes them, and 5.1.0 swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Apple Health, it cannot reach those entries. You can delete everything ChillMate wrote from the Health app, where it lists ChillMate among your apps.</p>
+    <p>5.1.0 also asks for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote.</p>
   </div>
 
   <div class="card">
@@ -386,7 +395,7 @@ font-weight:800;max-width:19ch;margin:0}
     <h2 id="control"><svg class="icon" style="color:var(--purple)" aria-hidden="true"><use href="#i-lock"/></svg>Your control and&nbsp;deletion</h2>
     <ul>
       <li>You can delete logs, plans, reminders, timers, journal entries, and your whole account from inside the app.</li>
-      <li>Deleting the app removes its local data from your iPhone. iCloud data can be removed from iCloud settings or from within the app's backup controls.</li>
+      <li>Deleting the app removes its local data from your iPhone. The iCloud sync copy can be removed in iOS Settings, under your iCloud storage, and backup files from the app's backup controls.</li>
       <li>iOS permission controls for Health, Location, Notifications, Contacts, and Photos remain available in the Settings app at any time.</li>
     </ul>
     <p>Because ChillMate does not collect your data on a server, there is no remote profile to ask for, correct, or erase. You already hold all of it. If you are in the EU or EEA, your GDPR rights (access, correction, erasure, portability, objection) are met directly by these controls on your phone.</p>
@@ -425,7 +434,7 @@ font-weight:800;max-width:19ch;margin:0}
     <a href="https://github.com/thijsverstapen/ChillMate">GitHub</a>
     <span class="sep" aria-hidden="true">·</span>
     <a href="mailto:chillmate@icloud.com">chillmate@icloud.com</a>
-    <span class="made">ChillMate 5.0.0 · made by one person in the Netherlands</span>
+    <span class="made">ChillMate 5.1.0 · made by one person in the Netherlands</span>
   </footer>
 
 </main>
