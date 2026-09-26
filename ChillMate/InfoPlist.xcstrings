@@ -70,31 +70,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate kann eine Person aus deinen Kontakten zu einem privaten Eintrag oder einer STI-Benachrichtigung hinzufügen."
+            "value" : "ChillMate lässt dich deine Vertrauensperson oder eine Person für einen privaten Eintrag aus deinen Kontakten auswählen. Es sieht nur die Person, die du auswählst."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate can let you add a person from Contacts to a private log or STI warning shortcut."
+            "value" : "ChillMate lets you pick your trusted contact, or a partner for a private log, from your contacts. It only sees the person you pick."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate puede añadir a una persona de tus contactos a un registro privado o a un aviso de ITS."
+            "value" : "ChillMate te deja elegir tu contacto de confianza, o una pareja para un registro privado, de tus contactos. Solo ve a la persona que eliges."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate peut ajouter une personne de vos contacts à une entrée privée ou à une alerte IST."
+            "value" : "ChillMate te laisse choisir ton contact de confiance, ou un·e partenaire pour une entrée privée, dans tes contacts. Il ne voit que la personne que tu choisis."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate kan iemand uit je contacten toevoegen aan een privélogboek of een soa-melding."
+            "value" : "ChillMate laat je je vertrouwenscontact, of een partner voor een privélog, uit je contacten kiezen. Het ziet alleen de persoon die je kiest."
           }
         }
       }
@@ -207,42 +207,6 @@
         }
       }
     },
-    "NSLocationAlwaysAndWhenInUseUsageDescription" : {
-      "comment" : "Shown when requesting location access.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate nutzt deinen Standort nur, wenn du ihn selbst zu einem privaten Eintrag hinzufügst."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate uses your location if you choose to add it to a private log entry."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate usa tu ubicación solo si decides añadirla a un registro privado."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate utilise votre position uniquement si vous choisissez de l'ajouter à une entrée privée."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ChillMate gebruikt je locatie alleen als je die zelf aan een privé-item toevoegt."
-          }
-        }
-      }
-    },
     "NSLocationWhenInUseUsageDescription" : {
       "comment" : "Shown when requesting location access while the app is in use.",
       "extractionState" : "manual",
@@ -250,31 +214,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate nutzt deinen Standort nur, wenn du ihn selbst zu einem privaten Eintrag hinzufügst."
+            "value" : "ChillMate nutzt deinen Standort nur, wenn du darum bittest: für einen Eintrag oder für eine Nachricht, die du gerade sendest."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate uses your location if you choose to add it to a private log entry."
+            "value" : "ChillMate uses your location only when you ask: to add it to a log, or to put it in a message you are sending."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate usa tu ubicación solo si decides añadirla a un registro privado."
+            "value" : "ChillMate usa tu ubicación solo cuando tú lo pides: para añadirla a un registro o para ponerla en un mensaje que estás enviando."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate utilise votre position uniquement si vous choisissez de l'ajouter à une entrée privée."
+            "value" : "ChillMate utilise ta position seulement quand tu le demandes : pour l’ajouter à une entrée, ou pour la mettre dans un message que tu envoies."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate gebruikt je locatie alleen als je die zelf aan een privé-item toevoegt."
+            "value" : "ChillMate gebruikt je locatie alleen als jij erom vraagt: om hem aan een log toe te voegen, of om hem mee te sturen in een bericht dat je verstuurt."
           }
         }
       }

@@ -76,6 +76,10 @@ enum DefaultsKey {
     /// Set once every sample an earlier version wrote into Apple Health with the
     /// night's details in its metadata has been replaced. See `HealthLegacyCleanup`.
     static let healthLegacyMetadataRemoved = "healthLegacyMetadataRemoved"
+
+    /// Set once Spotlight has confirmed that every journal entry earlier versions
+    /// indexed is gone. See `SpotlightService.removeJournalIndexIfNeeded`.
+    static let spotlightJournalRemoved = "spotlightJournalRemoved"
     static let lastKnownHRVms = "lastKnownHRVms"
     static let lastDailyRecoveryScore = "lastDailyRecoveryScore"
     static let reductionGoalSessions = "reductionGoalSessions"

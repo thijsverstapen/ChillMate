@@ -90,6 +90,7 @@ struct ChillMateApp: App {
             TypedRecordsMigration.runIfNeeded()
             DataRetentionSweep.runIfNeeded()
             Task {
+                await services.spotlight.removeJournalIndexIfNeeded(defaults: .standard)
                 await HealthLegacyCleanup.runIfNeeded(services: services)
                 await SleepBackfill.run(services: services)
             }
@@ -98,8 +99,6 @@ struct ChillMateApp: App {
             guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
             if id == SpotlightService.riskCheckerItemID {
                 UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: DefaultsKey.pendingAppDestination)
-            } else if id.hasPrefix("journal-") {
-                UserDefaults.standard.set(NotificationDestination.journal.rawValue, forKey: DefaultsKey.pendingAppDestination)
             }
         }
         .onChange(of: scenePhase) { _, newPhase in

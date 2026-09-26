@@ -299,19 +299,17 @@ final class NotificationService {
         clearWeekendSafetyCheckIns()
         guard UserDefaults.standard.bool(forKey: DefaultsKey.weekendSafetyEnabled) else { return }
 
-        // Calendar weekday: Sunday = 1 … Saturday = 7. Saturday's early hours are
-        // Friday night; Sunday's early hours are Saturday night. Two soft pings each.
-        let slots: [(weekday: Int, hour: Int, minute: Int)] = [
-            (7, 1, 30), (7, 4, 0),
-            (1, 1, 30), (1, 4, 0)
-        ]
+        // Which of tonight's check-ins "I'm home safe" has already answered. This
+        // runs on every return to the app, so without it the answer lasted only
+        // until the phone was next opened.
+        let homeSafe = UserDefaults.standard.double(forKey: DefaultsKey.lastHomeSafeTimestamp)
+        let triggers = WeekendCheckInSchedule.triggers(
+            now: .now,
+            lastHomeSafe: homeSafe > 0 ? Date(timeIntervalSince1970: homeSafe) : nil,
+            calendar: .current
+        )
 
-        for (index, slot) in slots.enumerated() {
-            var components = DateComponents()
-            components.weekday = slot.weekday
-            components.hour = slot.hour
-            components.minute = slot.minute
-
+        for (index, planned) in triggers.enumerated() {
             let content = notificationContent(
                 title: String(localized: "Checking in"),
                 body: String(localized: "Out tonight? Tap if you want support, or let us know you’re safe."),
@@ -321,10 +319,19 @@ final class NotificationService {
                 interruptionLevel: .passive
             )
 
+            let trigger: UNNotificationTrigger
+            switch planned {
+            case .repeating(let slot):
+                trigger = UNCalendarNotificationTrigger(dateMatching: slot.components, repeats: true)
+            case .once(let date):
+                let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+                trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            }
+
             center.add(UNNotificationRequest(
                 identifier: weekendSafetyIdentifier(index),
                 content: content,
-                trigger: UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+                trigger: trigger
             ))
         }
     }
@@ -670,8 +677,13 @@ final class NotificationService {
             .map(\.identifier)
             .filter { $0.hasPrefix("chillmate.sessionCheckIn.") || $0.hasPrefix("chillmate.weekendsafety.") }
 
-        guard !stale.isEmpty else { return }
-        center.removePendingNotificationRequests(withIdentifiers: stale)
+        if !stale.isEmpty {
+            center.removePendingNotificationRequests(withIdentifiers: stale)
+        }
+        // The weekend ones repeat. Removing them took every future weekend with
+        // tonight, until the app was next opened; putting them back here skips
+        // only what is left of tonight.
+        scheduleWeekendSafetyCheckIns()
     }
 
     func clearSessionCheckIns(id: UUID) {

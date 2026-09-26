@@ -138,9 +138,8 @@ protocol EncryptedBackups: Sendable {
 /// to cover the whole class would be a second copy of it to keep in step.
 @MainActor
 protocol SpotlightIndexing: Sendable {
-    func indexJournalEntry(_ entry: JournalEntry)
     func indexTools()
-    func removeJournalEntry(_ entry: JournalEntry)
+    func removeJournalIndexIfNeeded(defaults: UserDefaults) async
 }
 
 /// One location, when the user asks for one.

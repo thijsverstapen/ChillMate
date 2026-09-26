@@ -37,9 +37,9 @@ YOUR SLEEP, FILLED IN PROPERLY
 ChillMate could already read your sleep from Apple Health, but it only looked when you saved a night, which is usually before you've slept. Now it looks again once you're up and fills in how long you slept by itself. It never overwrites a number you typed, and a night two devices recorded counts once, not twice.
 
 YOUR JOURNAL, FINALLY SEARCHABLE
-Remember writing something and can't find it? There's a search box now. It matches on meaning, not just letters, so looking for "felt anxious" finds the night you wrote "feeling anxious". A year of entries is suddenly worth having.
+Remember writing something and can't find it? There's a search box now. It matches on meaning, not just letters, so looking for "felt anxious" finds the night you wrote "feeling anxious".
 
-Insights also has a new card showing how your writing has read over time — recent entries against earlier ones. Entries too short to judge are left out, and it tells you how many it could actually read. A confident line drawn through nothing is worse than no line.
+Insights also has a new card showing how your writing has read over time — recent entries against earlier ones. Entries too short to judge are left out, and it tells you how many it could actually read.
 
 TYPE IT INSTEAD OF TAPPING IT
 The safety checker takes a sentence now. Write what you had the way you'd say it out loud, and it offers the same selection tapping would have made. It only picks from what the app already knows, and the ratings come from exactly the same place they always did.
@@ -51,7 +51,7 @@ FOR AN APPOINTMENT
 The summary you can hand to a professional now has room for a paragraph in your own words, drafted from your journal and yours to edit before anyone sees it. It sits under its own heading, so it's clear which part is a count and which part is you.
 
 WHERE THE WARNINGS COME FROM
-Every warning in the checker now says what it rests on: matching a published independent chart, rated higher here on purpose, or not on that chart at all. They were never all the same kind of claim, and now they don't look like it.
+Every warning in the checker now says what it rests on: matching a published independent chart, rated higher here on purpose, or not on that chart at all.
 
 FIXED, AND IT MATTERS
 A session shorter than an hour and a half got no check-in at all. The first one was scheduled for later than the session itself ran, so it never arrived. Short sessions are checked on properly now.
@@ -60,7 +60,9 @@ ALSO
 • Ask Siri how many nights you've logged. It says how many, never what.
 • The weekly reflection explains itself now when the written summary isn't available, instead of just not being there.
 • Noticeably quicker if you have a long history.
-• The watch's Safety screen no longer has the button that opened the emergency page on your iPhone. Calling for help from your wrist works as before.
+• Your journal no longer shows up in iPhone search, where it could be read without unlocking ChillMate.
+• "I'm home safe" now quiets the rest of that night's check-ins, even after you open the app again.
+• The watch no longer has the button that opened your iPhone's emergency page. Calling for help from it works as before.
 
 Thank you for using this. Genuinely.
 
@@ -82,9 +84,9 @@ JE SLAAP, EINDELIJK GOED INGEVULD
 ChillMate kon je slaap al uit Apple Health lezen, maar keek alleen als je een nacht opsloeg, en dan heb je meestal nog niet geslapen. Nu kijkt het opnieuw zodra je op bent, en vult het zelf in hoe lang je sliep. Het overschrijft nooit een getal dat jij invulde, en een nacht die twee apparaten bijhielden telt één keer, niet twee.
 
 JE DAGBOEK, EINDELIJK DOORZOEKBAAR
-Weet je nog dat je iets schreef, maar kun je het niet terugvinden? Er is nu een zoekbalk. Die zoekt op betekenis, niet alleen op letters, dus zoeken op "voelde me angstig" vindt de nacht waarin je "angstig gevoel" schreef. Een jaar aan notities is ineens iets waard.
+Weet je nog dat je iets schreef, maar kun je het niet terugvinden? Er is nu een zoekbalk. Die zoekt op betekenis, niet alleen op letters, dus zoeken op "voelde me angstig" vindt de nacht waarin je "angstig gevoel" schreef.
 
-Bij Inzichten staat ook een nieuwe kaart die laat zien hoe je schrijven in de loop van de tijd aanvoelde — recente notities tegenover eerdere. Notities die te kort zijn om iets over te zeggen blijven buiten beschouwing, en er staat bij hoeveel er gelezen konden worden. Een zelfverzekerde lijn door niets is erger dan geen lijn.
+Bij Inzichten staat ook een nieuwe kaart die laat zien hoe je schrijven in de loop van de tijd aanvoelde — recente notities tegenover eerdere. Notities die te kort zijn om iets over te zeggen blijven buiten beschouwing, en er staat bij hoeveel er gelezen konden worden.
 
 TYPEN IN PLAATS VAN TIKKEN
 De veiligheidscheck neemt nu een zin aan. Schrijf op wat je hebt gehad zoals je het zou zeggen, en hij stelt dezelfde selectie voor als tikken zou doen. Hij kiest alleen uit wat de app al kent, en de inschattingen komen precies vandaan waar ze altijd vandaan kwamen.
@@ -96,7 +98,7 @@ VOOR EEN AFSPRAAK
 De samenvatting die je aan een hulpverlener kunt geven heeft nu ruimte voor een stuk in je eigen woorden, geschreven vanuit je dagboek en van jou om aan te passen voordat iemand het ziet. Het staat onder een eigen kopje, zodat duidelijk is welk deel een telling is en welk deel jij bent.
 
 WAAR DE WAARSCHUWINGEN OP RUSTEN
-Elke waarschuwing in de check zegt nu waarop hij rust: gelijk aan een gepubliceerd onafhankelijk overzicht, hier bewust hoger ingeschat, of helemaal niet op dat overzicht. Het waren nooit allemaal dezelfde soort uitspraken, en nu zien ze er ook niet meer zo uit.
+Elke waarschuwing in de check zegt nu waarop hij rust: gelijk aan een gepubliceerd onafhankelijk overzicht, hier bewust hoger ingeschat, of helemaal niet op dat overzicht.
 
 OPGELOST, EN DAT IS BELANGRIJK
 Een sessie korter dan anderhalf uur kreeg helemaal geen check-in. De eerste stond gepland voor later dan de sessie zelf duurde, dus kwam hij nooit. Korte sessies worden nu gewoon gecheckt.
@@ -105,7 +107,9 @@ VERDER
 • Vraag Siri hoeveel nachten je hebt gelogd. Hij zegt hoeveel, nooit wat.
 • De weekreflectie legt nu uit waarom de geschreven samenvatting er niet is, in plaats van er gewoon niet te zijn.
 • Merkbaar sneller als je een lange geschiedenis hebt.
-• Het Veiligheid-scherm op je horloge heeft geen knop meer die de noodpagina op je iPhone opende. Hulp bellen vanaf je pols werkt zoals altijd.
+• Je dagboek verschijnt niet meer in de zoekfunctie van je iPhone, waar het te lezen was zonder ChillMate te ontgrendelen.
+• "Ik ben veilig thuis" houdt de rest van die nacht de check-ins stil, ook als je de app daarna opent.
+• Je horloge heeft geen knop meer die de noodpagina op je iPhone opende. Hulp bellen vanaf je pols werkt zoals altijd.
 
 Dankjewel dat je ChillMate gebruikt. Echt.
 
@@ -127,9 +131,9 @@ DEIN SCHLAF, RICHTIG EINGETRAGEN
 ChillMate las deinen Schlaf schon aus Apple Health, aber nur beim Speichern einer Nacht – meist bevor du geschlafen hast. Jetzt schaut es noch einmal, wenn du wach bist, und trägt selbst ein, wie lange du geschlafen hast. Es überschreibt nie eine Zahl, die du eingegeben hast, und eine von zwei Geräten aufgezeichnete Nacht zählt einmal.
 
 DEIN TAGEBUCH, ENDLICH DURCHSUCHBAR
-Du weißt, dass du etwas geschrieben hast, findest es aber nicht? Jetzt gibt es eine Suche. Sie sucht nach Bedeutung, nicht nur nach Buchstaben, also findet "fühlte mich ängstlich" die Nacht, in der du "ängstliches Gefühl" geschrieben hast. Ein Jahr an Einträgen ist plötzlich etwas wert.
+Du weißt, dass du etwas geschrieben hast, findest es aber nicht? Jetzt gibt es eine Suche. Sie sucht nach Bedeutung, nicht nur nach Buchstaben, also findet "fühlte mich ängstlich" die Nacht, in der du "ängstliches Gefühl" geschrieben hast.
 
-Bei den Einblicken gibt es außerdem eine neue Karte, die zeigt, wie sich dein Schreiben über die Zeit gelesen hat — neuere Einträge gegen frühere. Einträge, die zu kurz sind, bleiben außen vor, und es steht dabei, wie viele gelesen werden konnten. Eine selbstbewusste Linie durch nichts ist schlimmer als gar keine.
+Bei den Einblicken gibt es außerdem eine neue Karte, die zeigt, wie sich dein Schreiben über die Zeit gelesen hat — neuere Einträge gegen frühere. Einträge, die zu kurz sind, bleiben außen vor, und es steht dabei, wie viele gelesen werden konnten.
 
 TIPPEN STATT ANTIPPEN
 Die Sicherheitsprüfung nimmt jetzt einen Satz. Schreib auf, was du hattest, so wie du es sagen würdest, und sie schlägt dieselbe Auswahl vor wie das Antippen. Sie wählt nur aus dem, was die App schon kennt, und die Einstufungen kommen genau von dort, wo sie immer herkamen.
@@ -138,18 +142,20 @@ LASS DIE APP DAS FORMULAR MACHEN
 Schreib dein Tagebuch, und die App kann anbieten, dein Nachtprotokoll daraus zu füllen — Stunden Schlaf, ob du seitdem geschlafen hast, ob du eine Erinnerungslücke beschrieben hast. Sie trägt nie von selbst etwas ein, und du prüfst jeden Wert vorher.
 
 FÜR EINEN TERMIN
-Die Zusammenfassung, die du einer Fachperson geben kannst, hat jetzt Platz für einen Absatz in deinen eigenen Worten, aus deinem Tagebuch entworfen und deiner zum Ändern, bevor ihn jemand sieht. Er steht unter einer eigenen Überschrift, damit klar ist, welcher Teil eine Zahl ist und welcher Teil du bist.
+Die Zusammenfassung für eine Fachperson hat jetzt Platz für einen Absatz in deinen eigenen Worten, aus deinem Tagebuch entworfen, und du bearbeitest ihn, bevor ihn jemand sieht. Er steht unter einer eigenen Überschrift, damit klar ist, welcher Teil eine Zahl ist und welcher Teil du bist.
 
 WORAUF DIE WARNUNGEN BERUHEN
-Jede Warnung in der Prüfung sagt jetzt, worauf sie beruht: gleich einer veröffentlichten unabhängigen Übersicht, hier bewusst höher eingestuft, oder gar nicht auf dieser Übersicht. Es waren nie alles dieselben Aussagen, und jetzt sehen sie auch nicht mehr so aus.
+Jede Warnung in der Prüfung sagt jetzt, worauf sie beruht: gleich einer veröffentlichten unabhängigen Übersicht, hier bewusst höher eingestuft, oder gar nicht auf dieser Übersicht.
 
 BEHOBEN, UND ZWAR WICHTIG
-Eine Sitzung unter anderthalb Stunden bekam gar keinen Check-in. Der erste war für später geplant, als die Sitzung überhaupt lief, also kam er nie. Kurze Sitzungen werden jetzt richtig begleitet.
+Eine Sitzung unter anderthalb Stunden bekam gar keinen Check-in. Der erste war später geplant, als die Sitzung dauerte, also kam er nie. Kurze Sitzungen werden jetzt richtig begleitet.
 
 AUSSERDEM
 • Frag Siri, wie viele Nächte du erfasst hast. Sie sagt wie viele, nie was.
 • Die Wochenreflexion sagt jetzt, warum die geschriebene Zusammenfassung fehlt.
 • Spürbar schneller bei einer langen Geschichte.
+• Dein Tagebuch taucht nicht mehr in der iPhone-Suche auf, wo man es ohne Entsperren von ChillMate lesen konnte.
+• „Ich bin sicher zu Hause“ stellt die übrigen Check-ins der Nacht still, auch wenn du die App danach öffnest.
 • Auf der Watch fehlt die Taste, die die Notfallseite auf dem iPhone öffnete. Hilfe rufen geht wie bisher.
 
 Danke, dass du ChillMate benutzt. Wirklich.
@@ -172,9 +178,9 @@ TON SOMMEIL, ENFIN BIEN REMPLI
 ChillMate lisait déjà ton sommeil dans Apple Santé, mais seulement quand tu enregistrais une nuit, souvent avant d'avoir dormi. Maintenant il regarde à nouveau une fois que tu es debout, et indique tout seul combien de temps tu as dormi. Il n'écrase jamais un chiffre que tu as saisi, et une nuit vue par deux appareils compte une fois.
 
 TON JOURNAL, ENFIN CONSULTABLE
-Tu te souviens d'avoir écrit quelque chose sans le retrouver ? Il y a une recherche maintenant. Elle cherche le sens, pas seulement les lettres, donc chercher "je me sentais anxieux" trouve la nuit où tu as écrit "sentiment d'anxiété". Une année d'entrées vaut soudain quelque chose.
+Tu te souviens d'avoir écrit quelque chose sans le retrouver ? Il y a une recherche maintenant. Elle cherche le sens, pas seulement les lettres, donc chercher "je me sentais anxieux" trouve la nuit où tu as écrit "sentiment d'anxiété".
 
-Les aperçus ont aussi une nouvelle carte montrant le ton de ce que tu écris au fil du temps — entrées récentes contre entrées plus anciennes. Celles trop courtes pour être jugées sont ignorées, et il est indiqué combien ont pu être lues. Une ligne assurée tracée à travers rien est pire que pas de ligne.
+Les aperçus ont aussi une nouvelle carte montrant le ton de ce que tu écris au fil du temps — entrées récentes contre entrées plus anciennes. Celles trop courtes pour être jugées sont ignorées, et il est indiqué combien ont pu être lues.
 
 ÉCRIRE PLUTÔT QUE TOUCHER
 Le vérificateur accepte une phrase maintenant. Écris ce que tu as pris comme tu le dirais, et il propose la même sélection que si tu avais touché. Il ne choisit que parmi ce que l'app connaît déjà, et les évaluations viennent exactement d'où elles venaient avant.
@@ -186,7 +192,7 @@ POUR UN RENDEZ-VOUS
 Le résumé que tu peux donner à un professionnel a maintenant de la place pour un paragraphe dans tes propres mots, rédigé depuis ton journal et à toi de le modifier avant que quiconque le voie. Il est sous son propre titre, pour qu'on voie quelle partie est un décompte et quelle partie c'est toi.
 
 SUR QUOI REPOSENT LES AVERTISSEMENTS
-Chaque avertissement dit maintenant sur quoi il repose : identique à une référence indépendante publiée, relevé ici volontairement, ou absent de cette référence. Ils n'ont jamais tous été la même sorte d'affirmation, et maintenant ils n'en ont plus l'air.
+Chaque avertissement dit maintenant sur quoi il repose : identique à une référence indépendante publiée, relevé ici volontairement, ou absent de cette référence.
 
 CORRIGÉ, ET ÇA COMPTE
 Une session de moins d'une heure et demie ne recevait aucun point de contact. Le premier était prévu plus tard que la session elle-même, donc il n'arrivait jamais. Les sessions courtes sont suivies correctement maintenant.
@@ -195,7 +201,9 @@ AUSSI
 • Demande à Siri combien de nuits tu as enregistrées. Il dit combien, jamais quoi.
 • La réflexion hebdomadaire explique maintenant pourquoi le résumé écrit n'est pas là, au lieu de simplement ne pas y être.
 • Nettement plus rapide si tu as un long historique.
-• L'écran Sécurité de la montre n'a plus le bouton qui ouvrait la page d'urgence sur ton iPhone. Appeler à l'aide depuis ta montre marche comme avant.
+• Ton journal n'apparaît plus dans la recherche de l'iPhone, où on pouvait le lire sans déverrouiller ChillMate.
+• « Je suis chez moi » coupe les check-ins restants de la nuit, même si tu rouvres l'app.
+• La montre n'a plus le bouton qui ouvrait la page d'urgence de ton iPhone. Appeler à l'aide depuis la montre marche comme avant.
 
 Merci d'utiliser ChillMate. Vraiment.
 
@@ -217,9 +225,9 @@ TU SUEÑO, POR FIN BIEN ANOTADO
 ChillMate ya podía leer tu sueño de Apple Salud, pero solo miraba al guardar una noche, casi siempre antes de que hubieras dormido. Ahora vuelve a mirar cuando ya estás en pie y anota solo cuánto dormiste. Nunca sobrescribe un número que escribiste tú, y una noche que registraron dos dispositivos cuenta una vez, no dos.
 
 TU DIARIO, POR FIN CON BÚSQUEDA
-¿Recuerdas haber escrito algo y no lo encuentras? Ahora hay un buscador. Busca por significado, no solo por letras, así que buscar "me sentí ansioso" encuentra la noche en que escribiste "sensación de ansiedad". Un año de entradas de repente vale algo.
+¿Recuerdas haber escrito algo y no lo encuentras? Ahora hay un buscador. Busca por significado, no solo por letras, así que buscar "me sentí ansioso" encuentra la noche en que escribiste "sensación de ansiedad".
 
-En Perspectivas hay también una tarjeta nueva que muestra cómo ha sonado lo que escribes con el tiempo — entradas recientes frente a anteriores. Las demasiado cortas para juzgar se dejan fuera, y se indica cuántas se pudieron leer. Una línea segura trazada sobre nada es peor que ninguna línea.
+En Perspectivas hay también una tarjeta nueva que muestra cómo ha sonado lo que escribes con el tiempo — entradas recientes frente a anteriores. Las demasiado cortas para juzgar se dejan fuera, y se indica cuántas se pudieron leer.
 
 ESCRIBIR EN VEZ DE TOCAR
 El comprobador acepta una frase. Escribe lo que tomaste como lo dirías, y te propone la misma selección que habrías hecho tocando. Solo elige entre lo que la app ya conoce, y las valoraciones vienen exactamente de donde venían antes.
@@ -231,7 +239,7 @@ PARA UNA CITA
 El resumen que puedes dar a un profesional tiene ahora sitio para un párrafo en tus propias palabras, redactado desde tu diario y tuyo para editarlo antes de que nadie lo vea. Va bajo su propio título, para que se vea qué parte es un recuento y qué parte eres tú.
 
 EN QUÉ SE APOYAN LOS AVISOS
-Cada aviso dice ahora en qué se apoya: igual que una referencia independiente publicada, subido aquí a propósito, o fuera de esa referencia. Nunca fueron todos la misma clase de afirmación, y ahora ya no lo parecen.
+Cada aviso dice ahora en qué se apoya: igual que una referencia independiente publicada, subido aquí a propósito, o fuera de esa referencia.
 
 ARREGLADO, Y ES IMPORTANTE
 Una sesión de menos de hora y media no recibía ningún aviso de seguimiento. El primero se programaba más tarde de lo que duraba la sesión, así que nunca llegaba. Las sesiones cortas ya se siguen bien.
@@ -240,6 +248,8 @@ ADEMÁS
 • Pregúntale a Siri cuántas noches has registrado. Dice cuántas, nunca qué.
 • La reflexión semanal ahora explica por qué no está el resumen escrito, en vez de simplemente no estar.
 • Bastante más rápida si tienes un historial largo.
-• La pantalla de Seguridad del reloj ya no tiene el botón que abría la página de emergencia en tu iPhone. Pedir ayuda desde la muñeca funciona como siempre.
+• Tu diario ya no aparece en la búsqueda del iPhone, donde se podía leer sin desbloquear ChillMate.
+• «He llegado a casa» silencia el resto de check-ins de esa noche, aunque vuelvas a abrir la app.
+• El reloj ya no tiene el botón que abría la página de emergencia de tu iPhone. Pedir ayuda desde la muñeca funciona como siempre.
 
 Gracias por usar ChillMate. De verdad.

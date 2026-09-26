@@ -110,3 +110,60 @@ public enum SaferPlanReminderSchedule {
         )
     }
 }
+
+/// The four soft check-ins across Friday and Saturday night, and what saying
+/// "I'm home safe" does to them.
+///
+/// They used to be four repeating calendar triggers, cleared when somebody said
+/// they were home and then scheduled again, unchanged, the next time the app came
+/// to the front. Home at two and opening the phone to check a message meant the
+/// four o'clock check-in came anyway. Clearing them also removed every future
+/// weekend's, until the app happened to be opened again.
+///
+/// This decides, for each slot, whether its next occurrence should still fire.
+public enum WeekendCheckInSchedule {
+
+    public struct Slot: Equatable, Sendable {
+        public let weekday: Int
+        public let hour: Int
+        public let minute: Int
+
+        public var components: DateComponents {
+            DateComponents(hour: hour, minute: minute, weekday: weekday)
+        }
+    }
+
+    /// Calendar weekdays: Sunday is 1, Saturday is 7. Saturday's early hours are
+    /// Friday night, Sunday's are Saturday night. Two each.
+    public static let slots: [Slot] = [
+        Slot(weekday: 7, hour: 1, minute: 30), Slot(weekday: 7, hour: 4, minute: 0),
+        Slot(weekday: 1, hour: 1, minute: 30), Slot(weekday: 1, hour: 4, minute: 0)
+    ]
+
+    /// How long "I'm home safe" quiets the check-ins for. Long enough to cover the
+    /// rest of the night it was said in, short enough never to reach the next one.
+    public static let quietAfterHomeSafe: TimeInterval = 12 * 60 * 60
+
+    public enum Trigger: Equatable, Sendable {
+        /// Every week at this slot, starting with its next occurrence.
+        case repeating(Slot)
+        /// Once, at this moment: the slot's occurrence after the one that was
+        /// quieted. The next time the app runs it becomes repeating again.
+        case once(Date)
+    }
+
+    /// One trigger per slot, in the order of `slots`.
+    public static func triggers(now: Date, lastHomeSafe: Date?, calendar: Calendar) -> [Trigger] {
+        slots.map { slot in
+            guard let lastHomeSafe,
+                  let next = calendar.nextDate(after: now, matching: slot.components, matchingPolicy: .nextTime),
+                  next >= lastHomeSafe,
+                  next.timeIntervalSince(lastHomeSafe) <= quietAfterHomeSafe,
+                  let following = calendar.nextDate(after: next, matching: slot.components, matchingPolicy: .nextTime)
+            else {
+                return .repeating(slot)
+            }
+            return .once(following)
+        }
+    }
+}

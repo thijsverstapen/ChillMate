@@ -255,7 +255,6 @@ struct JournalView: View {
             entry.feelsGoodAbout = feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines)
             entry.photos = photoData
             modelContext.saveChanges()
-            services.spotlight.indexJournalEntry(entry)
         } else {
             let entry = JournalEntry(
                 date: date,
@@ -268,7 +267,6 @@ struct JournalView: View {
             )
             modelContext.insert(entry)
             modelContext.saveChanges()
-            services.spotlight.indexJournalEntry(entry)
         }
 
         // Saved → drop back to the read-only overview for the day.
@@ -291,7 +289,6 @@ struct JournalView: View {
         guard let entry = selectedJournalEntry else { return }
         journalHaptic = .warning
         journalHapticTick += 1
-        services.spotlight.removeJournalEntry(entry)
         modelContext.delete(entry)
         modelContext.saveChanges()
         isEditing = false

@@ -198,7 +198,7 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 117 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/c4627d6"><code>c4627d6</code></a>, whose combined SHA-256 begins <code>cde6f30b7a30a9f1</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 117 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/5fab06b"><code>5fab06b</code></a>, whose combined SHA-256 begins <code>d2cc194dfe40b68a</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
         <caption>Checked against ChillMate 5.1.0 (build 510), across all 117 Swift files in the app targets and the domain package.</caption>
@@ -279,9 +279,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>28 changes since this page first existed.</caption>
+        <caption>29 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-09-26</td><td>Remove the watch&#x27;s Ping my phone button</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/5fab06b"><code>5fab06b</code></a></td></tr>
           <tr><td>2026-09-26</td><td>Stop telling other apps what somebody took, and fill in their sleep once they are up</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c4627d6"><code>c4627d6</code></a></td></tr>
           <tr><td>2026-09-25</td><td>Make every sentence about where data goes true, and say what changed</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/6cc5c38"><code>6cc5c38</code></a></td></tr>
           <tr><td>2026-09-25</td><td>Release 5.1.0 as build 510, and make the changelog prove it agrees with the project</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/11ef50f"><code>11ef50f</code></a></td></tr>
@@ -357,6 +358,7 @@ font-weight:800;max-width:19ch;margin:0}
   <div class="card">
     <h2 id="where"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-cloud"/></svg>Where your data is&nbsp;stored</h2>
     <p><strong>On your iPhone.</strong> Data is kept in the app's private storage, protected by iOS file protection and, if you enable it, an extra app lock (Face ID or PIN).</p>
+    <p><strong>Not in iPhone search.</strong> Until version 5.1.0, saving a journal entry also put its text into iPhone search. Anyone holding your unlocked phone could read it there without getting past the app lock. ChillMate no longer does this, and 5.1.0 removes what was already there.</p>
     <p><strong>Optional iCloud.</strong> Both iCloud features are off unless you turn them on, and they are protected differently. <strong>iCloud sync</strong> keeps a copy of your data in <em>your own</em> private iCloud account through Apple's CloudKit, so your history can move to a new iPhone. Unless you have turned on Apple's Advanced Data Protection, Apple holds the keys to that copy. I have no access to it at all. <strong>The encrypted backup</strong> is encrypted on your iPhone before it is saved to iCloud Drive, with a key that never leaves the device, so neither Apple nor I can read it.</p>
     <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, iCloud sync was on for everyone signed into iCloud, without asking, while this page described it as something you turn on. That was wrong. If you used ChillMate before 5.1.0, the app now asks you once whether to keep the iCloud copy, and new installs start with it off. Turning it off stops new copies but does not delete the one already there. You can remove that in iOS Settings, under your iCloud storage.</p>
     <p><strong>No servers of mine.</strong> There is no ChillMate server anywhere that receives or stores your personal information.</p>
