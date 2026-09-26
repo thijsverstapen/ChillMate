@@ -613,8 +613,7 @@ SHOTS = ["home.jpg", "risk.jpg", "help.jpg", "support.jpg", "privacy.jpg"]
 
 
 def watch(depth):
-    alt = ("The watch app's Safety screen, offering an emergency call and a way "
-           "to ping your phone.")
+    alt = "The watch app's Safety screen, with a one-tap call to emergency services."
     return f"""<div class="watch">
         <div class="watch-shell">
           <div class="watch-screen">
@@ -1689,6 +1688,7 @@ RELEASES = [
         "Siri can count your logged nights. It reports how many, never what \u2014 what you logged is not something that should be readable from a lock screen.",
         "The weekly reflection now says why there is no written summary when Apple Intelligence is off or unavailable, instead of the section quietly disappearing.",
         "Fixed: most of the recovery card's small print, such as \"not logged\" and \"none\", was in English whichever language you chose.",
+        "The Apple Watch Safety screen no longer has the button that opened the emergency page on your iPhone. Calling emergency services, or your trusted contact, from the watch works as before.",
         "Long histories are faster. The stored data is indexed on the dates everything is sorted by, and the check for whether a night had anything logged no longer sorts a list to answer yes or no.",
     ]),
     ("5.0.0", "501", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [

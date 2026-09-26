@@ -138,9 +138,6 @@ final class WatchConnectivityService: NSObject {
             NotificationCenter.default.post(name: .watchDidReportHomeSafe, object: nil)
             Task { await Services.live.notifications.clearSafetyCheckInsForTonight() }
         }
-        if payload["sosRequested"] as? Bool == true {
-            NotificationCenter.default.post(name: .watchDidRequestSOS, object: nil)
-        }
         if let value = payload["setDiscreetCheckIns"] as? Bool {
             UserDefaults.standard.set(value, forKey: DefaultsKey.watchDiscreetCheckIns)
             sendSettings() // echo the change back so both sides agree
@@ -186,7 +183,6 @@ extension Notification.Name {
     static let watchDidLogHydration = Notification.Name("ChillMate.watchDidLogHydration")
     static let chillMateRefreshTimers = Notification.Name("ChillMate.refreshTimers")
     static let watchDidRequestQuickSkip = Notification.Name("ChillMate.watchDidRequestQuickSkip")
-    static let watchDidRequestSOS = Notification.Name("ChillMate.watchDidRequestSOS")
     static let watchDidReportHomeSafe = Notification.Name("ChillMate.watchDidReportHomeSafe")
 }
 

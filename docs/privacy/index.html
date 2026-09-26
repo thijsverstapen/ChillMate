@@ -198,10 +198,10 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 114 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/6cc5c38"><code>6cc5c38</code></a>, whose combined SHA-256 begins <code>5faa3acbc7935d5f</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 117 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/c4627d6"><code>c4627d6</code></a>, whose combined SHA-256 begins <code>cde6f30b7a30a9f1</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
-        <caption>Checked against ChillMate 5.1.0 (build 510), across all 114 Swift files in the app targets and the domain package.</caption>
+        <caption>Checked against ChillMate 5.1.0 (build 510), across all 117 Swift files in the app targets and the domain package.</caption>
         <thead>
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
@@ -279,9 +279,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>27 changes since this page first existed.</caption>
+        <caption>28 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-09-26</td><td>Stop telling other apps what somebody took, and fill in their sleep once they are up</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c4627d6"><code>c4627d6</code></a></td></tr>
           <tr><td>2026-09-25</td><td>Make every sentence about where data goes true, and say what changed</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/6cc5c38"><code>6cc5c38</code></a></td></tr>
           <tr><td>2026-09-25</td><td>Release 5.1.0 as build 510, and make the changelog prove it agrees with the project</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/11ef50f"><code>11ef50f</code></a></td></tr>
           <tr><td>2026-09-18</td><td>Fingerprint the code a reader can actually clone, and follow the build to 501</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/e9ba6d1"><code>e9ba6d1</code></a></td></tr>

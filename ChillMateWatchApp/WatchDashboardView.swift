@@ -480,7 +480,6 @@ private struct BreathingScreen: View {
 
 private struct SafetyScreen: View {
     @ObservedObject var connectivity: WatchConnectivityReceiver
-    @State private var pinged = false
     @State private var homeSafe = false
 
     var body: some View {
@@ -521,17 +520,6 @@ private struct SafetyScreen: View {
                     connectivity.sendHomeSafe()
                     homeSafe = true
                     WKInterfaceDevice.current().play(.success)
-                }
-
-                SafetyActionButton(
-                    title: pinged ? String(localized: "Phone alerted") : String(localized: "Ping my phone"),
-                    symbol: pinged ? "checkmark.circle.fill" : "iphone.radiowaves.left.and.right",
-                    tint: .orange
-                ) {
-                    guard !pinged else { return }
-                    connectivity.sendSOS()
-                    pinged = true
-                    WKInterfaceDevice.current().play(.notification)
                 }
             }
             .padding(.horizontal, 6)
@@ -691,10 +679,6 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     func toggleDiscreetCheckIns() {
         discreetCheckInsEnabled.toggle()
         sendEvent(["setDiscreetCheckIns": discreetCheckInsEnabled])
-    }
-
-    func sendSOS() {
-        sendEvent(["sosRequested": true])
     }
 
     /// "I got home." The phone stops the tonight-only safety check-ins, because

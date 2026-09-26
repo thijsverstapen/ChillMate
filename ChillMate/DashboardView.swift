@@ -469,7 +469,7 @@ struct DashboardView: View {
 /// Inbound relays from the watch app.
 ///
 /// Grouped into one modifier so the dashboard's modifier chain reads as
-/// intent rather than three near-identical NotificationCenter subscriptions.
+/// intent rather than near-identical NotificationCenter subscriptions.
 private struct WatchRelayObservers: ViewModifier {
     let quickSkip: () -> Void
     let logHydration: () -> Void
@@ -481,14 +481,6 @@ private struct WatchRelayObservers: ViewModifier {
             }
             .onReceive(NotificationCenter.default.publisher(for: .watchDidLogHydration)) { _ in
                 logHydration()
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .watchDidRequestSOS)) { _ in
-                // "Ping my phone" from the Watch Safety screen routes this phone
-                // straight to the country-aware emergency page.
-                UserDefaults.standard.set(
-                    NotificationDestination.emergency.rawValue,
-                    forKey: DefaultsKey.pendingAppDestination
-                )
             }
     }
 }

@@ -60,6 +60,7 @@ ALSO
 • Ask Siri how many nights you've logged. It says how many, never what.
 • The weekly reflection explains itself now when the written summary isn't available, instead of just not being there.
 • Noticeably quicker if you have a long history.
+• The watch's Safety screen no longer has the button that opened the emergency page on your iPhone. Calling for help from your wrist works as before.
 
 Thank you for using this. Genuinely.
 
@@ -104,6 +105,7 @@ VERDER
 • Vraag Siri hoeveel nachten je hebt gelogd. Hij zegt hoeveel, nooit wat.
 • De weekreflectie legt nu uit waarom de geschreven samenvatting er niet is, in plaats van er gewoon niet te zijn.
 • Merkbaar sneller als je een lange geschiedenis hebt.
+• Het Veiligheid-scherm op je horloge heeft geen knop meer die de noodpagina op je iPhone opende. Hulp bellen vanaf je pols werkt zoals altijd.
 
 Dankjewel dat je ChillMate gebruikt. Echt.
 
@@ -148,6 +150,7 @@ AUSSERDEM
 • Frag Siri, wie viele Nächte du erfasst hast. Sie sagt wie viele, nie was.
 • Die Wochenreflexion sagt jetzt, warum die geschriebene Zusammenfassung fehlt.
 • Spürbar schneller bei einer langen Geschichte.
+• Auf der Watch fehlt die Taste, die die Notfallseite auf dem iPhone öffnete. Hilfe rufen geht wie bisher.
 
 Danke, dass du ChillMate benutzt. Wirklich.
 
@@ -192,6 +195,7 @@ AUSSI
 • Demande à Siri combien de nuits tu as enregistrées. Il dit combien, jamais quoi.
 • La réflexion hebdomadaire explique maintenant pourquoi le résumé écrit n'est pas là, au lieu de simplement ne pas y être.
 • Nettement plus rapide si tu as un long historique.
+• L'écran Sécurité de la montre n'a plus le bouton qui ouvrait la page d'urgence sur ton iPhone. Appeler à l'aide depuis ta montre marche comme avant.
 
 Merci d'utiliser ChillMate. Vraiment.
 
@@ -236,5 +240,6 @@ ADEMÁS
 • Pregúntale a Siri cuántas noches has registrado. Dice cuántas, nunca qué.
 • La reflexión semanal ahora explica por qué no está el resumen escrito, en vez de simplemente no estar.
 • Bastante más rápida si tienes un historial largo.
+• La pantalla de Seguridad del reloj ya no tiene el botón que abría la página de emergencia en tu iPhone. Pedir ayuda desde la muñeca funciona como siempre.
 
 Gracias por usar ChillMate. De verdad.
