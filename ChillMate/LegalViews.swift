@@ -36,7 +36,7 @@ struct PrivacyPolicyView: View {
                             rows: [
                                 String(localized: "To show your private overview, reminders, aftercare prompts, STI follow-ups, emergency shortcuts, and wellbeing reflections."),
                                 String(localized: "To sync with Apple Health only for the categories you approve. What goes to Apple Health is when a night happened and how long you slept, never what you took or what you wrote."),
-                                String(localized: "To create encrypted backups only when backup features are enabled."),
+                                String(localized: "To keep an encrypted recovery copy on this iPhone, and an encrypted backup file only when you export one."),
                                 // Absent until 5.1.0, while the store was mirrored to CloudKit
                                 // for everyone signed into iCloud. Leaving it out said the
                                 // opposite by omission.

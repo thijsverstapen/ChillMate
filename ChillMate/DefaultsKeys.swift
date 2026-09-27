@@ -35,7 +35,6 @@ enum DefaultsKey {
     static let duressModeActive = "duressModeActive"
     static let requiresPIN = "requiresPIN"
     static let autoLockMinutes = "autoLockMinutes"
-    static let localEncryptionEnabled = "localEncryptionEnabled"
     static let screenPrivacyEnabled = "screenPrivacyEnabled"
     static let pinFailedAttempts = "pinFailedAttempts"
     static let pinLockoutUntil = "pinLockoutUntil"
@@ -105,13 +104,23 @@ enum DefaultsKey {
     static let trustedContactMessage = "trustedContactMessage"
 
     // MARK: Backup & recovery
-    static let iCloudBackupEnabled = "iCloudBackupEnabled"
     /// "on" or "off", or absent on an install from before 5.1.0 that has not
     /// been asked. See `ICloudSyncPreference`.
     static let iCloudSyncChoice = "iCloudSyncChoice"
-    static let lastICloudBackupTimestamp = "lastICloudBackupTimestamp"
-    static let lastICloudRestoreTimestamp = "lastICloudRestoreTimestamp"
-    static let lastICloudBackupStatus = "lastICloudBackupStatus"
+
+    /// The encrypted iCloud Drive backup, removed in 5.1.0. Read once by
+    /// `LegacyICloudBackupFiles` to decide whether there are files to delete,
+    /// then removed.
+    static let legacyICloudBackupEnabled = "iCloudBackupEnabled"
+    static let legacyLastICloudBackupTimestamp = "lastICloudBackupTimestamp"
+    static let legacyICloudBackupKeys = [
+        legacyICloudBackupEnabled,
+        legacyLastICloudBackupTimestamp,
+        "lastICloudRestoreTimestamp",
+        "lastICloudBackupStatus"
+    ]
+    /// Set once the files that backup wrote are gone.
+    static let legacyICloudBackupsRemoved = "legacyICloudBackupsRemoved"
     static let lastOnDeviceRecoveryStatus = "lastOnDeviceRecoveryStatus"
     static let lastOnDeviceRecoverySnapshotTimestamp = "lastOnDeviceRecoverySnapshotTimestamp"
     static let lastOnDeviceRecoveryRestoreTimestamp = "lastOnDeviceRecoveryRestoreTimestamp"

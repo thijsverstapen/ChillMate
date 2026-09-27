@@ -174,52 +174,16 @@ struct EncryptionInfoCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("Your data is protected by default. You can also create an encrypted backup file that only you can open. Handy if you ever reinstall or switch phones.")
+            // Used to add "Handy if you ever reinstall or switch phones." The file
+            // is sealed with a key that never leaves this iPhone, so on a new
+            // phone it opens nothing; iCloud sync is what moves your history.
+            Text("While your iPhone is locked, ChillMate's files can't be read. You can also export an encrypted backup file, which only this iPhone can open.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(16)
         .glassSurface(radius: 24, tint: Color.chillPrimary.opacity(0.08))
-    }
-}
-
-struct PrivacyDashboardCard: View {
-    private let rows: [(String, String, String)] = [
-        ("Stored on this device", "Profile, logs, STI tests, timers, plans, journal entries, trusted contact, background, and lock settings.", "iphone"),
-        ("Encrypted backup", "Created as local backup files or encrypted iCloud Drive backups when you turn those options on.", "lock.doc.fill"),
-        ("Shared with Apple Health", "Only the health categories you enable in Permissions.", "heart.text.square.fill"),
-        ("Never sent by ChillMate", "Partner messages, emergency texts, and route actions stay user-initiated through iOS apps.", "hand.raised.fill")
-    ]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Data map")
-                .font(.headline)
-                .foregroundStyle(Color.chillText)
-
-            ForEach(rows, id: \.0) { row in
-                HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: row.2)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(Color.chillSecondaryBlue)
-                        .frame(width: 38, height: 38)
-                        .glassSurface(radius: 19, tint: Color.chillSecondaryBlue.opacity(0.10))
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(row.0)
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.chillText)
-                        Text(row.1)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Color.chillSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            }
-        }
-        .padding(16)
-        .glassSurface(radius: 28, tint: .black.opacity(0.04))
     }
 }
 
@@ -406,7 +370,7 @@ struct EncryptedBackupCard: View {
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
 
-                    Text("Create an encrypted backup of your ChillMate data. ChillMate also saves a recovery copy on your device automatically. Useful if you ever reinstall the app.")
+                    Text("Create an encrypted backup of your ChillMate data. Only this iPhone can open it; to move your history to a new phone, use iCloud sync. ChillMate also keeps a recovery copy on this iPhone automatically.")
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -447,113 +411,6 @@ struct EncryptedBackupCard: View {
                 }
                 .buttonStyle(ChillPillButtonStyle(prominent: false))
             }
-        }
-        .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
-    }
-}
-
-struct ICloudBackupCard: View {
-    @Binding var isEnabled: Bool
-    let status: String
-    let lastBackupTimestamp: Double
-    let isWorking: Bool
-    let saveNow: () -> Void
-    let restore: () -> Void
-    let deleteBackups: () -> Void
-
-    /// Always shown. `status` is persisted, so the old `if !status.isEmpty` early
-    /// return meant a stored line like "Backup complete." hid the date forever.
-    private var lastBackupText: String {
-        guard lastBackupTimestamp > 0 else {
-            return String(localized: "No backup yet.")
-        }
-        let date = Date(timeIntervalSince1970: lastBackupTimestamp)
-        let relative = date.formatted(.relative(presentation: .named))
-        let stamp = date.formatted(date: .abbreviated, time: .shortened)
-        return String(localized: "Last backup \(relative), on \(stamp).")
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 14) {
-                Image(systemName: "icloud.fill")
-                    .font(.system(size: 21, weight: .semibold))
-                    .foregroundStyle(Color.chillPrimary)
-                    .frame(width: 42, height: 42)
-                    .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.12))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Encrypted iCloud backup")
-                        .font(.headline)
-                        .foregroundStyle(Color.chillText)
-
-                    Text("ChillMate saves an encrypted backup file to your iCloud Drive. Your data is encrypted before it leaves the app.")
-                        .font(.caption)
-                        .foregroundStyle(Color.chillSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer(minLength: 0)
-
-                Toggle("iCloud backup", isOn: $isEnabled)
-                    .labelsHidden()
-                    .tint(Color.chillPrimary)
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(lastBackupText)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if !status.isEmpty {
-                    Text(status)
-                        .font(.caption)
-                        .foregroundStyle(Color.chillTertiary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            HStack(spacing: 10) {
-                // Both buttons carry the same content shape so the HStack splits
-                // evenly. Previously the spinner sat beside a full-width label,
-                // making "Back up now" measure far wider than "Restore".
-                Button(action: saveNow) {
-                    Label {
-                        Text("Back up now")
-                    } icon: {
-                        if isWorking {
-                            ProgressView().controlSize(.small)
-                        } else {
-                            Image(systemName: "icloud.and.arrow.up.fill")
-                        }
-                    }
-                    .font(.headline)
-                    .chillLineLimit(1, scale: 0.75)
-                    .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(ChillPillButtonStyle(prominent: true))
-                .disabled(isWorking || !isEnabled)
-
-                Button(action: restore) {
-                    Label("Restore", systemImage: "icloud.and.arrow.down.fill")
-                        .font(.headline)
-                        .chillLineLimit(1, scale: 0.75)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(ChillPillButtonStyle(prominent: false))
-                .disabled(isWorking)
-            }
-
-            Button(role: .destructive, action: deleteBackups) {
-                Label("Delete iCloud backups", systemImage: "trash.fill")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .red))
-            .disabled(isWorking)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)

@@ -6,7 +6,8 @@ import ChillMateCore
 
 /// Everything ChillMate talks to that is not itself.
 ///
-/// The app reached for seven singletons by name in a hundred and ten places.
+/// The app reached for seven singletons by name in a hundred and ten places
+/// (six since 5.1.0 removed the iCloud Drive backup).
 /// That is fine until you want to prove something about the code that calls
 /// them: `NotificationService.shared` writes to the real notification centre, so
 /// a test could either schedule real notifications or test nothing, and it chose
@@ -106,19 +107,6 @@ protocol WatchRelaying: Sendable {
     func syncStandaloneState()
 }
 
-/// Encrypted backups in the user's own iCloud Drive.
-///
-/// Exactly the members the app reaches for, and no more: a protocol wide enough
-/// to cover the whole class would be a second copy of it to keep in step.
-@MainActor
-protocol CloudBackups: Sendable {
-    func deleteBackups() throws
-    var isAvailable: Bool { get }
-    func restoreLatestBackup(into context: ModelContext) throws -> ChillMateBackupImportSummary
-    func saveLatestBackup(localContext: ModelContext) throws -> Date
-    var statusLine: String { get }
-}
-
 /// Sealing and opening the encrypted archive, and the on-device recovery snapshot.
 ///
 /// Exactly the members the app reaches for, and no more: a protocol wide enough
@@ -161,7 +149,6 @@ struct Services {
     var notifications: any NotificationScheduling
     var health: any HealthReading
     var watch: any WatchRelaying
-    var cloudBackups: any CloudBackups
     var encryptedBackups: any EncryptedBackups
     var spotlight: any SpotlightIndexing
     var location: any LocationLookup
@@ -171,7 +158,6 @@ struct Services {
         notifications: NotificationService.shared,
         health: HealthKitService.shared,
         watch: WatchConnectivityService.shared,
-        cloudBackups: ICloudBackupService.shared,
         encryptedBackups: EncryptedBackupService.shared,
         spotlight: SpotlightService.shared,
         location: LocationLookupService.shared

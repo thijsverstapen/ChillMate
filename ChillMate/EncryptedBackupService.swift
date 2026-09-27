@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import OSLog
 import Security
 import SwiftData
 
@@ -87,134 +88,62 @@ final class EncryptedBackupService {
     }
 }
 
-@MainActor
-final class ICloudBackupService {
-    static let shared = ICloudBackupService()
-
-    private let folderName = "ChillMate"
-    private let latestFileName = "ChillMate-iCloud-Encrypted-Backup.cmbak"
-
-    private init() {}
-
-    var isAvailable: Bool {
-        FileManager.default.url(forUbiquityContainerIdentifier: nil) != nil
-    }
-
-    var statusLine: String {
-        guard isAvailable else {
-            return String(localized: "iCloud Drive is not available on this device.")
-        }
-
-        if let latest = try? latestBackupDate() {
-            let stamp = latest.formatted(date: .abbreviated, time: .shortened)
-            return String(localized: "Latest encrypted iCloud backup: \(stamp).")
-        }
-
-        return String(localized: "iCloud is ready. No ChillMate backup has been saved yet.")
-    }
-
-    /// How many timestamped archives to keep alongside the "latest" file.
+/// What is left of the encrypted iCloud Drive backup, which 5.1.0 removed.
+///
+/// It saved a snapshot to iCloud Drive under a key that never leaves the phone,
+/// so only the iPhone that made it could open it: no help on a new phone, which
+/// is what iCloud sync is for, and the on-device recovery snapshot already covers
+/// mistakes on this one. Two iCloud switches that sounded alike and did
+/// different things were one too many.
+///
+/// The files it wrote are removed once, so nothing that nothing can use is left
+/// in somebody's iCloud Drive. They are ChillMate's own, in ChillMate's own
+/// folder, and only ChillMate's `.cmbak` files are touched.
+enum LegacyICloudBackupFiles {
+    /// Deletes every backup file earlier versions saved, and returns how many.
+    /// Throws when iCloud Drive cannot be reached, so the caller can try again.
     ///
-    /// Every backup wrote a new timestamped archive and nothing ever removed them,
-    /// so a user backing up daily filled their iCloud Drive without bound. The only
-    /// cleanup available was `deleteBackups()`, which removes all of them.
-    /// Keeping a handful preserves the point of timestamped copies (rolling back
-    /// past a bad import) without the unbounded growth.
-    private let archiveRetentionCount = 10
-
-    func saveLatestBackup(localContext: ModelContext) throws -> Date {
-        let directory = try backupDirectory()
-        let data = try Services.live.encryptedBackups.encryptedBackupData(localContext: localContext)
-        let latestURL = directory.appendingPathComponent(latestFileName)
-        try data.write(to: latestURL, options: [.atomic, .completeFileProtection])
-
-        let archiveURL = directory.appendingPathComponent(timestampedFileName())
-        try data.write(to: archiveURL, options: [.atomic, .completeFileProtection])
-        pruneArchives(in: directory)
-
-        let date = Date.now
-        UserDefaults.standard.set(date.timeIntervalSince1970, forKey: DefaultsKey.lastICloudBackupTimestamp)
-        UserDefaults.standard.set(String(localized: "Encrypted iCloud backup saved."), forKey: DefaultsKey.lastICloudBackupStatus)
-        return date
-    }
-
-    func restoreLatestBackup(into context: ModelContext) throws -> ChillMateBackupImportSummary {
-        let url = try latestBackupURL()
-        let data = try Data(contentsOf: url)
-        let summary = try Services.live.encryptedBackups.importEncryptedBackupData(data, into: context)
-        UserDefaults.standard.set(Date.now.timeIntervalSince1970, forKey: DefaultsKey.lastICloudRestoreTimestamp)
-        UserDefaults.standard.set(String(localized: "Restored \(summary.totalItems) items from iCloud."), forKey: DefaultsKey.lastICloudBackupStatus)
-        return summary
-    }
-
-    func latestBackupDate() throws -> Date? {
-        let url = try latestBackupURL()
-        let values = try url.resourceValues(forKeys: [.contentModificationDateKey])
-        return values.contentModificationDate
-    }
-
-    func deleteBackups() throws {
-        guard let directory = try? backupDirectory() else {
-            return
+    /// Not on the main thread: finding the iCloud container can block.
+    nonisolated static func removeAll() throws -> Int {
+        guard let container = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
+            throw CocoaError(.fileNoSuchFile)
         }
-
-        let contents = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
-        for url in contents where url.pathExtension == "cmbak" {
-            try FileManager.default.removeItem(at: url)
-        }
-
-        UserDefaults.standard.removeObject(forKey: DefaultsKey.lastICloudBackupTimestamp)
-        UserDefaults.standard.removeObject(forKey: DefaultsKey.lastICloudRestoreTimestamp)
-        UserDefaults.standard.set(String(localized: "iCloud backups deleted."), forKey: DefaultsKey.lastICloudBackupStatus)
-    }
-
-    private func latestBackupURL() throws -> URL {
-        let url = try backupDirectory().appendingPathComponent(latestFileName)
-        guard FileManager.default.fileExists(atPath: url.path) else {
-            throw ICloudBackupError.noBackupFound
-        }
-        return url
-    }
-
-    private func backupDirectory() throws -> URL {
-        guard let containerURL = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
-            throw ICloudBackupError.iCloudUnavailable
-        }
-
-        let directory = containerURL
+        let directory = container
             .appendingPathComponent("Documents", isDirectory: true)
-            .appendingPathComponent(folderName, isDirectory: true)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        return directory
-    }
+            .appendingPathComponent("ChillMate", isDirectory: true)
+        guard FileManager.default.fileExists(atPath: directory.path) else { return 0 }
 
-    /// Trims timestamped archives to `archiveRetentionCount`, newest kept.
-    ///
-    /// Sorts by the timestamp encoded in the filename rather than by file dates:
-    /// iCloud rewrites modification dates as it syncs, so file metadata is not a
-    /// reliable ordering here. Never touches the "latest" file.
-    private func pruneArchives(in directory: URL) {
-        guard let contents = try? FileManager.default.contentsOfDirectory(
-            at: directory,
-            includingPropertiesForKeys: nil
-        ) else { return }
-
-        let archives = contents
-            .filter { $0.pathExtension == "cmbak" && $0.lastPathComponent != latestFileName }
-            .sorted { $0.lastPathComponent > $1.lastPathComponent }
-
-        guard archives.count > archiveRetentionCount else { return }
-        for url in archives.dropFirst(archiveRetentionCount) {
-            try? FileManager.default.removeItem(at: url)
+        let files = try FileManager.default
+            .contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+            .filter { $0.pathExtension == "cmbak" }
+        for file in files {
+            try FileManager.default.removeItem(at: file)
         }
+        return files.count
     }
 
-    private func timestampedFileName() -> String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        let stamp = formatter.string(from: .now)
-            .replacingOccurrences(of: ":", with: "-")
-        return "ChillMate-iCloud-Encrypted-Backup-\(stamp).cmbak"
+    /// Once per install, and only for somebody who ever turned the backup on.
+    @MainActor
+    static func removeIfNeeded(defaults: UserDefaults = .standard) async {
+        guard !defaults.bool(forKey: DefaultsKey.legacyICloudBackupsRemoved) else { return }
+
+        let everUsed = defaults.object(forKey: DefaultsKey.legacyICloudBackupEnabled) != nil
+            || defaults.double(forKey: DefaultsKey.legacyLastICloudBackupTimestamp) > 0
+        if everUsed {
+            do {
+                let removed = try await Task.detached(priority: .utility) { try removeAll() }.value
+                Logger.data.info("Removed \(removed, privacy: .public) legacy iCloud backup files")
+            } catch {
+                // Signed out of iCloud, or iCloud Drive off. The files are
+                // unreadable without this phone's key either way; try again later.
+                return
+            }
+        }
+
+        for key in DefaultsKey.legacyICloudBackupKeys {
+            defaults.removeObject(forKey: key)
+        }
+        defaults.set(true, forKey: DefaultsKey.legacyICloudBackupsRemoved)
     }
 }
 
@@ -258,20 +187,6 @@ struct ChillMateBackupImportSummary {
     }
 }
 
-enum ICloudBackupError: LocalizedError {
-    case iCloudUnavailable
-    case noBackupFound
-
-    var errorDescription: String? {
-        switch self {
-        case .iCloudUnavailable:
-            String(localized: "iCloud Drive is not available. Sign in to iCloud and make sure iCloud Drive is on.")
-        case .noBackupFound:
-            String(localized: "No ChillMate iCloud backup was found yet.")
-        }
-    }
-}
-
 enum EncryptedBackupError: LocalizedError {
     case encryptionFailed
     case decryptionFailed
@@ -311,22 +226,22 @@ enum EncryptedBackupError: LocalizedError {
 ///   that lets ChillMate describe itself as holding nothing.
 ///
 /// **Use.** AES-GCM via CryptoKit, sealing the encoded archive. The same key
-/// encrypts the on-device recovery snapshot and any file written to iCloud
-/// Drive.
+/// encrypts the on-device recovery snapshot and any file somebody exports.
 ///
 /// **The consequence worth knowing.** Because the key is device-only, an
-/// encrypted backup can only be opened by the device that made it. A file in
-/// iCloud Drive protects the data against deleting the app or wiping the phone
-/// and restoring it; it does not move your history to a *new* phone, because the
-/// key does not go with it. Nothing in the UI promises that it does, but nothing
-/// warns that it does not either, and someone setting up a new phone would
-/// reasonably assume otherwise. Making it portable means introducing a
-/// passphrase, which means a key derived from something a person can forget —
-/// that is a product decision, not a refactor.
+/// encrypted backup can only be opened by the device that made it. An exported
+/// file does not move your history to a *new* phone, because the key does not go
+/// with it; iCloud sync is what does that. The export card says so. Making the
+/// file portable means introducing a passphrase, which means a key derived from
+/// something a person can forget — that is a product decision, not a refactor.
+///
+/// Until 5.1.0 there was also an encrypted iCloud Drive backup under this key,
+/// with the same limit and no word about it. It is gone; see
+/// `LegacyICloudBackupFiles`.
 ///
 /// **End of life.** The key is destroyed with the Keychain item, which happens
 /// when the app is deleted. Deleting the app therefore makes every existing
-/// encrypted backup permanently unreadable, including the ones in iCloud Drive.
+/// encrypted backup permanently unreadable.
 /// `deleteOnDeviceRecoverySnapshot()` removes the snapshot but deliberately
 /// leaves the key, so a snapshot taken afterwards is still readable.
 private final class EncryptedBackupKeychain {
@@ -437,12 +352,6 @@ private extension UInt8 {
         return String([digits[Int(self >> 4)], digits[Int(self & 0x0F)]])
     }
 }
-
-/// Conformance declared here rather than beside the protocol: `CloudBackups`
-/// inherits `Sendable`, and Swift treats a Sendable conformance in another
-/// file as retroactive — a warning today and an error in a future language
-/// mode.
-extension ICloudBackupService: CloudBackups {}
 
 /// Conformance declared here rather than beside the protocol: `EncryptedBackups`
 /// inherits `Sendable`, and Swift treats a Sendable conformance in another

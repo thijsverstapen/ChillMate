@@ -12,7 +12,6 @@ struct ChillMateApp: App {
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
     @AppStorage(DefaultsKey.lastAppUseTimestamp) private var lastAppUseTimestamp = Date.now.timeIntervalSince1970
-    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
     @Environment(\.scenePhase) private var scenePhase
 
     /// Rebuilds the whole tree when duress mode changes. See
@@ -91,6 +90,7 @@ struct ChillMateApp: App {
             DataRetentionSweep.runIfNeeded()
             Task {
                 await services.spotlight.removeJournalIndexIfNeeded(defaults: .standard)
+                await LegacyICloudBackupFiles.removeIfNeeded()
                 await HealthLegacyCleanup.runIfNeeded(services: services)
                 await SleepBackfill.run(services: services)
             }
@@ -137,9 +137,11 @@ struct ChillMateApp: App {
     }
 
     private func refreshPrivacyAndNotificationState() {
-        if localEncryptionEnabled {
-            LocalSecurityService.applyFileProtection()
-        }
+        // Not a setting. The entitlement already gives every file complete
+        // protection; this re-applies it to anything a framework wrote with a
+        // weaker class. There used to be a switch for it that changed nothing a
+        // person could observe, while the Privacy screen said protection was off.
+        LocalSecurityService.applyFileProtection()
 
         guard notificationsEnabled else {
             services.notifications.clearInactivityReminders()
@@ -189,8 +191,12 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         BackgroundPhotoStore.migrateFromUserDefaultsIfNeeded()
         UNUserNotificationCenter.current().delegate = self
         Services.live.notifications.registerCategories()
-        // Required for CloudKit silent-push sync and HealthKit background delivery
-        if UserDefaults.standard.bool(forKey: DefaultsKey.iCloudBackupEnabled) {
+        // CloudKit tells a syncing store about changes from other devices with a
+        // silent push. This used to be tied to the iCloud Drive backup, a
+        // different feature, so somebody with sync on and the backup off only
+        // picked up other devices' changes whenever the app happened to look.
+        // The container's CloudKit setting is fixed at launch, and so is this.
+        if ICloudSyncPreference.choice(in: .standard) == .on {
             application.registerForRemoteNotifications()
         }
         return true
@@ -396,7 +402,6 @@ enum LocalizedEnumStrings {
         String(localized: "Poppers"),
         String(localized: "Positive"),
         String(localized: "Privacy & lock"),
-        String(localized: "Privacy dashboard"),
         String(localized: "Psychedelics"),
         String(localized: "Queer"),
         String(localized: "Questioning"),
@@ -424,7 +429,6 @@ enum LocalizedEnumStrings {
         String(localized: "Unknown"),
         String(localized: "Versatile"),
         String(localized: "Viagra"),
-        String(localized: "Work pressure"),
-        String(localized: "iCloud backup")
+        String(localized: "Work pressure")
     ]
 }

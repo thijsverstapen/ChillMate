@@ -155,8 +155,7 @@ struct ProfileSetupView: View {
     @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
     @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
     @AppStorage(DefaultsKey.locationServicesChecked) private var locationServicesChecked = false
-    @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
-    @AppStorage(DefaultsKey.lastICloudBackupStatus) private var lastICloudBackupStatus = ""
+    @AppStorage(DefaultsKey.iCloudSyncChoice) private var iCloudSyncChoice: String?
     @AppStorage(DefaultsKey.trustedContactName) private var trustedContactName = ""
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
     @AppStorage(DefaultsKey.trustedContactMessage) private var trustedContactMessage = TrustedContactDefaults.message
@@ -193,7 +192,6 @@ struct ProfileSetupView: View {
     @State private var isShowingPermissionWarning = false
     @State private var isShowingBackupImporter = false
     @State private var isImportingBackup = false
-    @State private var isRestoringICloudBackup = false
     @State private var isShowingTrustedContactPicker = false
     @State private var isShowingQuickStart = false
 
@@ -229,7 +227,7 @@ struct ProfileSetupView: View {
     }
 
     private var allPersonalizationFeaturesEnabled: Bool {
-        healthKitAutoSync && notificationsEnabled && locationServicesChecked && iCloudBackupEnabled
+        healthKitAutoSync && notificationsEnabled && locationServicesChecked
     }
 
     private var formattedHomeAddress: String {
@@ -367,14 +365,12 @@ struct ProfileSetupView: View {
 
                     ProfileSetupBackupImportCard(
                         isImporting: isImportingBackup,
-                        isRestoringICloud: isRestoringICloudBackup,
+                        isSyncOn: iCloudSyncChoice == ICloudSyncPreference.Choice.on.rawValue,
                         message: backupImportMessage,
                         importAction: {
                             isShowingBackupImporter = true
                         },
-                        restoreICloudAction: {
-                            restoreICloudBackup()
-                        }
+                        turnOnSyncAction: turnOnICloudSync
                     )
 
                     VStack(spacing: 0) {
@@ -768,14 +764,12 @@ struct ProfileSetupView: View {
             dailyAffirmationsEnabled: $dailyAffirmationsEnabled,
             requiresFaceID: $requiresFaceID,
             locationServicesChecked: $locationServicesChecked,
-            iCloudBackupEnabled: $iCloudBackupEnabled,
             message: permissionMessage,
             isChecking: isCheckingPermissions,
             requestHealth: requestHealthPermission,
             requestNotifications: requestNotificationPermission,
             requestFaceID: requestFaceID,
             requestLocation: requestLocationPermission,
-            requestICloud: requestICloudBackup,
             hasAgreed: $hasAgreed
         )
     }
@@ -1012,44 +1006,15 @@ struct ProfileSetupView: View {
         }
     }
 
-    private func requestICloudBackup() {
-        isCheckingPermissions = true
-        permissionMessage = nil
-
-        Task {
-            await MainActor.run {
-                if services.cloudBackups.isAvailable {
-                    iCloudBackupEnabled = true
-                    lastICloudBackupStatus = services.cloudBackups.statusLine
-                    permissionMessage = String(localized: "iCloud backup is ready. ChillMate will save encrypted backup files to iCloud Drive.")
-                } else {
-                    iCloudBackupEnabled = false
-                    permissionMessage = ICloudBackupError.iCloudUnavailable.localizedDescription
-                }
-                isCheckingPermissions = false
-            }
-        }
-    }
-
-    private func restoreICloudBackup() {
-        isRestoringICloudBackup = true
-        backupImportMessage = nil
-
-        Task {
-            do {
-                let summary = try services.cloudBackups.restoreLatestBackup(into: modelContext)
-                await MainActor.run {
-                    iCloudBackupEnabled = true
-                    backupImportMessage = String(localized: "Restored from iCloud. \(summary.displayText)")
-                    isRestoringICloudBackup = false
-                }
-            } catch {
-                await MainActor.run {
-                    backupImportMessage = String(localized: "Could not restore iCloud backup: \(error.localizedDescription)")
-                    isRestoringICloudBackup = false
-                }
-            }
-        }
+    /// Somebody setting up ChillMate on a new phone. Their history comes back
+    /// from iCloud if they synced it, which needs sync on and a fresh launch: the
+    /// store's CloudKit setting is fixed when it opens, and it is already open.
+    ///
+    /// This button used to restore the encrypted iCloud Drive backup, which could
+    /// never have worked on a new phone: its key stays on the phone that made it.
+    private func turnOnICloudSync() {
+        ICloudSyncPreference.record(.on)
+        backupImportMessage = String(localized: "iCloud sync is on. Close ChillMate from the app switcher and open it again, and your history comes back from iCloud.")
     }
 
     private func handleBackupImport(_ result: Result<[URL], Error>) {
@@ -1343,7 +1308,6 @@ private struct ProfilePermissionsPage: View {
     @Binding var dailyAffirmationsEnabled: Bool
     @Binding var requiresFaceID: Bool
     @Binding var locationServicesChecked: Bool
-    @Binding var iCloudBackupEnabled: Bool
     @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
     @AppStorage(DefaultsKey.weekendSafetyEnabled) private var weekendSafetyEnabled = false
     @AppStorage(DefaultsKey.safetyCheckInsEnabled) private var safetyCheckInsEnabled = false
@@ -1355,7 +1319,6 @@ private struct ProfilePermissionsPage: View {
     let requestNotifications: () -> Void
     let requestFaceID: () -> Void
     let requestLocation: () -> Void
-    let requestICloud: () -> Void
     @Binding var hasAgreed: Bool
 
     var body: some View {
@@ -1503,15 +1466,6 @@ private struct ProfilePermissionsPage: View {
                     action: requestLocation
                 )
 
-                ProfileSetupRowDivider()
-
-                PermissionSetupCard(
-                    title: String(localized: "iCloud Backup"),
-                    subtitle: String(localized: "Save and restore encrypted ChillMate backups through iCloud Drive."),
-                    symbol: "icloud.fill",
-                    isOn: iCloudBackupEnabled,
-                    action: requestICloud
-                )
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 6)
@@ -1563,7 +1517,7 @@ private struct ProfilePermissionsPage: View {
             .padding(16)
             .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
 
-            Text("Your profile stays private on this device. If iCloud Backup is on, ChillMate saves encrypted backup files to iCloud Drive.")
+            Text("Your profile stays private on this device. Nothing is copied to iCloud unless you turn on iCloud sync.")
                 .font(.footnote)
                 .foregroundStyle(Color.chillSecondary)
                 .multilineTextAlignment(.center)
@@ -1574,10 +1528,10 @@ private struct ProfilePermissionsPage: View {
 
 struct ProfileSetupBackupImportCard: View {
     let isImporting: Bool
-    let isRestoringICloud: Bool
+    let isSyncOn: Bool
     let message: String?
     let importAction: () -> Void
-    let restoreICloudAction: () -> Void
+    let turnOnSyncAction: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -1585,10 +1539,13 @@ struct ProfileSetupBackupImportCard: View {
                 ProfileSetupIcon(systemImage: "externaldrive.badge.plus")
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Have a backup?")
+                    Text("Used ChillMate before?")
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
-                    Text("Restore from iCloud or import a previous encrypted ChillMate backup before creating a new profile.")
+                    // Says what each button can and cannot do. The file option is
+                    // an export, sealed with a key that stays on the phone that
+                    // made it, so it is no help on a new one; iCloud sync is.
+                    Text("Turn on iCloud sync to bring back history you synced, or import a backup file made on this iPhone.")
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -1596,19 +1553,14 @@ struct ProfileSetupBackupImportCard: View {
             }
 
             HStack(spacing: 10) {
-                Button(action: restoreICloudAction) {
-                    HStack {
-                        if isRestoringICloud {
-                            ProgressView()
-                        }
-                        Label("iCloud", systemImage: "icloud.and.arrow.down.fill")
-                            .font(.headline)
-                            .chillLineLimit(1, scale: 0.8)
-                    }
-                    .frame(maxWidth: .infinity)
+                Button(action: turnOnSyncAction) {
+                    Label(isSyncOn ? "iCloud sync is on" : "iCloud sync", systemImage: "arrow.triangle.2.circlepath.icloud")
+                        .font(.headline)
+                        .chillLineLimit(1, scale: 0.8)
+                        .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(ChillPillButtonStyle(prominent: true))
-                .disabled(isRestoringICloud || isImporting)
+                .disabled(isSyncOn || isImporting)
 
                 Button(action: importAction) {
                     HStack {
@@ -1622,7 +1574,7 @@ struct ProfileSetupBackupImportCard: View {
                     .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .chillSecondaryBlue))
-                .disabled(isImporting || isRestoringICloud)
+                .disabled(isImporting)
             }
 
             if let message {

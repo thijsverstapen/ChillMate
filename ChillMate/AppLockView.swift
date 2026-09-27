@@ -7,7 +7,6 @@ import UIKit
 struct AppLockView<Content: View>: View {
     @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
     @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
-    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
     @AppStorage(DefaultsKey.autoLockMinutes) private var autoLockMinutes = 0
     @AppStorage(DefaultsKey.screenPrivacyEnabled) private var screenPrivacyEnabled = true
     @Environment(\.scenePhase) private var scenePhase
@@ -70,9 +69,7 @@ struct AppLockView<Content: View>: View {
         }
         .animation(.easeInOut(duration: 0.18), value: showPrivacyCover)
         .task {
-            if localEncryptionEnabled {
-                LocalSecurityService.applyFileProtection()
-            }
+            LocalSecurityService.applyFileProtection()
 
             isScreenCaptured = screenIsCaptured()
 

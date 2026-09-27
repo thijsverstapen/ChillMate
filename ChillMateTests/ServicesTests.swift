@@ -81,7 +81,6 @@ struct ServicesTests {
         #expect(services.notifications is NotificationService)
         #expect(services.health is HealthKitService)
         #expect(services.watch is WatchConnectivityService)
-        #expect(services.cloudBackups is ICloudBackupService)
         #expect(services.encryptedBackups is EncryptedBackupService)
         #expect(services.spotlight is SpotlightService)
         #expect(services.location is LocationLookupService)

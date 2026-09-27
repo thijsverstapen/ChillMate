@@ -47,7 +47,6 @@
 		AAB100000000000000000018 /* DrugCheckingEducationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000018 /* DrugCheckingEducationView.swift */; };
 		AAB100000000000000000019 /* PrivacyReceiptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000019 /* PrivacyReceiptView.swift */; };
 		AAB10000000000000000001A /* CareTimelineViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001A /* CareTimelineViews.swift */; };
-		AAB10000000000000000001B /* SecurityHealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001B /* SecurityHealthCheckView.swift */; };
 		AAB10000000000000000001C /* RecentlyDeletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001C /* RecentlyDeletedView.swift */; };
 		AAB10000000000000000001D /* DelayedAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF10000000000000000001D /* DelayedAction.swift */; };
 		AAB1000000000000000000F1 /* WidgetSharedKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF1000000000000000000F0 /* WidgetSharedKeys.swift */; };
@@ -243,7 +242,6 @@
 		AAF100000000000000000018 /* DrugCheckingEducationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrugCheckingEducationView.swift; sourceTree = "<group>"; };
 		AAF100000000000000000019 /* PrivacyReceiptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyReceiptView.swift; sourceTree = "<group>"; };
 		AAF10000000000000000001A /* CareTimelineViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareTimelineViews.swift; sourceTree = "<group>"; };
-		AAF10000000000000000001B /* SecurityHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityHealthCheckView.swift; sourceTree = "<group>"; };
 		AAF10000000000000000001C /* RecentlyDeletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentlyDeletedView.swift; sourceTree = "<group>"; };
 		AAF10000000000000000001D /* DelayedAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelayedAction.swift; sourceTree = "<group>"; };
 		AAF1000000000000000000F0 /* WidgetSharedKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSharedKeys.swift; sourceTree = "<group>"; };
@@ -451,7 +449,6 @@
 										AAF1000000000000000000F0 /* WidgetSharedKeys.swift */,
 				AAF10000000000000000001D /* DelayedAction.swift */,
 				AAF10000000000000000001C /* RecentlyDeletedView.swift */,
-				AAF10000000000000000001B /* SecurityHealthCheckView.swift */,
 				AAF10000000000000000001A /* CareTimelineViews.swift */,
 				AAF100000000000000000019 /* PrivacyReceiptView.swift */,
 				AAF100000000000000000018 /* DrugCheckingEducationView.swift */,
@@ -869,7 +866,6 @@
 										AAB1000000000000000000F1 /* WidgetSharedKeys.swift in Sources */,
 				AAB10000000000000000001D /* DelayedAction.swift in Sources */,
 				AAB10000000000000000001C /* RecentlyDeletedView.swift in Sources */,
-				AAB10000000000000000001B /* SecurityHealthCheckView.swift in Sources */,
 				AAB10000000000000000001A /* CareTimelineViews.swift in Sources */,
 				AAB100000000000000000019 /* PrivacyReceiptView.swift in Sources */,
 				AAB100000000000000000018 /* DrugCheckingEducationView.swift in Sources */,

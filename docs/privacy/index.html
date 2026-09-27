@@ -198,16 +198,16 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 117 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/5fab06b"><code>5fab06b</code></a>, whose combined SHA-256 begins <code>d2cc194dfe40b68a</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 116 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/e69e1a1"><code>e69e1a1</code></a>, whose combined SHA-256 begins <code>45215b4268e82306</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
-        <caption>Checked against ChillMate 5.1.0 (build 510), across all 117 Swift files in the app targets and the domain package.</caption>
+        <caption>Checked against ChillMate 5.1.0 (build 510), across all 116 Swift files in the app targets and the domain package.</caption>
         <thead>
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
         <tbody>
           <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn on iCloud sync in ChillMate's settings. Apple holds it, and I cannot read it.</td></tr>
-          <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
+          <tr><td>Encrypted backup file</td><td>Wherever you save it</td><td>Only if you export one yourself. Only the iPhone that made it can open it.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
           <tr><td>Apple Health</td><td>Apple Health on your iPhone</td><td>Only the categories you approve. ChillMate writes when a night happened and how long you slept, never what you took or what you wrote.</td></tr>
           <tr><td>An optional donation</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
@@ -279,9 +279,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>29 changes since this page first existed.</caption>
+        <caption>30 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-09-26</td><td>Keep the journal out of iPhone search, and let home safe mean the rest of the night</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/6bfe4f3"><code>6bfe4f3</code></a></td></tr>
           <tr><td>2026-09-26</td><td>Remove the watch&#x27;s Ping my phone button</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/5fab06b"><code>5fab06b</code></a></td></tr>
           <tr><td>2026-09-26</td><td>Stop telling other apps what somebody took, and fill in their sleep once they are up</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/c4627d6"><code>c4627d6</code></a></td></tr>
           <tr><td>2026-09-25</td><td>Make every sentence about where data goes true, and say what changed</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/6cc5c38"><code>6cc5c38</code></a></td></tr>
@@ -359,7 +360,8 @@ font-weight:800;max-width:19ch;margin:0}
     <h2 id="where"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-cloud"/></svg>Where your data is&nbsp;stored</h2>
     <p><strong>On your iPhone.</strong> Data is kept in the app's private storage, protected by iOS file protection and, if you enable it, an extra app lock (Face ID or PIN).</p>
     <p><strong>Not in iPhone search.</strong> Until version 5.1.0, saving a journal entry also put its text into iPhone search. Anyone holding your unlocked phone could read it there without getting past the app lock. ChillMate no longer does this, and 5.1.0 removes what was already there.</p>
-    <p><strong>Optional iCloud.</strong> Both iCloud features are off unless you turn them on, and they are protected differently. <strong>iCloud sync</strong> keeps a copy of your data in <em>your own</em> private iCloud account through Apple's CloudKit, so your history can move to a new iPhone. Unless you have turned on Apple's Advanced Data Protection, Apple holds the keys to that copy. I have no access to it at all. <strong>The encrypted backup</strong> is encrypted on your iPhone before it is saved to iCloud Drive, with a key that never leaves the device, so neither Apple nor I can read it.</p>
+    <p><strong>Optional iCloud.</strong> iCloud sync is off unless you turn it on. It keeps a copy of your data in <em>your own</em> private iCloud account through Apple's CloudKit, so your history can move to a new iPhone. Unless you have turned on Apple's Advanced Data Protection, Apple holds the keys to that copy. I have no access to it at all.</p>
+    <p><strong>No more iCloud Drive backup.</strong> Until version 5.1.0 there was also an encrypted backup to iCloud Drive. Its key never left the phone that made it, so it could never move your history to a new phone, which is what most people would expect a backup to do. 5.1.0 removes it, and deletes the backup files it left in your iCloud Drive. An encrypted backup file you export yourself still works the same way: only the iPhone that made it can open it.</p>
     <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, iCloud sync was on for everyone signed into iCloud, without asking, while this page described it as something you turn on. That was wrong. If you used ChillMate before 5.1.0, the app now asks you once whether to keep the iCloud copy, and new installs start with it off. Turning it off stops new copies but does not delete the one already there. You can remove that in iOS Settings, under your iCloud storage.</p>
     <p><strong>No servers of mine.</strong> There is no ChillMate server anywhere that receives or stores your personal information.</p>
   </div>

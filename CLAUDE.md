@@ -177,10 +177,10 @@ holds in English fails four times over.
 
 ## Services
 
-Seven things ChillMate talks to that are not itself: notifications, Apple Health,
-the watch, iCloud backups, the encrypted archive, Spotlight and location. They
-are still singletons and still do the work; nothing outside `ChillMate/Services.swift`
-says their names.
+Six things ChillMate talks to that are not itself: notifications, Apple Health,
+the watch, the encrypted archive, Spotlight and location. (There was a seventh,
+the iCloud Drive backup, until 5.1.0 removed it.) They are still singletons and
+still do the work; nothing outside `ChillMate/Services.swift` says their names.
 
 - Each has a protocol covering **exactly the members the app uses**. A protocol
   as wide as the class would be a second copy of it to keep in step.
@@ -243,13 +243,16 @@ full lifecycle in its doc comment.
 
 Two consequences that are easy to forget and expensive to rediscover:
 
-- **`ThisDeviceOnly` keeps the key out of iCloud Keychain**, so an encrypted
-  backup can only be opened by the device that made it. The iCloud Drive file
-  survives deleting the app or wiping and restoring *this* phone; it does not
-  carry history to a *new* phone. Making it portable means a passphrase, which
-  means a key a person can forget. That is a product decision.
-- **Deleting the app destroys the key**, and with it every backup ever written,
-  including the ones sitting in iCloud Drive.
+- **`ThisDeviceOnly` keeps the key out of iCloud Keychain**, so an exported
+  backup file and the on-device recovery snapshot can only be opened by the
+  device that made them. They never carry history to a *new* phone; iCloud sync
+  does that. Making the file portable means a passphrase, which means a key a
+  person can forget. That is a product decision.
+- **Deleting the app destroys the key**, and with it every backup ever written.
+- **There is no iCloud Drive backup any more.** It had the same device-only key
+  and said nothing about it, next to an iCloud sync switch that sounded alike.
+  5.1.0 removed it; `LegacyICloudBackupFiles` deletes the files it left behind,
+  once, and `CloudDocuments` stays in the entitlements only so that can happen.
 
 ## Releasing
 
