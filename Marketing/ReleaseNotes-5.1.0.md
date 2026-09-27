@@ -40,7 +40,7 @@ ONE iCloud SWITCH
 The encrypted iCloud Drive backup is gone. Only the phone that made it could open it, so it never helped you move to a new one. iCloud sync does that, and it's now the only iCloud switch. The old backup files are removed from your iCloud Drive.
 
 PRIVACY IN ONE PLACE
-Five overlapping privacy screens are now one: what protects your data, where it goes, and what happened lately. Tap any line to change it. A new switch lets a running timer say just "Timer" on your Lock Screen and watch face.
+Five overlapping privacy screens are now one: what protects your data, where it goes, and what happened lately. Tap any line to change it. A new switch lets a running timer say just "Timer" on your Lock Screen and Apple Watch.
 
 YOUR JOURNAL, FINALLY SEARCHABLE
 Remember writing something and can't find it? There's a search box now. It matches on meaning, not just letters, so looking for "felt anxious" finds the night you wrote "feeling anxious".
@@ -87,7 +87,7 @@ ChillMate kon je slaap al uit Apple Health lezen, maar keek alleen als je een na
 De versleutelde back-up naar iCloud Drive is weg. Alleen de telefoon die hem maakte kon hem openen, dus hij hielp je nooit naar een nieuwe. Dat doet iCloud-synchronisatie, en dat is nu de enige iCloud-schakelaar. De oude back-upbestanden worden uit je iCloud Drive verwijderd.
 
 PRIVACY OP ÉÉN PLEK
-Vijf overlappende privacyschermen zijn er nu één: wat je gegevens beschermt, waar ze heen gaan en wat er onlangs gebeurde. Tik op een regel om hem te wijzigen. Met een nieuwe schakelaar zegt een lopende timer gewoon "Timer" op je toegangsscherm en wijzerplaat.
+Vijf overlappende privacyschermen zijn er nu één: wat je gegevens beschermt, waar ze heen gaan en wat er onlangs gebeurde. Tik op een regel om hem te wijzigen. Met een nieuwe schakelaar zegt een lopende timer gewoon "Timer" op je toegangsscherm en Apple Watch.
 
 JE DAGBOEK, EINDELIJK DOORZOEKBAAR
 Weet je nog dat je iets schreef, maar kun je het niet terugvinden? Er is nu een zoekbalk. Die zoekt op betekenis, niet alleen op letters, dus zoeken op "voelde me angstig" vindt de nacht waarin je "angstig gevoel" schreef.
@@ -134,7 +134,7 @@ EIN iCloud-SCHALTER
 Das verschlüsselte iCloud-Drive-Backup ist weg. Nur das Handy, das es erstellt hat, konnte es öffnen, also half es nie beim Umzug. Das macht die iCloud-Synchronisierung, jetzt der einzige iCloud-Schalter. Die alten Backup-Dateien werden aus deinem iCloud Drive entfernt.
 
 DATENSCHUTZ AN EINEM ORT
-Fünf Datenschutz-Bildschirme sind jetzt einer: was deine Daten schützt, wohin sie gehen und was zuletzt passiert ist. Tippe auf eine Zeile, um sie zu ändern. Neu: Ein laufender Timer kann auf Sperrbildschirm und Zifferblatt einfach "Timer" zeigen.
+Fünf Datenschutz-Bildschirme sind jetzt einer: was deine Daten schützt, wohin sie gehen und was zuletzt passiert ist. Tippe auf eine Zeile, um sie zu ändern. Neu: Ein laufender Timer kann auf Sperrbildschirm und Apple Watch einfach "Timer" zeigen.
 
 DEIN TAGEBUCH, ENDLICH DURCHSUCHBAR
 Du weißt, dass du etwas geschrieben hast, findest es aber nicht? Jetzt gibt es eine Suche. Sie sucht nach Bedeutung, nicht nur nach Buchstaben, also findet "fühlte mich ängstlich" die Nacht, in der du "ängstliches Gefühl" geschrieben hast.
@@ -181,7 +181,7 @@ UN SEUL RÉGLAGE iCloud
 La sauvegarde chiffrée sur iCloud Drive disparaît. Seul le téléphone qui l'avait créée pouvait l'ouvrir, donc elle ne t'aidait jamais à changer de téléphone. C'est le rôle de la synchronisation iCloud, désormais le seul réglage iCloud. Les anciens fichiers de sauvegarde sont supprimés de ton iCloud Drive.
 
 LA CONFIDENTIALITÉ EN UN SEUL ENDROIT
-Cinq écrans de confidentialité n'en font plus qu'un : ce qui protège tes données, où elles vont et ce qui s'est passé récemment. Touche une ligne pour la modifier. Nouveau : un minuteur en cours peut afficher juste "Minuteur" sur ton écran verrouillé et ton cadran.
+Cinq écrans de confidentialité n'en font plus qu'un : ce qui protège tes données, où elles vont et ce qui s'est passé récemment. Touche une ligne pour la modifier. Nouveau : un minuteur en cours peut afficher juste "Minuteur" sur ton écran verrouillé et ton Apple Watch.
 
 TON JOURNAL, ENFIN CONSULTABLE
 Tu te souviens d'avoir écrit quelque chose sans le retrouver ? Il y a une recherche maintenant. Elle cherche le sens, pas seulement les lettres, donc chercher "je me sentais anxieux" trouve la nuit où tu as écrit "sentiment d'anxiété".
@@ -228,7 +228,7 @@ UN SOLO AJUSTE DE iCloud
 La copia cifrada en iCloud Drive desaparece. Solo el teléfono que la creó podía abrirla, así que nunca te ayudaba a cambiar de teléfono. Eso lo hace la sincronización con iCloud, ahora el único ajuste de iCloud. Los archivos de copia antiguos se borran de tu iCloud Drive.
 
 PRIVACIDAD EN UN SOLO LUGAR
-Cinco pantallas de privacidad son ahora una: qué protege tus datos, adónde van y qué ha pasado últimamente. Toca una línea para cambiarla. Y un nuevo interruptor hace que un temporizador activo diga solo "Temporizador" en tu pantalla de bloqueo y en tu reloj.
+Cinco pantallas de privacidad son ahora una: qué protege tus datos, adónde van y qué ha pasado últimamente. Toca una línea para cambiarla. Y un nuevo interruptor hace que un temporizador activo diga solo "Temporizador" en tu pantalla de bloqueo y en tu Apple Watch.
 
 TU DIARIO, POR FIN CON BÚSQUEDA
 ¿Recuerdas haber escrito algo y no lo encuentras? Ahora hay un buscador. Busca por significado, no solo por letras, así que buscar "me sentí ansioso" encuentra la noche en que escribiste "sensación de ansiedad".

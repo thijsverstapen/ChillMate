@@ -70666,59 +70666,59 @@
       },
       "comment" : "Privacy screen, discreet timer on."
     },
-    "A running timer says “Timer” on your Lock Screen, in the Dynamic Island and on your watch face, instead of naming the substance." : {
+    "A running timer says “Timer” on your Lock Screen, in the Dynamic Island and on your Apple Watch, instead of naming the substance." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein laufender Timer zeigt „Timer“ auf dem Sperrbildschirm, in der Dynamic Island und auf deinem Zifferblatt, statt die Substanz zu nennen."
+            "value" : "Ein laufender Timer zeigt „Timer“ auf dem Sperrbildschirm, in der Dynamic Island und auf deiner Apple Watch, statt die Substanz zu nennen."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un temporizador activo dice «Temporizador» en la pantalla de bloqueo, en la Dynamic Island y en la esfera de tu reloj, en vez de nombrar la sustancia."
+            "value" : "Un temporizador activo dice «Temporizador» en la pantalla de bloqueo, en la Dynamic Island y en tu Apple Watch, en vez de nombrar la sustancia."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un minuteur en cours affiche « Minuteur » sur l’écran verrouillé, dans la Dynamic Island et sur ton cadran, au lieu de nommer la substance."
+            "value" : "Un minuteur en cours affiche « Minuteur » sur l’écran verrouillé, dans la Dynamic Island et sur ton Apple Watch, au lieu de nommer la substance."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Een lopende timer zegt „Timer” op je toegangsscherm, in het Dynamic Island en op je wijzerplaat, in plaats van het middel te noemen."
+            "value" : "Een lopende timer zegt „Timer” op je toegangsscherm, in het Dynamic Island en op je Apple Watch, in plaats van het middel te noemen."
           }
         }
       },
       "comment" : "Settings > Privacy & lock: caption under the discreet Lock Screen timer switch"
     },
-    "A running dose timer shows the substance on your Lock Screen, in the Dynamic Island and on your watch face, where anyone nearby can read it." : {
+    "A running dose timer shows the substance on your Lock Screen, in the Dynamic Island and on your Apple Watch, where anyone nearby can read it." : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein laufender Dosis-Timer zeigt die Substanz auf deinem Sperrbildschirm, in der Dynamic Island und auf deinem Zifferblatt, wo jede Person in der Nähe sie lesen kann."
+            "value" : "Ein laufender Dosis-Timer zeigt die Substanz auf deinem Sperrbildschirm, in der Dynamic Island und auf deiner Apple Watch, wo jede Person in der Nähe sie lesen kann."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un temporizador de dosis activo muestra la sustancia en tu pantalla de bloqueo, en la Dynamic Island y en la esfera de tu reloj, donde cualquiera cerca puede leerla."
+            "value" : "Un temporizador de dosis activo muestra la sustancia en tu pantalla de bloqueo, en la Dynamic Island y en tu Apple Watch, donde cualquiera cerca puede leerla."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un minuteur de dose en cours affiche la substance sur ton écran verrouillé, dans la Dynamic Island et sur ton cadran, où toute personne à proximité peut la lire."
+            "value" : "Un minuteur de dose en cours affiche la substance sur ton écran verrouillé, dans la Dynamic Island et sur ton Apple Watch, où toute personne à proximité peut la lire."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Een lopende dosistimer toont het middel op je toegangsscherm, in het Dynamic Island en op je wijzerplaat, waar iedereen in de buurt het kan lezen."
+            "value" : "Een lopende dosistimer toont het middel op je toegangsscherm, in het Dynamic Island en op je Apple Watch, waar iedereen in de buurt het kan lezen."
           }
         }
       },

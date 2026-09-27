@@ -27,7 +27,7 @@ struct WatchDashboardView: View {
                             ) {}
                         } else {
                             ForEach(connectivity.activeTimers) { timer in
-                                WatchActiveTimerCard(timer: timer)
+                                WatchActiveTimerCard(timer: timer, discreet: connectivity.discreetTimer)
                             }
                         }
                     }
@@ -149,6 +149,10 @@ private struct WatchStreakHeader: View {
 
 private struct WatchActiveTimerCard: View {
     let timer: WatchTimerInfo
+    /// The phone's discreet Lock Screen timer. The watch has no lock of its own,
+    /// and Always On leaves this screen readable, dimmed, on a wrist that has
+    /// been lowered, so it keeps to the same choice as the watch face.
+    let discreet: Bool
     @State private var didWarn = false
 
     /// Two timelines with different cadences instead of one at 1 Hz.
@@ -167,7 +171,7 @@ private struct WatchActiveTimerCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Label(timer.substanceName, systemImage: "timer")
+                Label(discreet ? String(localized: "Timer") : timer.substanceName, systemImage: "timer")
                     .font(.headline)
                     .lineLimit(1)
                 Spacer(minLength: 4)
@@ -620,6 +624,9 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     @Published var breathingHapticsEnabled = true
     @Published var discreetCheckInsEnabled = true
     @Published var visibleTimersEnabled = true
+    /// Read back from the App Group at launch, where the last word from the
+    /// phone was kept, so a cold launch out of range still keeps to it.
+    @Published var discreetTimer = LockScreenTimerPrivacy.isDiscreet()
 
     // Local, persisted state
     @Published var hydrationCount = 0
@@ -764,6 +771,7 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         // has not heard yet must not overwrite the last choice with a default.
         if let value = context[WidgetSharedKey.discreetLockScreenTimer] as? Bool {
             WidgetSharedKey.suite?.set(value, forKey: WidgetSharedKey.discreetLockScreenTimer)
+            discreetTimer = value
         }
 
         publishWidgetSnapshot()

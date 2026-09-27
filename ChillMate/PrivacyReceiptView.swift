@@ -156,7 +156,7 @@ struct PrivacyReceiptView: View {
                         title: String(localized: "Discreet Lock Screen timer"),
                         detail: discreetLockScreenTimer
                             ? String(localized: "A running timer says “Timer”, never the substance.")
-                            : String(localized: "A running dose timer shows the substance on your Lock Screen, in the Dynamic Island and on your watch face, where anyone nearby can read it."),
+                            : String(localized: "A running dose timer shows the substance on your Lock Screen, in the Dynamic Island and on your Apple Watch, where anyone nearby can read it."),
                         symbol: "lock.iphone",
                         state: .from(protections.discreetTimer)
                     )

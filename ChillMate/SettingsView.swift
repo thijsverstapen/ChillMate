@@ -503,7 +503,7 @@ struct SettingsView: View {
 
                         SettingsToggleCard(
                             title: String(localized: "Discreet Lock Screen timer"),
-                            caption: String(localized: "A running timer says “Timer” on your Lock Screen, in the Dynamic Island and on your watch face, instead of naming the substance."),
+                            caption: String(localized: "A running timer says “Timer” on your Lock Screen, in the Dynamic Island and on your Apple Watch, instead of naming the substance."),
                             symbol: "lock.iphone",
                             isOn: discreetTimerBinding
                         )

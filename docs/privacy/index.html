@@ -198,7 +198,7 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 116 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/f600eb6"><code>f600eb6</code></a>, whose combined SHA-256 begins <code>afba38328d9680a0</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 116 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/7f75b53"><code>7f75b53</code></a>, whose combined SHA-256 begins <code>483710cc3aa0a85f</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
         <caption>Checked against ChillMate 5.1.0 (build 510), across all 116 Swift files in the app targets and the domain package.</caption>
@@ -269,7 +269,7 @@ font-weight:800;max-width:19ch;margin:0}
     <h2 id="threat"><svg class="icon" style="color:var(--amber)" aria-hidden="true"><use href="#i-hand"/></svg>What this is really designed&nbsp;against
       <a class="anchor" href="#threat" aria-label="Link to this section">#</a></h2>
     <p>Most privacy pages talk about breaches and hackers. For an app like this, the realistic risk is closer to home: <strong>someone picking up your unlocked phone.</strong> A partner, a housemate, a family member, a colleague glancing at a notification.</p>
-    <p>So the app has its own Face ID or PIN lock, on top of the phone's. Notifications can be worded so the lock screen says nothing revealing, and a running timer can say just “Timer” there and on your watch face. One tap blanks the screen to a moon. And ChillMate hides what is on screen when you swap apps, and while your screen is being recorded or mirrored.</p>
+    <p>So the app has its own Face ID or PIN lock, on top of the phone's. Notifications can be worded so the lock screen says nothing revealing, and a running timer can say just “Timer” there and on your Apple Watch. One tap blanks the screen to a moon. And ChillMate hides what is on screen when you swap apps, and while your screen is being recorded or mirrored.</p>
     <p>Having no server has a useful side effect. If I were breached, nothing about you would come out, because I hold nothing. The trade is worth saying out loud: if you lose the phone and have no backup, the data is gone. That is deliberate, and it is why an encrypted backup is one setting away.</p>
   </div>
 
@@ -279,9 +279,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>31 changes since this page first existed.</caption>
+        <caption>32 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-09-27</td><td>Let a running timer say &quot;Timer&quot; instead of the substance, on the phone and the watch face</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/7f75b53"><code>7f75b53</code></a></td></tr>
           <tr><td>2026-09-27</td><td>Keep one iCloud switch, and put privacy on one screen that can change it</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/f600eb6"><code>f600eb6</code></a></td></tr>
           <tr><td>2026-09-26</td><td>Keep the journal out of iPhone search, and let home safe mean the rest of the night</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/6bfe4f3"><code>6bfe4f3</code></a></td></tr>
           <tr><td>2026-09-26</td><td>Remove the watch&#x27;s Ping my phone button</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/5fab06b"><code>5fab06b</code></a></td></tr>
