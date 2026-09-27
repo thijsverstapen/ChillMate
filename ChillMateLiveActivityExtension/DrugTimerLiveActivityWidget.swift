@@ -243,6 +243,13 @@ private struct ChillMateWidgetDescriptorView: View {
     }
 }
 
+/// What a running timer is called on the Lock Screen and in the Dynamic Island:
+/// the substance, or "Timer" in discreet mode. Read from the state, which the
+/// app can change while the timer runs; the attributes are fixed at the start.
+private func timerTitle(_ context: ActivityViewContext<DrugTimerActivityAttributes>) -> String {
+    context.state.discreet == true ? String(localized: "Timer") : context.attributes.substanceName
+}
+
 struct DrugTimerLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: DrugTimerActivityAttributes.self) { context in
@@ -259,7 +266,7 @@ struct DrugTimerLiveActivityWidget: Widget {
                             .font(.caption.weight(.bold))
                             .foregroundStyle(accent)
 
-                        Text(context.attributes.substanceName)
+                        Text(timerTitle(context))
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.white)
                             .lineLimit(1)
@@ -351,7 +358,7 @@ private struct DrugTimerLiveActivityView: View {
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(context.attributes.substanceName)
+                    Text(timerTitle(context))
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(.white)
                         .lineLimit(1)

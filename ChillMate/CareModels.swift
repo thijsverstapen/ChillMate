@@ -1,6 +1,7 @@
 import Foundation
 import ActivityKit
 import SwiftData
+import WidgetKit
 import ChillMateCore
 
 @Model
@@ -428,7 +429,33 @@ enum RedoseDecision: String, CaseIterable, Identifiable {
     }
 }
 
+extension LockScreenTimerPrivacy {
+    /// The first launch that has this setting. Somebody who already asked for
+    /// discreet notifications wanted a Lock Screen that gives nothing away, so
+    /// their timer starts discreet too; everybody else keeps what they had until
+    /// they choose. Written once, into the shared suite the extension reads.
+    static func settleDefault(standard: UserDefaults = .standard, shared: UserDefaults? = WidgetSharedKey.suite) {
+        guard let shared, shared.object(forKey: WidgetSharedKey.discreetLockScreenTimer) == nil else { return }
+        shared.set(standard.bool(forKey: DefaultsKey.discreetNotifications), forKey: WidgetSharedKey.discreetLockScreenTimer)
+    }
+}
+
 enum DrugTimerLiveActivityController {
+    /// Brings every running timer, and the Lock Screen widget, in line with the
+    /// discreet setting. Without this a switch flipped mid-session would only
+    /// reach the next timer, and the one on the Lock Screen right now is the one
+    /// somebody is worried about.
+    @MainActor
+    static func applyDiscreet(_ discreet: Bool) async {
+        for activity in Activity<DrugTimerActivityAttributes>.activities {
+            var state = activity.content.state
+            guard state.discreet != discreet else { continue }
+            state.discreet = discreet
+            await activity.update(ActivityContent(state: state, staleDate: activity.content.staleDate))
+        }
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     @MainActor
     static func start(for timer: DrugDoseTimerRecord, now: Date = .now) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
@@ -440,7 +467,8 @@ enum DrugTimerLiveActivityController {
             substanceName: timer.substanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: timer.redoseNudgeIsActive(at: now),
-            startedAt: timer.startedAt
+            startedAt: timer.startedAt,
+            discreet: LockScreenTimerPrivacy.isDiscreet()
         )
 
         do {
@@ -467,7 +495,8 @@ enum DrugTimerLiveActivityController {
             substanceName: timer.substanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: timer.redoseNudgeIsActive(at: now),
-            startedAt: timer.startedAt
+            startedAt: timer.startedAt,
+            discreet: LockScreenTimerPrivacy.isDiscreet()
         )
 
         for activity in Activity<DrugTimerActivityAttributes>.activities where activity.id == timer.liveActivityID {
@@ -485,7 +514,8 @@ enum DrugTimerLiveActivityController {
             substanceName: timer.substanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: false,
-            startedAt: timer.startedAt
+            startedAt: timer.startedAt,
+            discreet: LockScreenTimerPrivacy.isDiscreet()
         )
 
         for activity in Activity<DrugTimerActivityAttributes>.activities where activity.id == timer.liveActivityID {

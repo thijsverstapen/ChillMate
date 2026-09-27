@@ -10,14 +10,14 @@ import Testing
 @Suite("Privacy screen")
 struct PrivacyScreenTests {
 
-    private let none = PrivacyProtections(appLock: false, secondPIN: false, hideFromScreenshots: false, quietLockScreen: false)
+    private let none = PrivacyProtections(appLock: false, secondPIN: false, hideFromScreenshots: false, quietLockScreen: false, discreetTimer: false)
 
-    @Test("Each protection counts once, and there are four")
+    @Test("Each protection counts once, and there are five")
     func counting() {
         #expect(none.onCount == 0)
-        #expect(PrivacyProtections.total == 4)
+        #expect(PrivacyProtections.total == 5)
 
-        let all = PrivacyProtections(appLock: true, secondPIN: true, hideFromScreenshots: true, quietLockScreen: true)
+        let all = PrivacyProtections(appLock: true, secondPIN: true, hideFromScreenshots: true, quietLockScreen: true, discreetTimer: true)
         #expect(all.onCount == PrivacyProtections.total)
 
         var one = none

@@ -9,7 +9,7 @@ import ChillMateCore
 /// backup" among five protections and told people to turn on the ones that were
 /// off. Sharing data with Health is not a protection, and nudging somebody to
 /// share more to raise a score is the opposite of what the screen was for. These
-/// four each reduce what somebody holding the phone, or looking over a shoulder,
+/// five each reduce what somebody holding the phone, or looking over a shoulder,
 /// can see. File protection is not here because it cannot be off.
 struct PrivacyProtections: Equatable {
     var appLock: Bool
@@ -18,11 +18,13 @@ struct PrivacyProtections: Equatable {
     /// Lock Screen notifications say nothing specific: discreet wording, or no
     /// notifications at all.
     var quietLockScreen: Bool
+    /// A running timer says "Timer" rather than the substance.
+    var discreetTimer: Bool
 
-    static let total = 4
+    static let total = 5
 
     var onCount: Int {
-        [appLock, secondPIN, hideFromScreenshots, quietLockScreen].filter { $0 }.count
+        [appLock, secondPIN, hideFromScreenshots, quietLockScreen, discreetTimer].filter { $0 }.count
     }
 
     static func quietLockScreen(notificationsOn: Bool, discreet: Bool) -> Bool {
@@ -41,6 +43,7 @@ struct PrivacyReceiptView: View {
     @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
     @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
     @AppStorage(DefaultsKey.screenPrivacyEnabled) private var screenPrivacyEnabled = true
+    @AppStorage(WidgetSharedKey.discreetLockScreenTimer, store: WidgetSharedKey.suite) private var discreetLockScreenTimer = false
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
     @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
@@ -61,7 +64,8 @@ struct PrivacyReceiptView: View {
             appLock: requiresFaceID || requiresPIN,
             secondPIN: requiresPIN && hasDuressPIN,
             hideFromScreenshots: screenPrivacyEnabled,
-            quietLockScreen: PrivacyProtections.quietLockScreen(notificationsOn: notificationsEnabled, discreet: discreetNotifications)
+            quietLockScreen: PrivacyProtections.quietLockScreen(notificationsOn: notificationsEnabled, discreet: discreetNotifications),
+            discreetTimer: discreetLockScreenTimer
         )
     }
 
@@ -147,6 +151,15 @@ struct PrivacyReceiptView: View {
                         state: .from(protections.hideFromScreenshots)
                     )
                     settingsRow(.notifications, title: String(localized: "Discreet notifications"), detail: notificationsDetail, symbol: "bell.badge.fill", state: .from(protections.quietLockScreen))
+                    settingsRow(
+                        .privacy,
+                        title: String(localized: "Discreet Lock Screen timer"),
+                        detail: discreetLockScreenTimer
+                            ? String(localized: "A running timer says “Timer”, never the substance.")
+                            : String(localized: "A running dose timer shows the substance on your Lock Screen, in the Dynamic Island and on your watch face, where anyone nearby can read it."),
+                        symbol: "lock.iphone",
+                        state: .from(protections.discreetTimer)
+                    )
 
                     PrivacySectionTitle(String(localized: "Where your data goes"))
 
@@ -172,11 +185,6 @@ struct PrivacyReceiptView: View {
                         detail: String(localized: "If you pair one: your trusted contact, emergency number, running timers and today's score go straight to it, not through any server."),
                         symbol: "applewatch",
                         state: .info
-                    )
-                    systemSettingsRow(
-                        title: String(localized: "Lock Screen"),
-                        detail: String(localized: "A running dose timer shows the substance on your Lock Screen, where anyone near your phone can read it. You can turn Live Activities off for ChillMate in iOS Settings."),
-                        symbol: "lock.iphone"
                     )
                     settingsRow(
                         .shortcuts,

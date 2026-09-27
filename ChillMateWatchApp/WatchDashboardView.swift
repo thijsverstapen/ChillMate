@@ -760,6 +760,11 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         if let value = context[WidgetSharedKey.watchBreathingHaptics] as? Bool { breathingHapticsEnabled = value }
         if let value = context[WidgetSharedKey.watchDiscreetCheckIns] as? Bool { discreetCheckInsEnabled = value }
         if let value = context[WidgetSharedKey.watchVisibleTimers] as? Bool { visibleTimersEnabled = value }
+        // Straight to the App Group, and only when the phone said: a launch that
+        // has not heard yet must not overwrite the last choice with a default.
+        if let value = context[WidgetSharedKey.discreetLockScreenTimer] as? Bool {
+            WidgetSharedKey.suite?.set(value, forKey: WidgetSharedKey.discreetLockScreenTimer)
+        }
 
         publishWidgetSnapshot()
     }
@@ -773,7 +778,10 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         shared.set(dailyScore, forKey: WidgetSharedKey.watchScore)
         shared.set(dailyScoreActive, forKey: WidgetSharedKey.watchScoreActive)
 
-        let active = activeTimers.first
+        // "Visible timers and complications" switched off has to reach the face
+        // too. It used to hide timers in the app only, so the complication kept
+        // naming the substance for somebody who had asked for it not to.
+        let active = visibleTimersEnabled ? activeTimers.first : nil
         shared.set(active?.substanceName ?? "", forKey: WidgetSharedKey.watchTimerSubstance)
         shared.set(active?.startedAt.timeIntervalSince1970 ?? 0, forKey: WidgetSharedKey.watchTimerStart)
         shared.set(active.map { $0.endsAt.timeIntervalSince1970 } ?? 0, forKey: WidgetSharedKey.watchTimerEnd)

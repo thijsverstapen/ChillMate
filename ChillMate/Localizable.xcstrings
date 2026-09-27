@@ -13308,35 +13308,6 @@
         }
       }
     },
-    "Check-in" : {
-      "comment" : "Neutral stand-in for the substance name on the Lock Screen when discreet wording is on",
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check-in"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check-in"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check-in"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check-in"
-          }
-        }
-      }
-    },
     "Check-in ended" : {
       "localizations" : {
         "de" : {
@@ -70086,35 +70057,6 @@
       },
       "comment" : "Privacy screen row title."
     },
-    "A running dose timer shows the substance on your Lock Screen, where anyone near your phone can read it. You can turn Live Activities off for ChillMate in iOS Settings." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ein laufender Dosis-Timer zeigt die Substanz auf deinem Sperrbildschirm, wo jede Person in der Nähe deines Handys sie lesen kann. Du kannst Live-Aktivitäten für ChillMate in den iOS-Einstellungen ausschalten."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un temporizador de dosis activo muestra la sustancia en tu pantalla de bloqueo, donde cualquiera cerca de tu teléfono puede leerla. Puedes desactivar las Actividades en vivo de ChillMate en los Ajustes de iOS."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un minuteur de dose en cours affiche la substance sur ton écran verrouillé, où toute personne près de ton téléphone peut la lire. Tu peux désactiver les Activités en direct de ChillMate dans les Réglages d’iOS."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Een lopende dosistimer toont het middel op je toegangsscherm, waar iedereen in de buurt van je telefoon het kan lezen. Je kunt Live Activities voor ChillMate uitzetten in de iOS-instellingen."
-          }
-        }
-      },
-      "comment" : "Privacy screen, Lock Screen row."
-    },
     "Siri" : {
       "localizations" : {
         "de" : {
@@ -70665,6 +70607,122 @@
         }
       },
       "comment" : "Privacy screen, discreet notifications row when notifications are off."
+    },
+    "Discreet Lock Screen timer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diskreter Timer auf dem Sperrbildschirm"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temporizador discreto en la pantalla de bloqueo"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minuteur discret sur l’écran verrouillé"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discrete timer op het toegangsscherm"
+          }
+        }
+      },
+      "comment" : "Settings, Privacy & lock toggle title; Privacy screen row title."
+    },
+    "A running timer says “Timer”, never the substance." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein laufender Timer zeigt „Timer“, nie die Substanz."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un temporizador activo dice «Temporizador», nunca la sustancia."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un minuteur en cours affiche « Minuteur », jamais la substance."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een lopende timer zegt „Timer”, nooit het middel."
+          }
+        }
+      },
+      "comment" : "Privacy screen, discreet timer on."
+    },
+    "A running timer says “Timer” on your Lock Screen, in the Dynamic Island and on your watch face, instead of naming the substance." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein laufender Timer zeigt „Timer“ auf dem Sperrbildschirm, in der Dynamic Island und auf deinem Zifferblatt, statt die Substanz zu nennen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un temporizador activo dice «Temporizador» en la pantalla de bloqueo, en la Dynamic Island y en la esfera de tu reloj, en vez de nombrar la sustancia."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un minuteur en cours affiche « Minuteur » sur l’écran verrouillé, dans la Dynamic Island et sur ton cadran, au lieu de nommer la substance."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een lopende timer zegt „Timer” op je toegangsscherm, in het Dynamic Island en op je wijzerplaat, in plaats van het middel te noemen."
+          }
+        }
+      },
+      "comment" : "Settings > Privacy & lock: caption under the discreet Lock Screen timer switch"
+    },
+    "A running dose timer shows the substance on your Lock Screen, in the Dynamic Island and on your watch face, where anyone nearby can read it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein laufender Dosis-Timer zeigt die Substanz auf deinem Sperrbildschirm, in der Dynamic Island und auf deinem Zifferblatt, wo jede Person in der Nähe sie lesen kann."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un temporizador de dosis activo muestra la sustancia en tu pantalla de bloqueo, en la Dynamic Island y en la esfera de tu reloj, donde cualquiera cerca puede leerla."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un minuteur de dose en cours affiche la substance sur ton écran verrouillé, dans la Dynamic Island et sur ton cadran, où toute personne à proximité peut la lire."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een lopende dosistimer toont het middel op je toegangsscherm, in het Dynamic Island en op je wijzerplaat, waar iedereen in de buurt het kan lezen."
+          }
+        }
+      },
+      "comment" : "Privacy screen: the discreet timer row when the setting is off"
     }
   },
   "version" : "1.1"

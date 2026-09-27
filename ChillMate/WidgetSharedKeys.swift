@@ -101,6 +101,14 @@ enum WidgetSharedKey {
     static let doseTimerEnd = "doseTimerEnd"
     static let doseTimerComedownEnd = "doseTimerComedownEnd"
 
+    /// Whether a running dose timer names its substance on the Lock Screen, in
+    /// the Dynamic Island, in the Lock Screen widget and on the watch face.
+    /// Written by the phone app's Privacy & lock setting; read by the Live
+    /// Activity extension, which cannot see the app's own defaults, and relayed
+    /// to the watch, which writes it into its own suite for its complication.
+    /// See `LockScreenTimerPrivacy`.
+    static let discreetLockScreenTimer = "discreetLockScreenTimer"
+
     // MARK: Written by the Control Center controls, read by the phone app
 
     /// Where the app should navigate on next foreground. A control runs in the
@@ -252,5 +260,20 @@ enum WatchLogic {
     /// because day zero is 1 January 2001.
     static func isAvailableToday(lastSentDay: Int, now: Date = .now, calendar: Calendar = .current) -> Bool {
         lastSentDay != dayKey(for: now, calendar: calendar)
+    }
+}
+
+/// Whether the Lock Screen timer says what was taken.
+///
+/// A running timer used to show the substance by name on the Lock Screen and in
+/// the Dynamic Island — "GHB 1:12:40" on a phone face-up on a table, readable by
+/// anyone near it, whatever the discreet notification setting said. Discreet, it
+/// says "Timer", and "Winding down" where it would have said "After effects".
+///
+/// Deciding the words is left to each surface, whose catalog they live in; this
+/// only carries the choice across the process boundary.
+enum LockScreenTimerPrivacy {
+    static func isDiscreet(in defaults: UserDefaults? = WidgetSharedKey.suite) -> Bool {
+        defaults?.bool(forKey: WidgetSharedKey.discreetLockScreenTimer) ?? false
     }
 }

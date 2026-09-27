@@ -28,6 +28,9 @@ struct DoseTimerWidget: Widget {
 struct DoseTimerEntry: TimelineEntry {
     let date: Date
     let snapshot: DoseTimerSnapshot?
+    /// Say "Timer" and "Winding down", never the substance or "after effects".
+    /// See `LockScreenTimerPrivacy`.
+    var discreet = false
 
     /// Which half of the curve this entry sits in.
     var isComedown: Bool {
@@ -58,11 +61,12 @@ struct DoseTimerTimelineProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (DoseTimerEntry) -> Void) {
-        completion(DoseTimerEntry(date: .now, snapshot: DoseTimerSnapshot.read()))
+        completion(DoseTimerEntry(date: .now, snapshot: DoseTimerSnapshot.read(), discreet: LockScreenTimerPrivacy.isDiscreet()))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<DoseTimerEntry>) -> Void) {
         let now = Date.now
+        let discreet = LockScreenTimerPrivacy.isDiscreet()
         guard let snapshot = DoseTimerSnapshot.read(now: now) else {
             // Nothing running. One empty entry, and no policy that would have the
             // system wake this up again for no reason — the app reloads timelines
@@ -71,9 +75,9 @@ struct DoseTimerTimelineProvider: TimelineProvider {
             return
         }
 
-        var entries = [DoseTimerEntry(date: now, snapshot: snapshot)]
+        var entries = [DoseTimerEntry(date: now, snapshot: snapshot, discreet: discreet)]
         if snapshot.endsAt > now {
-            entries.append(DoseTimerEntry(date: snapshot.endsAt, snapshot: snapshot))
+            entries.append(DoseTimerEntry(date: snapshot.endsAt, snapshot: snapshot, discreet: discreet))
         }
         entries.append(DoseTimerEntry(date: snapshot.lastMoment, snapshot: nil))
 
@@ -101,7 +105,11 @@ struct DoseTimerWidgetView: View {
     private var inline: some View {
         if let snapshot = entry.snapshot {
             if entry.isComedown {
-                Label("\(snapshot.substanceName) · after effects", systemImage: "moon.zzz.fill")
+                if entry.discreet {
+                    Label("Winding down", systemImage: "moon.zzz.fill")
+                } else {
+                    Label("\(snapshot.substanceName) · after effects", systemImage: "moon.zzz.fill")
+                }
             } else {
                 Label {
                     Text(timerInterval: entry.date...max(entry.date.addingTimeInterval(1), snapshot.endsAt), countsDown: true)
@@ -145,12 +153,12 @@ struct DoseTimerWidgetView: View {
     private var rectangular: some View {
         if let snapshot = entry.snapshot {
             VStack(alignment: .leading, spacing: 1) {
-                Label(snapshot.substanceName, systemImage: entry.isComedown ? "moon.zzz.fill" : "timer")
+                Label(entry.discreet ? String(localized: "Timer") : snapshot.substanceName, systemImage: entry.isComedown ? "moon.zzz.fill" : "timer")
                     .font(.caption.weight(.bold))
                     .lineLimit(1)
 
                 if entry.isComedown {
-                    Text("After effects")
+                    Text(entry.discreet ? "Winding down" : "After effects")
                         .font(.caption2.weight(.semibold))
                     if let end = snapshot.comedownEndsAt {
                         Text("until \(end.formatted(date: .omitted, time: .shortened))")
@@ -161,7 +169,7 @@ struct DoseTimerWidgetView: View {
                     Text(timerInterval: entry.date...max(entry.date.addingTimeInterval(1), snapshot.endsAt), countsDown: true)
                         .font(.caption2.weight(.semibold))
                         .monospacedDigit()
-                    if snapshot.comedownEndsAt != nil {
+                    if snapshot.comedownEndsAt != nil, !entry.discreet {
                         Text("After effects follow")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
@@ -177,7 +185,11 @@ struct DoseTimerWidgetView: View {
     }
 
     private func accessibilityLabel(_ snapshot: DoseTimerSnapshot) -> Text {
-        entry.isComedown
+        // VoiceOver reads the Lock Screen aloud, so discreet has to hold here too.
+        if entry.discreet {
+            return entry.isComedown ? Text("Timer, winding down") : Text("Check-in timer running")
+        }
+        return entry.isComedown
             ? Text("\(snapshot.substanceName), after effects")
             : Text("\(snapshot.substanceName), check-in timer running")
     }

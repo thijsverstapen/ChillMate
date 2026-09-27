@@ -148,6 +148,9 @@ struct SettingsView: View {
     @AppStorage(DefaultsKey.watchStressAndTemperatureDetection) private var watchStressAndTemperatureDetection = false
     @AppStorage(DefaultsKey.autoLockMinutes) private var autoLockMinutes = 0
     @AppStorage(DefaultsKey.screenPrivacyEnabled) private var screenPrivacyEnabled = true
+    // In the shared suite: the Live Activity extension reads it to decide what the
+    // Lock Screen says.
+    @AppStorage(WidgetSharedKey.discreetLockScreenTimer, store: WidgetSharedKey.suite) private var discreetLockScreenTimer = false
     @AppStorage(DefaultsKey.safetyCheckInsEnabled) private var safetyCheckInsEnabled = false
     @AppStorage(DefaultsKey.weekendSafetyEnabled) private var weekendSafetyEnabled = false
     @AppStorage(DefaultsKey.checkInHour) private var checkInHour = 10
@@ -204,6 +207,21 @@ struct SettingsView: View {
 
     private var palette: DailyScorePalette {
         DailyScorePalette(score: lastDailyRecoveryScore)
+    }
+
+    /// Applies the change to timers already running from the switch itself. An
+    /// `onChange` on the Settings list did not fire while the list sat underneath
+    /// the page the switch is on, so a running timer kept naming the substance.
+    /// The watch is told at the same moment, for its face.
+    private var discreetTimerBinding: Binding<Bool> {
+        Binding(
+            get: { discreetLockScreenTimer },
+            set: { isOn in
+                discreetLockScreenTimer = isOn
+                Task { await DrugTimerLiveActivityController.applyDiscreet(isOn) }
+                services.watch.sendSettings()
+            }
+        )
     }
 
     private var watchSettingsFingerprint: [Bool] {
@@ -481,6 +499,13 @@ struct SettingsView: View {
                             caption: String(localized: "Cover the app in the App Switcher and while your screen is being recorded or mirrored, so a quick glance never reveals your log."),
                             symbol: "eye.slash.fill",
                             isOn: $screenPrivacyEnabled
+                        )
+
+                        SettingsToggleCard(
+                            title: String(localized: "Discreet Lock Screen timer"),
+                            caption: String(localized: "A running timer says “Timer” on your Lock Screen, in the Dynamic Island and on your watch face, instead of naming the substance."),
+                            symbol: "lock.iphone",
+                            isOn: discreetTimerBinding
                         )
 
                         EncryptionInfoCard()

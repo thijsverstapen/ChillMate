@@ -108,7 +108,7 @@ SECTIONS = [
 
     ("threat", "hand", "var(--amber)", "Waar het echt tegen ontworpen is", """
     <p>De meeste privacypagina's gaan over datalekken en hackers. Voor een app als deze ligt het risico dichter bij huis: <strong>iemand die je ontgrendelde telefoon oppakt.</strong> Een partner, een huisgenoot, familie, een collega die naar een melding kijkt.</p>
-    <p>Daarom heeft de app een eigen Face ID- of pinvergrendeling, bovenop die van je telefoon. Meldingen kun je zo laten formuleren dat je vergrendelscherm niets prijsgeeft. Eén tik maakt het scherm zwart. En ChillMate verbergt wat er op het scherm staat als je van app wisselt, en tijdens schermopname of spiegelen.</p>
+    <p>Daarom heeft de app een eigen Face ID- of pinvergrendeling, bovenop die van je telefoon. Meldingen kun je zo laten formuleren dat je vergrendelscherm niets prijsgeeft, en een lopende timer kan daar en op je wijzerplaat gewoon “Timer” zeggen. Eén tik maakt het scherm zwart. En ChillMate verbergt wat er op het scherm staat als je van app wisselt, en tijdens schermopname of spiegelen.</p>
     <p>Geen server hebben heeft een handig neveneffect. Word ik gehackt, dan komt er niets over jou naar buiten, want ik bewaar niets. De keerzijde zeg ik er eerlijk bij: raak je je telefoon kwijt en heb je geen back-up, dan zijn de gegevens weg. Dat is bewust, en daarom staat een versleutelde back-up één instelling verderop.</p>
 """),
 

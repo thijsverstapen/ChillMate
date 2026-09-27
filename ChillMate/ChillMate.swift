@@ -26,6 +26,7 @@ struct ChillMateApp: App {
     /// install that already has a store is ever asked.
     init() {
         ICloudSyncPreference.resolveAtLaunch(storeExists: ICloudSyncPreference.defaultStoreExists)
+        LockScreenTimerPrivacy.settleDefault()
     }
 
     var body: some Scene {
@@ -107,6 +108,9 @@ struct ChillMateApp: App {
                 recordAppUse()
                 refreshLiveActivities()
                 services.watch.syncStandaloneState()
+                // A running timer brought in line with the discreet setting, in
+                // case a change never reached it: it updates only what disagrees.
+                Task { await DrugTimerLiveActivityController.applyDiscreet(LockScreenTimerPrivacy.isDiscreet()) }
                 // Somebody who slept since the app was last in front finds the
                 // night filled in when they come back to it.
                 Task { await SleepBackfill.run(services: services) }

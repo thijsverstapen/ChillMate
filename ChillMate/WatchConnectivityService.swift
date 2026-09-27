@@ -74,7 +74,12 @@ final class WatchConnectivityService: NSObject {
         func flag(_ key: String) -> Bool { d.object(forKey: key) as? Bool ?? true }
         // Built from the registry rather than listed here, so a key cannot be
         // spelled one way at this end and another way on the watch.
-        push(Dictionary(uniqueKeysWithValues: WidgetSharedKey.watchSettingKeys.map { ($0, flag($0)) }))
+        var settings = Dictionary(uniqueKeysWithValues: WidgetSharedKey.watchSettingKeys.map { ($0, flag($0)) })
+        // Not one of the watch's own settings: it lives in the App Group and
+        // defaults to off, so it is read where it lives. The watch face shows the
+        // same timer as the Lock Screen and keeps to the same choice.
+        settings[WidgetSharedKey.discreetLockScreenTimer] = LockScreenTimerPrivacy.isDiscreet()
+        push(settings)
     }
 
     func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool) {
