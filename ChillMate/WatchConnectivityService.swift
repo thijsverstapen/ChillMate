@@ -32,6 +32,23 @@ final class WatchConnectivityService: NSObject {
 
     // MARK: - Outbound state
 
+    /// Starts from what was sent before this launch, under anything sent since.
+    ///
+    /// `updateApplicationContext` replaces the watch's context wholesale, and
+    /// `context` starts empty on every launch. So the first push after the phone
+    /// app restarted carried no timers, and a watch that read its context then,
+    /// on its own next launch, showed no running timer until the timers screen
+    /// was opened on the phone. The system keeps the last context sent; that is
+    /// the starting point now, and every key sent since this launch wins.
+    fileprivate func restoreSentContext(_ sent: [String: Any]) {
+        context = Self.restoredContext(sent: sent, sinceLaunch: context)
+    }
+
+    /// Everything sent before, with every key sent since this launch winning.
+    static func restoredContext(sent: [String: Any], sinceLaunch: [String: Any]) -> [String: Any] {
+        sent.merging(sinceLaunch) { _, newer in newer }
+    }
+
     private func push(_ updates: [String: Any]) {
         context.merge(updates) { _, new in new }
         guard WCSession.default.activationState == .activated else { return }
@@ -161,7 +178,9 @@ final class WatchConnectivityService: NSObject {
 extension WatchConnectivityService: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard activationState == .activated else { return }
+        let sent = WCInboundBox(dict: session.applicationContext)
         Task { @MainActor in
+            WatchConnectivityService.shared.restoreSentContext(sent.dict)
             Services.live.watch.syncStandaloneState()
         }
     }

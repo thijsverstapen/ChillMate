@@ -222,4 +222,24 @@ struct WatchLogicTests {
         #expect(WatchEvent.homeSafeReported.payload["homeSafeReported"] as? Bool == true)
         #expect(WatchEvent.discreetCheckIns(false).payload["setDiscreetCheckIns"] as? Bool == false)
     }
+
+    // MARK: The phone's context across a relaunch
+
+    /// The phone's context starts empty on every launch and each push replaces
+    /// the watch's wholesale, so what was sent before has to be carried forward:
+    /// a restarted phone app left the watch with no running timer.
+    @Test("What was sent before a relaunch is kept, and anything sent since wins")
+    @MainActor
+    func contextSurvivesRelaunch() {
+        let sent: [String: Any] = [
+            WidgetSharedKey.watchContextTimers: [["id": "a"]],
+            WidgetSharedKey.watchContextStreakDays: 3,
+        ]
+        let sinceLaunch: [String: Any] = [WidgetSharedKey.watchContextStreakDays: 4, "emergencyNumber": "911"]
+        let restored = WatchConnectivityService.restoredContext(sent: sent, sinceLaunch: sinceLaunch)
+        #expect((restored[WidgetSharedKey.watchContextTimers] as? [[String: String]])?.first?["id"] == "a")
+        #expect(restored[WidgetSharedKey.watchContextStreakDays] as? Int == 4)
+        #expect(restored["emergencyNumber"] as? String == "911")
+    }
 }
+

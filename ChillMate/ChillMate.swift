@@ -85,6 +85,7 @@ struct ChillMateApp: App {
             recordAppUse()
             refreshPrivacyAndNotificationState()
             services.watch.activate()
+            sendRunningTimersToWatch()
             services.spotlight.indexTools()
             ChillTips.configure()
             TypedRecordsMigration.runIfNeeded()
@@ -108,6 +109,7 @@ struct ChillMateApp: App {
                 recordAppUse()
                 refreshLiveActivities()
                 services.watch.syncStandaloneState()
+                sendRunningTimersToWatch()
                 // A running timer brought in line with the discreet setting, in
                 // case a change never reached it: it updates only what disagrees.
                 Task { await DrugTimerLiveActivityController.applyDiscreet(LockScreenTimerPrivacy.isDiscreet()) }
@@ -118,6 +120,17 @@ struct ChillMateApp: App {
 
             refreshPrivacyAndNotificationState()
         }
+    }
+
+    /// Tells the watch, and the Lock Screen widget, which timers are running.
+    ///
+    /// The watch hears about timers when one starts or is deleted, and that was
+    /// not enough: after the phone app restarted, the next context it sent
+    /// replaced the watch's without them, so a watch that read it showed no
+    /// running timer while one was. Sent again whenever the app comes to the
+    /// front, from whichever store is open, so duress mode sends none.
+    private func sendRunningTimersToWatch() {
+        ActiveDoseTimer.broadcast(from: ChillMateModelContainer.container().mainContext)
     }
 
     /// Moves a destination left by a Control Center control into the key the rest
