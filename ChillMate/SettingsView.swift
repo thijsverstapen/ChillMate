@@ -682,7 +682,7 @@ struct SettingsView: View {
                 await MainActor.run {
                     isRevertingToggle = !success
                     requiresFaceID = success
-                    message = success ? "Face ID lock is on." : "Face ID could not be enabled."
+                    message = success ? String(localized: "Face ID lock is on.") : String(localized: "Face ID could not be enabled.")
                     isWorking = false
                 }
             } catch {
@@ -889,7 +889,7 @@ struct SettingsView: View {
                             services.notifications.scheduleDailyAffirmations()
                         }
                     }
-                    message = granted ? "Notifications are on." : "Notification permission was not granted."
+                    message = granted ? String(localized: "Notifications are on.") : String(localized: "Notification permission was not granted.")
                     isWorking = false
                 }
             } catch {
@@ -934,7 +934,7 @@ struct SettingsView: View {
                         services.notifications.scheduleInactivityReminders()
                         services.notifications.scheduleDailyAffirmations()
                     }
-                    message = granted ? "Daily affirmations are on." : "Notification permission was not granted."
+                    message = granted ? String(localized: "Daily affirmations are on.") : String(localized: "Notification permission was not granted.")
                     isWorking = false
                 }
             } catch {

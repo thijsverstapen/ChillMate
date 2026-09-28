@@ -101,6 +101,22 @@ struct SupportDirectoryTests {
                     "\(country) offers no emergency entry")
         }
     }
+
+    /// Every button under an entry has to still carry what it acts on. The verbs
+    /// were English for every country but the Netherlands; the number or address
+    /// is not a word and must survive the translation untouched.
+    @Test("Each action still names its number or address",
+          arguments: ["Belgium", "Germany", "United Kingdom", "France", "Spain", "United States", "Ireland", "Australia"])
+    func actionsKeepTheirTarget(country: String) {
+        for resource in SupportResource.resources(for: country) {
+            guard let url = resource.url else { continue }
+            if url.scheme == "tel" {
+                let digits = (url.host ?? "").filter(\.isNumber)
+                let shown = resource.action.filter(\.isNumber)
+                #expect(shown.contains(digits), "\(resource.title): \(resource.action)")
+            }
+        }
+    }
 }
 
 /// The phone and the watch have to agree on the spelling of every setting they

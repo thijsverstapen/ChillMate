@@ -116,11 +116,17 @@ are the first CI job.
   nesting are handled; it checks every literal in a labelled control's first
   argument, so a ternary cannot hide one; it covers App Intents, widget gallery
   names and all four product targets; it refuses a bare literal assigned to
-  anything named like something a person reads; it refuses an English sentence
+  anything named like something a person reads; it refuses an English-looking
+  literal in a ternary or `??` branch, or handed to a `title:`, `detail:`,
+  `value:` or similar argument, outside `String(localized:)` — a plain `String`
+  parameter is invisible to every other rule; it refuses an English sentence
   anywhere in `NotificationService.swift` outside `String(localized:)`; and it
   refuses `.rawValue` in a position a person will read, where
   `localizedDisplayName` is meant. Each of those rules exists because a string
   shipped in English through that exact hole.
+
+  A timer's `substanceName` is the raw value, which is English. What a person
+  reads is `localizedSubstanceName`.
 
   **Reusing an existing key means reading its translations, not just its
   spelling.** The gate checks that a literal has a key and that the key has all

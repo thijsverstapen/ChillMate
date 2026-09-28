@@ -460,6 +460,6 @@ private enum RouteSearchService {
 
 private extension LoggedLocation {
     var locationMessage: String {
-        "\(name.isEmpty ? "Current location" : name) • \(coordinateSummary)"
+        "\(name.isEmpty ? String(localized: "Current location") : name) • \(coordinateSummary)"
     }
 }

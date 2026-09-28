@@ -280,7 +280,7 @@ private struct SafetyAutopilotStatusCard: View {
         HStack(spacing: 12) {
             SafetyStatusMetric(title: String(localized: "Streak"), value: "\(context.recoveryStreakDays)d", symbol: "leaf.circle.fill", tint: Color.chillMint)
             SafetyStatusMetric(title: String(localized: "Risk trend"), value: "\(context.riskTrend.recent)/3w", symbol: "chart.line.uptrend.xyaxis", tint: context.riskTrend.recent > context.riskTrend.previous ? .orange : Color.chillSecondaryBlue)
-            SafetyStatusMetric(title: String(localized: "Timer"), value: context.activeTimer == nil ? "None" : "Active", symbol: "timer", tint: context.activeTimer == nil ? Color.chillSecondary : Color.chillSecondaryBlue)
+            SafetyStatusMetric(title: String(localized: "Timer"), value: context.activeTimer == nil ? String(localized: "Off") : String(localized: "Running"), symbol: "timer", tint: context.activeTimer == nil ? Color.chillSecondary : Color.chillSecondaryBlue)
         }
         .padding(14)
         .glassSurface(radius: 28, tint: Color.chillSecondaryBlue.opacity(0.08))
