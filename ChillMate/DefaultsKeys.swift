@@ -193,7 +193,6 @@ enum DefaultsKey {
     // MARK: Misc settings
     static let healthKitSexualActivityWriteEnabled = "healthKitSexualActivityWriteEnabled"
     static let stiReminderMonths = "stiReminderMonths"
-    static let watchStressAndTemperatureDetection = "watchStressAndTemperatureDetection"
     static let recentlyDeletedItems = "recentlyDeletedItems"
 
     // MARK: Language

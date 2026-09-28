@@ -95,9 +95,11 @@
 		F77A00000000000000000001 /* EncryptedBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F77A00000000000000000011 /* EncryptedBackupService.swift */; };
 		F88B00000000000000000001 /* ChillMateWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000011 /* ChillMateWatchApp.swift */; };
 		F88B00000000000000000002 /* WatchDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000012 /* WatchDashboardView.swift */; };
+		CD6CEE441F65F5384C58F607 /* WatchHeartRateReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BC209AFFB43DD6CFF6A7422 /* WatchHeartRateReader.swift */; };
 		F88B00000000000000000003 /* ChillMateWatchApp.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000014 /* ChillMateWatchApp.app */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F88B00000000000000000004 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000015 /* Assets.xcassets */; };
 		F88B00000000000000000005 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F88B00000000000000000016 /* Localizable.xcstrings */; };
+		D58799632E1270FEC5F9013A /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 805A707665112E49DE651333 /* InfoPlist.xcstrings */; };
 		F99C00000000000000000002 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = F99C00000000000000000001 /* Localizable.xcstrings */; };
 		AAB100000000000000000021 /* PanicHideControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000021 /* PanicHideControl.swift */; };
 		AAB100000000000000000025 /* ComedownPhaseCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000025 /* ComedownPhaseCard.swift */; };
@@ -300,10 +302,12 @@
 		F77A00000000000000000011 /* EncryptedBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedBackupService.swift; sourceTree = "<group>"; };
 		F88B00000000000000000011 /* ChillMateWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChillMateWatchApp.swift; sourceTree = "<group>"; };
 		F88B00000000000000000012 /* WatchDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchDashboardView.swift; sourceTree = "<group>"; };
+		9BC209AFFB43DD6CFF6A7422 /* WatchHeartRateReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchHeartRateReader.swift; sourceTree = "<group>"; };
 		F88B00000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F88B00000000000000000014 /* ChillMateWatchApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChillMateWatchApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F88B00000000000000000015 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F88B00000000000000000016 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		805A707665112E49DE651333 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		F99C00000000000000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		AAF100000000000000000021 /* PanicHideControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanicHideControl.swift; sourceTree = "<group>"; };
 		AAF100000000000000000025 /* ComedownPhaseCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComedownPhaseCard.swift; sourceTree = "<group>"; };
@@ -587,8 +591,10 @@
 			children = (
 				F88B00000000000000000015 /* Assets.xcassets */,
 				F88B00000000000000000016 /* Localizable.xcstrings */,
+				805A707665112E49DE651333 /* InfoPlist.xcstrings */,
 				F88B00000000000000000011 /* ChillMateWatchApp.swift */,
 				F88B00000000000000000012 /* WatchDashboardView.swift */,
+				9BC209AFFB43DD6CFF6A7422 /* WatchHeartRateReader.swift */,
 				F88B00000000000000000013 /* Info.plist */,
 			);
 			path = ChillMateWatchApp;
@@ -833,6 +839,7 @@
 			files = (
 				F88B00000000000000000004 /* Assets.xcassets in Resources */,
 				F88B00000000000000000005 /* Localizable.xcstrings in Resources */,
+				D58799632E1270FEC5F9013A /* InfoPlist.xcstrings in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -981,6 +988,7 @@
 				AAB1000000000000000000F3 /* WidgetSharedKeys.swift in Sources */,
 				F88B00000000000000000001 /* ChillMateWatchApp.swift in Sources */,
 				F88B00000000000000000002 /* WatchDashboardView.swift in Sources */,
+				CD6CEE441F65F5384C58F607 /* WatchHeartRateReader.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
@@ -1334,7 +1342,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSContactsUsageDescription = "ChillMate lets you pick your trusted contact, or a partner for a private log, from your contacts. It only sees the person you pick.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "ChillMate uses Face ID to help protect your sensitive information.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate reads your sleep to fill in how long you slept after a night, and your heart rate and heart rate variability for your recovery score and your Apple Watch.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate reads your sleep to fill in how long you slept after a night, and your resting heart rate and heart rate variability for your recovery score.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ChillMate writes sexual activity and sleep for the nights you log, your breathing sessions, and your aftercare mood. Nothing about what you took or what you wrote goes with them.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ChillMate uses your location only when you ask: to add it to a log, or to put it in a message you are sending.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
@@ -1377,7 +1385,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSContactsUsageDescription = "ChillMate lets you pick your trusted contact, or a partner for a private log, from your contacts. It only sees the person you pick.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "ChillMate uses Face ID to help protect your sensitive information.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate reads your sleep to fill in how long you slept after a night, and your heart rate and heart rate variability for your recovery score and your Apple Watch.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate reads your sleep to fill in how long you slept after a night, and your resting heart rate and heart rate variability for your recovery score.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ChillMate writes sexual activity and sleep for the nights you log, your breathing sessions, and your aftercare mood. Nothing about what you took or what you wrote goes with them.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "ChillMate uses your location only when you ask: to add it to a log, or to put it in a message you are sending.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
@@ -1498,6 +1506,7 @@
 				INFOPLIST_FILE = ChillMateWatchApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = ChillMate;
 				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate shows your current heart rate on your Apple Watch and warns you when it is high. It is not saved or sent anywhere.";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.BIJTHIJS.ChillMate;
 				MARKETING_VERSION = 5.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.watchkitapp;
@@ -1527,6 +1536,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = ChillMate;
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate shows your current heart rate on your Apple Watch and warns you when it is high. It is not saved or sent anywhere.";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.BIJTHIJS.ChillMate;
 				MARKETING_VERSION = 5.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.watchkitapp;

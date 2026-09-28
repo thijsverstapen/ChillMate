@@ -126,27 +126,6 @@ final class WatchConnectivityService: NSObject {
         ])
     }
 
-    /// The heart rate goes with the time it was taken, so the watch can decline
-    /// to show a reading that is no longer about now.
-    func sendLatestHeartRate(_ reading: HealthSample?) {
-        push([
-            WidgetSharedKey.hasBPM: reading != nil,
-            WidgetSharedKey.latestBPM: reading?.value ?? 0,
-            WidgetSharedKey.latestBPMAt: reading?.date.timeIntervalSince1970 ?? 0,
-        ])
-    }
-
-    /// Relays heart-rate variability so the watch can tell dancing apart from
-    /// strain. The phone already reads this for the recovery score; before now it
-    /// never crossed to the device actually on the wrist.
-    func sendLatestHRV(_ reading: HealthSample?) {
-        push([
-            WidgetSharedKey.hasHRV: reading != nil,
-            WidgetSharedKey.latestHRVms: reading?.value ?? 0,
-            WidgetSharedKey.latestHRVAt: reading?.date.timeIntervalSince1970 ?? 0,
-        ])
-    }
-
     /// Push everything the watch needs that lives outside SwiftData. Called on
     /// activation and whenever the app becomes active.
     func syncStandaloneState() {

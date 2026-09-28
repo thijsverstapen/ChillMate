@@ -654,7 +654,6 @@ struct WatchCompanionSettingsCard: View {
     @Binding var breathingHaptics: Bool
     @Binding var discreetCheckIns: Bool
     @Binding var visibleTimers: Bool
-    @Binding var stressAndTemperatureDetection: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -662,7 +661,7 @@ struct WatchCompanionSettingsCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("These settings control the Apple Watch companion: hydration reminders, elevated heart-rate warnings, haptic breathing, discreet check-ins, timer visibility, and a strain warning that combines heart rate with heart-rate variability.")
+            Text("These settings control the Apple Watch companion: hydration reminders, heart-rate warnings from the watch's own sensor, haptic breathing, discreet check-ins and timer visibility.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -672,7 +671,6 @@ struct WatchCompanionSettingsCard: View {
             SettingsToggleLine(title: String(localized: "Breathing haptics"), symbol: "lungs.fill", isOn: $breathingHaptics)
             SettingsToggleLine(title: String(localized: "Discreet haptic check-ins"), symbol: "applewatch.radiowaves.left.and.right", isOn: $discreetCheckIns)
             SettingsToggleLine(title: String(localized: "Visible timers and complications"), symbol: "timer", isOn: $visibleTimers)
-            SettingsToggleLine(title: String(localized: "Strain warnings"), symbol: "thermometer.medium", isOn: $stressAndTemperatureDetection)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)

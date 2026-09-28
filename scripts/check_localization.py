@@ -21,6 +21,9 @@ REQUIRED = {"nl", "de", "fr", "es"}
 CATALOGS = [
     ROOT / "ChillMate/Localizable.xcstrings",
     ROOT / "ChillMate/InfoPlist.xcstrings",
+    # The watch asks for heart-rate access in its own words since it reads its
+    # own sensor, so its permission prompt has a catalog of its own.
+    ROOT / "ChillMateWatchApp/InfoPlist.xcstrings",
     ROOT / "ChillMateWatchApp/Localizable.xcstrings",
     ROOT / "ChillMateWatchAppWidget/Localizable.xcstrings",
     # Added in 4.3.0. The Live Activity extension shipped with no catalog at

@@ -145,7 +145,10 @@ struct HealthKitAccessTests {
         HKObjectType.workoutType()
     ]
 
+    /// Heart rate itself is here since the watch reads its own sensor: the phone
+    /// read it only to pass it on.
     private static let neverRead: [HKObjectType?] = [
+        HKObjectType.quantityType(forIdentifier: .heartRate),
         HKObjectType.quantityType(forIdentifier: .respiratoryRate),
         HKObjectType.workoutType(),
         HKObjectType.categoryType(forIdentifier: .sexualActivity),
@@ -183,7 +186,6 @@ struct HealthKitAccessTests {
         ])
         #expect(read == [
             HKCategoryTypeIdentifier.sleepAnalysis.rawValue,
-            HKQuantityTypeIdentifier.heartRate.rawValue,
             HKQuantityTypeIdentifier.restingHeartRate.rawValue,
             HKQuantityTypeIdentifier.heartRateVariabilitySDNN.rawValue
         ])
@@ -293,7 +295,6 @@ struct SleepBackfillTests {
             return intervals
         }
         func latestHRV() async throws -> HealthSample? { nil }
-        func latestHeartRate() async throws -> HealthSample? { nil }
         func latestRestingHeartRate() async throws -> Double? { nil }
         func removeLegacyMetadata(matching nights: [HealthLogSnapshot]) async throws -> Bool { true }
         func requestAuthorization() async throws {}
