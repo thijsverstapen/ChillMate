@@ -175,7 +175,7 @@ private struct SafetyAutopilotContext {
                 title: timer.redoseNudgeIsActive(at: now)
                     ? String(localized: "Pause before continuing")
                     : String(localized: "Check-in is active"),
-                detail: String(localized: "\(timer.substanceName) check-in is \(progress) through. Check water, food, body temperature, support, and whether you still feel safe."),
+                detail: String(localized: "\(timer.localizedSubstanceName) check-in is \(progress) through. Check water, food, body temperature, support, and whether you still feel safe."),
                 symbol: "timer.circle.fill"
             ))
         }

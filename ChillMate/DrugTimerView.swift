@@ -559,7 +559,7 @@ private struct DrugTimerCard: View {
             if shouldShowRedoseNudge {
                 RedoseNudgeCard(
                     progress: progress,
-                    previousDoseText: "\(timer.substanceName) at \(timer.startedAt.formatted(date: .omitted, time: .shortened))",
+                    previousDoseText: String(localized: "\(timer.localizedSubstanceName) at \(timer.startedAt.formatted(date: .omitted, time: .shortened))"),
                     avoid: { saveRedoseDecision(.avoided) },
                     redose: { saveRedoseDecision(.redosed) }
                 )
@@ -585,7 +585,7 @@ private struct DrugTimerCard: View {
 
     private var details: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(timer.substanceName)
+            Text(timer.localizedSubstanceName)
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
             Text(isActive ? remainingText : String(localized: "Check-in ended"))
@@ -622,8 +622,8 @@ private struct DrugTimerCard: View {
             await DrugTimerLiveActivityController.end(timer)
         }
         RecentlyDeletedStore.record(
-            kind: "Timer",
-            title: "\(timer.substanceName) timer",
+            kind: .timer,
+            title: String(localized: "\(timer.localizedSubstanceName) timer"),
             detail: timer.startedAt.formatted(date: .abbreviated, time: .shortened)
         )
         services.notifications.clearSessionCheckIns(id: timer.id)

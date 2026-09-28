@@ -114,7 +114,7 @@ private struct DoseHistoryRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
-                Text(row.substance)
+                Text(Substance(rawValue: row.substance)?.localizedDisplayName ?? row.substance)
                     .font(.headline)
                     .foregroundStyle(Color.chillText)
                 Spacer()

@@ -52,7 +52,7 @@ enum ActiveDoseTimer {
             )?.afterEffectsEnd
         }
         return DoseTimerSnapshot(
-            substanceName: timer.substanceName,
+            substanceName: timer.localizedSubstanceName,
             startedAt: timer.startedAt,
             endsAt: timer.endsAt,
             comedownEndsAt: comedownEnd

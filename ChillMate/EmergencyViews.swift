@@ -360,7 +360,7 @@ struct EmergencyCardView: View {
             .filter { $0.endsAt > now }
             .map {
                 let route = AdministrationRoute(rawValue: $0.administrationRoute)?.displayName ?? "Saved route"
-                return "\($0.substanceName) (\(route))"
+                return "\($0.localizedSubstanceName) (\(route))"
             }
         if !timerNames.isEmpty {
             return Array(timerNames.prefix(5))

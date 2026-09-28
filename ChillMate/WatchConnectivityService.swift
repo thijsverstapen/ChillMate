@@ -57,7 +57,7 @@ final class WatchConnectivityService: NSObject {
         let payload = timers.filter { $0.endsAt > now }.map { timer in
             [
                 "id": timer.id.uuidString,
-                "substance": timer.substanceName,
+                "substance": timer.localizedSubstanceName,
                 "startedAt": timer.startedAt.timeIntervalSince1970,
                 "endsAt": timer.endsAt.timeIntervalSince1970,
                 "durationHours": timer.durationHours

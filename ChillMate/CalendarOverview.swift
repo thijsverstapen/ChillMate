@@ -411,8 +411,8 @@ struct CalendarOverviewView: View {
 
     private func delete(_ entry: NightEntry) {
         RecentlyDeletedStore.record(
-            kind: "Chill log",
-            title: entry.skippedNight ? "Skipped Chill check" : "Chill log",
+            kind: .chillLog,
+            title: entry.skippedNight ? String(localized: "Skipped Chill check") : String(localized: "Chill log"),
             detail: entry.date.formatted(date: .abbreviated, time: .shortened)
         )
         modelContext.delete(entry)

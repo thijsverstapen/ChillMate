@@ -177,7 +177,7 @@ struct DoseTimerSnapshotTests {
 
         for discreetNotifications in [false, true] {
             UserDefaults.standard.set(discreetNotifications, forKey: key)
-            #expect(ActiveDoseTimer.snapshot(for: timer).substanceName == Substance.ketamine.rawValue)
+            #expect(ActiveDoseTimer.snapshot(for: timer).substanceName == Substance.ketamine.localizedDisplayName)
         }
     }
 

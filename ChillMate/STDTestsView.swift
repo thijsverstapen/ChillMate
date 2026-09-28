@@ -264,7 +264,7 @@ private struct STDTestCard: View {
 
                 Button(role: .destructive) {
                     RecentlyDeletedStore.record(
-                        kind: "STI test",
+                        kind: .stiTest,
                         title: String(localized: "STI test"),
                         detail: test.testDate.formatted(date: .abbreviated, time: .omitted)
                     )
