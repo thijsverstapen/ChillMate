@@ -18,6 +18,8 @@
 		A11B00000000000000000002 /* NightEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000012 /* NightEntry.swift */; };
 		A11B00000000000000000004 /* LiquidGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000014 /* LiquidGlass.swift */; };
 		A11B00000000000000000005 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000015 /* DashboardView.swift */; };
+		B2B7C6E043D47D53D4FE1D2F /* WhatsNewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD8583719D52FDA9F75912D /* WhatsNewView.swift */; };
+		2DC87E3FE8A207EDAC4853E1 /* WhatsNew.swift in Sources */ = {isa = PBXBuildFile; fileRef = E115B20DE828F3B8F2446C40 /* WhatsNew.swift */; };
 		71200A9481A3D3E1A6913837 /* DoseHistoryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C0154EAB4DC2F0ED3AE119 /* DoseHistoryViews.swift */; };
 		DE7EA87BD0DDA849F71D99B6 /* DashboardMetricsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDDBA162651C1581CB98A263 /* DashboardMetricsGrid.swift */; };
 		3DA11B274183EEDFB615216E /* DashboardCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A4E15BC04A0B5F032A8532 /* DashboardCards.swift */; };
@@ -226,6 +228,8 @@
 		A11B00000000000000000012 /* NightEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightEntry.swift; sourceTree = "<group>"; };
 		A11B00000000000000000014 /* LiquidGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlass.swift; sourceTree = "<group>"; };
 		A11B00000000000000000015 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		2BD8583719D52FDA9F75912D /* WhatsNewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNewView.swift; sourceTree = "<group>"; };
+		E115B20DE828F3B8F2446C40 /* WhatsNew.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhatsNew.swift; sourceTree = "<group>"; };
 		F7C0154EAB4DC2F0ED3AE119 /* DoseHistoryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoseHistoryViews.swift; sourceTree = "<group>"; };
 		FDDBA162651C1581CB98A263 /* DashboardMetricsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardMetricsGrid.swift; sourceTree = "<group>"; };
 		75A4E15BC04A0B5F032A8532 /* DashboardCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCards.swift; sourceTree = "<group>"; };
@@ -508,6 +512,8 @@
 				A11B00000000000000000012 /* NightEntry.swift */,
 						A11B00000000000000000014 /* LiquidGlass.swift */,
 				A11B00000000000000000015 /* DashboardView.swift */,
+				2BD8583719D52FDA9F75912D /* WhatsNewView.swift */,
+				E115B20DE828F3B8F2446C40 /* WhatsNew.swift */,
 				F7C0154EAB4DC2F0ED3AE119 /* DoseHistoryViews.swift */,
 				FDDBA162651C1581CB98A263 /* DashboardMetricsGrid.swift */,
 				75A4E15BC04A0B5F032A8532 /* DashboardCards.swift */,
@@ -935,6 +941,8 @@
 				A11B00000000000000000002 /* NightEntry.swift in Sources */,
 						A11B00000000000000000004 /* LiquidGlass.swift in Sources */,
 				A11B00000000000000000005 /* DashboardView.swift in Sources */,
+				B2B7C6E043D47D53D4FE1D2F /* WhatsNewView.swift in Sources */,
+				2DC87E3FE8A207EDAC4853E1 /* WhatsNew.swift in Sources */,
 				71200A9481A3D3E1A6913837 /* DoseHistoryViews.swift in Sources */,
 				DE7EA87BD0DDA849F71D99B6 /* DashboardMetricsGrid.swift in Sources */,
 				3DA11B274183EEDFB615216E /* DashboardCards.swift in Sources */,
