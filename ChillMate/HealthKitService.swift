@@ -267,13 +267,13 @@ final class HealthKitService {
 
     // MARK: - Heart
 
-    func latestHRV() async throws -> Double? {
+    func latestHRV() async throws -> HealthSample? {
         guard isAvailable, let hrvType = Self.heartRateVariabilityType else { return nil }
         try await requestAuthorization(scopes: [.heartRateVariabilityRead])
         return try await latestQuantity(hrvType, unit: HKUnit.secondUnit(with: .milli))
     }
 
-    func latestHeartRate() async throws -> Double? {
+    func latestHeartRate() async throws -> HealthSample? {
         guard isAvailable, let hrType = Self.heartRateType else { return nil }
         try await requestAuthorization(scopes: [.heartRateRead])
         return try await latestQuantity(hrType, unit: HKUnit(from: "count/min"))
@@ -284,10 +284,13 @@ final class HealthKitService {
     func latestRestingHeartRate() async throws -> Double? {
         guard isAvailable, let type = Self.restingHeartRateType else { return nil }
         try await requestAuthorization(scopes: [.heartRateRead])
-        return try await latestQuantity(type, unit: HKUnit(from: "count/min"))
+        return try await latestQuantity(type, unit: HKUnit(from: "count/min"))?.value
     }
 
-    private func latestQuantity(_ type: HKQuantityType, unit: HKUnit) async throws -> Double? {
+    /// The most recent sample, with the time it was taken. The time goes with the
+    /// value because the most recent sample can be days old, and a reader that
+    /// does not know that shows it as now.
+    private func latestQuantity(_ type: HKQuantityType, unit: HKUnit) async throws -> HealthSample? {
         let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
         return try await withCheckedThrowingContinuation { continuation in
             let query = HKSampleQuery(sampleType: type, predicate: nil, limit: 1, sortDescriptors: [sort]) { _, samples, error in
@@ -295,7 +298,10 @@ final class HealthKitService {
                     continuation.resume(throwing: error)
                     return
                 }
-                continuation.resume(returning: (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: unit))
+                let sample = samples?.first as? HKQuantitySample
+                continuation.resume(returning: sample.map {
+                    HealthSample(value: $0.quantity.doubleValue(for: unit), date: $0.endDate)
+                })
             }
             store.execute(query)
         }

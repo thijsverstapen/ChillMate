@@ -292,8 +292,8 @@ struct SleepBackfillTests {
             askedToExcludeOwn.append(excludingOwnSamples)
             return intervals
         }
-        func latestHRV() async throws -> Double? { nil }
-        func latestHeartRate() async throws -> Double? { nil }
+        func latestHRV() async throws -> HealthSample? { nil }
+        func latestHeartRate() async throws -> HealthSample? { nil }
         func latestRestingHeartRate() async throws -> Double? { nil }
         func removeLegacyMetadata(matching nights: [HealthLogSnapshot]) async throws -> Bool { true }
         func requestAuthorization() async throws {}

@@ -49,15 +49,22 @@ struct WatchDashboardView: View {
                         WKInterfaceDevice.current().play(.click)
                     }
 
-                    if connectivity.heartRateWarningsEnabled, let bpm = connectivity.latestBPM {
-                        WatchHeartRateCard(bpm: bpm)
-                    }
+                    // Re-checked every minute, so a reading that stops being
+                    // current leaves the screen instead of staying as though it
+                    // were now. See `WatchLogic.readingIsCurrentFor`.
+                    TimelineView(.periodic(from: .now, by: 60)) { context in
+                        let bpm = WatchLogic.isCurrent(connectivity.latestBPM, now: context.date) ? connectivity.latestBPM?.value : nil
+                        let hrv = WatchLogic.isCurrent(connectivity.latestHRV, now: context.date) ? connectivity.latestHRV?.value : nil
+                        VStack(alignment: .leading, spacing: 10) {
+                            if connectivity.heartRateWarningsEnabled, let bpm {
+                                WatchHeartRateCard(bpm: bpm)
+                            }
 
-                    if connectivity.strainDetectionEnabled,
-                       let bpm = connectivity.latestBPM,
-                       let hrv = connectivity.latestHRVms,
-                       WatchStrainCard.isStrained(bpm: bpm, hrvMs: hrv) {
-                        WatchStrainCard(bpm: bpm, hrvMs: hrv)
+                            if connectivity.strainDetectionEnabled, let bpm, let hrv,
+                               WatchStrainCard.isStrained(bpm: bpm, hrvMs: hrv) {
+                                WatchStrainCard(bpm: bpm, hrvMs: hrv)
+                            }
+                        }
                     }
 
                     NavigationLink {
@@ -155,13 +162,12 @@ private struct WatchActiveTimerCard: View {
     let discreet: Bool
     @State private var didWarn = false
 
-    /// Two timelines with different cadences instead of one at 1 Hz.
-    ///
-    /// The whole card (label, Gauge, and the card background) used to be rebuilt
-    /// every second for the entire length of a dose window, which on a watch is a
-    /// real battery cost. The countdown text genuinely needs 1 Hz because it shows
-    /// seconds; the gauge does not. Across a multi-hour window one second moves the
-    /// bar by well under a hundredth of a percent, so it ticks every 15s.
+    /// No timeline at 1 Hz. The countdown is `Text(timerInterval:)`, which the
+    /// system draws, and its own view updates only when the window ends. The
+    /// gauge ticks every 15 s: across a multi-hour window one second moves the
+    /// bar by well under a hundredth of a percent. The whole card used to be
+    /// rebuilt every second for the length of a dose window, which on a watch is
+    /// a real battery cost.
     ///
     /// Neither timeline is gated behind Reduce Motion. That preference asks for
     /// less motion, not for frozen content, and these views redraw a countdown and
@@ -170,16 +176,18 @@ private struct WatchActiveTimerCard: View {
     /// accommodation.
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Label(discreet ? String(localized: "Timer") : timer.substanceName, systemImage: "timer")
-                    .font(.headline)
-                    .lineLimit(1)
-                Spacer(minLength: 4)
-                TimelineView(.periodic(from: .now, by: 1)) { context in
-                    let remaining = max(0, timer.endsAt.timeIntervalSince(context.date))
-                    Text(remaining <= 0 ? String(localized: "Window ended") : remaining.formattedRemaining)
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(remaining <= 0 ? .orange : .secondary)
+            // One line when the name and the countdown fit side by side, two when
+            // they do not: on a small watch "Benzodiazepines" beside "3:58:49"
+            // left room for four letters of the name.
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    title
+                    Spacer(minLength: 4)
+                    countdown
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    title
+                    countdown
                 }
             }
 
@@ -219,6 +227,33 @@ private struct WatchActiveTimerCard: View {
             guard !didWarn else { return }
             didWarn = true
             WKInterfaceDevice.current().play(.notification)
+        }
+    }
+
+    private var title: some View {
+        Label(discreet ? String(localized: "Timer") : timer.substanceName, systemImage: "timer")
+            .font(.headline)
+            .lineLimit(1)
+    }
+
+    /// Updated at the one moment it changes, the end of the window. In between,
+    /// `Text(timerInterval:)` is drawn by the system: no body update every
+    /// second, and it stays right in Always On, where a per-second timeline is
+    /// throttled and would show a stale count.
+    private var countdown: some View {
+        TimelineView(.explicit([.now, timer.endsAt])) { context in
+            if context.date >= timer.endsAt {
+                Text("Window ended")
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.orange)
+            } else {
+                // Fixed to its own width: a timer text otherwise takes all the
+                // room it is offered.
+                Text(timerInterval: context.date...timer.endsAt, countsDown: true)
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(.secondary)
+                    .fixedSize()
+            }
         }
     }
 }
@@ -568,33 +603,6 @@ private extension View {
     }
 }
 
-private extension TimeInterval {
-    var formattedRemaining: String {
-        let total = Int(self)
-        let hours = total / 3600
-        let minutes = (total % 3600) / 60
-        let seconds = total % 60
-        if hours > 0 {
-            return "\(hours):\(minutes.twoDigitPadded):\(seconds.twoDigitPadded)"
-        }
-        return "\(minutes):\(seconds.twoDigitPadded)"
-    }
-}
-
-private extension Int {
-    var twoDigitPadded: String { self < 10 ? "0\(self)" : "\(self)" }
-}
-
-// MARK: - Model
-
-struct WatchTimerInfo: Identifiable, Equatable {
-    let id: UUID
-    let substanceName: String
-    let startedAt: Date
-    let durationSeconds: TimeInterval
-
-    var endsAt: Date { startedAt.addingTimeInterval(durationSeconds) }
-}
 
 // MARK: - Connectivity (watch side)
 
@@ -607,8 +615,11 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     @Published var recoveryStreakDays = 0
     @Published var dailyScore = 0
     @Published var dailyScoreActive = false
-    @Published var latestBPM: Double? = nil
-    @Published var latestHRVms: Double? = nil
+    /// The phone's last heart-rate and variability readings, with when each was
+    /// taken. Shown only while `WatchLogic.isCurrent` says they are still about
+    /// now: the phone reads them when Home appears, which can be hours ago.
+    @Published var latestBPM: HealthSample? = nil
+    @Published var latestHRV: HealthSample? = nil
     @Published var strainDetectionEnabled = true
     @Published var trustedContactName = ""
     @Published var trustedContactPhone = ""
@@ -667,31 +678,31 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         }
     }
 
-    // MARK: Outbound events (reliable one-shot delivery)
+    // MARK: Outbound events
 
     func logHydration() {
         rolloverIfNeeded()
         hydrationCount += 1
         defaults.set(hydrationCount, forKey: hydrationCountKey)
-        sendEvent(["hydrationLogged": true])
+        sendEvent(.hydrationLogged)
     }
 
     func logQuickSkip() {
         guard !quickSkipSentToday else { return }
         quickSkipSentToday = true
         defaults.set(Self.todayKey, forKey: quickSkipDayKey)
-        sendEvent(["quickSkipRequested": true])
+        sendEvent(.quickSkipRequested)
     }
 
     func toggleDiscreetCheckIns() {
         discreetCheckInsEnabled.toggle()
-        sendEvent(["setDiscreetCheckIns": discreetCheckInsEnabled])
+        sendEvent(.discreetCheckIns(discreetCheckInsEnabled))
     }
 
     /// "I got home." The phone stops the tonight-only safety check-ins, because
     /// the question they were asking has been answered.
     func sendHomeSafe() {
-        sendEvent(["homeSafeReported": true])
+        sendEvent(.homeSafeReported)
     }
 
     func call(_ number: String) {
@@ -700,51 +711,59 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         WKApplication.shared().openSystemURL(url)
     }
 
-    private func sendEvent(_ payload: [String: Any]) {
-        // transferUserInfo / sendMessage require an activated session. In the rare
-        // cold-start race where we're not activated yet, kick activation and drop
-        // this one event rather than risk a WCSession exception. State re-syncs on
-        // the next interaction.
+    /// Sends a tap to the phone, or keeps it until the session can.
+    ///
+    /// A tap made before the session had finished activating, which is most
+    /// likely in the first moments after the app opens, used to be dropped while
+    /// the screen showed it as done: a clear night marked as sent for the rest of
+    /// the day that the phone never logged, a home-safe that left the check-ins
+    /// running. Waiting taps are kept on disk, so a relaunch does not lose them
+    /// either, and go out in order once activation completes.
+    private func sendEvent(_ event: WatchEvent) {
         guard WCSession.default.activationState == .activated else {
+            let pending = WatchLogic.enqueue(event, onto: WatchLogic.pendingEvents(in: defaults))
+            WatchLogic.savePendingEvents(pending, in: defaults)
             WCSession.default.activate()
             return
         }
+        flushPendingEvents()
+        deliver(event)
+    }
+
+    /// Hands every waiting tap to the system, oldest first. `transferUserInfo`
+    /// rather than `sendMessage`: once handed over, delivery is the system's to
+    /// finish, across relaunches and whether or not the phone is in reach.
+    fileprivate func flushPendingEvents() {
+        guard WCSession.default.activationState == .activated else { return }
+        let pending = WatchLogic.pendingEvents(in: defaults)
+        guard !pending.isEmpty else { return }
+        WatchLogic.savePendingEvents([], in: defaults)
+        for event in pending {
+            WCSession.default.transferUserInfo(event.payload)
+        }
+    }
+
+    private func deliver(_ event: WatchEvent) {
         if WCSession.default.isReachable {
-            WCSession.default.sendMessage(payload, replyHandler: nil) { [payload] _ in
+            WCSession.default.sendMessage(event.payload, replyHandler: nil) { _ in
                 // Delivery failed while "reachable"; fall back to the guaranteed queue.
-                WCSession.default.transferUserInfo(payload)
+                WCSession.default.transferUserInfo(event.payload)
             }
         } else {
-            WCSession.default.transferUserInfo(payload)
+            WCSession.default.transferUserInfo(event.payload)
         }
     }
 
     // MARK: Inbound state
 
-    private func applyContext(_ context: [String: Any]) {
-        if let timersPayload = context["timers"] as? [[String: Any]] {
-            activeTimers = timersPayload.compactMap { dict in
-                guard
-                    let idStr = dict["id"] as? String,
-                    let id = UUID(uuidString: idStr),
-                    let substance = dict["substance"] as? String,
-                    let startedAt = dict["startedAt"] as? TimeInterval,
-                    let durationHours = dict["durationHours"] as? Double
-                else { return nil }
-                return WatchTimerInfo(
-                    id: id,
-                    substanceName: substance,
-                    startedAt: Date(timeIntervalSince1970: startedAt),
-                    durationSeconds: durationHours * 3600
-                )
-            }
-            .filter { $0.endsAt > .now }
-            .sorted { $0.endsAt < $1.endsAt }
+    fileprivate func applyContext(_ context: [String: Any]) {
+        if let payload = context[WidgetSharedKey.watchContextTimers] as? [[String: Any]] {
+            activeTimers = WatchLogic.timers(from: payload)
         }
 
-        if let value = context["recoveryStreakDays"] as? Int { recoveryStreakDays = value }
-        if let value = context["dailyScore"] as? Int { dailyScore = value }
-        if let value = context["dailyScoreActive"] as? Bool { dailyScoreActive = value }
+        if let value = context[WidgetSharedKey.watchContextStreakDays] as? Int { recoveryStreakDays = value }
+        if let value = context[WidgetSharedKey.watchContextScore] as? Int { dailyScore = value }
+        if let value = context[WidgetSharedKey.watchContextScoreActive] as? Bool { dailyScoreActive = value }
         if let value = context["trustedContactName"] as? String { trustedContactName = value }
         if let value = context["trustedContactPhone"] as? String { trustedContactPhone = value }
         if let value = context["emergencyNumber"] as? String,
@@ -753,12 +772,15 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
             defaults.set(emergencyNumber, forKey: emergencyNumberKey)
         }
 
-        if let value = context["hasBPM"] as? Bool {
-            latestBPM = value ? (context["latestBPM"] as? Double) : nil
+        if let reading = WatchLogic.reading(
+            in: context, flag: WidgetSharedKey.hasBPM, value: WidgetSharedKey.latestBPM, takenAt: WidgetSharedKey.latestBPMAt
+        ) {
+            latestBPM = reading
         }
-
-        if let value = context[WidgetSharedKey.hasHRV] as? Bool {
-            latestHRVms = value ? (context[WidgetSharedKey.latestHRVms] as? Double) : nil
+        if let reading = WatchLogic.reading(
+            in: context, flag: WidgetSharedKey.hasHRV, value: WidgetSharedKey.latestHRVms, takenAt: WidgetSharedKey.latestHRVAt
+        ) {
+            latestHRV = reading
         }
 
         if let value = context[WidgetSharedKey.watchHydrationReminders] as? Bool { hydrationRemindersEnabled = value }
@@ -767,33 +789,27 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
         if let value = context[WidgetSharedKey.watchBreathingHaptics] as? Bool { breathingHapticsEnabled = value }
         if let value = context[WidgetSharedKey.watchDiscreetCheckIns] as? Bool { discreetCheckInsEnabled = value }
         if let value = context[WidgetSharedKey.watchVisibleTimers] as? Bool { visibleTimersEnabled = value }
-        // Straight to the App Group, and only when the phone said: a launch that
-        // has not heard yet must not overwrite the last choice with a default.
-        if let value = context[WidgetSharedKey.discreetLockScreenTimer] as? Bool {
-            WidgetSharedKey.suite?.set(value, forKey: WidgetSharedKey.discreetLockScreenTimer)
-            discreetTimer = value
-        }
+        // Only when the phone said: a launch that has not heard yet keeps the
+        // last choice, which `discreetTimer` was read back from.
+        if let value = context[WidgetSharedKey.discreetLockScreenTimer] as? Bool { discreetTimer = value }
 
         publishWidgetSnapshot()
     }
 
-    /// Mirrors the synced state into the shared App Group so the watch-face
-    /// complications (ChillMateWatchAppWidget) can render it. Key strings are
-    /// duplicated in the widget's WidgetStore by design. Keep them in sync.
+    /// Mirrors what the face shows into the App Group for the complications
+    /// (ChillMateWatchAppWidget), and reloads them only if it changed.
     private func publishWidgetSnapshot() {
-        guard let shared = UserDefaults(suiteName: WidgetSharedKey.suiteName) else { return }
-        shared.set(recoveryStreakDays, forKey: WidgetSharedKey.watchStreakDays)
-        shared.set(dailyScore, forKey: WidgetSharedKey.watchScore)
-        shared.set(dailyScoreActive, forKey: WidgetSharedKey.watchScoreActive)
-
-        // "Visible timers and complications" switched off has to reach the face
-        // too. It used to hide timers in the app only, so the complication kept
-        // naming the substance for somebody who had asked for it not to.
-        let active = visibleTimersEnabled ? activeTimers.first : nil
-        shared.set(active?.substanceName ?? "", forKey: WidgetSharedKey.watchTimerSubstance)
-        shared.set(active?.startedAt.timeIntervalSince1970 ?? 0, forKey: WidgetSharedKey.watchTimerStart)
-        shared.set(active.map { $0.endsAt.timeIntervalSince1970 } ?? 0, forKey: WidgetSharedKey.watchTimerEnd)
-
+        guard let shared = WidgetSharedKey.suite else { return }
+        let snapshot = WatchLogic.faceSnapshot(
+            timers: activeTimers,
+            timersVisible: visibleTimersEnabled,
+            streakDays: recoveryStreakDays,
+            score: dailyScore,
+            scoreActive: dailyScoreActive,
+            discreet: discreetTimer
+        )
+        guard snapshot != WatchFaceSnapshot.read(from: shared) else { return }
+        snapshot.write(to: shared)
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
@@ -806,7 +822,10 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
         guard activationState == .activated else { return }
         let box = WCContextBox(dict: session.receivedApplicationContext)
-        Task { @MainActor in self.applyContext(box.dict) }
+        Task { @MainActor in
+            self.applyContext(box.dict)
+            self.flushPendingEvents()
+        }
     }
 
     nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
@@ -818,8 +837,14 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
         let box = WCContextBox(dict: applicationContext)
         Task { @MainActor in self.applyContext(box.dict) }
     }
-}
 
+    /// Complication transfers arrive here, including when the system woke the
+    /// app in the background so the face could change without it being opened.
+    nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        let box = WCContextBox(dict: userInfo)
+        Task { @MainActor in self.applyContext(box.dict) }
+    }
+}
 
 /// Shown when heart rate and heart-rate variability disagree with each other.
 ///

@@ -77,6 +77,34 @@ enum WidgetSharedKey {
     /// worth interrupting someone for.
     static let hasHRV = "hasHRV"
     static let latestHRVms = "latestHRVms"
+    /// When that variability reading was taken, in seconds since 1970.
+    static let latestHRVAt = "latestHRVAt"
+
+    /// The heart rate the phone last read from Apple Health, whether one exists,
+    /// and when it was taken. The time is what lets the watch refuse a reading
+    /// that is no longer about now. A phone on an older build sends none, and
+    /// its readings count as not current.
+    static let hasBPM = "hasBPM"
+    static let latestBPM = "latestBPM"
+    static let latestBPMAt = "latestBPMAt"
+
+    // MARK: What the watch face shows, pushed from the phone
+
+    static let watchContextTimers = "timers"
+    static let watchContextStreakDays = "recoveryStreakDays"
+    static let watchContextScore = "dailyScore"
+    static let watchContextScoreActive = "dailyScoreActive"
+
+    /// The pushed keys the watch face shows. A push that changes one of them is
+    /// worth waking the watch for, so the face is right without the app open.
+    static let watchFaceKeys: Set<String> = [
+        watchContextTimers,
+        watchContextStreakDays,
+        watchContextScore,
+        watchContextScoreActive,
+        watchVisibleTimers,
+        discreetLockScreenTimer,
+    ]
 
     // MARK: Watch-local state
     //
@@ -89,6 +117,8 @@ enum WidgetSharedKey {
     static let watchHydrationDay = "watchHydrationDay"
     static let watchQuickSkipDay = "watchQuickSkipDay"
     static let watchEmergencyNumber = "watchEmergencyNumber"
+    /// Taps waiting for the phone: made before the session could carry them.
+    static let watchPendingEvents = "watchPendingEvents"
 
     // MARK: Written by the phone app, read by the Lock Screen dose widget
     //
@@ -260,6 +290,190 @@ enum WatchLogic {
     /// because day zero is 1 January 2001.
     static func isAvailableToday(lastSentDay: Int, now: Date = .now, calendar: Calendar = .current) -> Bool {
         lastSentDay != dayKey(for: now, calendar: calendar)
+    }
+
+    // MARK: Heart readings
+
+    /// How long a heart reading counts as describing now.
+    ///
+    /// Not a clinical threshold: it is how stale a number may be before "your
+    /// heart rate" stops being true of this moment. The phone used to relay the
+    /// most recent sample ever recorded, with no time, so the watch could warn
+    /// about yesterday's workout, or show a calm reading from hours ago while
+    /// the heart it described was racing.
+    static let readingIsCurrentFor: TimeInterval = 15 * 60
+
+    /// Whether a reading may be shown as the heart rate right now. A reading
+    /// dated a little ahead is allowed for, since the two clocks can disagree.
+    static func isCurrent(_ reading: HealthSample?, now: Date = .now) -> Bool {
+        guard let reading else { return false }
+        let age = now.timeIntervalSince(reading.date)
+        return age >= -60 && age <= readingIsCurrentFor
+    }
+
+    /// A heart reading carried by a push.
+    ///
+    /// `nil` when the push said nothing about it, so the watch keeps what it has.
+    /// `.some(nil)` when it said there is none, or sent a value without a time,
+    /// as an older phone does: a number of unknown age cannot be shown as now.
+    static func reading(in context: [String: Any], flag: String, value: String, takenAt: String) -> HealthSample?? {
+        guard let has = context[flag] as? Bool else { return nil }
+        guard has,
+              let number = context[value] as? Double,
+              let seconds = context[takenAt] as? TimeInterval else { return .some(nil) }
+        return .some(HealthSample(value: number, date: Date(timeIntervalSince1970: seconds)))
+    }
+
+    // MARK: Timers
+
+    /// The running timers in a push, soonest to end first. Entries that are
+    /// malformed or already over are dropped rather than shown.
+    static func timers(from payload: [[String: Any]], now: Date = .now) -> [WatchTimerInfo] {
+        payload.compactMap { dict -> WatchTimerInfo? in
+            guard
+                let idString = dict["id"] as? String,
+                let id = UUID(uuidString: idString),
+                let substance = dict["substance"] as? String,
+                let startedAt = dict["startedAt"] as? TimeInterval,
+                let durationHours = dict["durationHours"] as? Double
+            else { return nil }
+            return WatchTimerInfo(
+                id: id,
+                substanceName: substance,
+                startedAt: Date(timeIntervalSince1970: startedAt),
+                durationSeconds: durationHours * 3600
+            )
+        }
+        .filter { $0.endsAt > now }
+        .sorted { $0.endsAt < $1.endsAt }
+    }
+
+    // MARK: The face
+
+    /// What the complications should show. "Visible timers and complications"
+    /// switched off keeps the running timer off the face as well as out of the
+    /// app; it used to reach the app only.
+    static func faceSnapshot(
+        timers: [WatchTimerInfo],
+        timersVisible: Bool,
+        streakDays: Int,
+        score: Int,
+        scoreActive: Bool,
+        discreet: Bool
+    ) -> WatchFaceSnapshot {
+        let active = timersVisible ? timers.first : nil
+        return WatchFaceSnapshot(
+            streakDays: streakDays,
+            score: score,
+            scoreActive: scoreActive,
+            timerSubstance: active?.substanceName ?? "",
+            timerStart: active?.startedAt.timeIntervalSince1970 ?? 0,
+            timerEnd: active?.endsAt.timeIntervalSince1970 ?? 0,
+            discreet: discreet
+        )
+    }
+
+    // MARK: Taps waiting for the phone
+
+    /// Adds a tap to those waiting for the session. A later discreet check-ins
+    /// choice replaces one still waiting, because only the last one counts;
+    /// everything else is kept, in order. Two glasses of water are two.
+    static func enqueue(_ event: WatchEvent, onto pending: [WatchEvent]) -> [WatchEvent] {
+        var result = pending
+        if case .discreetCheckIns = event {
+            result.removeAll { if case .discreetCheckIns = $0 { true } else { false } }
+        }
+        result.append(event)
+        return result
+    }
+
+    static func pendingEvents(in defaults: UserDefaults) -> [WatchEvent] {
+        guard let data = defaults.data(forKey: WidgetSharedKey.watchPendingEvents) else { return [] }
+        return (try? JSONDecoder().decode([WatchEvent].self, from: data)) ?? []
+    }
+
+    static func savePendingEvents(_ events: [WatchEvent], in defaults: UserDefaults) {
+        if events.isEmpty {
+            defaults.removeObject(forKey: WidgetSharedKey.watchPendingEvents)
+        } else if let data = try? JSONEncoder().encode(events) {
+            defaults.set(data, forKey: WidgetSharedKey.watchPendingEvents)
+        }
+    }
+}
+
+/// A value read from Apple Health, and when it was measured.
+struct HealthSample: Equatable, Sendable {
+    let value: Double
+    let date: Date
+}
+
+/// One running dose timer, as the watch has it from the phone.
+struct WatchTimerInfo: Identifiable, Equatable, Sendable {
+    let id: UUID
+    let substanceName: String
+    let startedAt: Date
+    let durationSeconds: TimeInterval
+
+    var endsAt: Date { startedAt.addingTimeInterval(durationSeconds) }
+}
+
+/// Something the watch tells the phone.
+///
+/// Codable so it can wait on disk: a tap made before the session could carry
+/// it used to be dropped while the watch showed it as done.
+enum WatchEvent: Codable, Equatable, Sendable {
+    case hydrationLogged
+    case quickSkipRequested
+    case homeSafeReported
+    case discreetCheckIns(Bool)
+
+    /// The message as the phone's `WatchConnectivityService.handleInbound` reads it.
+    var payload: [String: Any] {
+        switch self {
+        case .hydrationLogged: ["hydrationLogged": true]
+        case .quickSkipRequested: ["quickSkipRequested": true]
+        case .homeSafeReported: ["homeSafeReported": true]
+        case .discreetCheckIns(let isOn): ["setDiscreetCheckIns": isOn]
+        }
+    }
+}
+
+/// What the watch face's complications show, as the watch app keeps it in the
+/// App Group.
+///
+/// Compared before it is written, so the complications are reloaded only when
+/// something on the face changed. Every push from the phone used to reload
+/// them, heart-rate relays included, spending a budget the system rations.
+struct WatchFaceSnapshot: Equatable {
+    var streakDays: Int
+    var score: Int
+    var scoreActive: Bool
+    /// Empty when no timer is shown.
+    var timerSubstance: String
+    var timerStart: TimeInterval
+    var timerEnd: TimeInterval
+    var discreet: Bool
+
+    static func read(from defaults: UserDefaults) -> WatchFaceSnapshot {
+        WatchFaceSnapshot(
+            streakDays: defaults.integer(forKey: WidgetSharedKey.watchStreakDays),
+            score: defaults.integer(forKey: WidgetSharedKey.watchScore),
+            scoreActive: defaults.bool(forKey: WidgetSharedKey.watchScoreActive),
+            timerSubstance: defaults.string(forKey: WidgetSharedKey.watchTimerSubstance) ?? "",
+            timerStart: defaults.double(forKey: WidgetSharedKey.watchTimerStart),
+            timerEnd: defaults.double(forKey: WidgetSharedKey.watchTimerEnd),
+            discreet: defaults.bool(forKey: WidgetSharedKey.discreetLockScreenTimer)
+        )
+    }
+
+    func write(to defaults: UserDefaults) {
+        defaults.set(streakDays, forKey: WidgetSharedKey.watchStreakDays)
+        defaults.set(score, forKey: WidgetSharedKey.watchScore)
+        defaults.set(scoreActive, forKey: WidgetSharedKey.watchScoreActive)
+        defaults.set(timerSubstance, forKey: WidgetSharedKey.watchTimerSubstance)
+        defaults.set(timerStart, forKey: WidgetSharedKey.watchTimerStart)
+        defaults.set(timerEnd, forKey: WidgetSharedKey.watchTimerEnd)
+        defaults.set(discreet, forKey: WidgetSharedKey.discreetLockScreenTimer)
     }
 }
 

@@ -50,6 +50,25 @@ final class WatchConnectivityService: NSObject {
         } catch {
             Logger.watch.error("Watch context update failed: \(error.localizedDescription, privacy: .public)")
         }
+
+        updateFaceIfShown(changing: updates)
+    }
+
+    /// Wakes the watch app in the background when the face shows something that
+    /// changed.
+    ///
+    /// Neither `sendMessage` nor `updateApplicationContext` wakes a watch app that
+    /// is not running, so a timer started on the phone, or a new streak, reached
+    /// the complication only once the watch app was next opened. A complication
+    /// transfer does wake it. The system allows a limited number a day, so it is
+    /// spent only when a complication is actually on the face and a key it shows
+    /// is part of this push.
+    private func updateFaceIfShown(changing updates: [String: Any]) {
+        guard updates.keys.contains(where: WidgetSharedKey.watchFaceKeys.contains),
+              WCSession.default.isComplicationEnabled,
+              WCSession.default.remainingComplicationUserInfoTransfers > 0 else { return }
+        let face = context.filter { WidgetSharedKey.watchFaceKeys.contains($0.key) }
+        WCSession.default.transferCurrentComplicationUserInfo(face)
     }
 
     func sendActiveTimers(_ timers: [DrugDoseTimerRecord]) {
@@ -63,7 +82,7 @@ final class WatchConnectivityService: NSObject {
                 "durationHours": timer.durationHours
             ] as [String: Any]
         }
-        push(["timers": payload])
+        push([WidgetSharedKey.watchContextTimers: payload])
     }
 
     func sendSettings() {
@@ -84,9 +103,9 @@ final class WatchConnectivityService: NSObject {
 
     func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool) {
         push([
-            "recoveryStreakDays": recoveryStreakDays,
-            "dailyScore": dailyScore,
-            "dailyScoreActive": dailyScoreActive
+            WidgetSharedKey.watchContextStreakDays: recoveryStreakDays,
+            WidgetSharedKey.watchContextScore: dailyScore,
+            WidgetSharedKey.watchContextScoreActive: dailyScoreActive
         ])
     }
 
@@ -107,15 +126,25 @@ final class WatchConnectivityService: NSObject {
         ])
     }
 
-    func sendLatestHeartRate(_ bpm: Double?) {
-        push(["hasBPM": bpm != nil, "latestBPM": bpm ?? 0])
+    /// The heart rate goes with the time it was taken, so the watch can decline
+    /// to show a reading that is no longer about now.
+    func sendLatestHeartRate(_ reading: HealthSample?) {
+        push([
+            WidgetSharedKey.hasBPM: reading != nil,
+            WidgetSharedKey.latestBPM: reading?.value ?? 0,
+            WidgetSharedKey.latestBPMAt: reading?.date.timeIntervalSince1970 ?? 0,
+        ])
     }
 
     /// Relays heart-rate variability so the watch can tell dancing apart from
     /// strain. The phone already reads this for the recovery score; before now it
     /// never crossed to the device actually on the wrist.
-    func sendLatestHRV(_ ms: Double?) {
-        push([WidgetSharedKey.hasHRV: ms != nil, WidgetSharedKey.latestHRVms: ms ?? 0])
+    func sendLatestHRV(_ reading: HealthSample?) {
+        push([
+            WidgetSharedKey.hasHRV: reading != nil,
+            WidgetSharedKey.latestHRVms: reading?.value ?? 0,
+            WidgetSharedKey.latestHRVAt: reading?.date.timeIntervalSince1970 ?? 0,
+        ])
     }
 
     /// Push everything the watch needs that lives outside SwiftData. Called on

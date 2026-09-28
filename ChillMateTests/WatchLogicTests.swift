@@ -85,4 +85,175 @@ struct WatchLogicTests {
         #expect(WatchLogic.isAvailableToday(lastSentDay: today) == false)
         #expect(WatchLogic.isAvailableToday(lastSentDay: today - 1))
     }
+
+    // MARK: Heart readings
+
+    private let now = Date(timeIntervalSince1970: 1_790_000_000)
+
+    private func reading(minutesAgo: Double) -> HealthSample {
+        HealthSample(value: 130, date: now.addingTimeInterval(-minutesAgo * 60))
+    }
+
+    /// The phone used to relay the most recent sample ever recorded, so the watch
+    /// could describe yesterday's workout as the heart rate right now.
+    @Test("A reading from a few minutes ago is current, one from much longer ago is not", .tags(.safety))
+    func readingsExpire() {
+        #expect(WatchLogic.isCurrent(reading(minutesAgo: 5), now: now))
+        #expect(WatchLogic.isCurrent(reading(minutesAgo: 14), now: now))
+        #expect(!WatchLogic.isCurrent(reading(minutesAgo: 16), now: now))
+        #expect(!WatchLogic.isCurrent(reading(minutesAgo: 24 * 60), now: now))
+        #expect(!WatchLogic.isCurrent(nil, now: now))
+    }
+
+    /// The phone's clock and the watch's can disagree by a little, never by much.
+    @Test("A reading slightly in the future is allowed for, one well ahead is not")
+    func futureReadings() {
+        #expect(WatchLogic.isCurrent(reading(minutesAgo: -0.5), now: now))
+        #expect(!WatchLogic.isCurrent(reading(minutesAgo: -5), now: now))
+    }
+
+    @Test("A push that says nothing about heart rate leaves the watch's reading alone")
+    func silentPushKeepsReading() {
+        let parsed = WatchLogic.reading(in: [:], flag: WidgetSharedKey.hasBPM, value: WidgetSharedKey.latestBPM, takenAt: WidgetSharedKey.latestBPMAt)
+        #expect(parsed == nil)
+    }
+
+    @Test("A push that says there is no reading clears it")
+    func noReadingClears() {
+        let parsed = WatchLogic.reading(in: [WidgetSharedKey.hasBPM: false], flag: WidgetSharedKey.hasBPM, value: WidgetSharedKey.latestBPM, takenAt: WidgetSharedKey.latestBPMAt)
+        #expect(parsed == .some(nil))
+    }
+
+    /// An older phone sends the value without a time. A number of unknown age
+    /// cannot be shown as the heart rate now.
+    @Test("A reading without its time counts as none", .tags(.safety))
+    func undatedReadingIsNone() {
+        let context: [String: Any] = [WidgetSharedKey.hasBPM: true, WidgetSharedKey.latestBPM: 140.0]
+        let parsed = WatchLogic.reading(in: context, flag: WidgetSharedKey.hasBPM, value: WidgetSharedKey.latestBPM, takenAt: WidgetSharedKey.latestBPMAt)
+        #expect(parsed == .some(nil))
+    }
+
+    @Test("A dated reading arrives with its value and time")
+    func datedReadingArrives() throws {
+        let context: [String: Any] = [
+            WidgetSharedKey.hasHRV: true,
+            WidgetSharedKey.latestHRVms: 24.0,
+            WidgetSharedKey.latestHRVAt: now.timeIntervalSince1970,
+        ]
+        let parsed = WatchLogic.reading(in: context, flag: WidgetSharedKey.hasHRV, value: WidgetSharedKey.latestHRVms, takenAt: WidgetSharedKey.latestHRVAt)
+        let pushed = try #require(parsed)
+        let sample = try #require(pushed)
+        #expect(sample == HealthSample(value: 24, date: now))
+    }
+
+    // MARK: Timers
+
+    private func timerPayload(id: UUID = UUID(), substance: String = "Timer", startedMinutesAgo: Double, hours: Double) -> [String: Any] {
+        [
+            "id": id.uuidString,
+            "substance": substance,
+            "startedAt": now.addingTimeInterval(-startedMinutesAgo * 60).timeIntervalSince1970,
+            "durationHours": hours,
+        ]
+    }
+
+    @Test("Running timers arrive soonest-ending first, and finished or malformed ones are dropped")
+    func timersParse() {
+        let soon = UUID(), later = UUID()
+        let payload: [[String: Any]] = [
+            timerPayload(id: later, startedMinutesAgo: 10, hours: 4),
+            timerPayload(id: soon, startedMinutesAgo: 170, hours: 3),
+            timerPayload(startedMinutesAgo: 300, hours: 2),
+            ["id": "not a uuid", "substance": "X", "startedAt": 0.0, "durationHours": 1.0],
+            ["substance": "missing id"],
+        ]
+        let timers = WatchLogic.timers(from: payload, now: now)
+        #expect(timers.map(\.id) == [soon, later])
+    }
+
+    // MARK: The face
+
+    private var running: [WatchTimerInfo] {
+        WatchLogic.timers(from: [timerPayload(substance: "Ketamin", startedMinutesAgo: 30, hours: 2)], now: now)
+    }
+
+    @Test("The face shows the first running timer when timers are visible")
+    func faceShowsTimer() throws {
+        let face = WatchLogic.faceSnapshot(timers: running, timersVisible: true, streakDays: 4, score: 71, scoreActive: true, discreet: false)
+        let timer = try #require(running.first)
+        #expect(face.timerSubstance == "Ketamin")
+        #expect(face.timerEnd == timer.endsAt.timeIntervalSince1970)
+        #expect(face.streakDays == 4)
+        #expect(face.score == 71)
+    }
+
+    /// "Visible timers and complications" used to hide timers in the app only,
+    /// so the face kept naming the substance for somebody who had switched it off.
+    @Test("With timers hidden, the face shows none", .tags(.safety))
+    func faceHidesTimer() {
+        let face = WatchLogic.faceSnapshot(timers: running, timersVisible: false, streakDays: 4, score: 71, scoreActive: true, discreet: false)
+        #expect(face.timerSubstance.isEmpty)
+        #expect(face.timerStart == 0)
+        #expect(face.timerEnd == 0)
+    }
+
+    @Test("What the face shows survives the App Group round trip")
+    func faceRoundTrips() throws {
+        let suite = "WatchLogicTests.face"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defaults.removePersistentDomain(forName: suite)
+        let face = WatchLogic.faceSnapshot(timers: running, timersVisible: true, streakDays: 9, score: 55, scoreActive: false, discreet: true)
+        face.write(to: defaults)
+        #expect(WatchFaceSnapshot.read(from: defaults) == face)
+    }
+
+    /// Only a change on the face is worth waking the watch for.
+    @Test("The keys that wake the watch are the ones its face shows")
+    func faceKeys() {
+        #expect(WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.watchContextTimers))
+        #expect(WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.discreetLockScreenTimer))
+        #expect(WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.watchVisibleTimers))
+        #expect(!WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.hasBPM))
+        #expect(!WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.latestHRVms))
+    }
+
+    // MARK: Taps waiting for the phone
+
+    @Test("Every glass of water is kept, in order")
+    func waterIsKept() {
+        var pending: [WatchEvent] = []
+        pending = WatchLogic.enqueue(.hydrationLogged, onto: pending)
+        pending = WatchLogic.enqueue(.homeSafeReported, onto: pending)
+        pending = WatchLogic.enqueue(.hydrationLogged, onto: pending)
+        #expect(pending == [.hydrationLogged, .homeSafeReported, .hydrationLogged])
+    }
+
+    @Test("Only the last discreet check-ins choice still waiting is sent")
+    func lastChoiceWins() {
+        var pending: [WatchEvent] = [.discreetCheckIns(false), .quickSkipRequested]
+        pending = WatchLogic.enqueue(.discreetCheckIns(true), onto: pending)
+        #expect(pending == [.quickSkipRequested, .discreetCheckIns(true)])
+    }
+
+    /// Kept on disk so a relaunch before the session activates loses nothing.
+    @Test("Waiting taps survive a relaunch, and an empty queue leaves nothing behind")
+    func pendingPersists() throws {
+        let suite = "WatchLogicTests.pending"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defaults.removePersistentDomain(forName: suite)
+        let events: [WatchEvent] = [.quickSkipRequested, .discreetCheckIns(false), .homeSafeReported]
+        WatchLogic.savePendingEvents(events, in: defaults)
+        #expect(WatchLogic.pendingEvents(in: defaults) == events)
+        WatchLogic.savePendingEvents([], in: defaults)
+        #expect(defaults.object(forKey: WidgetSharedKey.watchPendingEvents) == nil)
+    }
+
+    /// The phone's `WatchConnectivityService.handleInbound` reads these exact keys.
+    @Test("Each tap reaches the phone in the shape it reads")
+    func eventPayloads() {
+        #expect(WatchEvent.hydrationLogged.payload["hydrationLogged"] as? Bool == true)
+        #expect(WatchEvent.quickSkipRequested.payload["quickSkipRequested"] as? Bool == true)
+        #expect(WatchEvent.homeSafeReported.payload["homeSafeReported"] as? Bool == true)
+        #expect(WatchEvent.discreetCheckIns(false).payload["setDiscreetCheckIns"] as? Bool == false)
+    }
 }
