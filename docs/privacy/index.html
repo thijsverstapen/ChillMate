@@ -198,10 +198,10 @@ font-weight:800;max-width:19ch;margin:0}
       <a class="anchor" href="#network" aria-label="Link to this section">#</a></h2>
     <p>Most privacy policies describe intentions. This one lists what actually leaves the device, which is both shorter and easier to check.</p>
     <p>ChillMate's own code makes <strong>no internet connections at all</strong>: no <code>URLSession</code>, no analytics, no crash reporter, no remote settings. Everything in the table below is either an Apple service talking to your own account, or something you tapped.</p>
-    <p class="meta">Checked against 116 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/7f75b53"><code>7f75b53</code></a>, whose combined SHA-256 begins <code>483710cc3aa0a85f</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
+    <p class="meta">Checked against 129 Swift files, commit <a href="https://github.com/thijsverstapen/ChillMate/commit/44b07d7"><code>44b07d7</code></a>, whose combined SHA-256 begins <code>2784fdef0a66d6c2</code>. Recompute it from the same files and you can tell whether you are reading the code this page describes.</p>
     <div class="table-scroll">
       <table>
-        <caption>Checked against ChillMate 5.1.0 (build 510), across all 116 Swift files in the app targets and the domain package.</caption>
+        <caption>Checked against ChillMate 5.1.0 (build 510), across all 129 Swift files in the app targets and the domain package.</caption>
         <thead>
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
@@ -279,9 +279,10 @@ font-weight:800;max-width:19ch;margin:0}
     <p>A privacy policy is a promise that can be edited quietly, and almost nowhere lets you check whether it was. This one is in a public repository, so here is its whole history, read out of git when this page was built rather than typed in by hand.</p>
     <div class="table-scroll">
       <table>
-        <caption>32 changes since this page first existed.</caption>
+        <caption>33 changes since this page first existed.</caption>
         <thead><tr><th scope="col">When</th><th scope="col">What changed</th><th scope="col">Commit</th></tr></thead>
         <tbody>
+          <tr><td>2026-09-27</td><td>Keep the watch app&#x27;s own timer discreet too</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/d220cad"><code>d220cad</code></a></td></tr>
           <tr><td>2026-09-27</td><td>Let a running timer say &quot;Timer&quot; instead of the substance, on the phone and the watch face</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/7f75b53"><code>7f75b53</code></a></td></tr>
           <tr><td>2026-09-27</td><td>Keep one iCloud switch, and put privacy on one screen that can change it</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/f600eb6"><code>f600eb6</code></a></td></tr>
           <tr><td>2026-09-26</td><td>Keep the journal out of iPhone search, and let home safe mean the rest of the night</td><td><a href="https://github.com/thijsverstapen/ChillMate/commit/6bfe4f3"><code>6bfe4f3</code></a></td></tr>
@@ -334,7 +335,7 @@ font-weight:800;max-width:19ch;margin:0}
     <ul>
       <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
       <li>Private logs, sleep notes, health-related entries and test reminders, plans, journal entries, check-ins, and emergency-card details.</li>
-      <li>Sleep, heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.</li>
+      <li>Sleep, resting heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.</li>
     </ul>
     <p>Some of the entries you choose to add are health-related and sensitive. They are stored only on your device, under your control.</p>
   </div>
@@ -371,6 +372,7 @@ font-weight:800;max-width:19ch;margin:0}
   <div class="card">
     <h2 id="watch"><svg class="icon" style="color:var(--mint)" aria-hidden="true"><use href="#i-watch"/></svg>Apple&nbsp;Watch</h2>
     <p>If you pair an Apple Watch, ChillMate copies part of your data to it, so the watch still works when your phone is out of reach. That means your streak and daily score, any running dose timers, your watch settings, your emergency number, and the <strong>name and phone number of your trusted contact</strong>, so the watch can call them without your phone.</p>
+    <p>If you allow it, the watch app also reads your heart rate from the watch's own sensor, only while it is open with heart-rate warnings on, to show it on its heart-rate card. That reading stays on the watch. It is not stored, and it is not sent to your phone.</p>
     <p>This goes straight between your phone and your watch, on your own two devices. It does not pass through my servers, because there are none.</p>
     <p>Two things worth knowing. Your trusted contact's details belong to somebody else, and they end up on a second device, so only add someone who would be comfortable with that. And ChillMate's app lock protects the <em>phone</em> app. On the watch, your watch passcode and wrist detection do that job instead.</p>
     <p>Clearing your trusted contact in Settings, or unpairing the watch, removes this mirrored data.</p>
@@ -380,14 +382,14 @@ font-weight:800;max-width:19ch;margin:0}
     <h2 id="permissions"><svg class="icon" style="color:var(--primary)" aria-hidden="true"><use href="#i-shield"/></svg>Device&nbsp;permissions</h2>
     <p>Each permission is optional and only used for the purpose you grant it:</p>
     <ul>
-      <li><strong>Apple Health.</strong> Only the categories you allow. ChillMate reads your sleep to fill in how long you slept after a night, and heart rate and HRV for your recovery score. It writes when a night happened, how long you slept, breathing sessions, and your aftercare mood.</li>
+      <li><strong>Apple Health.</strong> Only the categories you allow. ChillMate reads your sleep to fill in how long you slept after a night, and resting heart rate and HRV for your recovery score. On Apple Watch, it reads your heart rate from the watch's own sensor, as described above. It writes when a night happened, how long you slept, breathing sessions, and your aftercare mood.</li>
       <li><strong>Contacts.</strong> Only to let you pick a trusted contact. The lookup happens on your device.</li>
       <li><strong>Photos.</strong> Only to set a profile picture you choose.</li>
       <li><strong>Location.</strong> Only to attach a location to a log or include your current location in an emergency message you send.</li>
       <li><strong>Notifications.</strong> For the reminders and check-ins you turn on. Discreet wording can be enabled so lock-screen text stays vague.</li>
     </ul>
     <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, each night ChillMate wrote to Apple Health also carried what you took, whether a condom was used, whether you were penetrated, and your note. Other apps allowed to read your sleep or sexual activity could read those too, and so could Health's own export. That was wrong. ChillMate no longer writes them, and 5.1.0 swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Apple Health, it cannot reach those entries. You can delete everything ChillMate wrote from the Health app, where it lists ChillMate among your apps.</p>
-    <p>5.1.0 also asks for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote.</p>
+    <p>5.1.0 also asks for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote. The phone no longer reads your heart rate either, now that the watch reads it from its own sensor.</p>
   </div>
 
   <div class="card">
