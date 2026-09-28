@@ -67,6 +67,11 @@ struct DrugTimerView: View {
         !doseNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    /// Written out so that constructing this view does not make every call site
+    /// resolve the synthesized initializer, which with this many property
+    /// wrappers is slow to type-check. See `LogNightSheet.init()`.
+    init() {}
+
     var body: some View {
         Group {
             ZStack {
@@ -531,60 +536,15 @@ private struct DrugTimerCard: View {
         return "\(minutes) min left"
     }
 
+    // Assembled from named parts: written as one expression this was among the
+    // slowest bodies in the app to type-check.
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 14) {
-                Image(systemName: "timer")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(isActive ? Color.chillSecondaryBlue : Color.chillSecondary)
-                    .frame(width: 42, height: 42)
-                    .glassSurface(radius: 21, tint: (isActive ? Color.chillSecondaryBlue : Color.black).opacity(0.10))
-
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(timer.substanceName)
-                        .font(.headline)
-                        .foregroundStyle(Color.chillText)
-                    Text(isActive ? remainingText : String(localized: "Check-in ended"))
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(isActive ? Color.chillSecondaryBlue : Color.chillSecondary)
-                    Text("Until \(timer.endsAt.formatted(date: .omitted, time: .shortened))")
-                        .font(.caption)
-                        .foregroundStyle(Color.chillSecondary)
-                    if !timer.doseNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        Text(timer.doseNote)
-                            .font(.footnote)
-                            .foregroundStyle(Color.chillSecondary)
-                            .lineLimit(2)
-                    }
-
-                    if redoseDecision != .undecided {
-                        Text(redoseDecision.displayTitle)
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(redoseDecision == .avoided ? Color.chillMint : .orange)
-                    }
-                }
-
+                timerIcon
+                details
                 Spacer()
-
-                Button(role: .destructive) {
-                    Task {
-                        await DrugTimerLiveActivityController.end(timer)
-                    }
-                    RecentlyDeletedStore.record(
-                        kind: "Timer",
-                        title: "\(timer.substanceName) timer",
-                        detail: timer.startedAt.formatted(date: .abbreviated, time: .shortened)
-                    )
-                    services.notifications.clearSessionCheckIns(id: timer.id)
-                    services.notifications.clearRedoseNudge(id: timer.id)
-                    modelContext.delete(timer)
-                    modelContext.saveChanges()
-                    ActiveDoseTimer.broadcast(from: modelContext)
-                } label: {
-                    Image(systemName: "trash.fill")
-                }
-                .buttonStyle(ChillPlainButtonStyle())
-                .foregroundStyle(Color.chillSecondary)
+                deleteButton
             }
 
             if isActive {
@@ -613,6 +573,64 @@ private struct DrugTimerCard: View {
             }
             await DrugTimerLiveActivityController.update(timer, now: now)
         }
+    }
+
+    private var timerIcon: some View {
+        Image(systemName: "timer")
+            .font(.system(size: 20, weight: .bold))
+            .foregroundStyle(isActive ? Color.chillSecondaryBlue : Color.chillSecondary)
+            .frame(width: 42, height: 42)
+            .glassSurface(radius: 21, tint: (isActive ? Color.chillSecondaryBlue : Color.black).opacity(0.10))
+    }
+
+    private var details: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(timer.substanceName)
+                .font(.headline)
+                .foregroundStyle(Color.chillText)
+            Text(isActive ? remainingText : String(localized: "Check-in ended"))
+                .font(.caption.weight(.bold))
+                .foregroundStyle(isActive ? Color.chillSecondaryBlue : Color.chillSecondary)
+            Text("Until \(timer.endsAt.formatted(date: .omitted, time: .shortened))")
+                .font(.caption)
+                .foregroundStyle(Color.chillSecondary)
+            if !timer.doseNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Text(timer.doseNote)
+                    .font(.footnote)
+                    .foregroundStyle(Color.chillSecondary)
+                    .lineLimit(2)
+            }
+
+            if redoseDecision != .undecided {
+                Text(redoseDecision.displayTitle)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(redoseDecision == .avoided ? Color.chillMint : .orange)
+            }
+        }
+    }
+
+    private var deleteButton: some View {
+        Button(role: .destructive, action: deleteTimer) {
+            Image(systemName: "trash.fill")
+        }
+        .buttonStyle(ChillPlainButtonStyle())
+        .foregroundStyle(Color.chillSecondary)
+    }
+
+    private func deleteTimer() {
+        Task {
+            await DrugTimerLiveActivityController.end(timer)
+        }
+        RecentlyDeletedStore.record(
+            kind: "Timer",
+            title: "\(timer.substanceName) timer",
+            detail: timer.startedAt.formatted(date: .abbreviated, time: .shortened)
+        )
+        services.notifications.clearSessionCheckIns(id: timer.id)
+        services.notifications.clearRedoseNudge(id: timer.id)
+        modelContext.delete(timer)
+        modelContext.saveChanges()
+        ActiveDoseTimer.broadcast(from: modelContext)
     }
 
     private func saveRedoseDecision(_ decision: RedoseDecision) {

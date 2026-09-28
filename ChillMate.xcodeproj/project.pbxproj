@@ -18,7 +18,15 @@
 		A11B00000000000000000002 /* NightEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000012 /* NightEntry.swift */; };
 		A11B00000000000000000004 /* LiquidGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000014 /* LiquidGlass.swift */; };
 		A11B00000000000000000005 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000015 /* DashboardView.swift */; };
+		71200A9481A3D3E1A6913837 /* DoseHistoryViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C0154EAB4DC2F0ED3AE119 /* DoseHistoryViews.swift */; };
+		DE7EA87BD0DDA849F71D99B6 /* DashboardMetricsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDDBA162651C1581CB98A263 /* DashboardMetricsGrid.swift */; };
+		3DA11B274183EEDFB615216E /* DashboardCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A4E15BC04A0B5F032A8532 /* DashboardCards.swift */; };
+		AF86AF365574CA552D6714BE /* DashboardMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A99A4112BFB8BED8F00E52E4 /* DashboardMetrics.swift */; };
+		2A009A80ECEB8A9C59919448 /* CareToolDestination.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DA7A22BEC43525A42D11A3B /* CareToolDestination.swift */; };
 		A11B00000000000000000006 /* LogNightSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000016 /* LogNightSheet.swift */; };
+		1CB1459767D19F17CA1359E1 /* LogNightCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEA89AF0733665F4806C2589 /* LogNightCards.swift */; };
+		1BB0082892D1C9AFA3DD32DE /* ContactPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9330876954AEF2EE0641228 /* ContactPicker.swift */; };
+		EF648C3F18D253355BFC0542 /* LocationLookupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A50DB0C7951DF9F971F2F496 /* LocationLookupService.swift */; };
 		A11B00000000000000000007 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A11B00000000000000000017 /* Assets.xcassets */; };
 		A59876E7BF6206A7C1340C90 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C85331B142C2356AE703C063 /* Foundation.framework */; };
 		AAB100000000000000000001 /* DefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF100000000000000000001 /* DefaultsKeys.swift */; };
@@ -69,6 +77,8 @@
 		C33D00000000000000000003 /* WeeklyReflectionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33D00000000000000000013 /* WeeklyReflectionViews.swift */; };
 		C44E00000000000000000001 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E00000000000000000011 /* UserProfile.swift */; };
 		C44E00000000000000000002 /* ProfileSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E00000000000000000012 /* ProfileSetupView.swift */; };
+		452977DF6BF0A178FB1B5D68 /* ProfileSetupPermissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2E41BB6284980034999F7D /* ProfileSetupPermissions.swift */; };
+		AC195891706CB1059BE60AC0 /* AgeAssurance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 381ADC3D7D271DE49452F35A /* AgeAssurance.swift */; };
 		C44E00000000000000000003 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44E00000000000000000013 /* NotificationService.swift */; };
 		D55F00000000000000000001 /* CareModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000011 /* CareModels.swift */; };
 		D55F00000000000000000003 /* CareToolsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D55F00000000000000000013 /* CareToolsModels.swift */; };
@@ -214,7 +224,15 @@
 		A11B00000000000000000012 /* NightEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightEntry.swift; sourceTree = "<group>"; };
 		A11B00000000000000000014 /* LiquidGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlass.swift; sourceTree = "<group>"; };
 		A11B00000000000000000015 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		F7C0154EAB4DC2F0ED3AE119 /* DoseHistoryViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoseHistoryViews.swift; sourceTree = "<group>"; };
+		FDDBA162651C1581CB98A263 /* DashboardMetricsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardMetricsGrid.swift; sourceTree = "<group>"; };
+		75A4E15BC04A0B5F032A8532 /* DashboardCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardCards.swift; sourceTree = "<group>"; };
+		A99A4112BFB8BED8F00E52E4 /* DashboardMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardMetrics.swift; sourceTree = "<group>"; };
+		4DA7A22BEC43525A42D11A3B /* CareToolDestination.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CareToolDestination.swift; sourceTree = "<group>"; };
 		A11B00000000000000000016 /* LogNightSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogNightSheet.swift; sourceTree = "<group>"; };
+		DEA89AF0733665F4806C2589 /* LogNightCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogNightCards.swift; sourceTree = "<group>"; };
+		D9330876954AEF2EE0641228 /* ContactPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPicker.swift; sourceTree = "<group>"; };
+		A50DB0C7951DF9F971F2F496 /* LocationLookupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationLookupService.swift; sourceTree = "<group>"; };
 		A11B00000000000000000017 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAF100000000000000000001 /* DefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeys.swift; sourceTree = "<group>"; };
 		AAF100000000000000000002 /* LocalizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationService.swift; sourceTree = "<group>"; };
@@ -261,6 +279,8 @@
 		C33D00000000000000000013 /* WeeklyReflectionViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReflectionViews.swift; sourceTree = "<group>"; };
 		C44E00000000000000000011 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		C44E00000000000000000012 /* ProfileSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupView.swift; sourceTree = "<group>"; };
+		0E2E41BB6284980034999F7D /* ProfileSetupPermissions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSetupPermissions.swift; sourceTree = "<group>"; };
+		381ADC3D7D271DE49452F35A /* AgeAssurance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeAssurance.swift; sourceTree = "<group>"; };
 		C44E00000000000000000013 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		C6079172DEC0D2D76B936C7B /* ChillMateUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ChillMateUITests.swift; sourceTree = "<group>"; };
 		C85331B142C2356AE703C063 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -484,7 +504,15 @@
 				A11B00000000000000000012 /* NightEntry.swift */,
 						A11B00000000000000000014 /* LiquidGlass.swift */,
 				A11B00000000000000000015 /* DashboardView.swift */,
+				F7C0154EAB4DC2F0ED3AE119 /* DoseHistoryViews.swift */,
+				FDDBA162651C1581CB98A263 /* DashboardMetricsGrid.swift */,
+				75A4E15BC04A0B5F032A8532 /* DashboardCards.swift */,
+				A99A4112BFB8BED8F00E52E4 /* DashboardMetrics.swift */,
+				4DA7A22BEC43525A42D11A3B /* CareToolDestination.swift */,
 				A11B00000000000000000016 /* LogNightSheet.swift */,
+				DEA89AF0733665F4806C2589 /* LogNightCards.swift */,
+				D9330876954AEF2EE0641228 /* ContactPicker.swift */,
+				A50DB0C7951DF9F971F2F496 /* LocationLookupService.swift */,
 				B22C00000000000000000011 /* ChillMateModelContainer.swift */,
 				F77A00000000000000000011 /* EncryptedBackupService.swift */,
 				B22C00000000000000000012 /* HealthKitService.swift */,
@@ -496,6 +524,8 @@
 						B22C00000000000000000019 /* SpotlightService.swift */,
 				C44E00000000000000000011 /* UserProfile.swift */,
 				C44E00000000000000000012 /* ProfileSetupView.swift */,
+				0E2E41BB6284980034999F7D /* ProfileSetupPermissions.swift */,
+				381ADC3D7D271DE49452F35A /* AgeAssurance.swift */,
 				C44E00000000000000000013 /* NotificationService.swift */,
 				D55F00000000000000000011 /* CareModels.swift */,
 				D55F00000000000000000017 /* FeedbackView.swift */,
@@ -898,7 +928,15 @@
 				A11B00000000000000000002 /* NightEntry.swift in Sources */,
 						A11B00000000000000000004 /* LiquidGlass.swift in Sources */,
 				A11B00000000000000000005 /* DashboardView.swift in Sources */,
+				71200A9481A3D3E1A6913837 /* DoseHistoryViews.swift in Sources */,
+				DE7EA87BD0DDA849F71D99B6 /* DashboardMetricsGrid.swift in Sources */,
+				3DA11B274183EEDFB615216E /* DashboardCards.swift in Sources */,
+				AF86AF365574CA552D6714BE /* DashboardMetrics.swift in Sources */,
+				2A009A80ECEB8A9C59919448 /* CareToolDestination.swift in Sources */,
 				A11B00000000000000000006 /* LogNightSheet.swift in Sources */,
+				1CB1459767D19F17CA1359E1 /* LogNightCards.swift in Sources */,
+				1BB0082892D1C9AFA3DD32DE /* ContactPicker.swift in Sources */,
+				EF648C3F18D253355BFC0542 /* LocationLookupService.swift in Sources */,
 				B22C00000000000000000001 /* ChillMateModelContainer.swift in Sources */,
 				B22C00000000000000000002 /* HealthKitService.swift in Sources */,
 				B22C00000000000000000003 /* AppLockView.swift in Sources */,
@@ -909,6 +947,8 @@
 						B22C00000000000000000009 /* SpotlightService.swift in Sources */,
 				C44E00000000000000000001 /* UserProfile.swift in Sources */,
 				C44E00000000000000000002 /* ProfileSetupView.swift in Sources */,
+				452977DF6BF0A178FB1B5D68 /* ProfileSetupPermissions.swift in Sources */,
+				AC195891706CB1059BE60AC0 /* AgeAssurance.swift in Sources */,
 				C44E00000000000000000003 /* NotificationService.swift in Sources */,
 				D55F00000000000000000001 /* CareModels.swift in Sources */,
 				D55F00000000000000000007 /* FeedbackView.swift in Sources */,

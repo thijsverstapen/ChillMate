@@ -81,6 +81,11 @@ struct CombinationRiskCheckerView: View {
         return parts.joined(separator: " • ")
     }
 
+    /// Written out so that constructing this view does not make every call site
+    /// resolve the synthesized initializer, which with this many property
+    /// wrappers is slow to type-check. See `LogNightSheet.init()`.
+    init() {}
+
     var body: some View {
         Group {
             ZStack {
