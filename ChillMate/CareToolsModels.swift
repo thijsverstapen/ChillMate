@@ -78,6 +78,14 @@ enum EmergencyContactInfo {
 
     static var number: String { resolvedNumber() }
 
+    /// What the emergency card says until somebody writes their own: in their
+    /// language, naming the number that reaches help where they are. It used to
+    /// be an English sentence ending "call 112", which reaches nobody in the
+    /// United States or Australia.
+    static func defaultInstructions(number: String = number) -> String {
+        String(localized: "If I seem confused, overheated, unconscious, or cannot be woken, call \(number).")
+    }
+
     /// Strips a number down to the characters a `tel:` URL accepts.
     static func dialDigits(_ number: String) -> String {
         number.filter { $0.isNumber || $0 == "+" }

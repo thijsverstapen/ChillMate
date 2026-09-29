@@ -366,7 +366,7 @@ struct CalendarOverviewView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 12) {
-                        SectionTitle(title: "Substance tags in \(monthTitle)", symbol: "pills.fill")
+                        SectionTitle(title: String(localized: "Substance tags in \(monthTitle)"), symbol: "pills.fill")
 
                         if data.monthlySubstanceCounts.isEmpty {
                             EmptyGlassState(text: String(localized: "No substance tags in this month."))

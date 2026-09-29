@@ -507,7 +507,7 @@ private struct RiskAssessmentPanel: View {
                         RiskWarningLine(finding: finding)
                     }
 
-                    Text("If someone is unconscious, very confused, overheating, having chest pain, breathing oddly, or cannot be woken: call 112.")
+                    Text("If someone is unconscious, very confused, overheating, having chest pain, breathing oddly, or cannot be woken: call \(EmergencyContactInfo.number).")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.red)
                         .fixedSize(horizontal: false, vertical: true)

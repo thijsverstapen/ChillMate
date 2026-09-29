@@ -79,7 +79,6 @@ extension NotificationScheduling {
 protocol HealthReading: Sendable {
     func asleepIntervals(in window: DateInterval, excludingOwnSamples: Bool) async throws -> [DateInterval]
     func latestHRV() async throws -> HealthSample?
-    func latestHeartRate() async throws -> HealthSample?
     func latestRestingHeartRate() async throws -> Double?
     func removeLegacyMetadata(matching nights: [HealthLogSnapshot]) async throws -> Bool
     func requestAuthorization() async throws
@@ -100,8 +99,6 @@ protocol HealthReading: Sendable {
 protocol WatchRelaying: Sendable {
     func activate()
     func sendActiveTimers(_ timers: [DrugDoseTimerRecord])
-    func sendLatestHRV(_ reading: HealthSample?)
-    func sendLatestHeartRate(_ reading: HealthSample?)
     func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool)
     func sendSettings()
     func syncStandaloneState()

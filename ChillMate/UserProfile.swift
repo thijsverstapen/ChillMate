@@ -89,7 +89,7 @@ struct ProfileMedication: Codable, Identifiable, Hashable {
     var effectiveHours: Double
 
     var timingSummary: String {
-        "\(dosage.isEmpty ? "No amount saved" : dosage) • \(takenAt.formatted(date: .omitted, time: .shortened)) • \(effectiveHours.formatted(.number.precision(.fractionLength(0...1)))) h"
+        "\(dosage.isEmpty ? String(localized: "No amount saved") : dosage) • \(takenAt.formatted(date: .omitted, time: .shortened)) • \(effectiveHours.formatted(.number.precision(.fractionLength(0...1)))) h"
     }
 }
 

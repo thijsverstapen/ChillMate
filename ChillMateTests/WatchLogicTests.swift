@@ -94,8 +94,8 @@ struct WatchLogicTests {
         HealthSample(value: 130, date: now.addingTimeInterval(-minutesAgo * 60))
     }
 
-    /// The phone used to relay the most recent sample ever recorded, so the watch
-    /// could describe yesterday's workout as the heart rate right now.
+    /// A heart rate that is not from the last few minutes is not the heart as it
+    /// is now, and must not be shown as though it were.
     @Test("A reading from a few minutes ago is current, one from much longer ago is not", .tags(.safety))
     func readingsExpire() {
         #expect(WatchLogic.isCurrent(reading(minutesAgo: 5), now: now))
@@ -110,40 +110,6 @@ struct WatchLogicTests {
     func futureReadings() {
         #expect(WatchLogic.isCurrent(reading(minutesAgo: -0.5), now: now))
         #expect(!WatchLogic.isCurrent(reading(minutesAgo: -5), now: now))
-    }
-
-    @Test("A push that says nothing about heart rate leaves the watch's reading alone")
-    func silentPushKeepsReading() {
-        let parsed = WatchLogic.reading(in: [:], flag: WidgetSharedKey.hasBPM, value: WidgetSharedKey.latestBPM, takenAt: WidgetSharedKey.latestBPMAt)
-        #expect(parsed == nil)
-    }
-
-    @Test("A push that says there is no reading clears it")
-    func noReadingClears() {
-        let parsed = WatchLogic.reading(in: [WidgetSharedKey.hasBPM: false], flag: WidgetSharedKey.hasBPM, value: WidgetSharedKey.latestBPM, takenAt: WidgetSharedKey.latestBPMAt)
-        #expect(parsed == .some(nil))
-    }
-
-    /// An older phone sends the value without a time. A number of unknown age
-    /// cannot be shown as the heart rate now.
-    @Test("A reading without its time counts as none", .tags(.safety))
-    func undatedReadingIsNone() {
-        let context: [String: Any] = [WidgetSharedKey.hasBPM: true, WidgetSharedKey.latestBPM: 140.0]
-        let parsed = WatchLogic.reading(in: context, flag: WidgetSharedKey.hasBPM, value: WidgetSharedKey.latestBPM, takenAt: WidgetSharedKey.latestBPMAt)
-        #expect(parsed == .some(nil))
-    }
-
-    @Test("A dated reading arrives with its value and time")
-    func datedReadingArrives() throws {
-        let context: [String: Any] = [
-            WidgetSharedKey.hasHRV: true,
-            WidgetSharedKey.latestHRVms: 24.0,
-            WidgetSharedKey.latestHRVAt: now.timeIntervalSince1970,
-        ]
-        let parsed = WatchLogic.reading(in: context, flag: WidgetSharedKey.hasHRV, value: WidgetSharedKey.latestHRVms, takenAt: WidgetSharedKey.latestHRVAt)
-        let pushed = try #require(parsed)
-        let sample = try #require(pushed)
-        #expect(sample == HealthSample(value: 24, date: now))
     }
 
     // MARK: Timers
@@ -213,8 +179,8 @@ struct WatchLogicTests {
         #expect(WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.watchContextTimers))
         #expect(WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.discreetLockScreenTimer))
         #expect(WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.watchVisibleTimers))
-        #expect(!WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.hasBPM))
-        #expect(!WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.latestHRVms))
+        #expect(!WidgetSharedKey.watchFaceKeys.contains(WidgetSharedKey.watchHydrationReminders))
+        #expect(!WidgetSharedKey.watchFaceKeys.contains("trustedContactPhone"))
     }
 
     // MARK: Taps waiting for the phone
@@ -256,4 +222,24 @@ struct WatchLogicTests {
         #expect(WatchEvent.homeSafeReported.payload["homeSafeReported"] as? Bool == true)
         #expect(WatchEvent.discreetCheckIns(false).payload["setDiscreetCheckIns"] as? Bool == false)
     }
+
+    // MARK: The phone's context across a relaunch
+
+    /// The phone's context starts empty on every launch and each push replaces
+    /// the watch's wholesale, so what was sent before has to be carried forward:
+    /// a restarted phone app left the watch with no running timer.
+    @Test("What was sent before a relaunch is kept, and anything sent since wins")
+    @MainActor
+    func contextSurvivesRelaunch() {
+        let sent: [String: Any] = [
+            WidgetSharedKey.watchContextTimers: [["id": "a"]],
+            WidgetSharedKey.watchContextStreakDays: 3,
+        ]
+        let sinceLaunch: [String: Any] = [WidgetSharedKey.watchContextStreakDays: 4, "emergencyNumber": "911"]
+        let restored = WatchConnectivityService.restoredContext(sent: sent, sinceLaunch: sinceLaunch)
+        #expect((restored[WidgetSharedKey.watchContextTimers] as? [[String: String]])?.first?["id"] == "a")
+        #expect(restored[WidgetSharedKey.watchContextStreakDays] as? Int == 4)
+        #expect(restored["emergencyNumber"] as? String == "911")
+    }
 }
+

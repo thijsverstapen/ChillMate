@@ -7,6 +7,8 @@ import WidgetKit
 
 struct WatchDashboardView: View {
     @StateObject private var connectivity = WatchConnectivityReceiver.shared
+    @StateObject private var heartRate = WatchHeartRateReader()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         NavigationStack {
@@ -49,20 +51,13 @@ struct WatchDashboardView: View {
                         WKInterfaceDevice.current().play(.click)
                     }
 
-                    // Re-checked every minute, so a reading that stops being
-                    // current leaves the screen instead of staying as though it
-                    // were now. See `WatchLogic.readingIsCurrentFor`.
-                    TimelineView(.periodic(from: .now, by: 60)) { context in
-                        let bpm = WatchLogic.isCurrent(connectivity.latestBPM, now: context.date) ? connectivity.latestBPM?.value : nil
-                        let hrv = WatchLogic.isCurrent(connectivity.latestHRV, now: context.date) ? connectivity.latestHRV?.value : nil
-                        VStack(alignment: .leading, spacing: 10) {
-                            if connectivity.heartRateWarningsEnabled, let bpm {
+                    // Read from this watch's own sensor. Re-checked every minute,
+                    // so a reading that stops being current leaves the screen
+                    // instead of staying as though it were now.
+                    if connectivity.heartRateWarningsEnabled {
+                        TimelineView(.periodic(from: .now, by: 60)) { context in
+                            if WatchLogic.isCurrent(heartRate.latest, now: context.date), let bpm = heartRate.latest?.value {
                                 WatchHeartRateCard(bpm: bpm)
-                            }
-
-                            if connectivity.strainDetectionEnabled, let bpm, let hrv,
-                               WatchStrainCard.isStrained(bpm: bpm, hrvMs: hrv) {
-                                WatchStrainCard(bpm: bpm, hrvMs: hrv)
                             }
                         }
                     }
@@ -104,6 +99,20 @@ struct WatchDashboardView: View {
             .navigationTitle("ChillMate")
         }
         .tint(.mint)
+        // The sensor is read only while the app is in front with warnings on,
+        // so the query is not left running behind a lowered wrist.
+        .task(id: readsHeartRate) {
+            if readsHeartRate {
+                heartRate.start()
+            } else {
+                heartRate.stop()
+            }
+        }
+        .onDisappear { heartRate.stop() }
+    }
+
+    private var readsHeartRate: Bool {
+        connectivity.heartRateWarningsEnabled && scenePhase == .active
     }
 }
 
@@ -615,12 +624,6 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
     @Published var recoveryStreakDays = 0
     @Published var dailyScore = 0
     @Published var dailyScoreActive = false
-    /// The phone's last heart-rate and variability readings, with when each was
-    /// taken. Shown only while `WatchLogic.isCurrent` says they are still about
-    /// now: the phone reads them when Home appears, which can be hours ago.
-    @Published var latestBPM: HealthSample? = nil
-    @Published var latestHRV: HealthSample? = nil
-    @Published var strainDetectionEnabled = true
     @Published var trustedContactName = ""
     @Published var trustedContactPhone = ""
     /// Last number relayed by the phone. Persisted (see `emergencyNumberKey`) so a
@@ -772,20 +775,8 @@ final class WatchConnectivityReceiver: NSObject, ObservableObject {
             defaults.set(emergencyNumber, forKey: emergencyNumberKey)
         }
 
-        if let reading = WatchLogic.reading(
-            in: context, flag: WidgetSharedKey.hasBPM, value: WidgetSharedKey.latestBPM, takenAt: WidgetSharedKey.latestBPMAt
-        ) {
-            latestBPM = reading
-        }
-        if let reading = WatchLogic.reading(
-            in: context, flag: WidgetSharedKey.hasHRV, value: WidgetSharedKey.latestHRVms, takenAt: WidgetSharedKey.latestHRVAt
-        ) {
-            latestHRV = reading
-        }
-
         if let value = context[WidgetSharedKey.watchHydrationReminders] as? Bool { hydrationRemindersEnabled = value }
         if let value = context[WidgetSharedKey.watchHeartRateWarnings] as? Bool { heartRateWarningsEnabled = value }
-        if let value = context[WidgetSharedKey.watchStrainDetection] as? Bool { strainDetectionEnabled = value }
         if let value = context[WidgetSharedKey.watchBreathingHaptics] as? Bool { breathingHapticsEnabled = value }
         if let value = context[WidgetSharedKey.watchDiscreetCheckIns] as? Bool { discreetCheckInsEnabled = value }
         if let value = context[WidgetSharedKey.watchVisibleTimers] as? Bool { visibleTimersEnabled = value }
@@ -843,52 +834,5 @@ extension WatchConnectivityReceiver: WCSessionDelegate {
     nonisolated func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         let box = WCContextBox(dict: userInfo)
         Task { @MainActor in self.applyContext(box.dict) }
-    }
-}
-
-/// Shown when heart rate and heart-rate variability disagree with each other.
-///
-/// The elevated heart-rate card above fires on rate alone, which on a dance floor
-/// is almost always just dancing. Strain is the pairing: a fast heart *and*
-/// suppressed variability together are the body under load rather than in motion,
-/// and that combination is what precedes overheating on stimulants.
-///
-/// Named for strain rather than temperature, which the setting that gates it also
-/// once promised. Apple's wrist temperature is derived during sleep only, so
-/// there is no body temperature to read on a night out, and a card claiming to
-/// watch one would be inventing a sensor. What the watch can actually see is
-/// this, and this is worth seeing.
-private struct WatchStrainCard: View {
-    let bpm: Double
-    let hrvMs: Double
-
-    /// Sustained high rate with low variability. Both thresholds are deliberately
-    /// conservative: this interrupts someone's night, so it should be quiet until
-    /// it is worth being loud.
-    static func isStrained(bpm: Double, hrvMs: Double) -> Bool {
-        bpm > 120 && hrvMs > 0 && hrvMs < 30
-    }
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "thermometer.high")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(.orange)
-                .accessibilityHidden(true)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Your body is working hard")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.orange)
-                Text("Cool down, find water, and sit out the next one.")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
-        .background(.orange.opacity(0.16), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .accessibilityElement(children: .combine)
     }
 }

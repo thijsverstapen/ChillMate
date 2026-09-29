@@ -48,6 +48,9 @@ struct AppLockView<Content: View>: View {
                 .opacity(!lockRequired || isUnlocked ? 1 : 0)
                 .allowsHitTesting(!lockRequired || isUnlocked)
                 .accessibilityHidden(lockRequired && !isUnlocked)
+                // The content stays in the hierarchy while locked, so anything
+                // it presented would appear over the lock. This lets it wait.
+                .environment(\.appContentIsVisible, !lockRequired || isUnlocked)
 
             if lockRequired && !isUnlocked {
                 LockScreen(
@@ -726,3 +729,11 @@ private extension UInt8 {
         return String([digits[Int(self >> 4)], digits[Int(self & 0x0F)]])
     }
 }
+
+extension EnvironmentValues {
+    /// False while the app lock covers the content. The content is kept alive
+    /// underneath, so a sheet it presented would open on top of the lock screen;
+    /// something that presents on its own, like What's New, waits for this.
+    @Entry var appContentIsVisible: Bool = true
+}
+

@@ -101,6 +101,22 @@ struct SupportDirectoryTests {
                     "\(country) offers no emergency entry")
         }
     }
+
+    /// Every button under an entry has to still carry what it acts on. The verbs
+    /// were English for every country but the Netherlands; the number or address
+    /// is not a word and must survive the translation untouched.
+    @Test("Each action still names its number or address",
+          arguments: ["Belgium", "Germany", "United Kingdom", "France", "Spain", "United States", "Ireland", "Australia"])
+    func actionsKeepTheirTarget(country: String) {
+        for resource in SupportResource.resources(for: country) {
+            guard let url = resource.url else { continue }
+            if url.scheme == "tel" {
+                let digits = (url.host ?? "").filter(\.isNumber)
+                let shown = resource.action.filter(\.isNumber)
+                #expect(shown.contains(digits), "\(resource.title): \(resource.action)")
+            }
+        }
+    }
 }
 
 /// The phone and the watch have to agree on the spelling of every setting they
@@ -125,11 +141,6 @@ struct WatchSettingsKeyTests {
 
     /// The registry is what the sender iterates, so anything absent from it is
     /// never transmitted.
-    ///
-    /// The strain toggle's key keeps its original spelling,
-    /// "watchStressAndTemperatureDetection", even though the feature is now named
-    /// for strain. It is already on shipped devices, and renaming a defaults key
-    /// silently resets whatever the user chose.
     @Test("The registry matches what the watch actually reads", .tags(.safety))
     func registryCoversTheWatchsReads() {
         let expected = Set([
@@ -138,22 +149,8 @@ struct WatchSettingsKeyTests {
             "watchDiscreetCheckIns",
             "watchVisibleTimers",
             "watchHeartRateWarnings",
-            "watchStressAndTemperatureDetection",
         ])
         #expect(Set(WidgetSharedKey.watchSettingKeys) == expected,
                 "The pushed settings drifted from what the watch reads: \(WidgetSharedKey.watchSettingKeys)")
-    }
-
-    @Test("The strain toggle keeps the key already on shipped devices", .tags(.safety))
-    func strainKeyIsUnchanged() {
-        #expect(WidgetSharedKey.watchStrainDetection == "watchStressAndTemperatureDetection")
-        #expect(WidgetSharedKey.watchSettingKeys.contains(WidgetSharedKey.watchStrainDetection))
-    }
-
-    @Test("HRV crosses to the watch under its own keys", .tags(.safety))
-    func hrvKeysExist() {
-        #expect(WidgetSharedKey.hasHRV.isEmpty == false)
-        #expect(WidgetSharedKey.latestHRVms.isEmpty == false)
-        #expect(WidgetSharedKey.hasHRV != WidgetSharedKey.latestHRVms)
     }
 }
