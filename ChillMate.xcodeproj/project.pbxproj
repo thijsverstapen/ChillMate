@@ -1515,6 +1515,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = ChillMate;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate shows your current heart rate on your Apple Watch and warns you when it is high. It is not saved or sent anywhere.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ChillMate never saves anything to Apple Health from your Apple Watch.";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.BIJTHIJS.ChillMate;
 				MARKETING_VERSION = 5.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.watchkitapp;
@@ -1545,6 +1546,7 @@
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_WKApplication = YES;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "ChillMate shows your current heart rate on your Apple Watch and warns you when it is high. It is not saved or sent anywhere.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "ChillMate never saves anything to Apple Health from your Apple Watch.";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.BIJTHIJS.ChillMate;
 				MARKETING_VERSION = 5.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.BIJTHIJS.ChillMate.watchkitapp;
