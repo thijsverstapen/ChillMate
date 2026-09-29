@@ -109,7 +109,7 @@ struct PartnerCountCard: View {
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
 
-                    Text("\(partnerCount) \(partnerCount == 1 ? "person" : "people")")
+                    Text("\(partnerCount) person")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                 }

@@ -269,6 +269,14 @@ number already uploaded to App Store Connect is spent even if the upload was wro
 Release notes live in `Marketing/ReleaseNotes-<version>.md`, written in all five
 languages, user-facing and specific: what changed and why it matters, not a changelog.
 
+Every release also gets an entry in `ChillMate/WhatsNew.swift`: the page shown
+once to somebody who updated, never to a new install. `WhatsNewTests` fails
+while the app's `MARKETING_VERSION` has none, so bumping the version without one
+is caught before it ships. It is shorter than the release notes and plainer
+still, at most six items of a title and a sentence or two each, in words
+somebody who has never seen the code would use. The same rule about medical
+content holds here as everywhere else.
+
 ## Commit messages
 
 A sentence that says what changed and why, in the imperative, no prefix or tag. The

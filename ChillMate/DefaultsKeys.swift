@@ -179,6 +179,9 @@ enum DefaultsKey {
     static let onboardingSwipeHintShown = "onboardingSwipeHintShown"
     static let locationServicesChecked = "locationServicesChecked"
     static let lastSelectedTab = "lastSelectedTab"
+    /// The version whose What's New page was last shown or skipped. Set to the
+    /// current version when setup finishes, so a new install is not shown news.
+    static let whatsNewSeenVersion = "whatsNewSeenVersion"
 
     /// Set by the Focus filter when a Focus the user has configured for going out
     /// is active. Read by Home to lead with the during-session tools.
@@ -193,7 +196,6 @@ enum DefaultsKey {
     // MARK: Misc settings
     static let healthKitSexualActivityWriteEnabled = "healthKitSexualActivityWriteEnabled"
     static let stiReminderMonths = "stiReminderMonths"
-    static let watchStressAndTemperatureDetection = "watchStressAndTemperatureDetection"
     static let recentlyDeletedItems = "recentlyDeletedItems"
 
     // MARK: Language

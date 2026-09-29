@@ -1,0 +1,78 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "NSHealthShareUsageDescription" : {
+      "comment" : "Shown on Apple Watch when asking to read heart rate",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate shows your current heart rate on your Apple Watch and warns you when it is high. It is not saved or sent anywhere."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate toont je huidige hartslag op je Apple Watch en waarschuwt je als die hoog is. Hij wordt nergens opgeslagen of naartoe gestuurd."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate zeigt deine aktuelle Herzfrequenz auf deiner Apple Watch und warnt dich, wenn sie hoch ist. Sie wird nirgends gespeichert oder hingeschickt."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate affiche ta fréquence cardiaque actuelle sur ton Apple Watch et te prévient quand elle est élevée. Elle n'est ni enregistrée ni envoyée nulle part."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate muestra tu frecuencia cardiaca actual en tu Apple Watch y te avisa cuando es alta. No se guarda ni se envía a ningún sitio."
+          }
+        }
+      }
+    },
+    "NSHealthUpdateUsageDescription" : {
+      "comment" : "Required beside the read string because the watch asks Apple Health for access; the watch never writes, so this is never shown",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate never saves anything to Apple Health from your Apple Watch."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate slaat vanaf je Apple Watch nooit iets op in Apple Health."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate speichert von deiner Apple Watch aus nie etwas in Apple Health."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate n'enregistre jamais rien dans Apple Health depuis ton Apple Watch."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate nunca guarda nada en Apple Health desde tu Apple Watch."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

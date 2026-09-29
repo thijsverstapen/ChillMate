@@ -142,31 +142,31 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate liest deinen Schlaf, um einzutragen, wie lange du nach einer Nacht geschlafen hast, und deine Herzfrequenz und Herzfrequenzvariabilität für deine Erholungs-Punktzahl und deine Apple Watch."
+            "value" : "ChillMate liest deinen Schlaf, um einzutragen, wie lange du nach einer Nacht geschlafen hast, und deine Ruheherzfrequenz und Herzfrequenzvariabilität für deine Erholungs-Punktzahl."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate reads your sleep to fill in how long you slept after a night, and your heart rate and heart rate variability for your recovery score and your Apple Watch."
+            "value" : "ChillMate reads your sleep to fill in how long you slept after a night, and your resting heart rate and heart rate variability for your recovery score."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate lee tu sueño para anotar cuánto dormiste después de una noche, y tu frecuencia cardiaca y su variabilidad para tu puntuación de recuperación y tu Apple Watch."
+            "value" : "ChillMate lee tu sueño para anotar cuánto dormiste después de una noche, y tu frecuencia cardiaca en reposo y tu variabilidad de la frecuencia cardiaca para tu puntuación de recuperación."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate lit ton sommeil pour indiquer combien de temps tu as dormi après une nuit, ainsi que ta fréquence cardiaque et sa variabilité pour ton score de rétablissement et ton Apple Watch."
+            "value" : "ChillMate lit ton sommeil pour indiquer combien de temps tu as dormi après une nuit, et ta fréquence cardiaque au repos et ta variabilité cardiaque pour ton score de récupération."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ChillMate leest je slaap om in te vullen hoe lang je na een nacht hebt geslapen, en je hartslag en hartslagvariabiliteit voor je herstelscore en je Apple Watch."
+            "value" : "ChillMate leest je slaap om in te vullen hoe lang je na een nacht hebt geslapen, en je rusthartslag en hartslagvariabiliteit voor je herstelscore."
           }
         }
       }

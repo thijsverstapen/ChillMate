@@ -54,39 +54,19 @@ enum WidgetSharedKey {
     static let watchVisibleTimers = "watchVisibleTimers"
     static let watchHeartRateWarnings = "watchHeartRateWarnings"
 
-    static let watchStrainDetection = "watchStressAndTemperatureDetection"
-
     /// Every watch setting the phone pushes, so the sender cannot omit one by
     /// accident.
+    ///
+    /// The strain warning's setting is gone with the card: it paired a heart
+    /// rate with a variability reading that Apple Watch records only a few times
+    /// a day, so the two were almost never from the same moment.
     static let watchSettingKeys = [
         watchHydrationReminders,
         watchBreathingHaptics,
         watchDiscreetCheckIns,
         watchVisibleTimers,
         watchHeartRateWarnings,
-        watchStrainDetection,
     ]
-
-    // MARK: Physiological strain, pushed from the phone
-
-    /// Heart-rate variability in milliseconds, and whether a reading exists.
-    ///
-    /// Paired with the heart rate the phone already relays. Neither number means
-    /// much alone: a high heart rate on its own is dancing. A high heart rate
-    /// with suppressed variability is the body under load, which is the signal
-    /// worth interrupting someone for.
-    static let hasHRV = "hasHRV"
-    static let latestHRVms = "latestHRVms"
-    /// When that variability reading was taken, in seconds since 1970.
-    static let latestHRVAt = "latestHRVAt"
-
-    /// The heart rate the phone last read from Apple Health, whether one exists,
-    /// and when it was taken. The time is what lets the watch refuse a reading
-    /// that is no longer about now. A phone on an older build sends none, and
-    /// its readings count as not current.
-    static let hasBPM = "hasBPM"
-    static let latestBPM = "latestBPM"
-    static let latestBPMAt = "latestBPMAt"
 
     // MARK: What the watch face shows, pushed from the phone
 
@@ -297,10 +277,9 @@ enum WatchLogic {
     /// How long a heart reading counts as describing now.
     ///
     /// Not a clinical threshold: it is how stale a number may be before "your
-    /// heart rate" stops being true of this moment. The phone used to relay the
-    /// most recent sample ever recorded, with no time, so the watch could warn
-    /// about yesterday's workout, or show a calm reading from hours ago while
-    /// the heart it described was racing.
+    /// heart rate" stops being true of this moment. Apple Watch records heart
+    /// rate every few minutes when no workout is running, so a reading older
+    /// than this is not the heart as it is now.
     static let readingIsCurrentFor: TimeInterval = 15 * 60
 
     /// Whether a reading may be shown as the heart rate right now. A reading
@@ -309,19 +288,6 @@ enum WatchLogic {
         guard let reading else { return false }
         let age = now.timeIntervalSince(reading.date)
         return age >= -60 && age <= readingIsCurrentFor
-    }
-
-    /// A heart reading carried by a push.
-    ///
-    /// `nil` when the push said nothing about it, so the watch keeps what it has.
-    /// `.some(nil)` when it said there is none, or sent a value without a time,
-    /// as an older phone does: a number of unknown age cannot be shown as now.
-    static func reading(in context: [String: Any], flag: String, value: String, takenAt: String) -> HealthSample?? {
-        guard let has = context[flag] as? Bool else { return nil }
-        guard has,
-              let number = context[value] as? Double,
-              let seconds = context[takenAt] as? TimeInterval else { return .some(nil) }
-        return .some(HealthSample(value: number, date: Date(timeIntervalSince1970: seconds)))
     }
 
     // MARK: Timers

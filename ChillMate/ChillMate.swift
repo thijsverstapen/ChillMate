@@ -85,6 +85,7 @@ struct ChillMateApp: App {
             recordAppUse()
             refreshPrivacyAndNotificationState()
             services.watch.activate()
+            sendRunningTimersToWatch()
             services.spotlight.indexTools()
             ChillTips.configure()
             TypedRecordsMigration.runIfNeeded()
@@ -108,6 +109,7 @@ struct ChillMateApp: App {
                 recordAppUse()
                 refreshLiveActivities()
                 services.watch.syncStandaloneState()
+                sendRunningTimersToWatch()
                 // A running timer brought in line with the discreet setting, in
                 // case a change never reached it: it updates only what disagrees.
                 Task { await DrugTimerLiveActivityController.applyDiscreet(LockScreenTimerPrivacy.isDiscreet()) }
@@ -118,6 +120,17 @@ struct ChillMateApp: App {
 
             refreshPrivacyAndNotificationState()
         }
+    }
+
+    /// Tells the watch, and the Lock Screen widget, which timers are running.
+    ///
+    /// The watch hears about timers when one starts or is deleted, and that was
+    /// not enough: after the phone app restarted, the next context it sent
+    /// replaced the watch's without them, so a watch that read it showed no
+    /// running timer while one was. Sent again whenever the app comes to the
+    /// front, from whichever store is open, so duress mode sends none.
+    private func sendRunningTimersToWatch() {
+        ActiveDoseTimer.broadcast(from: ChillMateModelContainer.container().mainContext)
     }
 
     /// Moves a destination left by a Control Center control into the key the rest
@@ -212,18 +225,12 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
         if let shortcut = options.shortcutItem {
-            handleShortcut(shortcut)
+            Self.handleShortcut(shortcut)
         }
 
-        return UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
-    }
-
-    func application(
-        _ application: UIApplication,
-        performActionFor shortcutItem: UIApplicationShortcutItem,
-        completionHandler: @escaping (Bool) -> Void
-    ) {
-        completionHandler(handleShortcut(shortcutItem))
+        let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        configuration.delegateClass = QuickActionSceneDelegate.self
+        return configuration
     }
 
     func userNotificationCenter(
@@ -248,8 +255,10 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         completionHandler()
     }
 
+    /// A Home Screen quick action, from a cold launch here or from
+    /// `QuickActionSceneDelegate` when the app is already running.
     @discardableResult
-    private func handleShortcut(_ shortcutItem: UIApplicationShortcutItem) -> Bool {
+    static func handleShortcut(_ shortcutItem: UIApplicationShortcutItem) -> Bool {
         let destination: NotificationDestination?
 
         switch shortcutItem.type {
@@ -271,6 +280,25 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
 
         UserDefaults.standard.set(destination.rawValue, forKey: DefaultsKey.pendingAppDestination)
         return true
+    }
+}
+
+
+/// Delivers a quick action to an app that is already running.
+///
+/// With scenes, a quick action on a running app goes to the scene's delegate;
+/// `application(_:performActionFor:)` on the app delegate is never called. That
+/// was the only handler until 5.1.0, so every Home Screen quick action, Panic
+/// Support among them, opened the app wherever it was left whenever it was still
+/// in memory, and went where it said only from a cold launch. SwiftUI still owns
+/// the window; this only hears the action.
+final class QuickActionSceneDelegate: NSObject, UIWindowSceneDelegate {
+    func windowScene(
+        _ windowScene: UIWindowScene,
+        performActionFor shortcutItem: UIApplicationShortcutItem,
+        completionHandler: @escaping (Bool) -> Void
+    ) {
+        completionHandler(ChillMateAppDelegate.handleShortcut(shortcutItem))
     }
 }
 

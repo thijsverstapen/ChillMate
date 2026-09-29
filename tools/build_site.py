@@ -1414,7 +1414,7 @@ def build_privacy():
     <ul>
       <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
       <li>Private logs, sleep notes, health-related entries and test reminders, plans, journal entries, check-ins, and emergency-card details.</li>
-      <li>Sleep, heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.</li>
+      <li>Sleep, resting heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.</li>
     </ul>
     <p>Some of the entries you choose to add are health-related and sensitive. They are stored only on your device, under your control.</p>
   </div>
@@ -1451,6 +1451,7 @@ def build_privacy():
   <div class="card">
     <h2 id="watch">{icon("watch", style="color:var(--mint)")}Apple&nbsp;Watch</h2>
     <p>If you pair an Apple Watch, ChillMate copies part of your data to it, so the watch still works when your phone is out of reach. That means your streak and daily score, any running dose timers, your watch settings, your emergency number, and the <strong>name and phone number of your trusted contact</strong>, so the watch can call them without your phone.</p>
+    <p>If you allow it, the watch app also reads your heart rate from the watch's own sensor, only while it is open with heart-rate warnings on, to show it on its heart-rate card. That reading stays on the watch. It is not stored, and it is not sent to your phone.</p>
     <p>This goes straight between your phone and your watch, on your own two devices. It does not pass through my servers, because there are none.</p>
     <p>Two things worth knowing. Your trusted contact's details belong to somebody else, and they end up on a second device, so only add someone who would be comfortable with that. And ChillMate's app lock protects the <em>phone</em> app. On the watch, your watch passcode and wrist detection do that job instead.</p>
     <p>Clearing your trusted contact in Settings, or unpairing the watch, removes this mirrored data.</p>
@@ -1460,14 +1461,14 @@ def build_privacy():
     <h2 id="permissions">{icon("shield", style="color:var(--primary)")}Device&nbsp;permissions</h2>
     <p>Each permission is optional and only used for the purpose you grant it:</p>
     <ul>
-      <li><strong>Apple Health.</strong> Only the categories you allow. ChillMate reads your sleep to fill in how long you slept after a night, and heart rate and HRV for your recovery score. It writes when a night happened, how long you slept, breathing sessions, and your aftercare mood.</li>
+      <li><strong>Apple Health.</strong> Only the categories you allow. ChillMate reads your sleep to fill in how long you slept after a night, and resting heart rate and HRV for your recovery score. On Apple Watch, it reads your heart rate from the watch's own sensor, as described above. It writes when a night happened, how long you slept, breathing sessions, and your aftercare mood.</li>
       <li><strong>Contacts.</strong> Only to let you pick a trusted contact. The lookup happens on your device.</li>
       <li><strong>Photos.</strong> Only to set a profile picture you choose.</li>
       <li><strong>Location.</strong> Only to attach a location to a log or include your current location in an emergency message you send.</li>
       <li><strong>Notifications.</strong> For the reminders and check-ins you turn on. Discreet wording can be enabled so lock-screen text stays vague.</li>
     </ul>
     <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, each night ChillMate wrote to Apple Health also carried what you took, whether a condom was used, whether you were penetrated, and your note. Other apps allowed to read your sleep or sexual activity could read those too, and so could Health's own export. That was wrong. ChillMate no longer writes them, and 5.1.0 swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Apple Health, it cannot reach those entries. You can delete everything ChillMate wrote from the Health app, where it lists ChillMate among your apps.</p>
-    <p>5.1.0 also asks for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote.</p>
+    <p>5.1.0 also asks for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote. The phone no longer reads your heart rate either, now that the watch reads it from its own sensor.</p>
   </div>
 
   <div class="card">
@@ -1677,7 +1678,7 @@ RELEASES = [
     ("5.1.0", "510", "2026-09-25", "September 2026", "The app reads what you wrote, and iCloud becomes your choice", [
         "iCloud sync is now something you choose. Until this version, anyone signed into iCloud had a copy of their ChillMate data kept in their private iCloud database from the first launch, without being asked. All the while, the app, its onboarding and this site described it as something you turn on. It was your own iCloud and I could never read it, but that was wrong. New installs now start with it off. If you used ChillMate before, it asks you once, before it opens, whether to keep that copy; turning it off stops new copies but does not delete the one already in iCloud, which you can remove in iOS Settings. The Privacy screen now shows it as its own line, and the privacy page says what changed.",
         "Nights written to Apple Health no longer carry anything about the night. Until this version, every sleep and sexual-activity entry ChillMate wrote there also carried what you took, whether a condom was used, whether you were penetrated, and your note. Any app allowed to read that part of Health could read them, and Health's own export included them. This version stops writing them, and swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Health, it cannot reach those entries, and the privacy page says how to delete them yourself.",
-        "ChillMate asks Apple Health for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote. Resting heart rate now comes with heart rate, and breathing sessions from panic support have a switch at last, so they can reach Health at all.",
+        "ChillMate asks Apple Health for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote. On the phone it no longer reads heart rate either, because the watch now reads that from its own sensor: the Heart rate switch reads resting heart rate, for the recovery score, and nothing else. Breathing sessions from panic support have a switch at last, so they can reach Health at all.",
         "Sleep fills itself in. ChillMate used to read your sleep only at the moment you saved a night, which is usually before you have slept. It now looks again once you are up, and whenever you open the app, and it never overwrites a number you typed. A night recorded by both a watch and a sleep app used to count twice; it counts once now.",
         "Sleep you type in is written to Apple Health only when nothing else recorded that night, so a watch's record no longer gets a second copy beside it.",
         "Journal entries no longer go into iPhone search. Until this version, saving one put its text in the system's search index, where anyone holding the unlocked phone could read it without getting past ChillMate's Face ID or PIN. Deleting everything in the app left it there. This version removes what was indexed.",
@@ -1699,6 +1700,14 @@ RELEASES = [
         "Fixed: most of the recovery card's small print, such as \"not logged\" and \"none\", was in English whichever language you chose.",
         "Fixed: saying you were home safe from the watch quieted the rest of the night's check-ins only until the app was next opened, which put them all back. It also removed every later weekend's check-ins until then.",
         "The Apple Watch Safety screen no longer has the button that opened the emergency page on your iPhone. Calling emergency services, or your trusted contact, from the watch works as before.",
+        "The Apple Watch reads your heart rate from its own sensor. It used to show whatever the phone had last read from Apple Health, with no time attached, and the phone read it only when its Home screen appeared, so the watch could say \u201cslow down\u201d about yesterday's workout, or show a calm number while your heart was racing. It reads only while the watch app is open with heart-rate warnings on, and nothing it reads is stored or sent.",
+        "The watch's strain card is gone. It paired your heart rate with a heart-rate variability reading, which Apple Watch records only a few times a day, so the two were almost never from the same moment, and the card could describe neither.",
+        "Fixed: a tap on the watch in the first moments after opening it could be lost while showing as done, so \u201cI'm home safe\u201d said so and left the check-ins running. Taps now wait on the watch until they can be delivered, in order, even if the watch app restarts in between.",
+        "The watch face keeps up by itself. A timer started on your phone, or a new streak, used to reach the complication only the next time you opened the watch app. The phone now wakes the watch when something on its face has changed, and the countdown keeps time in Always On.",
+        "Fixed: after the phone app restarted, the watch could say there was no timer while one was running.",
+        "After an update, a short page says what the new version brings, in a few plain sentences, once. New installs skip it, and it never opens over a page a notification, a quick action or Siri took you to.",
+        "Fixed: Home Screen quick actions, Panic Support among them, went where they said only when the app was not already running. Otherwise they opened the app wherever it had been left.",
+        "Fixed: the night log's partner count said \u201cperson\u201d and \u201cpeople\u201d in English whichever language you chose.",
         "The app is about 2.7 MB smaller. A setting meant only for testing had been left on in every release since the first, and the launch image was stored twice, one copy unused. Twenty pieces of screen that nothing ever showed are gone too.",
         "Long histories are faster. The stored data is indexed on the dates everything is sorted by, and the check for whether a night had anything logged no longer sorts a list to answer yes or no.",
     ]),

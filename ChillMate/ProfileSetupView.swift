@@ -785,6 +785,9 @@ struct ProfileSetupView: View {
 
         modelContext.insert(profile)
         modelContext.saveChanges()
+        // Somebody who has just set the app up has nothing to catch up on. The
+        // next update's What's New is the first they see.
+        UserDefaults.standard.set(WhatsNew.currentVersion, forKey: DefaultsKey.whatsNewSeenVersion)
     }
 
     private func requestHealthPermission() {
