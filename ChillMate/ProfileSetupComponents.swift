@@ -447,7 +447,7 @@ struct ProfileSetupMedicationSection: View {
         VStack(spacing: 0) {
             ProfileSetupToggleRow(
                 title: String(localized: "I use current medication"),
-                subtitle: isEnabled ? "Medication fields are shown" : "No medication fields needed",
+                subtitle: isEnabled ? String(localized: "Medication fields are shown") : String(localized: "No medication fields needed"),
                 isOn: $isEnabled,
                 systemImage: "pills.fill"
             )

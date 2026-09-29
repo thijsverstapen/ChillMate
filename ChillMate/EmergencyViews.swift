@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 struct EmergencyNetherlandsView: View {
     @Environment(\.services) private var services
@@ -239,8 +240,11 @@ struct EmergencyNetherlandsView: View {
 
     private func emergencyMessage(location: LoggedLocation) -> String {
         let trimmed = trustedContactMessage.trimmingCharacters(in: .whitespacesAndNewlines)
-        let baseMessage = trimmed.isEmpty ? "Please come get me, I’m not okay at this moment." : trimmed
-        return "\(baseMessage)\nMy location: https://maps.apple.com/?ll=\(location.latitude),\(location.longitude)"
+        // The default message is the translated one, so a contact who gets this
+        // with nothing typed reads it in the sender's language, not in English.
+        let baseMessage = trimmed.isEmpty ? TrustedContactDefaults.message : trimmed
+        let link = "https://maps.apple.com/?ll=\(location.latitude),\(location.longitude)"
+        return "\(baseMessage)\n" + String(localized: "My location: \(link)")
     }
 }
 
@@ -350,7 +354,9 @@ struct EmergencyCardView: View {
     @AppStorage(DefaultsKey.trustedContactName) private var trustedContactName = ""
     @AppStorage(DefaultsKey.trustedContactPhone) private var trustedContactPhone = ""
     @AppStorage(DefaultsKey.emergencyAllergies) private var emergencyAllergies = ""
-    @AppStorage(DefaultsKey.emergencyInstructions) private var emergencyInstructions = "If I seem confused, overheated, unconscious, or cannot be woken, call 112."
+    /// Until something is typed, see `EmergencyContactInfo.defaultInstructions`.
+    /// Anything a person has typed is kept as it is.
+    @AppStorage(DefaultsKey.emergencyInstructions) private var emergencyInstructions = EmergencyContactInfo.defaultInstructions()
 
     private var profile: UserProfile? { profiles.first }
 
@@ -359,13 +365,13 @@ struct EmergencyCardView: View {
         let timerNames = timers
             .filter { $0.endsAt > now }
             .map {
-                let route = AdministrationRoute(rawValue: $0.administrationRoute)?.displayName ?? "Saved route"
-                return "\($0.substanceName) (\(route))"
+                let route = AdministrationRoute(rawValue: $0.administrationRoute)?.displayName ?? String(localized: "Saved route")
+                return "\($0.localizedSubstanceName) (\(route))"
             }
         if !timerNames.isEmpty {
             return Array(timerNames.prefix(5))
         }
-        return Array((entries.first?.substances ?? []).prefix(5))
+        return Array((entries.first?.substances ?? []).prefix(5)).map { Substance(rawValue: $0)?.localizedDisplayName ?? $0 }
     }
 
     var body: some View {
@@ -383,9 +389,9 @@ struct EmergencyCardView: View {
                         )
 
                         VStack(alignment: .leading, spacing: 14) {
-                            EmergencyCardLine(title: String(localized: "Name"), value: profile?.name ?? "Not set", symbol: "person.fill")
+                            EmergencyCardLine(title: String(localized: "Name"), value: profile?.name ?? String(localized: "Not set"), symbol: "person.fill")
                             EmergencyCardLine(title: String(localized: "Medication"), value: medicationText, symbol: "pills.fill")
-                            EmergencyCardLine(title: String(localized: "Current substances"), value: activeSubstances.isEmpty ? "None currently tracked" : activeSubstances.joined(separator: ", "), symbol: "timer")
+                            EmergencyCardLine(title: String(localized: "Current substances"), value: activeSubstances.isEmpty ? String(localized: "None currently tracked") : activeSubstances.joined(separator: ", "), symbol: "timer")
                             EmergencyCardLine(title: String(localized: "Trusted contact"), value: trustedContactText, symbol: "phone.fill")
 
                             VStack(alignment: .leading, spacing: 8) {

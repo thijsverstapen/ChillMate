@@ -24,8 +24,6 @@ struct ServicesTests {
         func sendActiveTimers(_ timers: [DrugDoseTimerRecord]) { sentTimers.append(timers) }
         func sendSettings() { settingsPushes += 1 }
         func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool) {}
-        func sendLatestHeartRate(_ value: Double?) {}
-        func sendLatestHRV(_ value: Double?) {}
         func syncStandaloneState() {}
     }
 

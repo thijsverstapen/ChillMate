@@ -17,7 +17,7 @@ struct LoggedLocation: Equatable, Sendable {
 
     var displayName: String {
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmedName.isEmpty ? "Current location" : trimmedName
+        return trimmedName.isEmpty ? String(localized: "Current location") : trimmedName
     }
 }
 

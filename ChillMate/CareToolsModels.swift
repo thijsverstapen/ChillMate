@@ -78,6 +78,14 @@ enum EmergencyContactInfo {
 
     static var number: String { resolvedNumber() }
 
+    /// What the emergency card says until somebody writes their own: in their
+    /// language, naming the number that reaches help where they are. It used to
+    /// be an English sentence ending "call 112", which reaches nobody in the
+    /// United States or Australia.
+    static func defaultInstructions(number: String = number) -> String {
+        String(localized: "If I seem confused, overheated, unconscious, or cannot be woken, call \(number).")
+    }
+
     /// Strips a number down to the characters a `tel:` URL accepts.
     static func dialDigits(_ number: String) -> String {
         number.filter { $0.isNumber || $0 == "+" }
@@ -257,12 +265,42 @@ enum TrustedContactDefaults {
 }
 
 
+/// What was deleted, as Recently deleted labels it.
+///
+/// The raw values are the English words the store has always saved, so an item
+/// deleted before this was an enum still finds its kind. The row used to show
+/// the stored word itself, which made every kind English in every language.
+enum RecentlyDeletedKind: String, CaseIterable {
+    case chillLog = "Chill log"
+    case riskCheck = "Risk check"
+    case timer = "Timer"
+    case stiTest = "STI test"
+    case plan = "Plan"
+
+    var localizedName: String {
+        switch self {
+        case .chillLog: String(localized: "Chill log")
+        case .riskCheck: String(localized: "Risk check")
+        case .timer: String(localized: "Timer")
+        case .stiTest: String(localized: "STI test")
+        case .plan: String(localized: "Plan")
+        }
+    }
+}
+
 struct RecentlyDeletedItem: Codable, Identifiable {
     var id = UUID()
+    /// A `RecentlyDeletedKind` raw value. Kept a string so the stored shape, and
+    /// every item already saved in it, stays readable.
     var kind: String
+    /// Written in the language the app was in when the item was deleted.
     var title: String
     var detail: String
     var deletedAt: Date
+
+    var localizedKind: String {
+        RecentlyDeletedKind(rawValue: kind)?.localizedName ?? kind
+    }
 }
 
 enum RecentlyDeletedStore {
@@ -276,9 +314,9 @@ enum RecentlyDeletedStore {
         return items.sorted { $0.deletedAt > $1.deletedAt }
     }
 
-    static func record(kind: String, title: String, detail: String, deletedAt: Date = .now) {
+    static func record(kind: RecentlyDeletedKind, title: String, detail: String, deletedAt: Date = .now) {
         var current = items()
-        current.insert(RecentlyDeletedItem(kind: kind, title: title, detail: detail, deletedAt: deletedAt), at: 0)
+        current.insert(RecentlyDeletedItem(kind: kind.rawValue, title: title, detail: detail, deletedAt: deletedAt), at: 0)
         current = Array(current.prefix(40))
         if let data = try? JSONEncoder().encode(current) {
             UserDefaults.standard.set(data, forKey: key)

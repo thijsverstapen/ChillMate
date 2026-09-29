@@ -354,7 +354,7 @@ struct SmartNextAction {
     ) {
         if let timer = timers.first(where: { $0.endsAt > now }) {
             title = String(localized: "Timer running")
-            detail = String(localized: "\(timer.substanceName) is still active. Check the timer before deciding anything else.")
+            detail = String(localized: "\(timer.localizedSubstanceName) is still active. Check the timer before deciding anything else.")
             symbol = "timer"
             tint = Color.chillIconAmber
             destination = .care(.drugTimers)

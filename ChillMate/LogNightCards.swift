@@ -109,7 +109,7 @@ struct PartnerCountCard: View {
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
 
-                    Text("\(partnerCount) \(partnerCount == 1 ? "person" : "people")")
+                    Text("\(partnerCount) person")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
                 }
@@ -612,7 +612,7 @@ struct MemoryGapProtocolCard: View {
                     .glassSurface(radius: 18, tint: .black.opacity(0.04), interactive: true)
 
                 if injuries || consentConcern || needsHelp || !safeNow {
-                    Text("If you are unsafe, injured, cannot wake someone, or feel at risk, call 112 or a trusted person now.")
+                    Text("If you are unsafe, injured, cannot wake someone, or feel at risk, call \(EmergencyContactInfo.number) or a trusted person now.")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.red)
                         .fixedSize(horizontal: false, vertical: true)

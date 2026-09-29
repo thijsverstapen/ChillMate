@@ -695,7 +695,7 @@ private struct SaferPlanCard: View {
 
             Button(role: .destructive) {
                 RecentlyDeletedStore.record(
-                    kind: "Plan",
+                    kind: .plan,
                     title: String(localized: "Before-Chill plan"),
                     detail: plan.plannedDate.formatted(date: .abbreviated, time: .shortened)
                 )

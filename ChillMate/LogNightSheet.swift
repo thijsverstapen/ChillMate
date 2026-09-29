@@ -54,8 +54,13 @@ struct LogNightSheet: View {
     /// Recent entries, only so the sheet can offer to repeat the last one.
     @Query(ChillMateQueries.recentEntries) private var recentEntries: [NightEntry]
 
-    @State private var startDate = Date.now
-    @State private var endDate = Date.now.addingTimeInterval(60 * 60)
+    /// When the sheet opened. The dates start from it, and a date still equal
+    /// to it is one nobody changed. Comparing against the clock instead made a
+    /// sheet left open across the turn of a minute ask to discard changes that
+    /// were never made.
+    @State private var openedAt: Date
+    @State private var startDate: Date
+    @State private var endDate: Date
     @State private var saveHaptic = 0
     @State private var mode: LogMode = .tracked
     @State private var selectedSubstances: Set<Substance> = []
@@ -118,8 +123,8 @@ struct LogNightSheet: View {
 
     private var hasUnsavedChanges: Bool {
         mode != .tracked ||
-        !Calendar.current.isDate(startDate, equalTo: .now, toGranularity: .minute) ||
-        abs(endDate.timeIntervalSince(Date.now.addingTimeInterval(60 * 60))) > 60 ||
+        startDate != openedAt ||
+        endDate != openedAt.addingTimeInterval(60 * 60) ||
         !selectedSubstances.isEmpty ||
         partnerCount != 1 ||
         !partnerDetails.isEmpty ||
@@ -145,10 +150,16 @@ struct LogNightSheet: View {
         attachedLocation != nil
     }
 
-    /// Written out, though it does nothing the synthesized one would not. With
-    /// this many property-wrapped stored properties, resolving the synthesized
-    /// initializer cost every call site 140 to 190 ms of type-checking.
-    init() {}
+    /// Written out rather than synthesized: with this many property-wrapped
+    /// stored properties, resolving the synthesized initializer cost every call
+    /// site 140 to 190 ms of type-checking. All three dates come from one
+    /// instant, so an untouched sheet compares equal to where it started.
+    init() {
+        let now = Date.now
+        _openedAt = State(initialValue: now)
+        _startDate = State(initialValue: now)
+        _endDate = State(initialValue: now.addingTimeInterval(60 * 60))
+    }
 
     var body: some View {
         NavigationStack {

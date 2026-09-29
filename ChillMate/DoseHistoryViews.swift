@@ -72,7 +72,7 @@ struct DoseHistoryRow: Identifiable {
             for substance in entry.substances {
                 countsBySubstance[substance, default: [:]][day, default: 0] += 1
                 if routeCounts[substance] == nil {
-                    routeCounts[substance] = ["Logged": 1]
+                    routeCounts[substance] = [String(localized: "Logged"): 1]
                 }
             }
         }
@@ -114,7 +114,7 @@ private struct DoseHistoryRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline) {
-                Text(row.substance)
+                Text(Substance(rawValue: row.substance)?.localizedDisplayName ?? row.substance)
                     .font(.headline)
                     .foregroundStyle(Color.chillText)
                 Spacer()
@@ -134,7 +134,13 @@ private struct DoseHistoryRowView: View {
             }
             .frame(height: 46)
 
-            Text("\(row.routeSummary) · \(row.redoseDays) continued day\(row.redoseDays == 1 ? "" : "s") · \(row.doseNotesCount) private note\(row.doseNotesCount == 1 ? "" : "s")")
+            // Two plural-aware strings, joined. The plural used to be an "s"
+            // passed in as text, which read "Tag in Folges" in German.
+            Text(verbatim: [
+                row.routeSummary,
+                String(localized: "\(row.redoseDays) continued days"),
+                String(localized: "\(row.doseNotesCount) private notes"),
+            ].joined(separator: " · "))
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)

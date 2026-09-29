@@ -84,7 +84,7 @@ private struct LatestDoseReminder: View {
             Label("Earlier log reminder", systemImage: "clock.arrow.circlepath")
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
-            Text("\(timer.substanceName) was logged at \(timer.startedAt.formatted(date: .abbreviated, time: .shortened)). Check-in progress: \(timer.effectProgress(at: .now).formatted(.percent.precision(.fractionLength(0)))).")
+            Text("\(timer.localizedSubstanceName) was logged at \(timer.startedAt.formatted(date: .abbreviated, time: .shortened)). Check-in progress: \(timer.effectProgress(at: .now).formatted(.percent.precision(.fractionLength(0)))).")
                 .font(.callout)
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)

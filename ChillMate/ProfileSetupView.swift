@@ -585,7 +585,7 @@ struct ProfileSetupView: View {
                     VStack(spacing: 0) {
                         ProfileSetupToggleRow(
                             title: String(localized: "On PrEP"),
-                            subtitle: isOnPrEP ? "Enabled" : "Not enabled",
+                            subtitle: isOnPrEP ? String(localized: "Enabled") : String(localized: "Not enabled"),
                             isOn: $isOnPrEP,
                             systemImage: "cross.case.fill"
                         )
@@ -785,6 +785,9 @@ struct ProfileSetupView: View {
 
         modelContext.insert(profile)
         modelContext.saveChanges()
+        // Somebody who has just set the app up has nothing to catch up on. The
+        // next update's What's New is the first they see.
+        UserDefaults.standard.set(WhatsNew.currentVersion, forKey: DefaultsKey.whatsNewSeenVersion)
     }
 
     private func requestHealthPermission() {
@@ -835,7 +838,7 @@ struct ProfileSetupView: View {
                         services.notifications.scheduleCheckInReminder()
                         services.notifications.scheduleInactivityReminders()
                     }
-                    permissionMessage = granted ? "Notifications are on." : "Notification permission was not granted."
+                    permissionMessage = granted ? String(localized: "Notifications are on.") : String(localized: "Notification permission was not granted.")
                     isCheckingPermissions = false
                 }
             } catch {

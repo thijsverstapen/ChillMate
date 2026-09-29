@@ -403,8 +403,12 @@ private struct RiskCheckRecordCard: View {
 
                 Button(role: .destructive) {
                     RecentlyDeletedStore.record(
-                        kind: "Risk check",
-                        title: record.substanceNames.isEmpty ? "Medication risk check" : record.substanceNames.joined(separator: ", "),
+                        kind: .riskCheck,
+                        title: record.substanceNames.isEmpty
+                            ? String(localized: "Medication risk check")
+                            : record.substanceNames
+                                .map { Substance(rawValue: $0)?.localizedDisplayName ?? $0 }
+                                .joined(separator: ", "),
                         detail: record.createdAt.formatted(date: .abbreviated, time: .shortened)
                     )
                     modelContext.delete(record)
@@ -503,7 +507,7 @@ private struct RiskAssessmentPanel: View {
                         RiskWarningLine(finding: finding)
                     }
 
-                    Text("If someone is unconscious, very confused, overheating, having chest pain, breathing oddly, or cannot be woken: call 112.")
+                    Text("If someone is unconscious, very confused, overheating, having chest pain, breathing oddly, or cannot be woken: call \(EmergencyContactInfo.number).")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.red)
                         .fixedSize(horizontal: false, vertical: true)

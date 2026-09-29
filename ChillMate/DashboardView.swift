@@ -277,10 +277,7 @@ struct DashboardView: View {
             .task(id: healthKitHRVReadEnabled) {
                 guard healthKitHRVReadEnabled else { return }
                 if let hrv = try? await services.health.latestHRV() {
-                    lastKnownHRVms = hrv
-                    // The watch needs this too: paired with heart rate it is what
-                    // separates dancing from strain.
-                    services.watch.sendLatestHRV(hrv)
+                    lastKnownHRVms = hrv.value
                 }
             }
             .task(id: healthKitHeartRateReadEnabled) {
@@ -289,14 +286,6 @@ struct DashboardView: View {
                 if let resting = try? await services.health.latestRestingHeartRate() {
                     lastKnownRestingBPM = resting
                 }
-            }
-            .task(id: healthKitHeartRateReadEnabled) {
-                // Relay the latest resting/most-recent heart rate to the Watch so
-                // its elevated-heart-rate warning card has data. Only runs when the
-                // user has already granted heart-rate reads (no surprise prompt).
-                guard healthKitHeartRateReadEnabled else { return }
-                let bpm = (try? await services.health.latestHeartRate()) ?? nil
-                services.watch.sendLatestHeartRate(bpm)
             }
             .toolbar { panicToolbarItem }
             .safeAreaInset(edge: .bottom) {
