@@ -143,4 +143,22 @@ struct EmergencyCountryCoverageTests {
         let countries = EmergencyContactInfo.selectableCountries
         #expect(Set(countries).count == countries.count)
     }
+
+    /// The emergency card's default instructions name the number for the user's
+    /// country. They used to say "call 112" to everybody, which reaches nobody in
+    /// the United States or Australia.
+    @Test("The default instructions name the number they are given", .tags(.safety),
+          arguments: ["911", "000", "999", "112"])
+    func defaultInstructionsNameTheNumber(number: String) {
+        let instructions = EmergencyContactInfo.defaultInstructions(number: number)
+        #expect(instructions.contains(number))
+        #expect(instructions == String(localized: "If I seem confused, overheated, unconscious, or cannot be woken, call \(number)."))
+    }
+
+    @Test("Outside the 112 countries the default instructions do not say 112", .tags(.safety))
+    func defaultInstructionsAvoid112Elsewhere() {
+        let instructions = EmergencyContactInfo.defaultInstructions(number: EmergencyContactInfo.number(forCountry: "United States"))
+        #expect(!instructions.contains("112"))
+    }
 }
+

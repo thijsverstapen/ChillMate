@@ -20,7 +20,7 @@ struct WidgetLogHydrationIntent: AppIntent {
         // The one fix is a constant in `WidgetSharedKey`, which every target compiles.
         let defaults = UserDefaults(suiteName: WidgetSharedKey.suiteName) ?? .standard
         defaults.set(Date.now.timeIntervalSince1970, forKey: WidgetSharedKey.hydrationLogDate)
-        return .result(value: "Logged.")
+        return .result(value: String(localized: "Logged."))
     }
 }
 

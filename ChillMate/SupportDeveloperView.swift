@@ -260,7 +260,7 @@ struct SupportDeveloperView: View {
                 break
             case .failed(let message):
                 alertTitle = String(localized: "Something went wrong")
-                alertMessage = message ?? "The tip could not be completed. Please try again."
+                alertMessage = message ?? String(localized: "The tip could not be completed. Please try again.")
             }
         }
     }

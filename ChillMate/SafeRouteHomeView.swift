@@ -24,6 +24,11 @@ struct SafeRouteHomeView: View {
         profiles.first?.homeAddress.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
     }
 
+    /// Written out so that constructing this view does not make every call site
+    /// resolve the synthesized initializer, which with this many property
+    /// wrappers is slow to type-check. See `LogNightSheet.init()`.
+    init() {}
+
     var body: some View {
         // No own NavigationStack: this is always pushed onto Home's stack (from the
         // "While you’re out" group), so wrapping it would nest stacks and blank out.
@@ -455,6 +460,6 @@ private enum RouteSearchService {
 
 private extension LoggedLocation {
     var locationMessage: String {
-        "\(name.isEmpty ? "Current location" : name) • \(coordinateSummary)"
+        "\(name.isEmpty ? String(localized: "Current location") : name) • \(coordinateSummary)"
     }
 }

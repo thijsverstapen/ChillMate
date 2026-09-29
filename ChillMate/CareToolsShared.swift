@@ -309,3 +309,33 @@ struct CareEmptyState: View {
             .glassSurface(radius: 24, tint: .black.opacity(0.04))
     }
 }
+
+struct SectionTitle: View {
+    let title: String
+    let symbol: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: symbol)
+                .font(.system(size: 14, weight: .black))
+                .foregroundStyle(LinearGradient.chillBrand)
+                .symbolRenderingMode(.hierarchical)
+            Text(title)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(Color.chillText)
+        }
+    }
+}
+
+struct EmptyGlassState: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.callout)
+            .foregroundStyle(Color.chillSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(18)
+            .glassSurface(radius: 24, tint: .black.opacity(0.04))
+    }
+}

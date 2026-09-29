@@ -124,89 +124,95 @@ struct SupportResource: Identifiable {
     private static var gpTitle: String { String(localized: "GP or family doctor") }
     private static var gpAction: String { String(localized: "Call your GP") }
 
+    /// The button under an entry. The verb is translated; the number or address
+    /// it acts on is not a word and stays as written. These were English in every
+    /// language for every country but the Netherlands.
+    private static func call(_ number: String) -> String { String(localized: "Call \(number)") }
+    private static func open(_ address: String) -> String { String(localized: "Open \(address)") }
+
     static let belgium: [SupportResource] = [
         drugChecking("https://www.modusvivendi-be.org"),
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "Zelfmoordlijn 1813", detail: genericCrisisDetail, action: "Call 1813", url: URL(string: "tel://1813"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Sensoa", detail: genericSTIDetail, action: "Open sensoa.be", url: URL(string: "https://www.sensoa.be"), tags: ["sti", "pep", "prep"]),
+        SupportResource(title: "112", detail: genericEmergencyDetail, action: call("112"), url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "Zelfmoordlijn 1813", detail: genericCrisisDetail, action: call("1813"), url: URL(string: "tel://1813"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "Sensoa", detail: genericSTIDetail, action: open("sensoa.be"), url: URL(string: "https://www.sensoa.be"), tags: ["sti", "pep", "prep"]),
         SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "De DrugLijn", detail: genericDrugsDetail, action: "Open druglijn.be", url: URL(string: "https://www.druglijn.be"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Zorgcentra na Seksueel Geweld", detail: genericAssaultDetail, action: "Open seksueelgeweld.be", url: URL(string: "https://www.seksueelgeweld.be"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "Lumi", detail: genericLGBTQDetail, action: "Open lumi.be", url: URL(string: "https://lumi.be"), tags: ["lgbtq", "queer", "support"])
+        SupportResource(title: "De DrugLijn", detail: genericDrugsDetail, action: open("druglijn.be"), url: URL(string: "https://www.druglijn.be"), tags: ["drugs", "harm reduction"]),
+        SupportResource(title: "Zorgcentra na Seksueel Geweld", detail: genericAssaultDetail, action: open("seksueelgeweld.be"), url: URL(string: "https://www.seksueelgeweld.be"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "Lumi", detail: genericLGBTQDetail, action: open("lumi.be"), url: URL(string: "https://lumi.be"), tags: ["lgbtq", "queer", "support"])
     ]
 
     static let germany: [SupportResource] = [
         drugChecking("https://www.drugchecking.berlin"),
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "TelefonSeelsorge", detail: genericCrisisDetail, action: "Call 0800 111 0 111", url: URL(string: "tel://08001110111"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Deutsche Aidshilfe", detail: genericSTIDetail, action: "Open aidshilfe.de", url: URL(string: "https://www.aidshilfe.de"), tags: ["sti", "pep", "prep"]),
+        SupportResource(title: "112", detail: genericEmergencyDetail, action: call("112"), url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "TelefonSeelsorge", detail: genericCrisisDetail, action: call("0800 111 0 111"), url: URL(string: "tel://08001110111"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "Deutsche Aidshilfe", detail: genericSTIDetail, action: open("aidshilfe.de"), url: URL(string: "https://www.aidshilfe.de"), tags: ["sti", "pep", "prep"]),
         SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "drugcom.de", detail: genericDrugsDetail, action: "Open drugcom.de", url: URL(string: "https://www.drugcom.de"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Hilfetelefon", detail: genericAssaultDetail, action: "Call 116 016", url: URL(string: "tel://116016"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "LSVD+", detail: genericLGBTQDetail, action: "Open lsvd.de", url: URL(string: "https://www.lsvd.de"), tags: ["lgbtq", "queer", "support"])
+        SupportResource(title: "drugcom.de", detail: genericDrugsDetail, action: open("drugcom.de"), url: URL(string: "https://www.drugcom.de"), tags: ["drugs", "harm reduction"]),
+        SupportResource(title: "Hilfetelefon", detail: genericAssaultDetail, action: call("116 016"), url: URL(string: "tel://116016"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "LSVD+", detail: genericLGBTQDetail, action: open("lsvd.de"), url: URL(string: "https://www.lsvd.de"), tags: ["lgbtq", "queer", "support"])
     ]
 
     static let unitedKingdom: [SupportResource] = [
         drugChecking("https://wearetheloop.org"),
-        SupportResource(title: "999", detail: genericEmergencyDetail, action: "Call 999", url: URL(string: "tel://999"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "Samaritans", detail: genericCrisisDetail, action: "Call 116 123", url: URL(string: "tel://116123"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "NHS sexual health", detail: genericSTIDetail, action: "Open nhs.uk", url: URL(string: "https://www.nhs.uk/live-well/sexual-health/"), tags: ["sti", "pep", "prep"]),
+        SupportResource(title: "999", detail: genericEmergencyDetail, action: call("999"), url: URL(string: "tel://999"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "Samaritans", detail: genericCrisisDetail, action: call("116 123"), url: URL(string: "tel://116123"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "NHS sexual health", detail: genericSTIDetail, action: open("nhs.uk"), url: URL(string: "https://www.nhs.uk/live-well/sexual-health/"), tags: ["sti", "pep", "prep"]),
         SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "FRANK", detail: genericDrugsDetail, action: "Open talktofrank.com", url: URL(string: "https://www.talktofrank.com"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Rape Crisis", detail: genericAssaultDetail, action: "Open rapecrisis.org.uk", url: URL(string: "https://rapecrisis.org.uk"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "Switchboard LGBTQ+", detail: genericLGBTQDetail, action: "Open switchboard.lgbt", url: URL(string: "https://switchboard.lgbt"), tags: ["lgbtq", "queer", "support"])
+        SupportResource(title: "FRANK", detail: genericDrugsDetail, action: open("talktofrank.com"), url: URL(string: "https://www.talktofrank.com"), tags: ["drugs", "harm reduction"]),
+        SupportResource(title: "Rape Crisis", detail: genericAssaultDetail, action: open("rapecrisis.org.uk"), url: URL(string: "https://rapecrisis.org.uk"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "Switchboard LGBTQ+", detail: genericLGBTQDetail, action: open("switchboard.lgbt"), url: URL(string: "https://switchboard.lgbt"), tags: ["lgbtq", "queer", "support"])
     ]
 
     static let france: [SupportResource] = [
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "3114", detail: genericCrisisDetail, action: "Call 3114", url: URL(string: "tel://3114"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Sida Info Service", detail: genericSTIDetail, action: "Open sida-info-service.org", url: URL(string: "https://www.sida-info-service.org"), tags: ["sti", "pep", "prep"]),
+        SupportResource(title: "112", detail: genericEmergencyDetail, action: call("112"), url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "3114", detail: genericCrisisDetail, action: call("3114"), url: URL(string: "tel://3114"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "Sida Info Service", detail: genericSTIDetail, action: open("sida-info-service.org"), url: URL(string: "https://www.sida-info-service.org"), tags: ["sti", "pep", "prep"]),
         SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "Drogues Info Service", detail: genericDrugsDetail, action: "Open drogues-info-service.fr", url: URL(string: "https://www.drogues-info-service.fr"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Viols Femmes Informations", detail: genericAssaultDetail, action: "Call 0800 05 95 95", url: URL(string: "tel://0800059595"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "SOS homophobie", detail: genericLGBTQDetail, action: "Open sos-homophobie.org", url: URL(string: "https://www.sos-homophobie.org"), tags: ["lgbtq", "queer", "support"])
+        SupportResource(title: "Drogues Info Service", detail: genericDrugsDetail, action: open("drogues-info-service.fr"), url: URL(string: "https://www.drogues-info-service.fr"), tags: ["drugs", "harm reduction"]),
+        SupportResource(title: "Viols Femmes Informations", detail: genericAssaultDetail, action: call("0800 05 95 95"), url: URL(string: "tel://0800059595"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "SOS homophobie", detail: genericLGBTQDetail, action: open("sos-homophobie.org"), url: URL(string: "https://www.sos-homophobie.org"), tags: ["lgbtq", "queer", "support"])
     ]
 
     static let spain: [SupportResource] = [
         drugChecking("https://energycontrol.org"),
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "024", detail: genericCrisisDetail, action: "Call 024", url: URL(string: "tel://024"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Sanidad (salud sexual)", detail: genericSTIDetail, action: "Open sanidad.gob.es", url: URL(string: "https://www.sanidad.gob.es"), tags: ["sti", "pep", "prep"]),
+        SupportResource(title: "112", detail: genericEmergencyDetail, action: call("112"), url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "024", detail: genericCrisisDetail, action: call("024"), url: URL(string: "tel://024"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "Sanidad (salud sexual)", detail: genericSTIDetail, action: open("sanidad.gob.es"), url: URL(string: "https://www.sanidad.gob.es"), tags: ["sti", "pep", "prep"]),
         SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "Energy Control", detail: genericDrugsDetail, action: "Open energycontrol.org", url: URL(string: "https://energycontrol.org"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "016 (violencia sexual)", detail: genericAssaultDetail, action: "Call 016", url: URL(string: "tel://016"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "FELGTBI+", detail: genericLGBTQDetail, action: "Open felgtbi.org", url: URL(string: "https://felgtbi.org"), tags: ["lgbtq", "queer", "support"])
+        SupportResource(title: "Energy Control", detail: genericDrugsDetail, action: open("energycontrol.org"), url: URL(string: "https://energycontrol.org"), tags: ["drugs", "harm reduction"]),
+        SupportResource(title: "016 (violencia sexual)", detail: genericAssaultDetail, action: call("016"), url: URL(string: "tel://016"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "FELGTBI+", detail: genericLGBTQDetail, action: open("felgtbi.org"), url: URL(string: "https://felgtbi.org"), tags: ["lgbtq", "queer", "support"])
     ]
 
     static let unitedStates: [SupportResource] = [
         drugChecking("https://dancesafe.org"),
-        SupportResource(title: "911", detail: genericEmergencyDetail, action: "Call 911", url: URL(string: "tel://911"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "988 Suicide & Crisis Lifeline", detail: genericCrisisDetail, action: "Call 988", url: URL(string: "tel://988"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "CDC GetTested", detail: genericSTIDetail, action: "Open gettested.cdc.gov", url: URL(string: "https://gettested.cdc.gov"), tags: ["sti", "pep", "prep"]),
+        SupportResource(title: "911", detail: genericEmergencyDetail, action: call("911"), url: URL(string: "tel://911"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "988 Suicide & Crisis Lifeline", detail: genericCrisisDetail, action: call("988"), url: URL(string: "tel://988"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "CDC GetTested", detail: genericSTIDetail, action: open("gettested.cdc.gov"), url: URL(string: "https://gettested.cdc.gov"), tags: ["sti", "pep", "prep"]),
         SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "DanceSafe", detail: genericDrugsDetail, action: "Open dancesafe.org", url: URL(string: "https://dancesafe.org"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "RAINN", detail: genericAssaultDetail, action: "Open rainn.org", url: URL(string: "https://www.rainn.org"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "The Trevor Project", detail: genericLGBTQDetail, action: "Open thetrevorproject.org", url: URL(string: "https://www.thetrevorproject.org"), tags: ["lgbtq", "queer", "support"])
+        SupportResource(title: "DanceSafe", detail: genericDrugsDetail, action: open("dancesafe.org"), url: URL(string: "https://dancesafe.org"), tags: ["drugs", "harm reduction"]),
+        SupportResource(title: "RAINN", detail: genericAssaultDetail, action: open("rainn.org"), url: URL(string: "https://www.rainn.org"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "The Trevor Project", detail: genericLGBTQDetail, action: open("thetrevorproject.org"), url: URL(string: "https://www.thetrevorproject.org"), tags: ["lgbtq", "queer", "support"])
     ]
 
     static let ireland: [SupportResource] = [
-        SupportResource(title: "112", detail: genericEmergencyDetail, action: "Call 112", url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "Samaritans", detail: genericCrisisDetail, action: "Call 116 123", url: URL(string: "tel://116123"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Sexual Wellbeing (HSE)", detail: genericSTIDetail, action: "Open sexualwellbeing.ie", url: URL(string: "https://www.sexualwellbeing.ie"), tags: ["sti", "pep", "prep"]),
+        SupportResource(title: "112", detail: genericEmergencyDetail, action: call("112"), url: URL(string: "tel://112"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "Samaritans", detail: genericCrisisDetail, action: call("116 123"), url: URL(string: "tel://116123"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "Sexual Wellbeing (HSE)", detail: genericSTIDetail, action: open("sexualwellbeing.ie"), url: URL(string: "https://www.sexualwellbeing.ie"), tags: ["sti", "pep", "prep"]),
         SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "Drugs.ie", detail: genericDrugsDetail, action: "Open drugs.ie", url: URL(string: "https://www.drugs.ie"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "Dublin Rape Crisis Centre", detail: genericAssaultDetail, action: "Open drcc.ie", url: URL(string: "https://www.drcc.ie"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "LGBT Ireland", detail: genericLGBTQDetail, action: "Open lgbt.ie", url: URL(string: "https://lgbt.ie"), tags: ["lgbtq", "queer", "support"])
+        SupportResource(title: "Drugs.ie", detail: genericDrugsDetail, action: open("drugs.ie"), url: URL(string: "https://www.drugs.ie"), tags: ["drugs", "harm reduction"]),
+        SupportResource(title: "Dublin Rape Crisis Centre", detail: genericAssaultDetail, action: open("drcc.ie"), url: URL(string: "https://www.drcc.ie"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "LGBT Ireland", detail: genericLGBTQDetail, action: open("lgbt.ie"), url: URL(string: "https://lgbt.ie"), tags: ["lgbtq", "queer", "support"])
     ]
 
     static let australia: [SupportResource] = [
-        SupportResource(title: "000", detail: genericEmergencyDetail, action: "Call 000", url: URL(string: "tel://000"), tags: ["crisis", "emergency", "panic"]),
-        SupportResource(title: "Lifeline", detail: genericCrisisDetail, action: "Call 13 11 14", url: URL(string: "tel://131114"), tags: ["crisis", "mental health", "suicide"]),
-        SupportResource(title: "Healthdirect sexual health", detail: genericSTIDetail, action: "Open healthdirect.gov.au", url: URL(string: "https://www.healthdirect.gov.au/sexual-health"), tags: ["sti", "pep", "prep"]),
+        SupportResource(title: "000", detail: genericEmergencyDetail, action: call("000"), url: URL(string: "tel://000"), tags: ["crisis", "emergency", "panic"]),
+        SupportResource(title: "Lifeline", detail: genericCrisisDetail, action: call("13 11 14"), url: URL(string: "tel://131114"), tags: ["crisis", "mental health", "suicide"]),
+        SupportResource(title: "Healthdirect sexual health", detail: genericSTIDetail, action: open("healthdirect.gov.au"), url: URL(string: "https://www.healthdirect.gov.au/sexual-health"), tags: ["sti", "pep", "prep"]),
         SupportResource(title: gpTitle, detail: genericGPDetail, action: gpAction, url: nil, tags: ["doctor", "medication"]),
-        SupportResource(title: "Alcohol and Drug Foundation", detail: genericDrugsDetail, action: "Open adf.org.au", url: URL(string: "https://adf.org.au"), tags: ["drugs", "harm reduction"]),
-        SupportResource(title: "1800RESPECT", detail: genericAssaultDetail, action: "Call 1800 737 732", url: URL(string: "tel://1800737732"), tags: ["consent", "assault", "help"]),
-        SupportResource(title: "QLife", detail: genericLGBTQDetail, action: "Open qlife.org.au", url: URL(string: "https://qlife.org.au"), tags: ["lgbtq", "queer", "support"])
+        SupportResource(title: "Alcohol and Drug Foundation", detail: genericDrugsDetail, action: open("adf.org.au"), url: URL(string: "https://adf.org.au"), tags: ["drugs", "harm reduction"]),
+        SupportResource(title: "1800RESPECT", detail: genericAssaultDetail, action: call("1800 737 732"), url: URL(string: "tel://1800737732"), tags: ["consent", "assault", "help"]),
+        SupportResource(title: "QLife", detail: genericLGBTQDetail, action: open("qlife.org.au"), url: URL(string: "https://qlife.org.au"), tags: ["lgbtq", "queer", "support"])
     ]
 
     static func resources(for country: String) -> [SupportResource] {

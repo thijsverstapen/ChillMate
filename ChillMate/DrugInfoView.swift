@@ -4,7 +4,6 @@ import ChillMateCore
 
 struct DrugInfoView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.openURL) private var openURL
 
     var body: some View {
         Group {
@@ -23,55 +22,7 @@ struct DrugInfoView: View {
                         MedicalSafetyDisclaimerCard(compact: true)
 
                         ForEach(Substance.allCases.filter { $0 != .unknown && $0 != .other }) { substance in
-                            VStack(alignment: .leading, spacing: 10) {
-                                HStack(spacing: 12) {
-                                    Image(systemName: substance.symbolName)
-                                        .font(.system(size: 18, weight: .bold))
-                                        .foregroundStyle(substance.tint)
-                                        .frame(width: 38, height: 38)
-                                        .glassSurface(radius: 19, tint: substance.tint.opacity(0.14))
-
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(substance.localizedDisplayName)
-                                            .font(.headline)
-                                            .foregroundStyle(Color.chillText)
-                                        Text("Safety reference")
-                                            .font(.caption.weight(.bold))
-                                            .foregroundStyle(Color.chillSecondary)
-                                    }
-                                }
-
-                                Text(substance.informationSummary)
-                                    .font(.callout)
-                                    .foregroundStyle(Color.chillSecondary)
-                                    .fixedSize(horizontal: false, vertical: true)
-
-                                if let reference = substance.reference {
-                                    DrugReferenceSection(reference: reference, tint: substance.tint)
-                                }
-
-                                if substance == .alcohol {
-                                    AlcoholUnitsSection()
-                                }
-
-                                DrugInfoMiniSection(title: String(localized: "Main risks"), rows: substance.mainRisks, tint: substance.tint)
-                                DrugInfoMiniSection(title: String(localized: "Mixing risks"), rows: substance.mixingRisks, tint: .orange)
-                                DrugInfoMiniSection(title: String(localized: "Seek help now if"), rows: substance.seekHelpSigns, tint: .red)
-
-                                if let referenceURL = substance.referenceURL {
-                                    Button {
-                                        openURL(referenceURL)
-                                    } label: {
-                                        Label(substance.referenceLabel, systemImage: "link")
-                                            .font(.caption.weight(.bold))
-                                    }
-                                    .buttonStyle(.bordered)
-                                    .tint(substance.tint)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(16)
-                            .glassSurface(radius: 24, tint: substance.tint.opacity(0.08))
+                            SubstanceInfoCard(substance: substance)
                         }
                     }
                     .padding(20)
@@ -83,6 +34,66 @@ struct DrugInfoView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
         }
+    }
+}
+
+/// One substance's safety reference, as a card. Its own view rather than the
+/// body of the `ForEach` above: written inline, it made that body one of the
+/// slowest in the app to type-check. The content is unchanged.
+private struct SubstanceInfoCard: View {
+    @Environment(\.openURL) private var openURL
+    let substance: Substance
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                Image(systemName: substance.symbolName)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(substance.tint)
+                    .frame(width: 38, height: 38)
+                    .glassSurface(radius: 19, tint: substance.tint.opacity(0.14))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(substance.localizedDisplayName)
+                        .font(.headline)
+                        .foregroundStyle(Color.chillText)
+                    Text("Safety reference")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Color.chillSecondary)
+                }
+            }
+
+            Text(substance.informationSummary)
+                .font(.callout)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let reference = substance.reference {
+                DrugReferenceSection(reference: reference, tint: substance.tint)
+            }
+
+            if substance == .alcohol {
+                AlcoholUnitsSection()
+            }
+
+            DrugInfoMiniSection(title: String(localized: "Main risks"), rows: substance.mainRisks, tint: substance.tint)
+            DrugInfoMiniSection(title: String(localized: "Mixing risks"), rows: substance.mixingRisks, tint: .orange)
+            DrugInfoMiniSection(title: String(localized: "Seek help now if"), rows: substance.seekHelpSigns, tint: .red)
+
+            if let referenceURL = substance.referenceURL {
+                Button {
+                    openURL(referenceURL)
+                } label: {
+                    Label(substance.referenceLabel, systemImage: "link")
+                        .font(.caption.weight(.bold))
+                }
+                .buttonStyle(.bordered)
+                .tint(substance.tint)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .glassSurface(radius: 24, tint: substance.tint.opacity(0.08))
     }
 }
 

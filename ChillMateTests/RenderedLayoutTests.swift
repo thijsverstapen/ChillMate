@@ -105,6 +105,13 @@ struct RenderedLayoutTests {
         )
     }
 
+    /// The longest line on the What's New page, which is the one that wraps most.
+    private var whatsNewRow: some View {
+        let items = WhatsNew.releases.flatMap(\.items)
+        let longest = items.max { $0.detail.count < $1.detail.count }!
+        return WhatsNewRow(item: longest)
+    }
+
     // MARK: - The components
 
     @Test("A page header fits and grows")
@@ -120,5 +127,8 @@ struct RenderedLayoutTests {
 
     @Test("The comedown card fits and grows")
     func comedownIsSound() { check(comedown, "comedown card") }
+
+    @Test("A What's New line fits and grows")
+    func whatsNewRowIsSound() { check(whatsNewRow, "What's New row") }
 
 }

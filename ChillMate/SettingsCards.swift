@@ -511,6 +511,9 @@ struct PINSetupView: View {
         !pin.isEmpty || !confirmPIN.isEmpty
     }
 
+    // The body is assembled from named parts rather than written out in one
+    // expression: as a single body it was the slowest function in the app to
+    // type-check, at well over half a second on every build that touched this file.
     var body: some View {
         NavigationStack {
             ZStack {
@@ -518,80 +521,12 @@ struct PINSetupView: View {
 
                 VStack(alignment: .leading, spacing: 18) {
                     Spacer(minLength: 20)
-
-                    VStack(alignment: .leading, spacing: 14) {
-                        Image(systemName: "number.circle.fill")
-                            .font(.system(size: 34, weight: .bold))
-                            .foregroundStyle(Color.chillPrimary)
-                            .frame(width: 72, height: 72)
-                            .glassSurface(radius: 36, tint: Color.chillPrimary.opacity(0.16))
-                            .disablesRootSwipeBack()
-
-                        Text(titleText)
-                            .font(.largeTitle.bold())
-                            .foregroundStyle(Color.chillText)
-
-                        Text(explanationText)
-                            .font(.callout)
-                            .lineSpacing(3)
-                            .foregroundStyle(Color.chillSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        if let duressWarning {
-                            Label(duressWarning, systemImage: "exclamationmark.triangle.fill")
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.orange)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
-                    .padding(22)
-                    .glassSurface(radius: 34, tint: .black.opacity(0.04), interactive: true)
-
-                    VStack(spacing: 12) {
-                        SecureField("New PIN", text: $pin)
-                            .keyboardType(.numberPad)
-                            .textContentType(.oneTimeCode)
-
-                        SecureField("Confirm PIN", text: $confirmPIN)
-                            .keyboardType(.numberPad)
-                            .textContentType(.oneTimeCode)
-                    }
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
-                    .padding(16)
-                    .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
-                    .onChange(of: pin) { _, newValue in
-                        pin = String(newValue.filter(\.isNumber).prefix(8))
-                    }
-                    .onChange(of: confirmPIN) { _, newValue in
-                        confirmPIN = String(newValue.filter(\.isNumber).prefix(8))
-                    }
-
+                    header
+                    pinFields
                     if let message {
-                        Text(message)
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(.red)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(14)
-                            .glassSurface(radius: 20, tint: .red.opacity(0.10))
+                        errorMessage(message)
                     }
-
-                    GlassActionButton(prominent: true) {
-                        guard canSave else {
-                            message = pin.count < 4 ? "Use at least 4 numbers." : "The PINs do not match."
-                            return
-                        }
-
-                        save(pin)
-                        dismiss()
-                    } label: {
-                        Label("Save PIN", systemImage: "checkmark.circle.fill")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .disabled(!canSave)
-                    .opacity(canSave ? 1 : 0.55)
-
+                    saveButton
                     Spacer(minLength: 20)
                 }
                 .padding(20)
@@ -612,6 +547,98 @@ struct PINSetupView: View {
         }
     }
 
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Image(systemName: "number.circle.fill")
+                .font(.system(size: 34, weight: .bold))
+                .foregroundStyle(Color.chillPrimary)
+                .frame(width: 72, height: 72)
+                .glassSurface(radius: 36, tint: Color.chillPrimary.opacity(0.16))
+                .disablesRootSwipeBack()
+
+            Text(titleText)
+                .font(.largeTitle.bold())
+                .foregroundStyle(Color.chillText)
+
+            Text(explanationText)
+                .font(.callout)
+                .lineSpacing(3)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let duressWarning {
+                Label(duressWarning, systemImage: "exclamationmark.triangle.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(22)
+        .glassSurface(radius: 34, tint: .black.opacity(0.04), interactive: true)
+    }
+
+    private var pinFields: some View {
+        VStack(spacing: 12) {
+            SecureField("New PIN", text: $pin)
+                .keyboardType(.numberPad)
+                .textContentType(.oneTimeCode)
+
+            SecureField("Confirm PIN", text: $confirmPIN)
+                .keyboardType(.numberPad)
+                .textContentType(.oneTimeCode)
+        }
+        .font(.title3.weight(.semibold))
+        .foregroundStyle(Color.chillText)
+        .padding(16)
+        .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
+        .onChange(of: pin) { _, newValue in
+            pin = Self.pinDigits(newValue)
+        }
+        .onChange(of: confirmPIN) { _, newValue in
+            confirmPIN = Self.pinDigits(newValue)
+        }
+    }
+
+    /// At most eight digits, nothing else. Typed out step by step: written inline
+    /// as one expression, `filter` and `prefix` each have several overloads to
+    /// choose between, and those two lines cost more type-checking than the rest
+    /// of this screen together.
+    private static func pinDigits(_ text: String) -> String {
+        let digits: String = text.filter { (character: Character) -> Bool in character.isNumber }
+        return String(digits.prefix(8))
+    }
+
+    private func errorMessage(_ message: String) -> some View {
+        Text(message)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.red)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(14)
+            .glassSurface(radius: 20, tint: .red.opacity(0.10))
+    }
+
+    private var saveButton: some View {
+        GlassActionButton(prominent: true) {
+            guard canSave else {
+                // Were bare literals, so they would have shown in English in every
+                // language; the disabled button kept anyone from reaching them.
+                message = pin.count < 4
+                    ? String(localized: "Use at least 4 numbers.")
+                    : String(localized: "The PINs do not match.")
+                return
+            }
+
+            save(pin)
+            dismiss()
+        } label: {
+            Label("Save PIN", systemImage: "checkmark.circle.fill")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+        }
+        .disabled(!canSave)
+        .opacity(canSave ? 1 : 0.55)
+    }
+
     private func attemptDismiss() {
         if hasInput {
             isShowingDiscardWarning = true
@@ -627,7 +654,6 @@ struct WatchCompanionSettingsCard: View {
     @Binding var breathingHaptics: Bool
     @Binding var discreetCheckIns: Bool
     @Binding var visibleTimers: Bool
-    @Binding var stressAndTemperatureDetection: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -635,7 +661,7 @@ struct WatchCompanionSettingsCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("These settings control the Apple Watch companion: hydration reminders, elevated heart-rate warnings, haptic breathing, discreet check-ins, timer visibility, and a strain warning that combines heart rate with heart-rate variability.")
+            Text("These settings control the Apple Watch companion: hydration reminders, heart-rate warnings from the watch's own sensor, haptic breathing, discreet check-ins and timer visibility.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -645,7 +671,6 @@ struct WatchCompanionSettingsCard: View {
             SettingsToggleLine(title: String(localized: "Breathing haptics"), symbol: "lungs.fill", isOn: $breathingHaptics)
             SettingsToggleLine(title: String(localized: "Discreet haptic check-ins"), symbol: "applewatch.radiowaves.left.and.right", isOn: $discreetCheckIns)
             SettingsToggleLine(title: String(localized: "Visible timers and complications"), symbol: "timer", isOn: $visibleTimers)
-            SettingsToggleLine(title: String(localized: "Strain warnings"), symbol: "thermometer.medium", isOn: $stressAndTemperatureDetection)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)

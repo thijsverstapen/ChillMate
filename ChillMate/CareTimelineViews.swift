@@ -1,6 +1,7 @@
 import Foundation
 import SwiftData
 import SwiftUI
+import ChillMateCore
 
 struct UnifiedTimelineView: View {
     @Environment(\.dismiss) private var dismiss
@@ -10,31 +11,42 @@ struct UnifiedTimelineView: View {
     @Query(ChillMateQueries.recentPlansByDate) private var plans: [SaferSessionPlan]
     @Query(ChillMateQueries.recentTests) private var tests: [STDTestRecord]
 
+    /// Every string here is one a person reads on the Full timeline. Built as
+    /// plain `String`s, they were English in every language, and the timers'
+    /// titles named the substance by its English raw value.
     private var events: [UnifiedTimelineEvent] {
         var result: [UnifiedTimelineEvent] = []
         result += entries.map {
             UnifiedTimelineEvent(
                 date: $0.date,
-                title: $0.skippedNight ? "Skipped Chill check" : "Chill log",
-                detail: $0.skippedNight ? "Marked as skipped" : "\($0.partnerSummary), \($0.substances.isEmpty ? "no substances" : $0.substances.joined(separator: ", "))",
+                title: $0.skippedNight ? String(localized: "Skipped Chill check") : String(localized: "Chill log"),
+                detail: $0.skippedNight ? String(localized: "Marked as skipped") : Self.entryDetail($0),
                 symbol: $0.skippedNight ? "moon.zzz.fill" : "heart.text.square.fill",
                 tint: $0.skippedNight ? Color.chillIconPurple : Color.chillIconPink
             )
         }
         result += journalEntries.map {
-            UnifiedTimelineEvent(date: $0.date, title: String(localized: "Journal"), detail: $0.rememberClearly.isEmpty ? "Saved reflection" : $0.rememberClearly, symbol: "book.closed.fill", tint: Color.chillIconPurple)
+            UnifiedTimelineEvent(date: $0.date, title: String(localized: "Journal"), detail: $0.rememberClearly.isEmpty ? String(localized: "Saved reflection") : $0.rememberClearly, symbol: "book.closed.fill", tint: Color.chillIconPurple)
         }
         result += timers.map {
-            let route = AdministrationRoute(rawValue: $0.administrationRoute)?.displayName ?? "Saved route"
-            return UnifiedTimelineEvent(date: $0.startedAt, title: "\($0.substanceName) check-in", detail: "\(route), \($0.durationHours.formatted(.number.precision(.fractionLength(0...1)))) h reminder", symbol: "timer", tint: Color.chillIconAmber)
+            let route = AdministrationRoute(rawValue: $0.administrationRoute)?.displayName ?? String(localized: "Saved route")
+            let hours = $0.durationHours.formatted(.number.precision(.fractionLength(0...1)))
+            return UnifiedTimelineEvent(date: $0.startedAt, title: String(localized: "\($0.localizedSubstanceName) check-in"), detail: String(localized: "\(route), \(hours) h reminder"), symbol: "timer", tint: Color.chillIconAmber)
         }
         result += plans.map {
-            UnifiedTimelineEvent(date: $0.plannedDate, title: String(localized: "Before-Chill plan"), detail: $0.transportPlan.isEmpty ? "Ends \($0.endingDate.formatted(date: .omitted, time: .shortened))" : $0.transportPlan, symbol: "checkmark.shield.fill", tint: Color.chillMint)
+            UnifiedTimelineEvent(date: $0.plannedDate, title: String(localized: "Before-Chill plan"), detail: $0.transportPlan.isEmpty ? String(localized: "Ends \($0.endingDate.formatted(date: .omitted, time: .shortened))") : $0.transportPlan, symbol: "checkmark.shield.fill", tint: Color.chillMint)
         }
         result += tests.map {
-            UnifiedTimelineEvent(date: $0.testDate, title: String(localized: "STI test"), detail: $0.hasPositiveResult ? "Positive result saved" : "Results \($0.resultsDueDate.formatted(date: .abbreviated, time: .omitted))", symbol: "cross.case.fill", tint: Color.chillIconTeal)
+            UnifiedTimelineEvent(date: $0.testDate, title: String(localized: "STI test"), detail: $0.hasPositiveResult ? String(localized: "Positive result saved") : String(localized: "Results \($0.resultsDueDate.formatted(date: .abbreviated, time: .omitted))"), symbol: "cross.case.fill", tint: Color.chillIconTeal)
         }
         return result.sorted { $0.date > $1.date }
+    }
+
+    private static func entryDetail(_ entry: NightEntry) -> String {
+        let substances = entry.substances.isEmpty
+            ? String(localized: "no substances")
+            : entry.substances.map { Substance(rawValue: $0)?.localizedDisplayName ?? $0 }.joined(separator: ", ")
+        return "\(entry.partnerSummary), \(substances)"
     }
 
     var body: some View {

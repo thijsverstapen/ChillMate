@@ -128,6 +128,17 @@ final class DrugDoseTimerRecord {
     var endsAt: Date {
         startedAt.addingTimeInterval(durationHours * 60 * 60)
     }
+
+    /// The substance as the reader's language names it.
+    ///
+    /// `substanceName` stores the raw value, which is English and has to stay
+    /// that way: it is what `Substance(rawValue:)` and the published reference
+    /// look the timer up by. Shown as it is, a German Lock Screen read
+    /// "Ketamine" and a Spanish one "Cocaine". Anything a person reads goes
+    /// through here; anything that looks the substance up keeps the raw value.
+    var localizedSubstanceName: String {
+        Substance(rawValue: substanceName)?.localizedDisplayName ?? substanceName
+    }
 }
 
 enum AdministrationRoute: String, CaseIterable, Identifiable {
@@ -462,9 +473,9 @@ enum DrugTimerLiveActivityController {
             return
         }
 
-        let attributes = DrugTimerActivityAttributes(timerID: timer.id, substanceName: timer.substanceName)
+        let attributes = DrugTimerActivityAttributes(timerID: timer.id, substanceName: timer.localizedSubstanceName)
         let contentState = DrugTimerActivityAttributes.ContentState(
-            substanceName: timer.substanceName,
+            substanceName: timer.localizedSubstanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: timer.redoseNudgeIsActive(at: now),
             startedAt: timer.startedAt,
@@ -492,7 +503,7 @@ enum DrugTimerLiveActivityController {
         }
 
         let contentState = DrugTimerActivityAttributes.ContentState(
-            substanceName: timer.substanceName,
+            substanceName: timer.localizedSubstanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: timer.redoseNudgeIsActive(at: now),
             startedAt: timer.startedAt,
@@ -511,7 +522,7 @@ enum DrugTimerLiveActivityController {
         }
 
         let contentState = DrugTimerActivityAttributes.ContentState(
-            substanceName: timer.substanceName,
+            substanceName: timer.localizedSubstanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: false,
             startedAt: timer.startedAt,

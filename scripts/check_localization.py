@@ -21,6 +21,9 @@ REQUIRED = {"nl", "de", "fr", "es"}
 CATALOGS = [
     ROOT / "ChillMate/Localizable.xcstrings",
     ROOT / "ChillMate/InfoPlist.xcstrings",
+    # The watch asks for heart-rate access in its own words since it reads its
+    # own sensor, so its permission prompt has a catalog of its own.
+    ROOT / "ChillMateWatchApp/InfoPlist.xcstrings",
     ROOT / "ChillMateWatchApp/Localizable.xcstrings",
     ROOT / "ChillMateWatchAppWidget/Localizable.xcstrings",
     # Added in 4.3.0. The Live Activity extension shipped with no catalog at
@@ -518,6 +521,101 @@ def check_display_assignments(directory):
     return findings
 
 
+# A bare English literal that reaches the screen as a plain `String`.
+#
+# The shape the checks above cannot see. A literal handed to a parameter of type
+# `String` — `SectionTitle(title: "Substance tags in …")`, `value: timer == nil ?
+# "None" : "Active"`, `?? "Not set"` — never passes through `Text`, `Label` or
+# `String(localized:)`, and it is not assigned to anything named like copy either.
+# Over forty shipped in English that way, among them the message sent to a trusted
+# contact when nothing custom was typed, the default emergency instructions (which
+# also named 112 to people for whom 112 reaches nobody), every "Call …" and
+# "Open …" in four countries' support directories, and the whole Full timeline.
+#
+# So: an English-looking literal in a ternary or nil-coalescing branch, or given
+# to an argument labelled like something a person reads, outside the calls the
+# gate already treats as localized. English-looking means a capitalised word,
+# optionally followed by more; a key, a symbol name or a format fragment is not.
+DISPLAY_ARGUMENT = re.compile(
+    r"\b(?:title|detail|subtitle|message|action|caption|value|hint|summary)\s*:\s*$"
+)
+TERNARY_BRANCH = re.compile(r"\?\s*$")
+TERNARY_ELSE = re.compile(r"\?\s*(?:\"(?:[^\"\\]|\\.)*\"|String\(localized:[^)]*\))\s*:\s*$")
+ENGLISH_LITERAL = re.compile(r"^[A-Z][a-z]+(?:[ ,’'-][A-Za-z%\\(). ]+)*[.!?]?$")
+
+# Files where such literals are meant, with the reason. Whole files only where
+# every literal of the kind is deliberate.
+DISPLAY_LITERAL_EXEMPT_FILES = {
+    # The instructions to the on-device model are English on purpose; the model is
+    # told separately which language to answer in.
+    "OnDeviceAffirmationService.swift": None,
+    # The support directory's titles are the names of the organisations, which
+    # are not translated. Its actions and details are, so only `title:` is exempt.
+    "SupportDirectoryViews.swift": "title",
+}
+# Literals that look like words and are identifiers, with the reason.
+DISPLAY_LITERAL_EXEMPT_VALUES = {
+    # The stored key of the default country, read back and never shown.
+    "Netherlands",
+}
+
+
+def literals_outside_comments(text):
+    """Every top-level string literal with its offset, skipping comments."""
+    index = 0
+    while index < len(text):
+        if text.startswith("//", index):
+            newline = text.find("\n", index)
+            index = len(text) if newline < 0 else newline
+            continue
+        if text.startswith("/*", index):
+            end = text.find("*/", index)
+            index = len(text) if end < 0 else end + 2
+            continue
+        if text[index] == '"':
+            if text.startswith('\"\"\"', index):
+                end = text.find('\"\"\"', index + 3)
+                index = len(text) if end < 0 else end + 3
+                continue
+            yield scan_literal(text, index), index
+            index = skip_string(text, index)
+            continue
+        index += 1
+
+
+def check_display_literals(directory):
+    """No bare English literal may reach the screen as a plain String."""
+    findings = []
+    for source in sorted((ROOT / directory).glob("*.swift")):
+        exempt = DISPLAY_LITERAL_EXEMPT_FILES.get(source.name, "")
+        if exempt is None:
+            continue
+        text = source.read_text()
+        localized = {match.end() for pattern in LITERAL_PREFIXES for match in pattern.finditer(text)}
+        labelled = []
+        for match in LABELLED_CALL.finditer(text):
+            argument = first_argument(text, match.end() - 1)
+            if argument is not None:
+                labelled.append((match.end(), match.end() + len(argument)))
+
+        for raw, index in literals_outside_comments(text):
+            if index in localized or any(start <= index < end for start, end in labelled):
+                continue
+            if "://" in raw or raw in DISPLAY_LITERAL_EXEMPT_VALUES or not ENGLISH_LITERAL.match(raw):
+                continue
+            before = text[max(0, index - 160):index]
+            argument = DISPLAY_ARGUMENT.search(before)
+            if argument and exempt and argument.group(0).lstrip().startswith(exempt):
+                continue
+            if argument or TERNARY_BRANCH.search(before) or TERNARY_ELSE.search(before):
+                line = text[:index].count("\n") + 1
+                findings.append(
+                    f"{directory}/*.swift: {source.name}:{line} {raw[:60]!r} reaches the screen "
+                    "as a plain String; wrap it in String(localized:)"
+                )
+    return findings
+
+
 POSITIONAL = re.compile(r"%\d+\$")
 
 
@@ -678,6 +776,7 @@ for source_directory, source_catalog in SOURCE_CATALOGS:
     check_sources(source_directory, source_catalog)
     failures.extend(check_raw_value_rendering(source_directory))
     failures.extend(check_display_assignments(source_directory))
+    failures.extend(check_display_literals(source_directory))
     failures.extend(check_empty_labels(source_directory))
 
 failures.extend(check_notification_copy())

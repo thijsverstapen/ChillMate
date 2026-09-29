@@ -61,7 +61,6 @@ final class HealthKitService {
 
     nonisolated static var sexualActivityType: HKCategoryType? { HKObjectType.categoryType(forIdentifier: .sexualActivity) }
     nonisolated static var sleepAnalysisType: HKCategoryType? { HKObjectType.categoryType(forIdentifier: .sleepAnalysis) }
-    nonisolated static var heartRateType: HKQuantityType? { HKObjectType.quantityType(forIdentifier: .heartRate) }
     nonisolated static var restingHeartRateType: HKQuantityType? { HKObjectType.quantityType(forIdentifier: .restingHeartRate) }
     nonisolated static var mindfulSessionType: HKCategoryType? { HKObjectType.categoryType(forIdentifier: .mindfulSession) }
     nonisolated static var heartRateVariabilityType: HKQuantityType? { HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) }
@@ -78,7 +77,9 @@ final class HealthKitService {
     ///
     /// Resting heart rate rides with heart rate. It had a scope of its own that no
     /// switch in Settings could turn on, so the dashboard's read of it asked iOS
-    /// for access nobody had been shown.
+    /// for access nobody had been shown. It is now all that switch asks for: the
+    /// heart rate itself was read only to relay to the watch, and the watch
+    /// reads its own sensor.
     ///
     /// Static and pure so the tests can hold every scope to exactly this.
     nonisolated static func authorizationTypes(
@@ -94,9 +95,8 @@ final class HealthKitService {
             share.insert(type)
             read.insert(type)
         }
-        if scopes.contains(.heartRateRead) {
-            if let type = heartRateType { read.insert(type) }
-            if let type = restingHeartRateType { read.insert(type) }
+        if scopes.contains(.heartRateRead), let type = restingHeartRateType {
+            read.insert(type)
         }
         if scopes.contains(.heartRateVariabilityRead), let type = heartRateVariabilityType {
             read.insert(type)
@@ -267,16 +267,10 @@ final class HealthKitService {
 
     // MARK: - Heart
 
-    func latestHRV() async throws -> Double? {
+    func latestHRV() async throws -> HealthSample? {
         guard isAvailable, let hrvType = Self.heartRateVariabilityType else { return nil }
         try await requestAuthorization(scopes: [.heartRateVariabilityRead])
         return try await latestQuantity(hrvType, unit: HKUnit.secondUnit(with: .milli))
-    }
-
-    func latestHeartRate() async throws -> Double? {
-        guard isAvailable, let hrType = Self.heartRateType else { return nil }
-        try await requestAuthorization(scopes: [.heartRateRead])
-        return try await latestQuantity(hrType, unit: HKUnit(from: "count/min"))
     }
 
     /// Resting heart rate is a steadier recovery signal than a spot heart-rate
@@ -284,10 +278,13 @@ final class HealthKitService {
     func latestRestingHeartRate() async throws -> Double? {
         guard isAvailable, let type = Self.restingHeartRateType else { return nil }
         try await requestAuthorization(scopes: [.heartRateRead])
-        return try await latestQuantity(type, unit: HKUnit(from: "count/min"))
+        return try await latestQuantity(type, unit: HKUnit(from: "count/min"))?.value
     }
 
-    private func latestQuantity(_ type: HKQuantityType, unit: HKUnit) async throws -> Double? {
+    /// The most recent sample, with the time it was taken. The time goes with the
+    /// value because the most recent sample can be days old, and a reader that
+    /// does not know that shows it as now.
+    private func latestQuantity(_ type: HKQuantityType, unit: HKUnit) async throws -> HealthSample? {
         let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)
         return try await withCheckedThrowingContinuation { continuation in
             let query = HKSampleQuery(sampleType: type, predicate: nil, limit: 1, sortDescriptors: [sort]) { _, samples, error in
@@ -295,7 +292,10 @@ final class HealthKitService {
                     continuation.resume(throwing: error)
                     return
                 }
-                continuation.resume(returning: (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: unit))
+                let sample = samples?.first as? HKQuantitySample
+                continuation.resume(returning: sample.map {
+                    HealthSample(value: $0.quantity.doubleValue(for: unit), date: $0.endDate)
+                })
             }
             store.execute(query)
         }
@@ -591,7 +591,7 @@ enum HealthKitPermissionScope: String, CaseIterable, Identifiable {
         case .sleepReadWrite:
             String(localized: "Reads your sleep to fill in how long you slept after a night. Writes sleep you type in only when Apple Health has none for that night.")
         case .heartRateRead:
-            String(localized: "Reads your heart rate for your Apple Watch, and your resting heart rate to show beside your recovery score.")
+            String(localized: "Reads your resting heart rate to show beside your recovery score.")
         case .heartRateVariabilityRead:
             String(localized: "Reads heart rate variability, which is part of your daily recovery score.")
         case .mindfulWrite:
