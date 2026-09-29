@@ -89,6 +89,10 @@ enum ChillMateModelContainer {
             cloudKitDatabase: cloudKitDatabase
         )
 
+        // Before the store is opened: an existing store gets the indexes a new
+        // one would, which `#Index` alone never gives it.
+        StoreIndexRepair.runIfNeeded(storeURL: configuration.url, schema: schema)
+
         let container = try ModelContainer(for: schema, migrationPlan: ChillMateMigrationPlan.self, configurations: [configuration])
         LocalSecurityService.applyFileProtection()
         return container
