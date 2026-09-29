@@ -36,6 +36,42 @@
           }
         }
       }
+    },
+    "NSHealthUpdateUsageDescription" : {
+      "comment" : "Required beside the read string because the watch asks Apple Health for access; the watch never writes, so this is never shown",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate never saves anything to Apple Health from your Apple Watch."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate slaat vanaf je Apple Watch nooit iets op in Apple Health."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate speichert von deiner Apple Watch aus nie etwas in Apple Health."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate n'enregistre jamais rien dans Apple Health depuis ton Apple Watch."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate nunca guarda nada en Apple Health desde tu Apple Watch."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
