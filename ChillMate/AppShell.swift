@@ -102,7 +102,19 @@ private struct MainTabView: View {
     @AppStorage(DefaultsKey.pendingAppDestination) private var pendingAppDestination = ""
     @AppStorage(DefaultsKey.lastSelectedTab) private var lastSelectedTab = AppTab.home.rawValue
     @AppStorage(DefaultsKey.lastBackgroundedAt) private var lastBackgroundedAt = 0.0
+    @AppStorage(DefaultsKey.whatsNewSeenVersion) private var whatsNewSeenVersion: String?
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.appContentIsVisible) private var appContentIsVisible
+    @State private var whatsNew: WhatsNewRelease?
+    /// Set once a notification, a shortcut or Siri has taken somebody to a
+    /// page. What's New then waits for another launch rather than covering it.
+    @State private var wasSentSomewhere = false
+    /// Counts closings of What's New. `onDismiss` only bumps this; the work is
+    /// done in `onChange`, where `@AppStorage` reads are current. Read inside
+    /// `onDismiss`, `pendingAppDestination` still held what it was before the
+    /// destination arrived, so the destination was dropped and the page counted
+    /// as seen.
+    @State private var whatsNewClosings = 0
 
     /// After at least this long in the background, reopening the app returns to
     /// the Home tab instead of restoring whichever tab the user last viewed.
@@ -147,12 +159,21 @@ private struct MainTabView: View {
         .fullScreenCover(isPresented: $isShowingShortcutLog) {
             LogNightSheet()
         }
+        .sheet(item: $whatsNew, onDismiss: { whatsNewClosings += 1 }) { release in
+            WhatsNewView(release: release) { whatsNew = nil }
+        }
         .onAppear {
             restoreLastTabIfNeeded()
             applyPendingDestination()
         }
+        .onChange(of: appContentIsVisible, initial: true) { _, isVisible in
+            offerWhatsNewIfDue(isVisible: isVisible)
+        }
         .onChange(of: pendingAppDestination) { _, _ in
             applyPendingDestination()
+        }
+        .onChange(of: whatsNewClosings) { _, _ in
+            whatsNewDismissed()
         }
         .onChange(of: selectedTab) { _, tab in
             lastSelectedTab = tab.rawValue
@@ -171,6 +192,34 @@ private struct MainTabView: View {
                 break
             }
         }
+    }
+
+    /// Once per update, after the app is unlocked, and never in a launch that
+    /// took somebody somewhere: that page can wait for the next time the app is
+    /// opened.
+    ///
+    /// The destination is checked as well as the flag because the order of the
+    /// first `onAppear` and this is not promised: either can see it first.
+    private func offerWhatsNewIfDue(isVisible: Bool) {
+        guard isVisible, whatsNew == nil, !wasSentSomewhere, !hasDestinationWaiting, !isShowingShortcutLog else { return }
+        let version = WhatsNew.currentVersion
+        guard WhatsNew.shouldShow(currentVersion: version, lastSeenVersion: whatsNewSeenVersion) else { return }
+        whatsNew = WhatsNew.release(for: version)
+    }
+
+    /// Continue and swiping the page away both count: it is shown once. A page
+    /// closed to make way for a destination does not count, and the destination
+    /// is applied now that nothing covers it.
+    private func whatsNewDismissed() {
+        if hasDestinationWaiting {
+            applyPendingDestination()
+        } else {
+            whatsNewSeenVersion = WhatsNew.currentVersion
+        }
+    }
+
+    private var hasDestinationWaiting: Bool {
+        NotificationDestination(rawValue: pendingAppDestination) != nil
     }
 
     private func restoreLastTabIfNeeded() {
@@ -195,6 +244,16 @@ private struct MainTabView: View {
 
     private func applyPendingDestination() {
         guard let destination = NotificationDestination(rawValue: pendingAppDestination) else {
+            return
+        }
+
+        wasSentSomewhere = true
+        // Somebody tapping through to panic support should not land under a
+        // page of news, and the night log's full-screen cover cannot open over
+        // a sheet at all. Close it; once it has gone, `whatsNewDismissed`
+        // applies the destination.
+        if whatsNew != nil {
+            whatsNew = nil
             return
         }
 

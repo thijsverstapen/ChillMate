@@ -71578,6 +71578,383 @@
         }
       },
       "comment" : "Settings > Permissions: what the Apple Health heart rate switch reads"
+    },
+    "What's New" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was ist neu"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Novedades"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveautés"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat is er nieuw"
+          }
+        }
+      },
+      "comment" : "Title of the page shown once after an update"
+    },
+    "Version %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versión %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versie %@"
+          }
+        }
+      },
+      "comment" : "What's New: the app version, e.g. 5.1.0"
+    },
+    "Your iCloud, your choice" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein iCloud, deine Wahl"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu iCloud, tu decisión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton iCloud, ton choix"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouw iCloud, jouw keuze"
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: title"
+    },
+    "ChillMate now asks before it keeps a copy of your data in your iCloud. You can change your mind any time in Settings." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate fragt jetzt, bevor es eine Kopie deiner Daten in deiner iCloud behält. Du kannst das jederzeit in den Einstellungen ändern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate ahora te pregunta antes de guardar una copia de tus datos en tu iCloud. Puedes cambiarlo cuando quieras en Ajustes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate te demande maintenant avant de garder une copie de tes données dans ton iCloud. Tu peux changer d'avis à tout moment dans Réglages."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChillMate vraagt nu eerst of het een kopie van je gegevens in je iCloud mag bewaren. Je kunt dit altijd aanpassen in Instellingen."
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: plain-language detail"
+    },
+    "Less goes to Apple Health" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weniger an Apple Health"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Menos datos a Apple Health"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moins de données vers Apple Health"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minder naar Apple Health"
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: title"
+    },
+    "Only when a night happened and how long you slept are saved to Apple Health. Nothing else about your night." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nur wann eine Nacht war und wie lange du geschlafen hast, landet noch in Apple Health. Sonst nichts über deine Nacht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Apple Health solo van cuándo fue una noche y cuánto dormiste. Nada más de tu noche."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seuls le moment d'une nuit et la durée de ton sommeil vont encore dans Apple Health. Rien d'autre sur ta nuit."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alleen wanneer een nacht was en hoe lang je sliep, gaan nog naar Apple Health. Verder niets over je nacht."
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: plain-language detail"
+    },
+    "Privacy in one place" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutz an einem Ort"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La privacidad en un solo lugar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La confidentialité au même endroit"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy op één plek"
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: title"
+    },
+    "One screen shows what protects your data and where it goes. A running timer can now just say “Timer” on your Lock Screen." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Bildschirm zeigt, was deine Daten schützt und wohin sie gehen. Ein laufender Timer kann auf dem Sperrbildschirm jetzt einfach „Timer“ zeigen."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una sola pantalla muestra qué protege tus datos y adónde van. Un temporizador activo ahora puede decir solo «Temporizador» en tu pantalla de bloqueo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un seul écran montre ce qui protège tes données et où elles vont. Un minuteur en cours peut maintenant afficher juste « Minuteur » sur ton écran verrouillé."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eén scherm laat zien wat je gegevens beschermt en waar ze heen gaan. Een lopende timer kan nu gewoon „Timer” zeggen op je toegangsscherm."
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: plain-language detail"
+    },
+    "Your sleep, filled in" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Schlaf, schon eingetragen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu sueño, ya anotado"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ton sommeil, déjà rempli"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je slaap, al ingevuld"
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: title"
+    },
+    "After you wake up, ChillMate adds how long you slept from Apple Health. It never changes a number you typed." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn du aufwachst, trägt ChillMate aus Apple Health ein, wie lange du geschlafen hast. Eine Zahl, die du selbst eingegeben hast, ändert es nie."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando te despiertas, ChillMate añade desde Apple Health cuánto dormiste. Nunca cambia un número que hayas escrito tú."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À ton réveil, ChillMate ajoute la durée de ton sommeil depuis Apple Health. Il ne change jamais un chiffre que tu as saisi."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je wakker bent, vult ChillMate uit Apple Health in hoe lang je sliep. Een getal dat je zelf typte, verandert het nooit."
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: plain-language detail"
+    },
+    "Find what you wrote by what you meant, not only the exact words." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finde, was du geschrieben hast, nach dem, was du gemeint hast, nicht nur nach den genauen Wörtern."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encuentra lo que escribiste por lo que querías decir, no solo por las palabras exactas."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retrouve ce que tu as écrit d'après ce que tu voulais dire, pas seulement les mots exacts."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vind wat je schreef op wat je bedoelde, niet alleen op de precieze woorden."
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: plain-language detail"
+    },
+    "A better Apple Watch app" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine bessere Apple Watch-App"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una app de Apple Watch mejor"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Une meilleure app Apple Watch"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een betere Apple Watch-app"
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: title"
+    },
+    "Your watch shows your heart rate from its own sensor, keeps what you tap when your phone is out of reach, and updates its face by itself." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Watch zeigt deine Herzfrequenz von ihrem eigenen Sensor, verliert keine Eingaben, wenn dein iPhone außer Reichweite ist, und aktualisiert ihr Zifferblatt selbst."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu reloj muestra tu frecuencia cardiaca con su propio sensor, guarda lo que tocas cuando tu iPhone está lejos y actualiza su esfera solo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta montre affiche ta fréquence cardiaque grâce à son propre capteur, garde ce que tu touches quand ton iPhone est hors de portée et met à jour son cadran toute seule."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je horloge toont je hartslag van zijn eigen sensor, onthoudt wat je tikt als je telefoon buiten bereik is en werkt zijn wijzerplaat zelf bij."
+          }
+        }
+      },
+      "comment" : "What's New 5.1.0: plain-language detail"
     }
   },
   "version" : "1.1"
