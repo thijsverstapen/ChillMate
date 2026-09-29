@@ -1,150 +1,393 @@
 import Foundation
 import SwiftUI
+import UIKit
 import ChillMateCore
 
+/// The protections a person can switch on, and how many are.
+///
+/// The Security check this replaces counted "Apple Health sync" and "iCloud
+/// backup" among five protections and told people to turn on the ones that were
+/// off. Sharing data with Health is not a protection, and nudging somebody to
+/// share more to raise a score is the opposite of what the screen was for. These
+/// five each reduce what somebody holding the phone, or looking over a shoulder,
+/// can see. File protection is not here because it cannot be off.
+struct PrivacyProtections: Equatable {
+    var appLock: Bool
+    var secondPIN: Bool
+    var hideFromScreenshots: Bool
+    /// Lock Screen notifications say nothing specific: discreet wording, or no
+    /// notifications at all.
+    var quietLockScreen: Bool
+    /// A running timer says "Timer" rather than the substance.
+    var discreetTimer: Bool
+
+    static let total = 5
+
+    var onCount: Int {
+        [appLock, secondPIN, hideFromScreenshots, quietLockScreen, discreetTimer].filter { $0 }.count
+    }
+
+    static func quietLockScreen(notificationsOn: Bool, discreet: Bool) -> Bool {
+        !notificationsOn || discreet
+    }
+}
+
+/// Everything about privacy in one place: what protects the data, where it goes,
+/// and what happened to it lately. Every line that can be changed opens the
+/// place that changes it.
+///
+/// Until 5.1.0 this was spread over five screens — this one, Security check,
+/// Privacy timeline, Settings' Data map and Privacy & lock — which overlapped,
+/// disagreed in places, and could not change anything.
 struct PrivacyReceiptView: View {
-    @Environment(\.dismiss) private var dismiss
     @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
     @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
-    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
-    @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
+    @AppStorage(DefaultsKey.screenPrivacyEnabled) private var screenPrivacyEnabled = true
+    @AppStorage(WidgetSharedKey.discreetLockScreenTimer, store: WidgetSharedKey.suite) private var discreetLockScreenTimer = false
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
-    @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
+    @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
+    @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthSleepRead = false
+    @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthHeartRateRead = false
+    @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthHRVRead = false
+    @AppStorage(DefaultsKey.iCloudSyncChoice) private var iCloudSyncChoice: String?
+    @AppStorage(DefaultsKey.dataRetentionAutomatic) private var dataRetentionAutomatic = false
+    @AppStorage(DefaultsKey.dataRetentionMonths) private var dataRetentionMonths = 0
+    @AppStorage(DefaultsKey.lastOnDeviceRecoveryStatus) private var lastOnDeviceRecoveryStatus = ""
+    @AppStorage(DefaultsKey.lastOnDeviceRecoverySnapshotTimestamp) private var lastSnapshot = 0.0
+    @AppStorage(DefaultsKey.lastOnDeviceRecoveryRestoreTimestamp) private var lastRestore = 0.0
+    @AppStorage(DefaultsKey.lastAppUseTimestamp) private var lastAppUse = 0.0
+    @State private var hasDuressPIN = LocalSecurityService.hasDuressPIN()
+
+    private var protections: PrivacyProtections {
+        PrivacyProtections(
+            appLock: requiresFaceID || requiresPIN,
+            secondPIN: requiresPIN && hasDuressPIN,
+            hideFromScreenshots: screenPrivacyEnabled,
+            quietLockScreen: PrivacyProtections.quietLockScreen(notificationsOn: notificationsEnabled, discreet: discreetNotifications),
+            discreetTimer: discreetLockScreenTimer
+        )
+    }
+
+    /// What the store is doing right now, not what Settings will do after a restart.
+    private var iCloudSyncOn: Bool {
+        ICloudSyncPreference.isMirroringNow(storedChoice: iCloudSyncChoice)
+    }
+
+    private var healthReads: Bool { healthSleepRead || healthHeartRateRead || healthHRVRead }
 
     /// Built outside the view body: nesting `String(localized:)` inside an
-    /// interpolation inside another `String(localized:)` is legal Swift and
-    /// unreadable, and it defeats the localization gate's literal scanner, which
-    /// stops at the first inner quote.
+    /// interpolation inside another `String(localized:)` defeats the
+    /// localization gate's literal scanner, which stops at the first inner quote.
     private var lockStatus: String {
         let faceID = requiresFaceID ? String(localized: "on") : String(localized: "off")
         let pin = requiresPIN ? String(localized: "on") : String(localized: "off")
         return String(localized: "Face ID: \(faceID). PIN: \(pin).")
     }
 
-    var body: some View {
-        Group {
-            ZStack {
-                DashboardBackdrop()
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 12) {
-                        PageHeader(
-                            title: String(localized: "Privacy"),
-                            subtitle: String(localized: "A simple view of what ChillMate keeps on this iPhone and which protections are turned on."),
-                            symbol: "lock.shield.fill",
-                            tint: Color.chillPrimary
-                        )
-
-                        PrivacyReceiptRow(title: String(localized: "Saved on this iPhone"), detail: String(localized: "Profile, logs, timers, STI tests, plans, risk checks, journal entries, trusted contact, and preferences."), symbol: "iphone", isEnabled: true)
-                        PrivacyReceiptRow(title: String(localized: "Encrypted files"), detail: localEncryptionEnabled
-                                ? String(localized: "Strong iPhone file protection is on.")
-                                : String(localized: "Strong iPhone file protection is available, but off in settings."), symbol: "lock.doc.fill", isEnabled: localEncryptionEnabled)
-                        PrivacyReceiptRow(title: String(localized: "App lock"), detail: lockStatus, symbol: "faceid", isEnabled: requiresFaceID || requiresPIN)
-                        PrivacyReceiptRow(title: String(localized: "Apple Health"), detail: healthKitAutoSync
-                                ? String(localized: "ChillMate can read and write only the Health categories you allowed.")
-                                : String(localized: "Apple Health sync is off."), symbol: "heart.text.square.fill", isEnabled: healthKitAutoSync)
-                        PrivacyReceiptRow(title: String(localized: "Notifications"), detail: notificationsEnabled
-                                ? (discreetNotifications
-                                    ? String(localized: "Notifications are on, with discreet lock-screen wording.")
-                                    : String(localized: "Notifications are on, showing full wording on the lock screen."))
-                                : String(localized: "Notifications are off."), symbol: "bell.badge.fill", isEnabled: notificationsEnabled)
-                        PrivacyReceiptRow(title: String(localized: "iCloud backup"), detail: iCloudBackupEnabled
-                                ? String(localized: "Encrypted backup files can be saved to iCloud Drive.")
-                                : String(localized: "iCloud backup is off. Local encrypted recovery stays on this iPhone."), symbol: "icloud.fill", isEnabled: iCloudBackupEnabled)
-
-                        Text("More privacy tools")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(Color.chillSecondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.top, 14)
-
-                        VStack(spacing: 8) {
-                            PrivacyNavRow(title: String(localized: "Security check"), symbol: "checkmark.shield.fill", tint: Color.chillMint) {
-                                SecurityHealthCheckView()
-                            }
-                            PrivacyNavRow(title: String(localized: "Privacy timeline"), symbol: "clock.badge.checkmark.fill", tint: Color.chillIconTeal) {
-                                PrivacyTimelineView()
-                            }
-                            PrivacyNavRow(title: String(localized: "Recently deleted"), symbol: "trash.circle.fill", tint: Color.chillIconOrange) {
-                                RecentlyDeletedView()
-                            }
-                            PrivacyNavRow(title: String(localized: "Privacy Policy"), symbol: "hand.raised.square.fill", tint: Color.chillIconTeal) {
-                                PrivacyPolicyView()
-                            }
-                            PrivacyNavRow(title: String(localized: "Terms of Use"), symbol: "doc.text.fill", tint: Color.chillIconPurple) {
-                                TermsOfUseView()
-                            }
-                        }
-                    }
-                    .padding(20)
-                    .padding(.bottom, 36)
-                }
-                .scrollIndicators(.hidden)
-            }
-            .navigationTitle(Text(verbatim: ""))
+    private var healthDetail: String {
+        if healthKitAutoSync {
+            return String(localized: "Writes when your nights happened and how long you slept, and nothing else about them. Reads only the categories you allowed.")
         }
+        return healthReads
+            ? String(localized: "Reads only the categories you allowed, and writes nothing.")
+            : String(localized: "Apple Health sync is off.")
     }
-}
 
-private struct PrivacyNavRow<Destination: View>: View {
-    let title: String
-    let symbol: String
-    let tint: Color
-    @ViewBuilder var destination: () -> Destination
+    private var notificationsDetail: String {
+        guard notificationsEnabled else { return String(localized: "Notifications are off, so nothing shows on your Lock Screen.") }
+        return discreetNotifications
+            ? String(localized: "Notifications are on, with discreet lock-screen wording.")
+            : String(localized: "Notifications are on, showing full wording on the lock screen.")
+    }
+
+    private var retentionDetail: String {
+        guard dataRetentionAutomatic, dataRetentionMonths > 0 else {
+            return String(localized: "Off. Everything is kept until you delete it.")
+        }
+        // Formatted by Foundation, so "1 month" and "6 months" are right in every
+        // language without a plural rule in the catalog.
+        let period = DateComponentsFormatter.localizedString(from: DateComponents(month: dataRetentionMonths), unitsStyle: .full)
+            ?? "\(dataRetentionMonths)"
+        return String(localized: "Nights older than \(period) are deleted automatically.")
+    }
 
     var body: some View {
-        // Sub-pages are plain content (no own NavigationStack), so they push
-        // onto the shared More-hub stack and get the native back button and
-        // interactive swipe-back for free.
+        ZStack {
+            DashboardBackdrop()
+
+            ScrollView {
+                VStack(alignment: .leading, spacing: 10) {
+                    PageHeader(
+                        title: String(localized: "Privacy"),
+                        subtitle: String(localized: "Extra protections on: \(protections.onCount) of \(PrivacyProtections.total). Tap anything to change it."),
+                        symbol: "lock.shield.fill",
+                        tint: Color.chillPrimary
+                    )
+
+                    PrivacySectionTitle(String(localized: "Protections"))
+
+                    PrivacyRowContent(
+                        title: String(localized: "File protection"),
+                        detail: String(localized: "While your iPhone is locked, ChillMate's files can't be read."),
+                        symbol: "lock.doc.fill",
+                        state: .always
+                    )
+                    settingsRow(.privacy, title: String(localized: "App lock"), detail: lockStatus, symbol: "faceid", state: .from(protections.appLock))
+                    settingsRow(
+                        .privacy,
+                        title: String(localized: "Second PIN"),
+                        detail: requiresPIN
+                            ? String(localized: "Opens an empty ChillMate, for when someone makes you unlock it.")
+                            : String(localized: "Needs a PIN lock first. Opens an empty ChillMate, for when someone makes you unlock it."),
+                        symbol: "person.badge.shield.checkmark.fill",
+                        state: .from(protections.secondPIN)
+                    )
+                    settingsRow(
+                        .privacy,
+                        title: String(localized: "Hide contents from screenshots"),
+                        detail: String(localized: "Covers ChillMate in the App Switcher and while your screen is recorded or mirrored."),
+                        symbol: "eye.slash.fill",
+                        state: .from(protections.hideFromScreenshots)
+                    )
+                    settingsRow(.notifications, title: String(localized: "Discreet notifications"), detail: notificationsDetail, symbol: "bell.badge.fill", state: .from(protections.quietLockScreen))
+                    settingsRow(
+                        .privacy,
+                        title: String(localized: "Discreet Lock Screen timer"),
+                        detail: discreetLockScreenTimer
+                            ? String(localized: "A running timer says “Timer”, never the substance.")
+                            : String(localized: "A running dose timer shows the substance on your Lock Screen, in the Dynamic Island and on your Apple Watch, where anyone nearby can read it."),
+                        symbol: "lock.iphone",
+                        state: .from(protections.discreetTimer)
+                    )
+
+                    PrivacySectionTitle(String(localized: "Where your data goes"))
+
+                    PrivacyRowContent(
+                        title: String(localized: "Saved on this iPhone"),
+                        detail: String(localized: "Profile, logs, timers, STI tests, plans, risk checks, journal entries, trusted contact, and preferences."),
+                        symbol: "iphone",
+                        state: .always
+                    )
+                    settingsRow(
+                        .iCloud,
+                        title: String(localized: "iCloud sync"),
+                        detail: iCloudSyncOn
+                            ? String(localized: "A copy of everything is kept in your private iCloud.")
+                            : String(localized: "Off. Nothing is copied to iCloud."),
+                        symbol: "arrow.triangle.2.circlepath.icloud",
+                        state: .sharing(iCloudSyncOn)
+                    )
+                    settingsRow(.permissions, title: String(localized: "Apple Health"), detail: healthDetail, symbol: "heart.text.square.fill", state: .sharing(healthKitAutoSync || healthReads))
+                    settingsRow(
+                        .watch,
+                        title: String(localized: "Apple Watch"),
+                        detail: String(localized: "If you pair one: your trusted contact, emergency number, running timers and today's score go straight to it, not through any server."),
+                        symbol: "applewatch",
+                        state: .info
+                    )
+                    settingsRow(
+                        .shortcuts,
+                        title: String(localized: "Siri"),
+                        detail: String(localized: "Siri can say how many nights you logged, never what you logged."),
+                        symbol: "mic.fill",
+                        state: .info
+                    )
+                    systemSettingsRow(
+                        title: String(localized: "Location"),
+                        detail: String(localized: "Only when you ask: to add it to a log, or to put it in a message you are sending."),
+                        symbol: "location.fill"
+                    )
+                    settingsRow(.account, title: String(localized: "Automatic deletion"), detail: retentionDetail, symbol: "clock.arrow.circlepath", state: .from(dataRetentionAutomatic && dataRetentionMonths > 0))
+
+                    PrivacySectionTitle(String(localized: "Recent activity"))
+
+                    PrivacyRowContent(
+                        title: String(localized: "iPhone recovery backup"),
+                        detail: activityDetail(lastOnDeviceRecoveryStatus, fallback: String(localized: "Automatic encrypted snapshot"), at: lastSnapshot),
+                        symbol: "externaldrive.fill.badge.checkmark",
+                        state: .info
+                    )
+                    PrivacyRowContent(
+                        title: String(localized: "Recovery restore"),
+                        detail: activityDetail("", fallback: String(localized: "Recovered after reinstall when available"), at: lastRestore),
+                        symbol: "arrow.counterclockwise.circle.fill",
+                        state: .info
+                    )
+                    PrivacyRowContent(
+                        title: String(localized: "Last opened"),
+                        detail: activityDetail("", fallback: String(localized: "Latest app activity saved locally"), at: lastAppUse),
+                        symbol: "clock.fill",
+                        state: .info
+                    )
+
+                    PrivacySectionTitle(String(localized: "Your data"))
+
+                    linkRow(title: String(localized: "Recently deleted"), symbol: "trash.circle.fill") { RecentlyDeletedView() }
+                    linkRow(title: String(localized: "Export or delete your data"), symbol: "person.crop.circle.badge.xmark") {
+                        SettingsView(showsBackButton: false, openingPage: .account)
+                    }
+                    linkRow(title: String(localized: "Privacy Policy"), symbol: "hand.raised.square.fill") { PrivacyPolicyView() }
+                    linkRow(title: String(localized: "Terms of Use"), symbol: "doc.text.fill") { TermsOfUseView() }
+                }
+                .padding(20)
+                .padding(.bottom, 36)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .navigationTitle(Text(verbatim: ""))
+        .onAppear { hasDuressPIN = LocalSecurityService.hasDuressPIN() }
+    }
+
+    private func activityDetail(_ status: String, fallback: String, at timestamp: Double) -> String {
+        let text = status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? fallback : status
+        guard timestamp > 0 else { return text }
+        let stamp = Date(timeIntervalSince1970: timestamp).formatted(date: .abbreviated, time: .shortened)
+        return String(localized: "\(text) · \(stamp)")
+    }
+
+    private func settingsRow(_ page: SettingsSectionPage, title: String, detail: String, symbol: String, state: PrivacyRowState) -> some View {
+        NavigationLink {
+            SettingsView(showsBackButton: false, openingPage: page)
+        } label: {
+            PrivacyRowContent(title: title, detail: detail, symbol: symbol, state: state, trailing: .chevron)
+        }
+        .buttonStyle(ChillPlainButtonStyle())
+    }
+
+    /// For what only iOS Settings can change: Live Activities and location.
+    private func systemSettingsRow(title: String, detail: String, symbol: String) -> some View {
+        Button {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        } label: {
+            PrivacyRowContent(title: title, detail: detail, symbol: symbol, state: .info, trailing: .external)
+        }
+        .buttonStyle(ChillPlainButtonStyle())
+        .accessibilityHint(Text("Opens iOS Settings"))
+    }
+
+    private func linkRow<Destination: View>(title: String, symbol: String, @ViewBuilder destination: @escaping () -> Destination) -> some View {
         NavigationLink {
             destination()
         } label: {
-            HStack {
-                Label(title, systemImage: symbol)
-                    .font(.headline)
-                    .foregroundStyle(Color.chillText)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-            .padding(16)
-            .contentShape(Rectangle())
-            .glassSurface(radius: 22, tint: tint.opacity(0.12), interactive: true)
+            PrivacyRowContent(title: title, detail: nil, symbol: symbol, state: .info, trailing: .chevron)
         }
         .buttonStyle(ChillPlainButtonStyle())
     }
 }
 
-private struct PrivacyReceiptRow: View {
+private enum PrivacyRowState {
+    /// A protection that is on, off, or cannot be off.
+    case on, off, always
+    /// Data going somewhere, switched on. Shown in a neutral colour rather than
+    /// a protection's green: sharing is a choice, not a score to raise.
+    case sharingOn
+    case info
+
+    static func from(_ isOn: Bool) -> PrivacyRowState { isOn ? .on : .off }
+    static func sharing(_ isOn: Bool) -> PrivacyRowState { isOn ? .sharingOn : .off }
+
+    var label: String? {
+        switch self {
+        case .on, .sharingOn: String(localized: "On")
+        case .off: String(localized: "Off")
+        case .always: String(localized: "Always on")
+        case .info: nil
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .on, .always: Color.chillMint
+        case .off: Color.chillSecondary
+        case .sharingOn, .info: Color.chillPrimary
+        }
+    }
+}
+
+private enum PrivacyRowTrailing {
+    case none, chevron, external
+}
+
+private struct PrivacySectionTitle: View {
     let title: String
-    let detail: String
-    let symbol: String
-    let isEnabled: Bool
+
+    init(_ title: String) { self.title = title }
 
     var body: some View {
-        HStack(alignment: .center, spacing: 10) {
+        Text(title)
+            .font(.caption.weight(.bold))
+            .textCase(.uppercase)
+            .foregroundStyle(Color.chillSecondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.leading, 6)
+            .padding(.top, 14)
+            .accessibilityAddTraits(.isHeader)
+    }
+}
+
+private struct PrivacyRowContent: View {
+    let title: String
+    let detail: String?
+    let symbol: String
+    let state: PrivacyRowState
+    var trailing: PrivacyRowTrailing = .none
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
             Image(systemName: symbol)
                 .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(isEnabled ? Color.chillPrimary : Color.chillSecondary)
+                .foregroundStyle(state.tint)
                 .frame(width: 34, height: 34)
-                .glassSurface(radius: 17, tint: (isEnabled ? Color.chillPrimary : Color.black).opacity(0.10))
+                .glassSurface(radius: 17, tint: state.tint.opacity(0.12))
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(title)
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Color.chillText)
-                Text(detail)
-                    .font(.caption.weight(.semibold))
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(title)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillText)
+                    if let label = state.label {
+                        Text(label)
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(state.tint)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 2)
+                            .background(state.tint.opacity(0.14), in: Capsule())
+                    }
+                }
+                if let detail {
+                    Text(detail)
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.chillSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            Spacer(minLength: 0)
+
+            switch trailing {
+            case .none:
+                EmptyView()
+            case .chevron:
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(Color.chillSecondary)
-                    .chillLineLimit(2, scale: 0.82)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityHidden(true)
+            case .external:
+                Image(systemName: "arrow.up.forward.app")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .accessibilityHidden(true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
-        .glassSurface(radius: 22, tint: .black.opacity(0.04))
+        .contentShape(Rectangle())
+        .glassSurface(radius: 22, tint: .black.opacity(0.04), interactive: trailing != .none)
+        .accessibilityElement(children: .combine)
     }
 }
 

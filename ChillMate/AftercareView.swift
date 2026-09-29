@@ -1,3 +1,4 @@
+import ChillMateCore
 import Foundation
 import StoreKit
 import SwiftData
@@ -181,8 +182,10 @@ private struct AftercareEntryCard: View {
 
         Task {
             do {
-                let end = Calendar.current.date(byAdding: .hour, value: 18, to: entry.endDate) ?? entry.endDate.addingTimeInterval(18 * 60 * 60)
-                let hours = try await services.health.sleepHours(from: entry.endDate, to: end)
+                // The same window the automatic fill reads, so a night gets one
+                // figure whichever of the two finds it first.
+                let window = SleepFill.window(forNightEndingAt: entry.endDate)
+                let hours = try await services.health.sleepHours(from: window.start, to: window.end)
 
                 // HealthKit returns 0 (not an error) when the window has no samples,
                 // which is common for a just-ended or still-ongoing night. Never

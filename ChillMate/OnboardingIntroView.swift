@@ -1204,32 +1204,6 @@ private struct BetaNoticeLine: View {
     }
 }
 
-private struct MiniMetricBubble: View {
-    let title: String
-    let value: String
-    let symbol: String
-    let tint: Color
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Image(systemName: symbol)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(tint)
-            Text(value)
-                .font(.headline.weight(.black))
-                .foregroundStyle(.white)
-            Text(title)
-                .font(.caption2.weight(.bold))
-                .foregroundStyle(.white.opacity(0.70))
-        }
-        .frame(width: 86, height: 86)
-        .background(.white.opacity(0.13), in: Circle())
-        .overlay {
-            Circle().stroke(.white.opacity(0.20), lineWidth: 1)
-        }
-    }
-}
-
 private struct ScoreRing: View {
     let progress: Double
     let tint: Color
@@ -1278,29 +1252,3 @@ private struct TimelinePill: View {
     }
 }
 
-private struct ProfileIntroTile: View {
-    let systemImage: String
-    let title: String
-    let subtitle: String
-    var body: some View {
-        HStack(alignment: .top, spacing: 14) {
-            ProfileSetupIcon(systemImage: systemImage)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
-
-                Text(subtitle)
-                    .font(.footnote)
-                    .lineSpacing(2)
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(16)
-        .glassSurface(radius: 28, tint: .black.opacity(0.04), interactive: true)
-    }
-}

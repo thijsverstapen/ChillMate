@@ -7,7 +7,6 @@ import UIKit
 struct AppLockView<Content: View>: View {
     @AppStorage(DefaultsKey.requiresFaceID) private var requiresFaceID = false
     @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
-    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
     @AppStorage(DefaultsKey.autoLockMinutes) private var autoLockMinutes = 0
     @AppStorage(DefaultsKey.screenPrivacyEnabled) private var screenPrivacyEnabled = true
     @Environment(\.scenePhase) private var scenePhase
@@ -49,6 +48,9 @@ struct AppLockView<Content: View>: View {
                 .opacity(!lockRequired || isUnlocked ? 1 : 0)
                 .allowsHitTesting(!lockRequired || isUnlocked)
                 .accessibilityHidden(lockRequired && !isUnlocked)
+                // The content stays in the hierarchy while locked, so anything
+                // it presented would appear over the lock. This lets it wait.
+                .environment(\.appContentIsVisible, !lockRequired || isUnlocked)
 
             if lockRequired && !isUnlocked {
                 LockScreen(
@@ -70,9 +72,7 @@ struct AppLockView<Content: View>: View {
         }
         .animation(.easeInOut(duration: 0.18), value: showPrivacyCover)
         .task {
-            if localEncryptionEnabled {
-                LocalSecurityService.applyFileProtection()
-            }
+            LocalSecurityService.applyFileProtection()
 
             isScreenCaptured = screenIsCaptured()
 
@@ -729,3 +729,11 @@ private extension UInt8 {
         return String([digits[Int(self >> 4)], digits[Int(self & 0x0F)]])
     }
 }
+
+extension EnvironmentValues {
+    /// False while the app lock covers the content. The content is kept alive
+    /// underneath, so a sheet it presented would open on top of the lock screen;
+    /// something that presents on its own, like What's New, waits for this.
+    @Entry var appContentIsVisible: Bool = true
+}
+

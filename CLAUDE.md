@@ -101,8 +101,9 @@ command with `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`.
 
 ## Conventions the CI gates enforce
 
-Run `python3 scripts/check_localization.py` and `python3 scripts/check_defaults_keys.py`
-before pushing. They take seconds and are the first CI job.
+Run `python3 scripts/check_localization.py`, `python3 scripts/check_defaults_keys.py`
+and `python3 scripts/check_orphan_views.py` before pushing. They take seconds and
+are the first CI job.
 
 - **Every user-facing string is localized into all five languages.** Adding a
   `String(localized:)` means adding the key to `ChillMate/Localizable.xcstrings` with
@@ -115,11 +116,26 @@ before pushing. They take seconds and are the first CI job.
   nesting are handled; it checks every literal in a labelled control's first
   argument, so a ternary cannot hide one; it covers App Intents, widget gallery
   names and all four product targets; it refuses a bare literal assigned to
-  anything named like something a person reads; it refuses an English sentence
+  anything named like something a person reads; it refuses an English-looking
+  literal in a ternary or `??` branch, or handed to a `title:`, `detail:`,
+  `value:` or similar argument, outside `String(localized:)` — a plain `String`
+  parameter is invisible to every other rule; it refuses an English sentence
   anywhere in `NotificationService.swift` outside `String(localized:)`; and it
   refuses `.rawValue` in a position a person will read, where
   `localizedDisplayName` is meant. Each of those rules exists because a string
   shipped in English through that exact hole.
+
+  A timer's `substanceName` is the raw value, which is English. What a person
+  reads is `localizedSubstanceName`.
+
+  **Reusing an existing key means reading its translations, not just its
+  spelling.** The gate checks that a literal has a key and that the key has all
+  five languages. It cannot check that the key means the same thing in your
+  context. `Select %@` is fully translated and its Spanish is `Seleccionar a %@`
+  — the personal *a*, because it was written for choosing a contact. Reused for
+  a list of substances it reads "Seleccionar a Alcohol". A green gate on a reused
+  key proves the key exists, nothing more; open the catalog and read the four
+  translations before borrowing one.
 
   **The key order in the catalog is Xcode's, and nothing else may re-sort it.**
   Xcode collates the way a person reads — punctuation and accents near the
@@ -132,11 +148,18 @@ before pushing. They take seconds and are the first CI job.
   preserve its order.
 - **Every `UserDefaults` key lives in `DefaultsKey`** (`ChillMate/DefaultsKeys.swift`).
   No string literals at call sites.
+- **Every view is on a screen.** `check_orphan_views.py` refuses a SwiftUI
+  view referenced nowhere. A view that computes the right thing and is shown to
+  nobody passes every test there is — `JournalNightDraftCard` was an entire
+  5.1.0 feature, tested and translated, on no screen, and was found only by
+  running the app. The allowlist in the script is empty since 5.1.0, when the
+  fifteen older orphans were deleted; keep it that way, and never add to it
+  without a reason written beside the name.
 - **No build artifacts tracked.** `DerivedData/`, `build/` and `*.log` are ignored.
 
 ## Tests
 
-619 unit tests. CI runs the whole suite once per language, so an assertion that only
+About 790 unit tests. CI runs the whole suite once per language, so an assertion that only
 holds in English fails four times over.
 
 - **Never assert an English literal against localized output.** Name the line through
@@ -160,10 +183,10 @@ holds in English fails four times over.
 
 ## Services
 
-Seven things ChillMate talks to that are not itself: notifications, Apple Health,
-the watch, iCloud backups, the encrypted archive, Spotlight and location. They
-are still singletons and still do the work; nothing outside `ChillMate/Services.swift`
-says their names.
+Six things ChillMate talks to that are not itself: notifications, Apple Health,
+the watch, the encrypted archive, Spotlight and location. (There was a seventh,
+the iCloud Drive backup, until 5.1.0 removed it.) They are still singletons and
+still do the work; nothing outside `ChillMate/Services.swift` says their names.
 
 - Each has a protocol covering **exactly the members the app uses**. A protocol
   as wide as the class would be a second copy of it to keep in step.
@@ -204,7 +227,19 @@ children, and guards against a sync race. Follow its shape.
 5. **Remember the backups.** `EncryptedBackupService` writes a versioned payload, so a
    schema change means a restore path for the old shape too. A backup taken on the
    previous version has to keep restoring.
-6. **The watch and the widgets read the same container.** A schema change is not done
+6. **An index is not a migration, and `#Index` alone never reaches an existing
+   store.** On a fresh store it creates the index; on one that already exists it
+   does nothing, because Core Data does not count an index-only change as a model
+   change and never migrates. `StoreIndexRepair` closes that gap: before the
+   container opens the store, it builds a throwaway fresh store, takes the
+   `#Index` indexes Core Data gave it, and adds whichever the real store lacks,
+   under the same names. Checked by installing 5.0.0, logging a night and a
+   profile, and installing the repair over it: all eight date indexes added, Core
+   Data's own eleven untouched, rows byte-identical, integrity check clean, and a
+   second launch changed nothing. **Adding, removing or changing an `#Index`
+   means bumping `StoreIndexRepair.revision`**, and `StoreIndexRepairTests` fails
+   until the revision and its list of index names agree.
+7. **The watch and the widgets read the same container.** A schema change is not done
    until they build against it.
 
 ## The backup key
@@ -216,13 +251,16 @@ full lifecycle in its doc comment.
 
 Two consequences that are easy to forget and expensive to rediscover:
 
-- **`ThisDeviceOnly` keeps the key out of iCloud Keychain**, so an encrypted
-  backup can only be opened by the device that made it. The iCloud Drive file
-  survives deleting the app or wiping and restoring *this* phone; it does not
-  carry history to a *new* phone. Making it portable means a passphrase, which
-  means a key a person can forget. That is a product decision.
-- **Deleting the app destroys the key**, and with it every backup ever written,
-  including the ones sitting in iCloud Drive.
+- **`ThisDeviceOnly` keeps the key out of iCloud Keychain**, so an exported
+  backup file and the on-device recovery snapshot can only be opened by the
+  device that made them. They never carry history to a *new* phone; iCloud sync
+  does that. Making the file portable means a passphrase, which means a key a
+  person can forget. That is a product decision.
+- **Deleting the app destroys the key**, and with it every backup ever written.
+- **There is no iCloud Drive backup any more.** It had the same device-only key
+  and said nothing about it, next to an iCloud sync switch that sounded alike.
+  5.1.0 removed it; `LegacyICloudBackupFiles` deletes the files it left behind,
+  once, and `CloudDocuments` stays in the entitlements only so that can happen.
 
 ## Releasing
 
@@ -232,6 +270,14 @@ number already uploaded to App Store Connect is spent even if the upload was wro
 
 Release notes live in `Marketing/ReleaseNotes-<version>.md`, written in all five
 languages, user-facing and specific: what changed and why it matters, not a changelog.
+
+Every release also gets an entry in `ChillMate/WhatsNew.swift`: the page shown
+once to somebody who updated, never to a new install. `WhatsNewTests` fails
+while the app's `MARKETING_VERSION` has none, so bumping the version without one
+is caught before it ships. It is shorter than the release notes and plainer
+still, at most six items of a title and a sentence or two each, in words
+somebody who has never seen the code would use. The same rule about medical
+content holds here as everywhere else.
 
 ## Commit messages
 

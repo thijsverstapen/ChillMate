@@ -27,6 +27,24 @@ struct CombinationRiskCheckerView: View {
         return selectable.filter { $0.matches(substanceSearch) || selectedSubstances.contains($0) }
     }
 
+    /// What the typed text reads as, when it reads as a sentence rather than the
+    /// start of one substance's name.
+    ///
+    /// The field was only ever a filter: typing "beers and ket" narrowed the grid
+    /// to nothing, because no single substance is named that. The moment somebody
+    /// most wants this screen is the moment they are least able to tap through a
+    /// grid, and a sentence is what they will type.
+    ///
+    /// The reading is offered, never applied. `CombinationPhrase` chooses only
+    /// among substances the app already knows, and the rating still comes from
+    /// the table exactly as it would from taps.
+    private var phraseSuggestion: [Substance] {
+        let reading = CombinationPhrase.read(substanceSearch).substances
+        guard reading.count > 1 || (reading.count == 1 && !matchingSubstances.isEmpty) else { return [] }
+        guard !Set(reading).isSubset(of: selectedSubstances) else { return [] }
+        return reading
+    }
+
     private var assessment: CombinationAssessment {
         CombinationAssessment(
             substances: Array(selectedSubstances),
@@ -62,6 +80,11 @@ struct CombinationRiskCheckerView: View {
         parts.append("works \(medicationEffectHours.formatted(.number.precision(.fractionLength(0...1)))) h")
         return parts.joined(separator: " • ")
     }
+
+    /// Written out so that constructing this view does not make every call site
+    /// resolve the synthesized initializer, which with this many property
+    /// wrappers is slow to type-check. See `LogNightSheet.init()`.
+    init() {}
 
     var body: some View {
         Group {
@@ -235,7 +258,28 @@ struct CombinationRiskCheckerView: View {
                 .padding(12)
                 .glassSurface(radius: 16, tint: .black.opacity(0.04), interactive: true)
 
-                if matchingSubstances.isEmpty {
+                if !phraseSuggestion.isEmpty {
+                    Button {
+                        for substance in phraseSuggestion {
+                            selectedSubstances.insert(substance)
+                        }
+                        substanceSearch = ""
+                    } label: {
+                        Label(
+                            // A key of its own, not the existing "Select %@". That one's Spanish is
+                            // "Seleccionar a %@" — the personal a, because it was written for
+                            // choosing a contact. Reused here it would say "Seleccionar a Alcohol".
+                            String(localized: "Add these: \(phraseSuggestion.map(\.localizedDisplayName).formatted(.list(type: .and)))"),
+                            systemImage: "text.badge.plus"
+                        )
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color.chillPrimary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .buttonStyle(ChillPlainButtonStyle())
+                }
+
+                if matchingSubstances.isEmpty && phraseSuggestion.isEmpty {
                     Text("Nothing matches that. It may still be worth checking the two you do know.")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(Color.chillSecondary)
@@ -359,8 +403,12 @@ private struct RiskCheckRecordCard: View {
 
                 Button(role: .destructive) {
                     RecentlyDeletedStore.record(
-                        kind: "Risk check",
-                        title: record.substanceNames.isEmpty ? "Medication risk check" : record.substanceNames.joined(separator: ", "),
+                        kind: .riskCheck,
+                        title: record.substanceNames.isEmpty
+                            ? String(localized: "Medication risk check")
+                            : record.substanceNames
+                                .map { Substance(rawValue: $0)?.localizedDisplayName ?? $0 }
+                                .joined(separator: ", "),
                         detail: record.createdAt.formatted(date: .abbreviated, time: .shortened)
                     )
                     modelContext.delete(record)
@@ -459,7 +507,7 @@ private struct RiskAssessmentPanel: View {
                         RiskWarningLine(finding: finding)
                     }
 
-                    Text("If someone is unconscious, very confused, overheating, having chest pain, breathing oddly, or cannot be woken: call 112.")
+                    Text("If someone is unconscious, very confused, overheating, having chest pain, breathing oddly, or cannot be woken: call \(EmergencyContactInfo.number).")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.red)
                         .fixedSize(horizontal: false, vertical: true)
@@ -580,6 +628,20 @@ private struct RiskWarningLine: View {
                 .font(.callout)
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
+
+            // Where this row's rating comes from. Without it every warning
+            // carries the same apparent authority, and they do not all rest on
+            // the same thing: some match a published chart, some sit
+            // deliberately above it, and the ones involving poppers or
+            // sildenafil are not on it at all. Absent on the preset lines,
+            // which are ChillMate's own wording for a hazard the chart does not
+            // describe.
+            if let corroboration = finding.corroboration {
+                Label(corroboration.label, systemImage: corroboration.symbol)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary.opacity(0.75))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         // The badge and the sentence were two elements, so VoiceOver read the
         // severity as a stray phrase before an unrelated warning, and swiping
@@ -591,9 +653,20 @@ private struct RiskWarningLine: View {
         .accessibilityLabel(accessibilityDescription)
     }
 
+    /// The row reads as one element, so the provenance has to be part of that
+    /// sentence or it does not exist for anyone using VoiceOver — and the
+    /// provenance is the part that says how much weight to give the warning.
     private var accessibilityDescription: String {
-        guard let level = finding.level else { return finding.text }
-        return "\(level.label): \(finding.text)"
+        var parts: [String] = []
+        if let level = finding.level {
+            parts.append("\(level.label): \(finding.text)")
+        } else {
+            parts.append(finding.text)
+        }
+        if let corroboration = finding.corroboration {
+            parts.append(corroboration.label)
+        }
+        return parts.joined(separator: ". ")
     }
 }
 

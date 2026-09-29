@@ -24,8 +24,6 @@ struct ServicesTests {
         func sendActiveTimers(_ timers: [DrugDoseTimerRecord]) { sentTimers.append(timers) }
         func sendSettings() { settingsPushes += 1 }
         func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool) {}
-        func sendLatestHeartRate(_ value: Double?) {}
-        func sendLatestHRV(_ value: Double?) {}
         func syncStandaloneState() {}
     }
 
@@ -64,7 +62,13 @@ struct ServicesTests {
         let watch = RecordingWatch()
         let services = services(watch: watch)
         #expect(services.watch is RecordingWatch)
-        #expect(!(services.notifications is RecordingWatch))
+        // Spelled as the type it should still be, not as the type it should not
+        // be. `!(services.notifications is RecordingWatch)` was the previous
+        // assertion, and RecordingWatch only conforms to WatchRelaying, so that
+        // cast was statically always false and the negation always true: the
+        // line could not fail whatever the composition root did. The compiler
+        // had been saying so as a warning the whole time.
+        #expect(services.notifications is NotificationService)
     }
 
     /// `Services.live` is the only place the concrete types are named, and it
@@ -75,7 +79,6 @@ struct ServicesTests {
         #expect(services.notifications is NotificationService)
         #expect(services.health is HealthKitService)
         #expect(services.watch is WatchConnectivityService)
-        #expect(services.cloudBackups is ICloudBackupService)
         #expect(services.encryptedBackups is EncryptedBackupService)
         #expect(services.spotlight is SpotlightService)
         #expect(services.location is LocationLookupService)

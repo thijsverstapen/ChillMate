@@ -28,6 +28,59 @@ enum OnDeviceAffirmationService {
         #endif
     }
 
+    /// Why the on-device model is not available, when it is not.
+    ///
+    /// The weekly reflection's written summary simply disappeared when the model
+    /// was unavailable, which reads as a section that does not exist rather than
+    /// one that could. Two of the three reasons are things the reader can act on,
+    /// and the third is worth knowing rather than guessing at.
+    enum Absence {
+        /// The hardware cannot run Apple Intelligence.
+        case deviceNotEligible
+        /// The hardware can, and it is switched off.
+        case notEnabled
+        /// On its way: downloading, or warming up.
+        case modelNotReady
+        /// No FoundationModels at all, which is every build below iOS 26.
+        case unsupported
+
+        /// One sentence, in the reader's language, saying what is true and — when
+        /// there is one — what they could do about it.
+        var explanation: String {
+            switch self {
+            case .deviceNotEligible:
+                String(localized: "This device cannot run Apple Intelligence, so there is no written summary here. Everything else on this page still works.")
+            case .notEnabled:
+                String(localized: "Turn on Apple Intelligence in your device settings and a short written summary will appear here.")
+            case .modelNotReady:
+                String(localized: "Apple Intelligence is still getting ready. The written summary will appear once it is.")
+            case .unsupported:
+                String(localized: "A written summary is not available on this device. Everything else on this page still works.")
+            }
+        }
+    }
+
+    /// Nil when the model is ready to generate.
+    static var absence: Absence? {
+        #if canImport(FoundationModels)
+        switch SystemLanguageModel.default.availability {
+        case .available:
+            return nil
+        case .unavailable(let reason):
+            switch reason {
+            case .deviceNotEligible: return .deviceNotEligible
+            case .appleIntelligenceNotEnabled: return .notEnabled
+            case .modelNotReady: return .modelNotReady
+            // A reason added by a later OS is still an absence, and saying the
+            // neutral thing beats saying nothing or guessing wrong.
+            @unknown default: return .unsupported
+            }
+        }
+        #else
+        return .unsupported
+        #endif
+    }
+
     /// Generates up to `count` fresh affirmations on-device.
     ///
     /// Returns `nil` (not an empty array) when the model is unavailable or

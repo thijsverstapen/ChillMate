@@ -35,7 +35,6 @@ enum DefaultsKey {
     static let duressModeActive = "duressModeActive"
     static let requiresPIN = "requiresPIN"
     static let autoLockMinutes = "autoLockMinutes"
-    static let localEncryptionEnabled = "localEncryptionEnabled"
     static let screenPrivacyEnabled = "screenPrivacyEnabled"
     static let pinFailedAttempts = "pinFailedAttempts"
     static let pinLockoutUntil = "pinLockoutUntil"
@@ -71,9 +70,18 @@ enum DefaultsKey {
     static let healthKitSleepReadWriteEnabled = "healthKitSleepReadWriteEnabled"
     static let healthKitHeartRateReadEnabled = "healthKitHeartRateReadEnabled"
     static let healthKitHRVReadEnabled = "healthKitHRVReadEnabled"
-    static let healthKitWorkoutReadEnabled = "healthKitWorkoutReadEnabled"
-    static let healthKitVitalsReadEnabled = "healthKitVitalsReadEnabled"
     static let healthKitMindfulWriteEnabled = "healthKitMindfulWriteEnabled"
+
+    /// Set once every sample an earlier version wrote into Apple Health with the
+    /// night's details in its metadata has been replaced. See `HealthLegacyCleanup`.
+    static let healthLegacyMetadataRemoved = "healthLegacyMetadataRemoved"
+
+    /// Set once Spotlight has confirmed that every journal entry earlier versions
+    /// indexed is gone. See `SpotlightService.removeJournalIndexIfNeeded`.
+    static let spotlightJournalRemoved = "spotlightJournalRemoved"
+
+    /// The `StoreIndexRepair.revision` whose indexes this install's store has.
+    static let storeIndexRevision = "storeIndexRevision"
     static let lastKnownHRVms = "lastKnownHRVms"
     static let lastDailyRecoveryScore = "lastDailyRecoveryScore"
     static let reductionGoalSessions = "reductionGoalSessions"
@@ -99,10 +107,23 @@ enum DefaultsKey {
     static let trustedContactMessage = "trustedContactMessage"
 
     // MARK: Backup & recovery
-    static let iCloudBackupEnabled = "iCloudBackupEnabled"
-    static let lastICloudBackupTimestamp = "lastICloudBackupTimestamp"
-    static let lastICloudRestoreTimestamp = "lastICloudRestoreTimestamp"
-    static let lastICloudBackupStatus = "lastICloudBackupStatus"
+    /// "on" or "off", or absent on an install from before 5.1.0 that has not
+    /// been asked. See `ICloudSyncPreference`.
+    static let iCloudSyncChoice = "iCloudSyncChoice"
+
+    /// The encrypted iCloud Drive backup, removed in 5.1.0. Read once by
+    /// `LegacyICloudBackupFiles` to decide whether there are files to delete,
+    /// then removed.
+    static let legacyICloudBackupEnabled = "iCloudBackupEnabled"
+    static let legacyLastICloudBackupTimestamp = "lastICloudBackupTimestamp"
+    static let legacyICloudBackupKeys = [
+        legacyICloudBackupEnabled,
+        legacyLastICloudBackupTimestamp,
+        "lastICloudRestoreTimestamp",
+        "lastICloudBackupStatus"
+    ]
+    /// Set once the files that backup wrote are gone.
+    static let legacyICloudBackupsRemoved = "legacyICloudBackupsRemoved"
     static let lastOnDeviceRecoveryStatus = "lastOnDeviceRecoveryStatus"
     static let lastOnDeviceRecoverySnapshotTimestamp = "lastOnDeviceRecoverySnapshotTimestamp"
     static let lastOnDeviceRecoveryRestoreTimestamp = "lastOnDeviceRecoveryRestoreTimestamp"
@@ -161,6 +182,9 @@ enum DefaultsKey {
     static let onboardingSwipeHintShown = "onboardingSwipeHintShown"
     static let locationServicesChecked = "locationServicesChecked"
     static let lastSelectedTab = "lastSelectedTab"
+    /// The version whose What's New page was last shown or skipped. Set to the
+    /// current version when setup finishes, so a new install is not shown news.
+    static let whatsNewSeenVersion = "whatsNewSeenVersion"
 
     /// Set by the Focus filter when a Focus the user has configured for going out
     /// is active. Read by Home to lead with the during-session tools.
@@ -175,7 +199,6 @@ enum DefaultsKey {
     // MARK: Misc settings
     static let healthKitSexualActivityWriteEnabled = "healthKitSexualActivityWriteEnabled"
     static let stiReminderMonths = "stiReminderMonths"
-    static let watchStressAndTemperatureDetection = "watchStressAndTemperatureDetection"
     static let recentlyDeletedItems = "recentlyDeletedItems"
 
     // MARK: Language

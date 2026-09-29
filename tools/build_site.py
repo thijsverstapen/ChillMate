@@ -613,8 +613,7 @@ SHOTS = ["home.jpg", "risk.jpg", "help.jpg", "support.jpg", "privacy.jpg"]
 
 
 def watch(depth):
-    alt = ("The watch app's Safety screen, offering an emergency call and a way "
-           "to ping your phone.")
+    alt = "The watch app's Safety screen, with a one-tap call to emergency services."
     return f"""<div class="watch">
         <div class="watch-shell">
           <div class="watch-screen">
@@ -1319,10 +1318,10 @@ def build_privacy():
           <tr><th scope="col">What</th><th scope="col">Goes where</th><th scope="col">When</th></tr>
         </thead>
         <tbody>
-          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn iCloud on. Apple holds it, and I cannot read it.</td></tr>
-          <tr><td>Encrypted backup file</td><td>Your own iCloud Drive</td><td>Only if you turn backups on, or export a file yourself.</td></tr>
+          <tr><td>iCloud sync (CloudKit)</td><td>Your own private iCloud database</td><td>Only if you turn on iCloud sync in ChillMate's settings. Apple holds it, and I cannot read it.</td></tr>
+          <tr><td>Encrypted backup file</td><td>Wherever you save it</td><td>Only if you export one yourself. Only the iPhone that made it can open it.</td></tr>
           <tr><td>Apple Watch mirror</td><td>Your own watch, directly</td><td>If you pair a watch. Device to device, over Watch Connectivity.</td></tr>
-          <tr><td>Apple Health</td><td>Stays on the device</td><td>Only the categories you approve. HealthKit is local storage, not a service.</td></tr>
+          <tr><td>Apple Health</td><td>Apple Health on your iPhone</td><td>Only the categories you approve. ChillMate writes when a night happened and how long you slept, never what you took or what you wrote.</td></tr>
           <tr><td>An optional donation</td><td>Apple's In-App Purchase</td><td>Only if you tap it. Apple takes the payment, and I never see card details.</td></tr>
           <tr><td>A link you tap</td><td>Safari, to that site</td><td>Only on your tap. ChillMate does not fetch those pages itself.</td></tr>
           <tr><td>A call or message you send</td><td>Your phone app, your messages app</td><td>Only on your tap, and you see the message before it goes.</td></tr>
@@ -1382,7 +1381,7 @@ def build_privacy():
     <h2 id="threat">{icon("hand", style="color:var(--amber)")}What this is really designed&nbsp;against
       <a class="anchor" href="#threat" aria-label="Link to this section">#</a></h2>
     <p>Most privacy pages talk about breaches and hackers. For an app like this, the realistic risk is closer to home: <strong>someone picking up your unlocked phone.</strong> A partner, a housemate, a family member, a colleague glancing at a notification.</p>
-    <p>So the app has its own Face ID or PIN lock, on top of the phone's. Notifications can be worded so the lock screen says nothing revealing. One tap blanks the screen to a moon. And ChillMate hides what is on screen when you swap apps, and while your screen is being recorded or mirrored.</p>
+    <p>So the app has its own Face ID or PIN lock, on top of the phone's. Notifications can be worded so the lock screen says nothing revealing, and a running timer can say just “Timer” there and on your Apple Watch. One tap blanks the screen to a moon. And ChillMate hides what is on screen when you swap apps, and while your screen is being recorded or mirrored.</p>
     <p>Having no server has a useful side effect. If I were breached, nothing about you would come out, because I hold nothing. The trade is worth saying out loud: if you lose the phone and have no backup, the data is gone. That is deliberate, and it is why an encrypted backup is one setting away.</p>
   </div>
 
@@ -1415,7 +1414,7 @@ def build_privacy():
     <ul>
       <li>Your profile, photo, medication notes, trusted contact, home address, settings, and preferences.</li>
       <li>Private logs, sleep notes, health-related entries and test reminders, plans, journal entries, check-ins, and emergency-card details.</li>
-      <li>Optional information you choose to add from Apple Health, Contacts, Photos, or Location Services.</li>
+      <li>Sleep, resting heart rate and HRV from Apple Health if you turn them on, and anything you choose to add from Contacts, Photos, or Location Services.</li>
     </ul>
     <p>Some of the entries you choose to add are health-related and sensitive. They are stored only on your device, under your control.</p>
   </div>
@@ -1424,7 +1423,7 @@ def build_privacy():
     <h2 id="use">{icon("lock", style="color:var(--purple)")}How your information is&nbsp;used</h2>
     <ul>
       <li>To show your private overview, reminders, follow-ups, emergency shortcuts, and wellbeing reflections.</li>
-      <li>To sync with Apple Health only for the categories you approve in iOS settings.</li>
+      <li>To sync with Apple Health only for the categories you approve. What goes to Apple Health is when a night happened and how long you slept, never what you took or what you wrote.</li>
       <li>To create encrypted backups only when you turn backup features on.</li>
     </ul>
     <p>All of this happens on your phone. ChillMate never sends what you write to me.</p>
@@ -1442,13 +1441,17 @@ def build_privacy():
   <div class="card">
     <h2 id="where">{icon("cloud", style="color:var(--amber)")}Where your data is&nbsp;stored</h2>
     <p><strong>On your iPhone.</strong> Data is kept in the app's private storage, protected by iOS file protection and, if you enable it, an extra app lock (Face ID or PIN).</p>
-    <p><strong>Optional iCloud.</strong> If you turn on iCloud backup or sync, ChillMate stores your data in <em>your own</em> private iCloud account through Apple's CloudKit and iCloud Drive. Apple encrypts it, and only you can reach it. I have no access to it at all.</p>
+    <p><strong>Not in iPhone search.</strong> Until version 5.1.0, saving a journal entry also put its text into iPhone search. Anyone holding your unlocked phone could read it there without getting past the app lock. ChillMate no longer does this, and 5.1.0 removes what was already there.</p>
+    <p><strong>Optional iCloud.</strong> iCloud sync is off unless you turn it on. It keeps a copy of your data in <em>your own</em> private iCloud account through Apple's CloudKit, so your history can move to a new iPhone. Unless you have turned on Apple's Advanced Data Protection, Apple holds the keys to that copy. I have no access to it at all.</p>
+    <p><strong>No more iCloud Drive backup.</strong> Until version 5.1.0 there was also an encrypted backup to iCloud Drive. Its key never left the phone that made it, so it could never move your history to a new phone, which is what most people would expect a backup to do. 5.1.0 removes it, and deletes the backup files it left in your iCloud Drive. An encrypted backup file you export yourself still works the same way: only the iPhone that made it can open it.</p>
+    <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, iCloud sync was on for everyone signed into iCloud, without asking, while this page described it as something you turn on. That was wrong. If you used ChillMate before 5.1.0, the app now asks you once whether to keep the iCloud copy, and new installs start with it off. Turning it off stops new copies but does not delete the one already there. You can remove that in iOS Settings, under your iCloud storage.</p>
     <p><strong>No servers of mine.</strong> There is no ChillMate server anywhere that receives or stores your personal information.</p>
   </div>
 
   <div class="card">
     <h2 id="watch">{icon("watch", style="color:var(--mint)")}Apple&nbsp;Watch</h2>
     <p>If you pair an Apple Watch, ChillMate copies part of your data to it, so the watch still works when your phone is out of reach. That means your streak and daily score, any running dose timers, your watch settings, your emergency number, and the <strong>name and phone number of your trusted contact</strong>, so the watch can call them without your phone.</p>
+    <p>If you allow it, the watch app also reads your heart rate from the watch's own sensor, only while it is open with heart-rate warnings on, to show it on its heart-rate card. That reading stays on the watch. It is not stored, and it is not sent to your phone.</p>
     <p>This goes straight between your phone and your watch, on your own two devices. It does not pass through my servers, because there are none.</p>
     <p>Two things worth knowing. Your trusted contact's details belong to somebody else, and they end up on a second device, so only add someone who would be comfortable with that. And ChillMate's app lock protects the <em>phone</em> app. On the watch, your watch passcode and wrist detection do that job instead.</p>
     <p>Clearing your trusted contact in Settings, or unpairing the watch, removes this mirrored data.</p>
@@ -1458,12 +1461,14 @@ def build_privacy():
     <h2 id="permissions">{icon("shield", style="color:var(--primary)")}Device&nbsp;permissions</h2>
     <p>Each permission is optional and only used for the purpose you grant it:</p>
     <ul>
-      <li><strong>Apple Health.</strong> Read and write only the categories you allow (such as sleep, heart rate, HRV, and workouts).</li>
+      <li><strong>Apple Health.</strong> Only the categories you allow. ChillMate reads your sleep to fill in how long you slept after a night, and resting heart rate and HRV for your recovery score. On Apple Watch, it reads your heart rate from the watch's own sensor, as described above. It writes when a night happened, how long you slept, breathing sessions, and your aftercare mood.</li>
       <li><strong>Contacts.</strong> Only to let you pick a trusted contact. The lookup happens on your device.</li>
       <li><strong>Photos.</strong> Only to set a profile picture you choose.</li>
       <li><strong>Location.</strong> Only to attach a location to a log or include your current location in an emergency message you send.</li>
       <li><strong>Notifications.</strong> For the reminders and check-ins you turn on. Discreet wording can be enabled so lock-screen text stays vague.</li>
     </ul>
+    <p><strong>What changed in 5.1.0.</strong> Before version 5.1.0, each night ChillMate wrote to Apple Health also carried what you took, whether a condom was used, whether you were penetrated, and your note. Other apps allowed to read your sleep or sexual activity could read those too, and so could Health's own export. That was wrong. ChillMate no longer writes them, and 5.1.0 swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Apple Health, it cannot reach those entries. You can delete everything ChillMate wrote from the Health app, where it lists ChillMate among your apps.</p>
+    <p>5.1.0 also asks for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote. The phone no longer reads your heart rate either, now that the watch reads it from its own sensor.</p>
   </div>
 
   <div class="card">
@@ -1475,7 +1480,7 @@ def build_privacy():
     <h2 id="control">{icon("lock", style="color:var(--purple)")}Your control and&nbsp;deletion</h2>
     <ul>
       <li>You can delete logs, plans, reminders, timers, journal entries, and your whole account from inside the app.</li>
-      <li>Deleting the app removes its local data from your iPhone. iCloud data can be removed from iCloud settings or from within the app's backup controls.</li>
+      <li>Deleting the app removes its local data from your iPhone. The iCloud sync copy can be removed in iOS Settings, under your iCloud storage, and backup files from the app's backup controls.</li>
       <li>iOS permission controls for Health, Location, Notifications, Contacts, and Photos remain available in the Settings app at any time.</li>
     </ul>
     <p>Because ChillMate does not collect your data on a server, there is no remote profile to ask for, correct, or erase. You already hold all of it. If you are in the EU or EEA, your GDPR rights (access, correction, erasure, portability, objection) are met directly by these controls on your phone.</p>
@@ -1670,6 +1675,42 @@ def build_privacy_nl():
 
 
 RELEASES = [
+    ("5.1.0", "510", "2026-09-25", "September 2026", "The app reads what you wrote, and iCloud becomes your choice", [
+        "iCloud sync is now something you choose. Until this version, anyone signed into iCloud had a copy of their ChillMate data kept in their private iCloud database from the first launch, without being asked. All the while, the app, its onboarding and this site described it as something you turn on. It was your own iCloud and I could never read it, but that was wrong. New installs now start with it off. If you used ChillMate before, it asks you once, before it opens, whether to keep that copy; turning it off stops new copies but does not delete the one already in iCloud, which you can remove in iOS Settings. The Privacy screen now shows it as its own line, and the privacy page says what changed.",
+        "Nights written to Apple Health no longer carry anything about the night. Until this version, every sleep and sexual-activity entry ChillMate wrote there also carried what you took, whether a condom was used, whether you were penetrated, and your note. Any app allowed to read that part of Health could read them, and Health's own export included them. This version stops writing them, and swaps every entry it wrote for a copy without them. If you have turned off ChillMate's access to Health, it cannot reach those entries, and the privacy page says how to delete them yourself.",
+        "ChillMate asks Apple Health for less. It no longer asks to read workouts or breathing rate, which it never used, or to write heart rate, HRV or workouts, which it never wrote. On the phone it no longer reads heart rate either, because the watch now reads that from its own sensor: the Heart rate switch reads resting heart rate, for the recovery score, and nothing else. Breathing sessions from panic support have a switch at last, so they can reach Health at all.",
+        "Sleep fills itself in. ChillMate used to read your sleep only at the moment you saved a night, which is usually before you have slept. It now looks again once you are up, and whenever you open the app, and it never overwrites a number you typed. A night recorded by both a watch and a sleep app used to count twice; it counts once now.",
+        "Sleep you type in is written to Apple Health only when nothing else recorded that night, so a watch's record no longer gets a second copy beside it.",
+        "Journal entries no longer go into iPhone search. Until this version, saving one put its text in the system's search index, where anyone holding the unlocked phone could read it without getting past ChillMate's Face ID or PIN. Deleting everything in the app left it there. This version removes what was indexed.",
+        "The encrypted iCloud Drive backup is gone. Its key never left the phone that made it, so it could never bring your history to a new phone, which is what most people expect a backup to do, and nothing in the app said so. iCloud sync is the one iCloud switch now, and setting up ChillMate offers it to bring your history back. The backup files it left in your iCloud Drive are deleted.",
+        "Fixed: with iCloud sync on, changes from your other devices arrived late. The app only listened for iCloud's change notices when the old backup was switched on, which is a different feature.",
+        "Privacy is one screen instead of five: what protects your data, where it goes, and what happened lately. Each line opens the setting that changes it. A new setting has a running dose timer say “Timer” instead of the substance on the Lock Screen, in the Dynamic Island and on the Apple Watch. It starts on for anyone who had already chosen discreet notifications.",
+        "The Security check this replaces counted Apple Health sync and the iCloud backup as protections, and told you to switch on whatever was off. It counts only real protections now. A switch called Extra app security did nothing, because every file was already fully protected, so it is gone. So is the Data map card, which showed in English whatever language you chose.",
+        "More has a Your data section: the full timeline, insights, weekly reflection, helper summary and recently deleted. Before, you could only find them by searching. Search now finds Settings pages too.",
+        "Fixed: two cards said an exported backup would help after reinstalling or on a new phone. Only the iPhone that made it can open it, and they say so now.",
+        "The journal has a search box. It matches on meaning rather than letters, so looking for \u201cfelt anxious\u201d finds the night you wrote \u201cfeeling anxious\u201d. It reads your entries on the phone and nothing is sent anywhere.",
+        "A new card in Insights shows how your own writing has read over time, recent entries against earlier ones. Entries too short to judge are left out and it says how many it could read, because a flat line drawn through unreadable text is worse than no line.",
+        "The risk checker takes a sentence. Type \u201ca couple of beers and a bit of ket\u201d and it offers the same selection tapping would have made. It only ever picks from substances the app already knows, and the rating still comes from the same table. Nothing about the severity is guessed.",
+        "Write your journal and the app can offer to fill in the night log from it: hours slept, whether you have slept since, whether you described a gap in your memory. It never fills anything in by itself, and it never touches which substances were logged. Those stay yours to tap.",
+        "The helper summary can carry a paragraph in your own words, drafted from your journal and then yours to edit before anyone reads it. It sits under its own heading so a professional can see which part is a count and which part is you speaking.",
+        "Every warning in the risk checker now says where its rating comes from: matching TripSit\u2019s chart, rated above it deliberately, or not on it at all. The wording for that already existed and had never been shown, so every warning had been arriving with the same apparent authority.",
+        "Fixed: a session shorter than ninety minutes received no check-in at all. The first one was placed at ninety minutes and then tested against a window that had already closed, so an hour-long timer got silence from the feature whose whole job is to check on you.",
+        "Siri can count your logged nights. It reports how many, never what: what you logged should not be readable from a lock screen.",
+        "The weekly reflection now says why there is no written summary when Apple Intelligence is off or unavailable, instead of the section quietly disappearing.",
+        "Fixed: most of the recovery card's small print, such as \"not logged\" and \"none\", was in English whichever language you chose.",
+        "Fixed: saying you were home safe from the watch quieted the rest of the night's check-ins only until the app was next opened, which put them all back. It also removed every later weekend's check-ins until then.",
+        "The Apple Watch Safety screen no longer has the button that opened the emergency page on your iPhone. Calling emergency services, or your trusted contact, from the watch works as before.",
+        "The Apple Watch reads your heart rate from its own sensor. It used to show whatever the phone had last read from Apple Health, with no time attached, and the phone read it only when its Home screen appeared, so the watch could say \u201cslow down\u201d about yesterday's workout, or show a calm number while your heart was racing. It reads only while the watch app is open with heart-rate warnings on, and nothing it reads is stored or sent.",
+        "The watch's strain card is gone. It paired your heart rate with a heart-rate variability reading, which Apple Watch records only a few times a day, so the two were almost never from the same moment, and the card could describe neither.",
+        "Fixed: a tap on the watch in the first moments after opening it could be lost while showing as done, so \u201cI'm home safe\u201d said so and left the check-ins running. Taps now wait on the watch until they can be delivered, in order, even if the watch app restarts in between.",
+        "The watch face keeps up by itself. A timer started on your phone, or a new streak, used to reach the complication only the next time you opened the watch app. The phone now wakes the watch when something on its face has changed, and the countdown keeps time in Always On.",
+        "Fixed: after the phone app restarted, the watch could say there was no timer while one was running.",
+        "After an update, a short page says what the new version brings, in a few plain sentences, once. New installs skip it, and it never opens over a page a notification, a quick action or Siri took you to.",
+        "Fixed: Home Screen quick actions, Panic Support among them, went where they said only when the app was not already running. Otherwise they opened the app wherever it had been left.",
+        "Fixed: the night log's partner count said \u201cperson\u201d and \u201cpeople\u201d in English whichever language you chose.",
+        "The app is about 2.7 MB smaller. A setting meant only for testing had been left on in every release since the first, and the launch image was stored twice, one copy unused. Twenty pieces of screen that nothing ever showed are gone too.",
+        "Long histories are faster. The stored data is indexed on the dates everything is sorted by, and the check for whether a night had anything logged no longer sorts a list to answer yes or no.",
+    ]),
     ("5.0.0", "501", "2026-09-11", "September 2026", "Two substances it could not name, and the day it never mentioned", [
         "Benzodiazepines and methamphetamine can now be logged and checked. Until now there was no way to tell ChillMate about either, so GHB with a benzo returned no warning at all. Twenty-five new rated combinations between them.",
         "Every combination is now compared with TripSit's published drug combination chart, and each warning says how it compares. That comparison found four ChillMate was rating too low: GHB, GBL and alcohol each with ketamine, and MDMA with 3-MMC, are all at the highest severity now.",
@@ -2000,7 +2041,7 @@ def build_security():
       <li><strong>No server.</strong> There is no API, no database and no admin panel to attack, because none exist.</li>
       <li><strong>No accounts.</strong> No password reset flow, no session tokens, no account takeover.</li>
       <li><strong>No third-party SDKs</strong> receiving your data, so no supply chain of analytics vendors.</li>
-      <li><strong>Sync is Apple's.</strong> iCloud sync and iCloud Drive backups run in your own account under Apple's encryption.</li>
+      <li><strong>Sync is Apple's, and off by default.</strong> iCloud sync runs in your own account under Apple's encryption, and only if you turn it on. An exported backup file is encrypted on the device first, with a key that never leaves it.</li>
     </ul>
     <p>Here is what is left, and what is genuinely worth probing. The app lock, meaning the PBKDF2-derived PIN held in the Keychain plus Face ID, and the second PIN that opens the app empty. The encrypted backup format. The phone to watch mirror. What the widgets and Live Activities show on a locked screen, which since 5.0.0 includes a running dose and a check-in for the way home. And whether the discreet notification wording ever leaks something it should not.</p>
   </div>
@@ -2021,7 +2062,7 @@ def build_security():
       <li>Whether the app really makes no network calls, on device, under instrumentation rather than by reading the source.</li>
       <li>The PIN derivation and Keychain handling, and whether the legacy migration path leaks anything.</li>
       <li>The encrypted backup format, and whether a backup file discloses anything without the key.</li>
-      <li>What the widgets, complications and Live Activities expose on a locked screen. Since 5.0.0 that includes a widget for a running dose and a check-in for the way home. The route check-in carries no destination at all, and the dose widget drops the substance name when discreet wording is on. Both of those are claims worth testing rather than believing.</li>
+      <li>What the widgets, complications and Live Activities expose on a locked screen. Since 5.0.0 that includes a widget for a running dose and a check-in for the way home. The route check-in carries no destination at all, and the dose widget, the Live Activity and the watch drop the substance name when the discreet Lock Screen timer is on. Both of those are claims worth testing rather than believing.</li>
       <li>Whether the duress PIN is genuinely indistinguishable from a real unlock: same screen, same timing, no failed attempt recorded, nothing anywhere saying which one was used.</li>
       <li>Whether discreet notification wording ever leaks a category it should not.</li>
     </ul>

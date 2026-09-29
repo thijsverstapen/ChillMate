@@ -6,7 +6,8 @@ import ChillMateCore
 
 /// Everything ChillMate talks to that is not itself.
 ///
-/// The app reached for seven singletons by name in a hundred and ten places.
+/// The app reached for seven singletons by name in a hundred and ten places
+/// (six since 5.1.0 removed the iCloud Drive backup).
 /// That is fine until you want to prove something about the code that calls
 /// them: `NotificationService.shared` writes to the real notification centre, so
 /// a test could either schedule real notifications or test nothing, and it chose
@@ -76,18 +77,18 @@ extension NotificationScheduling {
 /// to cover the whole class would be a second copy of it to keep in step.
 @MainActor
 protocol HealthReading: Sendable {
-    func latestHRV() async throws -> Double?
-    func latestHeartRate() async throws -> Double?
+    func asleepIntervals(in window: DateInterval, excludingOwnSamples: Bool) async throws -> [DateInterval]
+    func latestHRV() async throws -> HealthSample?
     func latestRestingHeartRate() async throws -> Double?
+    func removeLegacyMetadata(matching nights: [HealthLogSnapshot]) async throws -> Bool
     func requestAuthorization() async throws
     // Two overloads on the concrete type: one asks for everything, one asks for
     // a named set. Both are called, so both are here.
     func requestAuthorization(scopes: Set<HealthKitPermissionScope>) async throws
-    func save(_ snapshot: HealthLogSnapshot) async throws
+    func save(_ snapshot: HealthLogSnapshot, sleepReadAllowed: Bool) async throws
     func saveMindfulMinutes(from startDate: Date, to endDate: Date) async throws
     func saveStateOfMind(date: Date, mood: AftercareMood) async throws
     func sleepHours(from startDate: Date, to endDate: Date) async throws -> Double
-    func sleepHoursAfterEntry(startDate: Date) async throws -> Double
 }
 
 /// What the phone tells the watch.
@@ -98,24 +99,9 @@ protocol HealthReading: Sendable {
 protocol WatchRelaying: Sendable {
     func activate()
     func sendActiveTimers(_ timers: [DrugDoseTimerRecord])
-    func sendLatestHRV(_ ms: Double?)
-    func sendLatestHeartRate(_ bpm: Double?)
     func sendMetrics(recoveryStreakDays: Int, dailyScore: Int, dailyScoreActive: Bool)
     func sendSettings()
     func syncStandaloneState()
-}
-
-/// Encrypted backups in the user's own iCloud Drive.
-///
-/// Exactly the members the app reaches for, and no more: a protocol wide enough
-/// to cover the whole class would be a second copy of it to keep in step.
-@MainActor
-protocol CloudBackups: Sendable {
-    func deleteBackups() throws
-    var isAvailable: Bool { get }
-    func restoreLatestBackup(into context: ModelContext) throws -> ChillMateBackupImportSummary
-    func saveLatestBackup(localContext: ModelContext) throws -> Date
-    var statusLine: String { get }
 }
 
 /// Sealing and opening the encrypted archive, and the on-device recovery snapshot.
@@ -137,9 +123,8 @@ protocol EncryptedBackups: Sendable {
 /// to cover the whole class would be a second copy of it to keep in step.
 @MainActor
 protocol SpotlightIndexing: Sendable {
-    func indexJournalEntry(_ entry: JournalEntry)
     func indexTools()
-    func removeJournalEntry(_ entry: JournalEntry)
+    func removeJournalIndexIfNeeded(defaults: UserDefaults) async
 }
 
 /// One location, when the user asks for one.
@@ -161,7 +146,6 @@ struct Services {
     var notifications: any NotificationScheduling
     var health: any HealthReading
     var watch: any WatchRelaying
-    var cloudBackups: any CloudBackups
     var encryptedBackups: any EncryptedBackups
     var spotlight: any SpotlightIndexing
     var location: any LocationLookup
@@ -171,7 +155,6 @@ struct Services {
         notifications: NotificationService.shared,
         health: HealthKitService.shared,
         watch: WatchConnectivityService.shared,
-        cloudBackups: ICloudBackupService.shared,
         encryptedBackups: EncryptedBackupService.shared,
         spotlight: SpotlightService.shared,
         location: LocationLookupService.shared

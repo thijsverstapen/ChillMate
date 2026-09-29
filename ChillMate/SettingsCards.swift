@@ -174,7 +174,10 @@ struct EncryptionInfoCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("Your data is protected by default. You can also create an encrypted backup file that only you can open. Handy if you ever reinstall or switch phones.")
+            // Used to add "Handy if you ever reinstall or switch phones." The file
+            // is sealed with a key that never leaves this iPhone, so on a new
+            // phone it opens nothing; iCloud sync is what moves your history.
+            Text("While your iPhone is locked, ChillMate's files can't be read. You can also export an encrypted backup file, which only this iPhone can open.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -184,51 +187,12 @@ struct EncryptionInfoCard: View {
     }
 }
 
-struct PrivacyDashboardCard: View {
-    private let rows: [(String, String, String)] = [
-        ("Stored on this device", "Profile, logs, STI tests, timers, plans, journal entries, trusted contact, background, and lock settings.", "iphone"),
-        ("Encrypted backup", "Created as local backup files or encrypted iCloud Drive backups when you turn those options on.", "lock.doc.fill"),
-        ("Shared with Apple Health", "Only the health categories you enable in Permissions.", "heart.text.square.fill"),
-        ("Never sent by ChillMate", "Partner messages, emergency texts, and route actions stay user-initiated through iOS apps.", "hand.raised.fill")
-    ]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("Data map")
-                .font(.headline)
-                .foregroundStyle(Color.chillText)
-
-            ForEach(rows, id: \.0) { row in
-                HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: row.2)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(Color.chillSecondaryBlue)
-                        .frame(width: 38, height: 38)
-                        .glassSurface(radius: 19, tint: Color.chillSecondaryBlue.opacity(0.10))
-
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(row.0)
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Color.chillText)
-                        Text(row.1)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Color.chillSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            }
-        }
-        .padding(16)
-        .glassSurface(radius: 28, tint: .black.opacity(0.04))
-    }
-}
-
 struct GranularHealthKitPermissionsCard: View {
     @Binding var sexualActivityWrite: Bool
     @Binding var sleepReadWrite: Bool
     @Binding var heartRateRead: Bool
     @Binding var hrvRead: Bool
-    @Binding var workoutRead: Bool
+    @Binding var mindfulWrite: Bool
     let requestScope: (HealthKitPermissionScope) -> Void
 
     var body: some View {
@@ -246,7 +210,9 @@ struct GranularHealthKitPermissionsCard: View {
             HealthPermissionToggleLine(scope: .sleepReadWrite, isOn: $sleepReadWrite, requestScope: requestScope)
             HealthPermissionToggleLine(scope: .heartRateRead, isOn: $heartRateRead, requestScope: requestScope)
             HealthPermissionToggleLine(scope: .heartRateVariabilityRead, isOn: $hrvRead, requestScope: requestScope)
-            HealthPermissionToggleLine(scope: .workoutRead, isOn: $workoutRead, requestScope: requestScope)
+            // Had no switch at all, so panic support's breathing sessions, which
+            // check this setting, could never reach Health.
+            HealthPermissionToggleLine(scope: .mindfulWrite, isOn: $mindfulWrite, requestScope: requestScope)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
@@ -404,7 +370,7 @@ struct EncryptedBackupCard: View {
                         .font(.headline)
                         .foregroundStyle(Color.chillText)
 
-                    Text("Create an encrypted backup of your ChillMate data. ChillMate also saves a recovery copy on your device automatically. Useful if you ever reinstall the app.")
+                    Text("Create an encrypted backup of your ChillMate data. Only this iPhone can open it; to move your history to a new phone, use iCloud sync. ChillMate also keeps a recovery copy on this iPhone automatically.")
                         .font(.caption)
                         .foregroundStyle(Color.chillSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -445,113 +411,6 @@ struct EncryptedBackupCard: View {
                 }
                 .buttonStyle(ChillPillButtonStyle(prominent: false))
             }
-        }
-        .padding(16)
-        .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
-    }
-}
-
-struct ICloudBackupCard: View {
-    @Binding var isEnabled: Bool
-    let status: String
-    let lastBackupTimestamp: Double
-    let isWorking: Bool
-    let saveNow: () -> Void
-    let restore: () -> Void
-    let deleteBackups: () -> Void
-
-    /// Always shown. `status` is persisted, so the old `if !status.isEmpty` early
-    /// return meant a stored line like "Backup complete." hid the date forever.
-    private var lastBackupText: String {
-        guard lastBackupTimestamp > 0 else {
-            return String(localized: "No backup yet.")
-        }
-        let date = Date(timeIntervalSince1970: lastBackupTimestamp)
-        let relative = date.formatted(.relative(presentation: .named))
-        let stamp = date.formatted(date: .abbreviated, time: .shortened)
-        return String(localized: "Last backup \(relative), on \(stamp).")
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 14) {
-                Image(systemName: "icloud.fill")
-                    .font(.system(size: 21, weight: .semibold))
-                    .foregroundStyle(Color.chillPrimary)
-                    .frame(width: 42, height: 42)
-                    .glassSurface(radius: 21, tint: Color.chillPrimary.opacity(0.12))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Encrypted iCloud backup")
-                        .font(.headline)
-                        .foregroundStyle(Color.chillText)
-
-                    Text("ChillMate saves an encrypted backup file to your iCloud Drive. Your data is encrypted before it leaves the app.")
-                        .font(.caption)
-                        .foregroundStyle(Color.chillSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer(minLength: 0)
-
-                Toggle("iCloud backup", isOn: $isEnabled)
-                    .labelsHidden()
-                    .tint(Color.chillPrimary)
-            }
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(lastBackupText)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Color.chillSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                if !status.isEmpty {
-                    Text(status)
-                        .font(.caption)
-                        .foregroundStyle(Color.chillTertiary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            HStack(spacing: 10) {
-                // Both buttons carry the same content shape so the HStack splits
-                // evenly. Previously the spinner sat beside a full-width label,
-                // making "Back up now" measure far wider than "Restore".
-                Button(action: saveNow) {
-                    Label {
-                        Text("Back up now")
-                    } icon: {
-                        if isWorking {
-                            ProgressView().controlSize(.small)
-                        } else {
-                            Image(systemName: "icloud.and.arrow.up.fill")
-                        }
-                    }
-                    .font(.headline)
-                    .chillLineLimit(1, scale: 0.75)
-                    .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(ChillPillButtonStyle(prominent: true))
-                .disabled(isWorking || !isEnabled)
-
-                Button(action: restore) {
-                    Label("Restore", systemImage: "icloud.and.arrow.down.fill")
-                        .font(.headline)
-                        .chillLineLimit(1, scale: 0.75)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(ChillPillButtonStyle(prominent: false))
-                .disabled(isWorking)
-            }
-
-            Button(role: .destructive, action: deleteBackups) {
-                Label("Delete iCloud backups", systemImage: "trash.fill")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(ChillPillButtonStyle(prominent: false, tint: .red))
-            .disabled(isWorking)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)
@@ -652,6 +511,9 @@ struct PINSetupView: View {
         !pin.isEmpty || !confirmPIN.isEmpty
     }
 
+    // The body is assembled from named parts rather than written out in one
+    // expression: as a single body it was the slowest function in the app to
+    // type-check, at well over half a second on every build that touched this file.
     var body: some View {
         NavigationStack {
             ZStack {
@@ -659,80 +521,12 @@ struct PINSetupView: View {
 
                 VStack(alignment: .leading, spacing: 18) {
                     Spacer(minLength: 20)
-
-                    VStack(alignment: .leading, spacing: 14) {
-                        Image(systemName: "number.circle.fill")
-                            .font(.system(size: 34, weight: .bold))
-                            .foregroundStyle(Color.chillPrimary)
-                            .frame(width: 72, height: 72)
-                            .glassSurface(radius: 36, tint: Color.chillPrimary.opacity(0.16))
-                            .disablesRootSwipeBack()
-
-                        Text(titleText)
-                            .font(.largeTitle.bold())
-                            .foregroundStyle(Color.chillText)
-
-                        Text(explanationText)
-                            .font(.callout)
-                            .lineSpacing(3)
-                            .foregroundStyle(Color.chillSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        if let duressWarning {
-                            Label(duressWarning, systemImage: "exclamationmark.triangle.fill")
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(.orange)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
-                    .padding(22)
-                    .glassSurface(radius: 34, tint: .black.opacity(0.04), interactive: true)
-
-                    VStack(spacing: 12) {
-                        SecureField("New PIN", text: $pin)
-                            .keyboardType(.numberPad)
-                            .textContentType(.oneTimeCode)
-
-                        SecureField("Confirm PIN", text: $confirmPIN)
-                            .keyboardType(.numberPad)
-                            .textContentType(.oneTimeCode)
-                    }
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(Color.chillText)
-                    .padding(16)
-                    .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
-                    .onChange(of: pin) { _, newValue in
-                        pin = String(newValue.filter(\.isNumber).prefix(8))
-                    }
-                    .onChange(of: confirmPIN) { _, newValue in
-                        confirmPIN = String(newValue.filter(\.isNumber).prefix(8))
-                    }
-
+                    header
+                    pinFields
                     if let message {
-                        Text(message)
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(.red)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(14)
-                            .glassSurface(radius: 20, tint: .red.opacity(0.10))
+                        errorMessage(message)
                     }
-
-                    GlassActionButton(prominent: true) {
-                        guard canSave else {
-                            message = pin.count < 4 ? "Use at least 4 numbers." : "The PINs do not match."
-                            return
-                        }
-
-                        save(pin)
-                        dismiss()
-                    } label: {
-                        Label("Save PIN", systemImage: "checkmark.circle.fill")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .disabled(!canSave)
-                    .opacity(canSave ? 1 : 0.55)
-
+                    saveButton
                     Spacer(minLength: 20)
                 }
                 .padding(20)
@@ -753,6 +547,98 @@ struct PINSetupView: View {
         }
     }
 
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            Image(systemName: "number.circle.fill")
+                .font(.system(size: 34, weight: .bold))
+                .foregroundStyle(Color.chillPrimary)
+                .frame(width: 72, height: 72)
+                .glassSurface(radius: 36, tint: Color.chillPrimary.opacity(0.16))
+                .disablesRootSwipeBack()
+
+            Text(titleText)
+                .font(.largeTitle.bold())
+                .foregroundStyle(Color.chillText)
+
+            Text(explanationText)
+                .font(.callout)
+                .lineSpacing(3)
+                .foregroundStyle(Color.chillSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if let duressWarning {
+                Label(duressWarning, systemImage: "exclamationmark.triangle.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(22)
+        .glassSurface(radius: 34, tint: .black.opacity(0.04), interactive: true)
+    }
+
+    private var pinFields: some View {
+        VStack(spacing: 12) {
+            SecureField("New PIN", text: $pin)
+                .keyboardType(.numberPad)
+                .textContentType(.oneTimeCode)
+
+            SecureField("Confirm PIN", text: $confirmPIN)
+                .keyboardType(.numberPad)
+                .textContentType(.oneTimeCode)
+        }
+        .font(.title3.weight(.semibold))
+        .foregroundStyle(Color.chillText)
+        .padding(16)
+        .glassSurface(radius: 24, tint: .black.opacity(0.04), interactive: true)
+        .onChange(of: pin) { _, newValue in
+            pin = Self.pinDigits(newValue)
+        }
+        .onChange(of: confirmPIN) { _, newValue in
+            confirmPIN = Self.pinDigits(newValue)
+        }
+    }
+
+    /// At most eight digits, nothing else. Typed out step by step: written inline
+    /// as one expression, `filter` and `prefix` each have several overloads to
+    /// choose between, and those two lines cost more type-checking than the rest
+    /// of this screen together.
+    private static func pinDigits(_ text: String) -> String {
+        let digits: String = text.filter { (character: Character) -> Bool in character.isNumber }
+        return String(digits.prefix(8))
+    }
+
+    private func errorMessage(_ message: String) -> some View {
+        Text(message)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(.red)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(14)
+            .glassSurface(radius: 20, tint: .red.opacity(0.10))
+    }
+
+    private var saveButton: some View {
+        GlassActionButton(prominent: true) {
+            guard canSave else {
+                // Were bare literals, so they would have shown in English in every
+                // language; the disabled button kept anyone from reaching them.
+                message = pin.count < 4
+                    ? String(localized: "Use at least 4 numbers.")
+                    : String(localized: "The PINs do not match.")
+                return
+            }
+
+            save(pin)
+            dismiss()
+        } label: {
+            Label("Save PIN", systemImage: "checkmark.circle.fill")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+        }
+        .disabled(!canSave)
+        .opacity(canSave ? 1 : 0.55)
+    }
+
     private func attemptDismiss() {
         if hasInput {
             isShowingDiscardWarning = true
@@ -768,7 +654,6 @@ struct WatchCompanionSettingsCard: View {
     @Binding var breathingHaptics: Bool
     @Binding var discreetCheckIns: Bool
     @Binding var visibleTimers: Bool
-    @Binding var stressAndTemperatureDetection: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -776,7 +661,7 @@ struct WatchCompanionSettingsCard: View {
                 .font(.headline)
                 .foregroundStyle(Color.chillText)
 
-            Text("These settings control the Apple Watch companion: hydration reminders, elevated heart-rate warnings, haptic breathing, discreet check-ins, timer visibility, and a strain warning that combines heart rate with heart-rate variability.")
+            Text("These settings control the Apple Watch companion: hydration reminders, heart-rate warnings from the watch's own sensor, haptic breathing, discreet check-ins and timer visibility.")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(Color.chillSecondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -786,7 +671,6 @@ struct WatchCompanionSettingsCard: View {
             SettingsToggleLine(title: String(localized: "Breathing haptics"), symbol: "lungs.fill", isOn: $breathingHaptics)
             SettingsToggleLine(title: String(localized: "Discreet haptic check-ins"), symbol: "applewatch.radiowaves.left.and.right", isOn: $discreetCheckIns)
             SettingsToggleLine(title: String(localized: "Visible timers and complications"), symbol: "timer", isOn: $visibleTimers)
-            SettingsToggleLine(title: String(localized: "Strain warnings"), symbol: "thermometer.medium", isOn: $stressAndTemperatureDetection)
         }
         .padding(16)
         .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.08), interactive: true)

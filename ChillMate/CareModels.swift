@@ -1,10 +1,16 @@
 import Foundation
 import ActivityKit
 import SwiftData
+import WidgetKit
 import ChillMateCore
 
 @Model
 final class STDTestRecord {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    #Index<STDTestRecord>([\.testDate])
+
     var id: UUID = UUID()
     var testDate: Date = Date.now
     var oralResult: String = STDResultStatus.pending.rawValue
@@ -75,6 +81,12 @@ enum STDResultStatus: String, CaseIterable, Identifiable {
 
 @Model
 final class DrugDoseTimerRecord {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    // Sorted and filtered on the same property, which is the case an index helps most.
+    #Index<DrugDoseTimerRecord>([\.startedAt])
+
     var id: UUID = UUID()
     var substanceName: String = Substance.cannabis.rawValue
     var startedAt: Date = Date.now
@@ -116,6 +128,17 @@ final class DrugDoseTimerRecord {
     var endsAt: Date {
         startedAt.addingTimeInterval(durationHours * 60 * 60)
     }
+
+    /// The substance as the reader's language names it.
+    ///
+    /// `substanceName` stores the raw value, which is English and has to stay
+    /// that way: it is what `Substance(rawValue:)` and the published reference
+    /// look the timer up by. Shown as it is, a German Lock Screen read
+    /// "Ketamine" and a Spanish one "Cocaine". Anything a person reads goes
+    /// through here; anything that looks the substance up keeps the raw value.
+    var localizedSubstanceName: String {
+        Substance(rawValue: substanceName)?.localizedDisplayName ?? substanceName
+    }
 }
 
 enum AdministrationRoute: String, CaseIterable, Identifiable {
@@ -155,6 +178,14 @@ enum AdministrationRoute: String, CaseIterable, Identifiable {
 
 @Model
 final class SaferSessionPlan {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    // Two separate indexes, not one compound index over the pair: the two
+    // descriptors sort by these independently, and a compound index only
+    // serves its leading column.
+    #Index<SaferSessionPlan>([\.plannedDate], [\.createdAt])
+
     var id: UUID = UUID()
     var plannedDate: Date = Date.now
     var endingDate: Date = Date.now.addingTimeInterval(4 * 60 * 60)
@@ -256,6 +287,12 @@ final class SaferSessionPlan {
 
 @Model
 final class JournalEntry {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    // Sorted and filtered on the same property.
+    #Index<JournalEntry>([\.date])
+
     var id: UUID = UUID()
     var date: Date = Date.now
     var rememberClearly: String = ""
@@ -305,6 +342,11 @@ final class JournalEntry {
 
 @Model
 final class RiskCheckRecord {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    #Index<RiskCheckRecord>([\.createdAt])
+
     var id: UUID = UUID()
     var medicationText: String = ""
     var timing: String = CombinationTiming.sameSession.rawValue
@@ -398,19 +440,46 @@ enum RedoseDecision: String, CaseIterable, Identifiable {
     }
 }
 
+extension LockScreenTimerPrivacy {
+    /// The first launch that has this setting. Somebody who already asked for
+    /// discreet notifications wanted a Lock Screen that gives nothing away, so
+    /// their timer starts discreet too; everybody else keeps what they had until
+    /// they choose. Written once, into the shared suite the extension reads.
+    static func settleDefault(standard: UserDefaults = .standard, shared: UserDefaults? = WidgetSharedKey.suite) {
+        guard let shared, shared.object(forKey: WidgetSharedKey.discreetLockScreenTimer) == nil else { return }
+        shared.set(standard.bool(forKey: DefaultsKey.discreetNotifications), forKey: WidgetSharedKey.discreetLockScreenTimer)
+    }
+}
+
 enum DrugTimerLiveActivityController {
+    /// Brings every running timer, and the Lock Screen widget, in line with the
+    /// discreet setting. Without this a switch flipped mid-session would only
+    /// reach the next timer, and the one on the Lock Screen right now is the one
+    /// somebody is worried about.
+    @MainActor
+    static func applyDiscreet(_ discreet: Bool) async {
+        for activity in Activity<DrugTimerActivityAttributes>.activities {
+            var state = activity.content.state
+            guard state.discreet != discreet else { continue }
+            state.discreet = discreet
+            await activity.update(ActivityContent(state: state, staleDate: activity.content.staleDate))
+        }
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+
     @MainActor
     static func start(for timer: DrugDoseTimerRecord, now: Date = .now) {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
             return
         }
 
-        let attributes = DrugTimerActivityAttributes(timerID: timer.id, substanceName: timer.substanceName)
+        let attributes = DrugTimerActivityAttributes(timerID: timer.id, substanceName: timer.localizedSubstanceName)
         let contentState = DrugTimerActivityAttributes.ContentState(
-            substanceName: timer.substanceName,
+            substanceName: timer.localizedSubstanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: timer.redoseNudgeIsActive(at: now),
-            startedAt: timer.startedAt
+            startedAt: timer.startedAt,
+            discreet: LockScreenTimerPrivacy.isDiscreet()
         )
 
         do {
@@ -434,10 +503,11 @@ enum DrugTimerLiveActivityController {
         }
 
         let contentState = DrugTimerActivityAttributes.ContentState(
-            substanceName: timer.substanceName,
+            substanceName: timer.localizedSubstanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: timer.redoseNudgeIsActive(at: now),
-            startedAt: timer.startedAt
+            startedAt: timer.startedAt,
+            discreet: LockScreenTimerPrivacy.isDiscreet()
         )
 
         for activity in Activity<DrugTimerActivityAttributes>.activities where activity.id == timer.liveActivityID {
@@ -452,10 +522,11 @@ enum DrugTimerLiveActivityController {
         }
 
         let contentState = DrugTimerActivityAttributes.ContentState(
-            substanceName: timer.substanceName,
+            substanceName: timer.localizedSubstanceName,
             endsAt: timer.endsAt,
             redoseNudgeActive: false,
-            startedAt: timer.startedAt
+            startedAt: timer.startedAt,
+            discreet: LockScreenTimerPrivacy.isDiscreet()
         )
 
         for activity in Activity<DrugTimerActivityAttributes>.activities where activity.id == timer.liveActivityID {

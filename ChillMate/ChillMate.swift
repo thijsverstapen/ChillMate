@@ -12,65 +12,125 @@ struct ChillMateApp: App {
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
     @AppStorage(DefaultsKey.lastAppUseTimestamp) private var lastAppUseTimestamp = Date.now.timeIntervalSince1970
-    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
     @Environment(\.scenePhase) private var scenePhase
 
     /// Rebuilds the whole tree when duress mode changes. See
     /// `LocalSecurityService.saveDuressPIN`.
     @AppStorage(DefaultsKey.duressModeActive) private var duressMode = false
 
+    /// "on", "off", or nil for an install from before 5.1.0 that has not been
+    /// asked. See `ICloudSyncPreference`.
+    @AppStorage(DefaultsKey.iCloudSyncChoice) private var iCloudSyncChoice: String?
+
+    /// Settles a fresh install as off before anything reads the choice, so only an
+    /// install that already has a store is ever asked.
+    init() {
+        ICloudSyncPreference.resolveAtLaunch(storeExists: ICloudSyncPreference.defaultStoreExists)
+        LockScreenTimerPrivacy.settleDefault()
+    }
+
     var body: some Scene {
         WindowGroup {
-            // Single onboarding path: AppLockView → AppHomeView.
-            // AppHomeView shows ProfileSetupView when no UserProfile exists,
-            // which is the sole first-run onboarding experience.
-            AppLockView {
-                AppHomeView()
-            }
-            // Keyed on duress mode so unlocking with the duress PIN rebuilds the
-            // tree against the empty store, and the real PIN rebuilds it back.
-            // Without the key SwiftUI keeps the container it was handed at launch.
-            .id(duressMode)
-            .modelContainer(ChillMateModelContainer.container())
-            .preferredColorScheme(.dark)
-            // Dates, numbers and measurements follow the chosen language right away.
-            // Catalog string lookup is bound to the bundle resolved at process start,
-            // so that part lands on the next launch (the picker says so).
-            // Resolves to the untouched system locale when no language was chosen,
-            // so a user's region and 24-hour-time preference survive.
-            .environment(\.locale, LocalizationService.effectiveLocale)
-            // Publishes the combined system + in-app reduce-motion preference to
-            // every descendant, including sheets and covers.
-            .chillMotionPreference()
-            .onAppear {
-                adoptControlDestination()
-                recordAppUse()
-                refreshPrivacyAndNotificationState()
-                services.watch.activate()
-                services.spotlight.indexTools()
-                ChillTips.configure()
-                TypedRecordsMigration.runIfNeeded()
-                DataRetentionSweep.runIfNeeded()
-            }
-            .onContinueUserActivity(CSSearchableItemActionType) { activity in
-                guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
-                if id == SpotlightService.riskCheckerItemID {
-                    UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: DefaultsKey.pendingAppDestination)
-                } else if id.hasPrefix("journal-") {
-                    UserDefaults.standard.set(NotificationDestination.journal.rawValue, forKey: DefaultsKey.pendingAppDestination)
+            // The store's CloudKit setting is fixed when the container is built,
+            // and `mainTree` builds it. So an install that has not answered sees
+            // the question first and the container is not created until it has —
+            // otherwise the first session after updating would sync on a setting
+            // nobody chose.
+            //
+            // Parsed, not compared with nil: a stored value that is neither answer
+            // must be asked again, and a raw nil check would let it through to a
+            // container that treats it as undecided and mirrors.
+            if iCloudSyncChoice.flatMap(ICloudSyncPreference.Choice.init(rawValue:)) == nil {
+                ICloudSyncDecisionView { choice in
+                    iCloudSyncChoice = choice.rawValue
                 }
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                if newPhase == .active {
-                    adoptControlDestination()
-                    recordAppUse()
-                    refreshLiveActivities()
-                    services.watch.syncStandaloneState()
-                }
-
-                refreshPrivacyAndNotificationState()
+                .preferredColorScheme(.dark)
+                .environment(\.locale, LocalizationService.effectiveLocale)
+            } else {
+                mainTree
             }
         }
+    }
+
+    /// The app itself, and where its UI first creates the model container.
+    ///
+    /// Not the only caller: Siri intents and `LoggedNightQuery` call
+    /// `ChillMateModelContainer.container()` without any UI, which is why an
+    /// undecided install keeps its old behaviour rather than being asked there.
+    @ViewBuilder
+    private var mainTree: some View {
+        // Single onboarding path: AppLockView → AppHomeView.
+        // AppHomeView shows ProfileSetupView when no UserProfile exists,
+        // which is the sole first-run onboarding experience.
+        AppLockView {
+            AppHomeView()
+        }
+        // Keyed on duress mode so unlocking with the duress PIN rebuilds the
+        // tree against the empty store, and the real PIN rebuilds it back.
+        // Without the key SwiftUI keeps the container it was handed at launch.
+        .id(duressMode)
+        .modelContainer(ChillMateModelContainer.container())
+        .preferredColorScheme(.dark)
+        // Dates, numbers and measurements follow the chosen language right away.
+        // Catalog string lookup is bound to the bundle resolved at process start,
+        // so that part lands on the next launch (the picker says so).
+        // Resolves to the untouched system locale when no language was chosen,
+        // so a user's region and 24-hour-time preference survive.
+        .environment(\.locale, LocalizationService.effectiveLocale)
+        // Publishes the combined system + in-app reduce-motion preference to
+        // every descendant, including sheets and covers.
+        .chillMotionPreference()
+        .onAppear {
+            adoptControlDestination()
+            recordAppUse()
+            refreshPrivacyAndNotificationState()
+            services.watch.activate()
+            sendRunningTimersToWatch()
+            services.spotlight.indexTools()
+            ChillTips.configure()
+            TypedRecordsMigration.runIfNeeded()
+            DataRetentionSweep.runIfNeeded()
+            Task {
+                await services.spotlight.removeJournalIndexIfNeeded(defaults: .standard)
+                await LegacyICloudBackupFiles.removeIfNeeded()
+                await HealthLegacyCleanup.runIfNeeded(services: services)
+                await SleepBackfill.run(services: services)
+            }
+        }
+        .onContinueUserActivity(CSSearchableItemActionType) { activity in
+            guard let id = activity.userInfo?[CSSearchableItemActivityIdentifier] as? String else { return }
+            if id == SpotlightService.riskCheckerItemID {
+                UserDefaults.standard.set(NotificationDestination.combinationRisk.rawValue, forKey: DefaultsKey.pendingAppDestination)
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                adoptControlDestination()
+                recordAppUse()
+                refreshLiveActivities()
+                services.watch.syncStandaloneState()
+                sendRunningTimersToWatch()
+                // A running timer brought in line with the discreet setting, in
+                // case a change never reached it: it updates only what disagrees.
+                Task { await DrugTimerLiveActivityController.applyDiscreet(LockScreenTimerPrivacy.isDiscreet()) }
+                // Somebody who slept since the app was last in front finds the
+                // night filled in when they come back to it.
+                Task { await SleepBackfill.run(services: services) }
+            }
+
+            refreshPrivacyAndNotificationState()
+        }
+    }
+
+    /// Tells the watch, and the Lock Screen widget, which timers are running.
+    ///
+    /// The watch hears about timers when one starts or is deleted, and that was
+    /// not enough: after the phone app restarted, the next context it sent
+    /// replaced the watch's without them, so a watch that read it showed no
+    /// running timer while one was. Sent again whenever the app comes to the
+    /// front, from whichever store is open, so duress mode sends none.
+    private func sendRunningTimersToWatch() {
+        ActiveDoseTimer.broadcast(from: ChillMateModelContainer.container().mainContext)
     }
 
     /// Moves a destination left by a Control Center control into the key the rest
@@ -94,9 +154,11 @@ struct ChillMateApp: App {
     }
 
     private func refreshPrivacyAndNotificationState() {
-        if localEncryptionEnabled {
-            LocalSecurityService.applyFileProtection()
-        }
+        // Not a setting. The entitlement already gives every file complete
+        // protection; this re-applies it to anything a framework wrote with a
+        // weaker class. There used to be a switch for it that changed nothing a
+        // person could observe, while the Privacy screen said protection was off.
+        LocalSecurityService.applyFileProtection()
 
         guard notificationsEnabled else {
             services.notifications.clearInactivityReminders()
@@ -146,8 +208,12 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         BackgroundPhotoStore.migrateFromUserDefaultsIfNeeded()
         UNUserNotificationCenter.current().delegate = self
         Services.live.notifications.registerCategories()
-        // Required for CloudKit silent-push sync and HealthKit background delivery
-        if UserDefaults.standard.bool(forKey: DefaultsKey.iCloudBackupEnabled) {
+        // CloudKit tells a syncing store about changes from other devices with a
+        // silent push. This used to be tied to the iCloud Drive backup, a
+        // different feature, so somebody with sync on and the backup off only
+        // picked up other devices' changes whenever the app happened to look.
+        // The container's CloudKit setting is fixed at launch, and so is this.
+        if ICloudSyncPreference.choice(in: .standard) == .on {
             application.registerForRemoteNotifications()
         }
         return true
@@ -159,18 +225,12 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {
         if let shortcut = options.shortcutItem {
-            handleShortcut(shortcut)
+            Self.handleShortcut(shortcut)
         }
 
-        return UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
-    }
-
-    func application(
-        _ application: UIApplication,
-        performActionFor shortcutItem: UIApplicationShortcutItem,
-        completionHandler: @escaping (Bool) -> Void
-    ) {
-        completionHandler(handleShortcut(shortcutItem))
+        let configuration = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        configuration.delegateClass = QuickActionSceneDelegate.self
+        return configuration
     }
 
     func userNotificationCenter(
@@ -195,8 +255,10 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
         completionHandler()
     }
 
+    /// A Home Screen quick action, from a cold launch here or from
+    /// `QuickActionSceneDelegate` when the app is already running.
     @discardableResult
-    private func handleShortcut(_ shortcutItem: UIApplicationShortcutItem) -> Bool {
+    static func handleShortcut(_ shortcutItem: UIApplicationShortcutItem) -> Bool {
         let destination: NotificationDestination?
 
         switch shortcutItem.type {
@@ -222,11 +284,36 @@ final class ChillMateAppDelegate: NSObject, UIApplicationDelegate, @preconcurren
 }
 
 
+/// Delivers a quick action to an app that is already running.
+///
+/// With scenes, a quick action on a running app goes to the scene's delegate;
+/// `application(_:performActionFor:)` on the app delegate is never called. That
+/// was the only handler until 5.1.0, so every Home Screen quick action, Panic
+/// Support among them, opened the app wherever it was left whenever it was still
+/// in memory, and went where it said only from a cold launch. SwiftUI still owns
+/// the window; this only hears the action.
+final class QuickActionSceneDelegate: NSObject, UIWindowSceneDelegate {
+    func windowScene(
+        _ windowScene: UIWindowScene,
+        performActionFor shortcutItem: UIApplicationShortcutItem,
+        completionHandler: @escaping (Bool) -> Void
+    ) {
+        completionHandler(ChillMateAppDelegate.handleShortcut(shortcutItem))
+    }
+}
+
+
 enum LocalizedEnumStrings {
     /// Extraction anchors. These keep every displayed enum rawValue present in the
     /// String Catalog (so they are translated and never flagged stale), even though
     /// they are rendered at runtime via `localizedDisplayName` rather than literals.
     static let anchors: [String] = [
+        // HealthKitPermissionScope
+        String(localized: "Sexual activity"),
+        String(localized: "Sleep"),
+        String(localized: "Heart rate"),
+        String(localized: "Heart rate variability"),
+        String(localized: "Mindful minutes"),
         String(localized: "Prefer not to say"),
         String(localized: "24 h"),
         String(localized: "3MMC"),
@@ -296,9 +383,7 @@ enum LocalizedEnumStrings {
         String(localized: "Grounded"),
         String(localized: "HIV"),
         String(localized: "HPV"),
-        String(localized: "HRV read/write"),
         String(localized: "Health"),
-        String(localized: "Heart rate read/write"),
         String(localized: "Heartbreak"),
         String(localized: "Hepatitis B"),
         String(localized: "Hepatitis C"),
@@ -349,7 +434,6 @@ enum LocalizedEnumStrings {
         String(localized: "Poppers"),
         String(localized: "Positive"),
         String(localized: "Privacy & lock"),
-        String(localized: "Privacy dashboard"),
         String(localized: "Psychedelics"),
         String(localized: "Queer"),
         String(localized: "Questioning"),
@@ -357,10 +441,8 @@ enum LocalizedEnumStrings {
         String(localized: "Relationship"),
         String(localized: "Safety review"),
         String(localized: "Same session"),
-        String(localized: "Sexual activity read/write"),
         String(localized: "Shaky"),
         String(localized: "Side"),
-        String(localized: "Sleep read/write"),
         String(localized: "Smoked"),
         String(localized: "Sniffed"),
         String(localized: "Social pressure"),
@@ -379,8 +461,6 @@ enum LocalizedEnumStrings {
         String(localized: "Unknown"),
         String(localized: "Versatile"),
         String(localized: "Viagra"),
-        String(localized: "Work pressure"),
-        String(localized: "Workout read/write"),
-        String(localized: "iCloud backup")
+        String(localized: "Work pressure")
     ]
 }

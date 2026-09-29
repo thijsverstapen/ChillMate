@@ -103,6 +103,17 @@ private struct PrivateInsightsSections: View {
                 clearNights: ChillInsightCalculator.sleptNightCount(entries: recentEntries, substanceNights: false)
             )
             PersonalBaselineCard(entries: recentEntries, timers: timers, windowDays: windowDays)
+
+            // Reads the journal the person wrote, not the nights they logged, so
+            // it is the one card here that says something when nothing was
+            // logged at all. Sorted newest first because the card splits the
+            // list down the middle into a recent half and an earlier one.
+            JournalMoodTrendCard(
+                texts: journals
+                    .sorted { $0.date > $1.date }
+                    .map(\.searchableText)
+                    .filter { !$0.isEmpty }
+            )
         }
     }
 }
@@ -137,7 +148,7 @@ private struct InsightMetricGrid: View {
     /// fixed 21 days, so at the 90 day setting it reported three weeks of logs under
     /// a caption promising three months.
     private var riskyLogCount: Int {
-        entries.filter { !$0.skippedNight && $0.hadSex && !$0.substances.isEmpty }.count
+        entries.filter { !$0.skippedNight && $0.hadSex && $0.hasSubstances }.count
     }
 
     private var continuedCount: Int {
@@ -292,7 +303,7 @@ enum ChillInsightCalculator {
     /// stops being hypothetical.
     static func recoveryStreakDays(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
         guard let latestUse = entries
-            .filter({ !$0.substances.isEmpty })
+            .filter({ $0.hasSubstances })
             .map(\.date)
             .max()
         else {
@@ -308,7 +319,7 @@ enum ChillInsightCalculator {
         var recent = 0
         var previous = 0
 
-        for entry in entries where !entry.skippedNight && entry.hadSex && !entry.substances.isEmpty {
+        for entry in entries where !entry.skippedNight && entry.hadSex && entry.hasSubstances {
             if entry.date >= recentCutoff {
                 recent += 1
             } else if entry.date >= previousCutoff {
@@ -355,7 +366,7 @@ extension ChillInsightCalculator {
         for entry in entries {
             let day = calendar.startOfDay(for: entry.date)
             let level: DayLevel
-            if !entry.substances.isEmpty {
+            if entry.hasSubstances {
                 level = (entry.hadSex && !entry.skippedNight) ? .risky : .substance
             } else {
                 level = .clear
@@ -387,7 +398,7 @@ extension ChillInsightCalculator {
     /// personal best older than the 1,000 most recent logs cannot be seen from here.
     static func longestClearStreak(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
         let substanceDays = entries
-            .filter { !$0.substances.isEmpty }
+            .filter { $0.hasSubstances }
             .map { calendar.startOfDay(for: $0.date) }
             .sorted()
         guard let last = substanceDays.last else { return 0 }
@@ -413,7 +424,7 @@ extension ChillInsightCalculator {
     /// in a row" is a pattern someone can recognise about themselves, where "17
     /// nights in 90 days" is a statistic about a stranger.
     static func consecutiveActiveWeeks(entries: [NightEntry], now: Date = .now, calendar: Calendar = .current) -> Int {
-        let active = Set(entries.filter { !$0.skippedNight && !$0.substances.isEmpty }.compactMap {
+        let active = Set(entries.filter { !$0.skippedNight && $0.hasSubstances }.compactMap {
             calendar.dateInterval(of: .weekOfYear, for: $0.date)?.start
         })
         guard !active.isEmpty else { return 0 }
@@ -441,13 +452,13 @@ extension ChillInsightCalculator {
     /// does not have enough to conclude anything.
     static func sleptNightCount(entries: [NightEntry], substanceNights: Bool) -> Int {
         entries.filter {
-            $0.sleptYet && $0.sleepHours > 0 && (substanceNights ? !$0.substances.isEmpty : $0.substances.isEmpty)
+            $0.sleptYet && $0.sleepHours > 0 && (substanceNights ? $0.hasSubstances : !$0.hasSubstances)
         }.count
     }
 
     static func averageSleep(entries: [NightEntry], substanceNights: Bool) -> Double? {
         let matching = entries.filter {
-            $0.sleptYet && $0.sleepHours > 0 && (substanceNights ? !$0.substances.isEmpty : $0.substances.isEmpty)
+            $0.sleptYet && $0.sleepHours > 0 && (substanceNights ? $0.hasSubstances : !$0.hasSubstances)
         }
         guard !matching.isEmpty else { return nil }
         return matching.map(\.sleepHours).reduce(0, +) / Double(matching.count)

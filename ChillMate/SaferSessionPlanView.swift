@@ -99,6 +99,11 @@ struct SaferSessionPlanView: View {
         aftercareReminderForEveryone
     }
 
+    /// Written out so that constructing this view does not make every call site
+    /// resolve the synthesized initializer, which with this many property
+    /// wrappers is slow to type-check. See `LogNightSheet.init()`.
+    init() {}
+
     var body: some View {
         Group {
             ZStack {
@@ -690,7 +695,7 @@ private struct SaferPlanCard: View {
 
             Button(role: .destructive) {
                 RecentlyDeletedStore.record(
-                    kind: "Plan",
+                    kind: .plan,
                     title: String(localized: "Before-Chill plan"),
                     detail: plan.plannedDate.formatted(date: .abbreviated, time: .shortened)
                 )

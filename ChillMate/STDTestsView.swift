@@ -39,6 +39,11 @@ struct STDTestsView: View {
         resultPhotoData != nil
     }
 
+    /// Written out so that constructing this view does not make every call site
+    /// resolve the synthesized initializer, which with this many property
+    /// wrappers is slow to type-check. See `LogNightSheet.init()`.
+    init() {}
+
     var body: some View {
         Group {
             ZStack {
@@ -259,7 +264,7 @@ private struct STDTestCard: View {
 
                 Button(role: .destructive) {
                     RecentlyDeletedStore.record(
-                        kind: "STI test",
+                        kind: .stiTest,
                         title: String(localized: "STI test"),
                         detail: test.testDate.formatted(date: .abbreviated, time: .omitted)
                     )

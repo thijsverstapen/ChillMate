@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 final class SpotlightService {
     static let shared = SpotlightService()
-    private let domainIdentifier = "com.codex.ChillMate.journal"
+    private let journalDomainIdentifier = "com.codex.ChillMate.journal"
     private let toolDomainIdentifier = "com.codex.ChillMate.tools"
 
     /// Identifier used both as the Spotlight uniqueIdentifier and as the routing key
@@ -29,47 +29,35 @@ final class SpotlightService {
         CSSearchableIndex.default().indexSearchableItems([item])
     }
 
-    func indexJournalEntry(_ entry: JournalEntry) {
-        let contentHash = (entry.rememberClearly + entry.feelsGoodAbout + entry.regrets).hashValue
-        let key = "spotlightHash-\(entry.id.uuidString)"
-        guard UserDefaults.standard.integer(forKey: key) != contentHash else { return }
-        UserDefaults.standard.set(contentHash, forKey: key)
+    /// Takes every journal entry back out of Spotlight, once per install.
+    ///
+    /// Until 5.1.0 saving a journal entry put its text — what somebody remembered,
+    /// what felt good, what they regretted — into the system search index. Anyone
+    /// holding the unlocked phone could read it from the Home Screen's search
+    /// without passing ChillMate's Face ID or PIN, in duress mode too, and deleting
+    /// all data in the app left it there. Nothing is indexed from the journal now;
+    /// the journal's own search, behind the lock, replaces it.
+    ///
+    /// The flag is set only once Spotlight confirms the removal, so a failure is
+    /// retried on the next launch.
+    func removeJournalIndexIfNeeded(defaults: UserDefaults = .standard) async {
+        guard !defaults.bool(forKey: DefaultsKey.spotlightJournalRemoved) else { return }
 
-        let attributeSet = CSSearchableItemAttributeSet(contentType: .text)
-        attributeSet.title = String(localized: "Journal: \(entry.date.formatted(date: .abbreviated, time: .shortened))")
-
-        var parts: [String] = []
-        if !entry.rememberClearly.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            parts.append(entry.rememberClearly)
+        // Each indexed entry also left a key behind, named after the entry.
+        for key in defaults.dictionaryRepresentation().keys where key.hasPrefix(Self.legacyJournalHashPrefix) {
+            defaults.removeObject(forKey: key)
         }
-        if !entry.feelsGoodAbout.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            parts.append(entry.feelsGoodAbout)
-        }
-        if !entry.regrets.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            parts.append(entry.regrets)
-        }
-        attributeSet.contentDescription = parts.isEmpty ? "Private journal entry" : parts.joined(separator: " · ")
-        attributeSet.keywords = ["journal", "ChillMate", "private", "reflection"]
 
-        let item = CSSearchableItem(
-            uniqueIdentifier: "journal-\(entry.id.uuidString)",
-            domainIdentifier: domainIdentifier,
-            attributeSet: attributeSet
-        )
-        item.expirationDate = .distantFuture
-
-        CSSearchableIndex.default().indexSearchableItems([item])
+        do {
+            try await CSSearchableIndex.default().deleteSearchableItems(withDomainIdentifiers: [journalDomainIdentifier])
+            defaults.set(true, forKey: DefaultsKey.spotlightJournalRemoved)
+        } catch {
+            // Left unset, so the next launch tries again.
+        }
     }
 
-    func removeJournalEntry(_ entry: JournalEntry) {
-        CSSearchableIndex.default().deleteSearchableItems(
-            withIdentifiers: ["journal-\(entry.id.uuidString)"]
-        )
-    }
-
-    func removeAllJournalEntries() {
-        CSSearchableIndex.default().deleteSearchableItems(withDomainIdentifiers: [domainIdentifier])
-    }
+    /// Prefix of the per-entry keys the journal indexing wrote. Not a key itself.
+    static let legacyJournalHashPrefix = "spotlightHash-"
 }
 
 /// Conformance declared here rather than beside the protocol: `SpotlightIndexing`

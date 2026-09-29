@@ -136,6 +136,15 @@ struct TimerEntry: TimelineEntry {
     let substance: String?
     let start: Date
     let end: Date
+    /// The phone's discreet Lock Screen timer, relayed. A watch face is read by
+    /// whoever sits beside you just as a Lock Screen is.
+    var discreet = false
+
+    /// What the face calls the running timer.
+    var title: String? {
+        guard let substance else { return nil }
+        return discreet ? String(localized: "Timer") : substance
+    }
 }
 
 struct TimerProvider: TimelineProvider {
@@ -160,7 +169,13 @@ struct TimerProvider: TimelineProvider {
 
     private func currentEntry() -> TimerEntry {
         if let active = WidgetStore.activeTimer {
-            return TimerEntry(date: .now, substance: active.substance, start: active.start, end: active.end)
+            return TimerEntry(
+                date: .now,
+                substance: active.substance,
+                start: active.start,
+                end: active.end,
+                discreet: LockScreenTimerPrivacy.isDiscreet()
+            )
         }
         return TimerEntry(date: .now, substance: nil, start: .now, end: .now)
     }
@@ -183,11 +198,11 @@ private struct TimerWidgetView: View {
     @Environment(\.widgetFamily) private var family
 
     var body: some View {
-        if let substance = entry.substance {
+        if let title = entry.title {
             switch family {
             case .accessoryCircular:
                 ProgressView(timerInterval: entry.start...entry.end, countsDown: true) {
-                    Text(substance)
+                    Text(title)
                 } currentValueLabel: {
                     Image(systemName: "timer")
                         .font(.system(size: 15, weight: .semibold))
@@ -196,12 +211,12 @@ private struct TimerWidgetView: View {
                 .widgetAccentable()
 
             case .accessoryInline:
-                Text("\(substance) \(Text(timerInterval: entry.start...entry.end, countsDown: true))")
+                Text("\(title) \(Text(timerInterval: entry.start...entry.end, countsDown: true))")
 
             default:
                 VStack(alignment: .leading, spacing: 2) {
                     Label {
-                        Text(substance)
+                        Text(title)
                             .font(.caption2.weight(.semibold))
                     } icon: {
                         Image(systemName: "timer")

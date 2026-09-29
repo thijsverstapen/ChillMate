@@ -8,46 +8,6 @@ import ChillMateCore
 /// screens. This is a move: the ranges are verbatim, and the only edit anywhere
 /// is that five components shared with the dashboard are no longer `private`.
 
-private struct CalendarOverviewButton: View {
-    let open: () -> Void
-
-    var body: some View {
-        Button(action: open) {
-            HStack(spacing: 14) {
-                Image(systemName: "calendar")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(Color.chillPrimary)
-                    .frame(width: 44, height: 44)
-                    .glassSurface(radius: 22, tint: Color.chillPrimary.opacity(0.14))
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Calendar")
-                        .font(.headline)
-                        .foregroundStyle(Color.chillText)
-
-                    Text("View logged and skipped Chills month by month")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.chillSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-            .padding(16)
-            .glassSurface(radius: 28, tint: Color.chillPrimary.opacity(0.09), interactive: true)
-        }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(String(localized: "Calendar"))
-        .accessibilityHint(String(localized: "View logged and skipped Chills month by month"))
-        .accessibilityAddTraits(.isButton)
-        .buttonStyle(ChillPlainButtonStyle())
-    }
-}
-
 private struct CalendarMonthData {
     let monthDays: [Date]
     let leadingBlankCount: Int
@@ -144,7 +104,7 @@ private struct CalendarDaySummary {
             if entry.skippedNight {
                 hasSkipped = true
             }
-            if !entry.substances.isEmpty {
+            if entry.hasSubstances {
                 hasSubstances = true
             }
         }
@@ -406,7 +366,7 @@ struct CalendarOverviewView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 12) {
-                        SectionTitle(title: "Substance tags in \(monthTitle)", symbol: "pills.fill")
+                        SectionTitle(title: String(localized: "Substance tags in \(monthTitle)"), symbol: "pills.fill")
 
                         if data.monthlySubstanceCounts.isEmpty {
                             EmptyGlassState(text: String(localized: "No substance tags in this month."))
@@ -451,8 +411,8 @@ struct CalendarOverviewView: View {
 
     private func delete(_ entry: NightEntry) {
         RecentlyDeletedStore.record(
-            kind: "Chill log",
-            title: entry.skippedNight ? "Skipped Chill check" : "Chill log",
+            kind: .chillLog,
+            title: entry.skippedNight ? String(localized: "Skipped Chill check") : String(localized: "Chill log"),
             detail: entry.date.formatted(date: .abbreviated, time: .shortened)
         )
         modelContext.delete(entry)

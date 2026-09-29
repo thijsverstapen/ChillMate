@@ -46,6 +46,9 @@ ALLOWED = {
     "appPINSalt",
     # Keychain account, not a defaults key.
     "encryptedBackupDeviceID",
+    # HealthKit sample metadata written before 5.1.0, matched only so it can be
+    # removed. Not a defaults key.
+    "ChillMateSubstances",
 }
 
 # The registries themselves, which exist to hold these literals.

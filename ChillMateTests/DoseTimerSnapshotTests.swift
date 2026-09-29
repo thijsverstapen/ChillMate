@@ -153,15 +153,16 @@ struct DoseTimerSnapshotTests {
         #expect(ActiveDoseTimer.mostRelevant(in: [timer], now: start.addingTimeInterval(3 * 3600)) == nil)
     }
 
-    /// The Lock Screen is read by whoever is standing next to you. The setting
-    /// that already keeps substance names out of notification text has to reach
-    /// this surface too, or the app is applying two standards to one screen —
-    /// the safe route activity refuses to carry a destination for exactly this
-    /// reason.
+    /// Whether the Lock Screen names the substance is the discreet Lock Screen
+    /// timer's call, made where the widget is drawn (`LockScreenTimerPrivacy`).
+    /// The snapshot used to swap in "Check-in" whenever discreet notifications
+    /// were on, which would now be a second switch overruling the first:
+    /// somebody who turned the discreet timer off would still not see the name.
+    /// The notification setting only seeds the timer's on first launch.
     // No `.serialized` trait here: the suite already carries one, and this test
     // reaches into `UserDefaults.standard`, so that guarantee has to hold.
-    @Test("Discreet wording keeps the substance name off the Lock Screen")
-    func discreetWordingHidesTheSubstance() throws {
+    @Test("Discreet notifications no longer decide what the timer is called")
+    func snapshotCarriesTheSubstance() {
         let key = DefaultsKey.discreetNotifications
         let previous = UserDefaults.standard.object(forKey: key)
         defer {
@@ -174,13 +175,10 @@ struct DoseTimerSnapshotTests {
 
         let timer = record(substance: .ketamine, startedAt: start, route: .sniffed)
 
-        UserDefaults.standard.set(false, forKey: key)
-        #expect(ActiveDoseTimer.snapshot(for: timer).substanceName == Substance.ketamine.rawValue)
-
-        UserDefaults.standard.set(true, forKey: key)
-        let discreet = ActiveDoseTimer.snapshot(for: timer).substanceName
-        #expect(discreet != Substance.ketamine.rawValue)
-        #expect(!discreet.isEmpty)
+        for discreetNotifications in [false, true] {
+            UserDefaults.standard.set(discreetNotifications, forKey: key)
+            #expect(ActiveDoseTimer.snapshot(for: timer).substanceName == Substance.ketamine.localizedDisplayName)
+        }
     }
 
     /// The route has to reach the published curve, or an edible gets the smoked

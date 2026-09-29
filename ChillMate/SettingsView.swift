@@ -35,10 +35,13 @@ enum SettingsGroup: String, CaseIterable, Identifiable {
 
 enum SettingsSectionPage: String, CaseIterable, Identifiable {
     case privacy = "Privacy & lock"
-    case privacyDashboard = "Privacy dashboard"
     case permissions = "Permissions"
     case notifications = "Notifications"
-    case iCloud = "iCloud backup"
+    // Was "iCloud backup". The page now holds iCloud sync as well, and the app
+    // tells people they can change sync "in Settings" — a page named only for
+    // the backup hid the one switch they were sent to find. The raw value is an
+    // identifier and a catalog lookup, never stored, so renaming it is safe.
+    case iCloud = "iCloud"
     case accessibility = "Accessibility"
     case appearance = "Appearance"
     case watch = "Apple Watch"
@@ -51,7 +54,7 @@ enum SettingsSectionPage: String, CaseIterable, Identifiable {
 
     var group: SettingsGroup {
         switch self {
-        case .privacy, .privacyDashboard, .permissions: .security
+        case .privacy, .permissions: .security
         case .notifications, .watch, .shortcuts: .alerts
         case .appearance, .accessibility: .presentation
         case .iCloud, .account: .data
@@ -63,8 +66,6 @@ enum SettingsSectionPage: String, CaseIterable, Identifiable {
         switch self {
         case .privacy:
             "lock.shield.fill"
-        case .privacyDashboard:
-            "list.clipboard.fill"
         case .permissions:
             "checkmark.shield.fill"
         case .notifications:
@@ -91,15 +92,13 @@ enum SettingsSectionPage: String, CaseIterable, Identifiable {
     var subtitle: String {
         switch self {
         case .privacy:
-            String(localized: "Face ID, PIN, and local protection")
-        case .privacyDashboard:
-            String(localized: "What is stored, exported, and never shared")
+            String(localized: "Face ID, PIN, and what others can see")
         case .permissions:
             String(localized: "Health and system access")
         case .notifications:
             String(localized: "Check-ins and affirmations")
         case .iCloud:
-            String(localized: "Encrypted backup and restore")
+            String(localized: "A copy in your private iCloud")
         case .accessibility:
             String(localized: "Readable, calm, and one-handed app behavior")
         case .appearance:
@@ -125,22 +124,16 @@ struct SettingsView: View {
     @AppStorage(DefaultsKey.requiresPIN) private var requiresPIN = false
     @State private var isShowingDuressSetup = false
     @State private var hasDuressPIN = LocalSecurityService.hasDuressPIN()
-    @AppStorage(DefaultsKey.localEncryptionEnabled) private var localEncryptionEnabled = true
     @AppStorage(DefaultsKey.healthKitAutoSync) private var healthKitAutoSync = false
     @AppStorage(DefaultsKey.healthKitSexualActivityWriteEnabled) private var healthKitSexualActivityWriteEnabled = false
     @AppStorage(DefaultsKey.healthKitSleepReadWriteEnabled) private var healthKitSleepReadWriteEnabled = false
     @AppStorage(DefaultsKey.healthKitHeartRateReadEnabled) private var healthKitHeartRateReadEnabled = false
     @AppStorage(DefaultsKey.healthKitHRVReadEnabled) private var healthKitHRVReadEnabled = false
-    @AppStorage(DefaultsKey.healthKitWorkoutReadEnabled) private var healthKitWorkoutReadEnabled = false
-    @AppStorage(DefaultsKey.healthKitVitalsReadEnabled) private var healthKitVitalsReadEnabled = false
     @AppStorage(DefaultsKey.healthKitMindfulWriteEnabled) private var healthKitMindfulWriteEnabled = false
     @AppStorage(DefaultsKey.notificationsEnabled) private var notificationsEnabled = false
     @AppStorage(DefaultsKey.dailyAffirmationsEnabled) private var dailyAffirmationsEnabled = false
     @AppStorage(DefaultsKey.discreetNotifications) private var discreetNotifications = false
     @AppStorage(DefaultsKey.notificationTone) private var notificationTone = NotificationTone.gentle.rawValue
-    @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
-    @AppStorage(DefaultsKey.lastICloudBackupStatus) private var lastICloudBackupStatus = ""
-    @AppStorage(DefaultsKey.lastICloudBackupTimestamp) private var lastICloudBackupTimestamp = 0.0
     @AppStorage(DefaultsKey.highContrastMode) private var highContrastMode = false
     @AppStorage(DefaultsKey.chillReducedMotion) private var chillReducedMotion = false
     @AppStorage(DefaultsKey.oneHandedControls) private var oneHandedControls = true
@@ -152,9 +145,11 @@ struct SettingsView: View {
     @AppStorage(DefaultsKey.watchBreathingHaptics) private var watchBreathingHaptics = true
     @AppStorage(DefaultsKey.watchDiscreetCheckIns) private var watchDiscreetCheckIns = true
     @AppStorage(DefaultsKey.watchVisibleTimers) private var watchVisibleTimers = true
-    @AppStorage(DefaultsKey.watchStressAndTemperatureDetection) private var watchStressAndTemperatureDetection = false
     @AppStorage(DefaultsKey.autoLockMinutes) private var autoLockMinutes = 0
     @AppStorage(DefaultsKey.screenPrivacyEnabled) private var screenPrivacyEnabled = true
+    // In the shared suite: the Live Activity extension reads it to decide what the
+    // Lock Screen says.
+    @AppStorage(WidgetSharedKey.discreetLockScreenTimer, store: WidgetSharedKey.suite) private var discreetLockScreenTimer = false
     @AppStorage(DefaultsKey.safetyCheckInsEnabled) private var safetyCheckInsEnabled = false
     @AppStorage(DefaultsKey.weekendSafetyEnabled) private var weekendSafetyEnabled = false
     @AppStorage(DefaultsKey.checkInHour) private var checkInHour = 10
@@ -200,17 +195,36 @@ struct SettingsView: View {
     @State private var isShowingBackupImporter = false
 
     let showsBackButton: Bool
+    /// Opens straight onto one page instead of the list, for screens that link
+    /// to a single setting: the Privacy screen, and search in More.
+    let openingPage: SettingsSectionPage?
 
-    init(showsBackButton: Bool = true) {
+    init(showsBackButton: Bool = true, openingPage: SettingsSectionPage? = nil) {
         self.showsBackButton = showsBackButton
+        self.openingPage = openingPage
     }
 
     private var palette: DailyScorePalette {
         DailyScorePalette(score: lastDailyRecoveryScore)
     }
 
+    /// Applies the change to timers already running from the switch itself. An
+    /// `onChange` on the Settings list did not fire while the list sat underneath
+    /// the page the switch is on, so a running timer kept naming the substance.
+    /// The watch is told at the same moment, for its face.
+    private var discreetTimerBinding: Binding<Bool> {
+        Binding(
+            get: { discreetLockScreenTimer },
+            set: { isOn in
+                discreetLockScreenTimer = isOn
+                Task { await DrugTimerLiveActivityController.applyDiscreet(isOn) }
+                services.watch.sendSettings()
+            }
+        )
+    }
+
     private var watchSettingsFingerprint: [Bool] {
-        [watchHydrationReminders, watchHeartRateWarnings, watchBreathingHaptics, watchDiscreetCheckIns, watchVisibleTimers, watchStressAndTemperatureDetection]
+        [watchHydrationReminders, watchHeartRateWarnings, watchBreathingHaptics, watchDiscreetCheckIns, watchVisibleTimers]
     }
 
     private var appVersionText: String {
@@ -220,6 +234,50 @@ struct SettingsView: View {
     }
 
     var body: some View {
+        Group {
+            if let openingPage {
+                settingsPage(openingPage)
+                    .onAppear { message = nil }
+            } else {
+                categoryListScreen
+            }
+        }
+        .onChange(of: requiresFaceID) { _, isOn in
+            faceIDLockChanged(isOn)
+        }
+        .onChange(of: healthKitAutoSync) { _, isOn in
+            healthKitSyncChanged(isOn)
+        }
+        .onChange(of: notificationsEnabled) { _, isOn in
+            notificationsChanged(isOn)
+        }
+        .onChange(of: dailyAffirmationsEnabled) { _, isOn in
+            dailyAffirmationsChanged(isOn)
+        }
+        .onChange(of: weeklyDigestEnabled) { _, isOn in
+            if isOn {
+                // Placeholder figures. Home reschedules with the real streak and score
+                // the next time it recomputes metrics, which is on its next appearance.
+                services.notifications.scheduleWeeklySummary(streak: 0, score: 0)
+            } else {
+                services.notifications.clearWeeklySummary()
+            }
+        }
+        .onChange(of: stiReminderEnabled) { _, isOn in
+            if isOn {
+                let dueDate = Calendar.current.date(byAdding: .month, value: stiReminderMonths, to: .now) ?? .now
+                services.notifications.scheduleSTIReminder(dueDate: dueDate)
+            } else {
+                services.notifications.clearSTIReminder()
+            }
+        }
+        // Push Apple Watch preference changes immediately (previously they
+        // only reached the watch once, at session activation). One combined
+        // observer keeps the modifier chain within the type-checker's budget.
+        .onChange(of: watchSettingsFingerprint) { _, _ in services.watch.sendSettings() }
+    }
+
+    private var categoryListScreen: some View {
         ZStack {
             DashboardBackdrop()
 
@@ -238,45 +296,6 @@ struct SettingsView: View {
                     // follow the user onto unrelated settings pages.
                     .onAppear { message = nil }
             }
-            .onChange(of: requiresFaceID) { _, isOn in
-                faceIDLockChanged(isOn)
-            }
-            .onChange(of: localEncryptionEnabled) { _, isOn in
-                localEncryptionChanged(isOn)
-            }
-            .onChange(of: healthKitAutoSync) { _, isOn in
-                healthKitSyncChanged(isOn)
-            }
-            .onChange(of: notificationsEnabled) { _, isOn in
-                notificationsChanged(isOn)
-            }
-            .onChange(of: dailyAffirmationsEnabled) { _, isOn in
-                dailyAffirmationsChanged(isOn)
-            }
-            .onChange(of: iCloudBackupEnabled) { _, isOn in
-                iCloudBackupChanged(isOn)
-            }
-            .onChange(of: weeklyDigestEnabled) { _, isOn in
-                if isOn {
-                    // Placeholder figures. Home reschedules with the real streak and score
-                    // the next time it recomputes metrics, which is on its next appearance.
-                    services.notifications.scheduleWeeklySummary(streak: 0, score: 0)
-                } else {
-                    services.notifications.clearWeeklySummary()
-                }
-            }
-            .onChange(of: stiReminderEnabled) { _, isOn in
-                if isOn {
-                    let dueDate = Calendar.current.date(byAdding: .month, value: stiReminderMonths, to: .now) ?? .now
-                    services.notifications.scheduleSTIReminder(dueDate: dueDate)
-                } else {
-                    services.notifications.clearSTIReminder()
-                }
-            }
-            // Push Apple Watch preference changes immediately (previously they
-            // only reached the watch once, at session activation). One combined
-            // observer keeps the modifier chain within the type-checker's budget.
-            .onChange(of: watchSettingsFingerprint) { _, _ in services.watch.sendSettings() }
             .endEditingOnTap()
         }
     }
@@ -472,13 +491,6 @@ struct SettingsView: View {
                             )
                         }
 
-                        SettingsToggleCard(
-                            title: String(localized: "Extra app security"),
-                            caption: String(localized: "Locks your private files even when the app is closed. Useful if your phone is ever lost or stolen."),
-                            symbol: "lock.doc.fill",
-                            isOn: $localEncryptionEnabled
-                        )
-
                         AutoLockTimeoutCard(selectedMinutes: $autoLockMinutes)
 
                         SettingsToggleCard(
@@ -488,15 +500,19 @@ struct SettingsView: View {
                             isOn: $screenPrivacyEnabled
                         )
 
-                        EncryptionInfoCard()
+                        SettingsToggleCard(
+                            title: String(localized: "Discreet Lock Screen timer"),
+                            caption: String(localized: "A running timer says “Timer” on your Lock Screen, in the Dynamic Island and on your Apple Watch, instead of naming the substance."),
+                            symbol: "lock.iphone",
+                            isOn: discreetTimerBinding
+                        )
 
-                    case .privacyDashboard:
-                        PrivacyDashboardCard()
+                        EncryptionInfoCard()
 
                     case .permissions:
                         SettingsToggleCard(
                             title: String(localized: "Add logs to Apple Health"),
-                            caption: String(localized: "Save sex and sleep entries to Apple Health after each log."),
+                            caption: String(localized: "Saves when each night happened, and how long you slept, to Apple Health. Nothing else about the night goes with it."),
                             symbol: "heart.text.square.fill",
                             isOn: $healthKitAutoSync
                         )
@@ -506,7 +522,7 @@ struct SettingsView: View {
                             sleepReadWrite: $healthKitSleepReadWriteEnabled,
                             heartRateRead: $healthKitHeartRateReadEnabled,
                             hrvRead: $healthKitHRVReadEnabled,
-                            workoutRead: $healthKitWorkoutReadEnabled,
+                            mindfulWrite: $healthKitMindfulWriteEnabled,
                             requestScope: requestHealthScope
                         )
 
@@ -514,16 +530,7 @@ struct SettingsView: View {
                         notificationsSectionContent
 
                     case .iCloud:
-                        ICloudBackupCard(
-                            isEnabled: $iCloudBackupEnabled,
-                            status: lastICloudBackupStatus,
-                            lastBackupTimestamp: lastICloudBackupTimestamp,
-                            isWorking: isWorking,
-                            saveNow: saveICloudBackup,
-                            restore: restoreICloudBackup,
-                            deleteBackups: deleteICloudBackups
-                        )
-
+                        ICloudSyncCard()
                     case .accessibility:
                         AccessibilityQualityCard(
                             highContrastMode: $highContrastMode,
@@ -550,8 +557,7 @@ struct SettingsView: View {
                             heartRateWarnings: $watchHeartRateWarnings,
                             breathingHaptics: $watchBreathingHaptics,
                             discreetCheckIns: $watchDiscreetCheckIns,
-                            visibleTimers: $watchVisibleTimers,
-                            stressAndTemperatureDetection: $watchStressAndTemperatureDetection
+                            visibleTimers: $watchVisibleTimers
                         )
 
                     case .shortcuts:
@@ -674,7 +680,7 @@ struct SettingsView: View {
                 await MainActor.run {
                     isRevertingToggle = !success
                     requiresFaceID = success
-                    message = success ? "Face ID lock is on." : "Face ID could not be enabled."
+                    message = success ? String(localized: "Face ID lock is on.") : String(localized: "Face ID could not be enabled.")
                     isWorking = false
                 }
             } catch {
@@ -685,15 +691,6 @@ struct SettingsView: View {
                     isWorking = false
                 }
             }
-        }
-    }
-
-    private func localEncryptionChanged(_ isOn: Bool) {
-        if isOn {
-            LocalSecurityService.applyFileProtection()
-            message = String(localized: "Extra security is on. Your private files are locked while ChillMate is closed.")
-        } else {
-            message = String(localized: "Extra security is off. Your iPhone still applies its built-in protection.")
         }
     }
 
@@ -760,12 +757,8 @@ struct SettingsView: View {
             healthKitHeartRateReadEnabled = enabled
         case .heartRateVariabilityRead:
             healthKitHRVReadEnabled = enabled
-        case .vitalsRead:
-            healthKitVitalsReadEnabled = enabled
         case .mindfulWrite:
             healthKitMindfulWriteEnabled = enabled
-        case .workoutRead:
-            healthKitWorkoutReadEnabled = enabled
         }
     }
 
@@ -894,7 +887,7 @@ struct SettingsView: View {
                             services.notifications.scheduleDailyAffirmations()
                         }
                     }
-                    message = granted ? "Notifications are on." : "Notification permission was not granted."
+                    message = granted ? String(localized: "Notifications are on.") : String(localized: "Notification permission was not granted.")
                     isWorking = false
                 }
             } catch {
@@ -902,104 +895,6 @@ struct SettingsView: View {
                     isRevertingToggle = true
                     notificationsEnabled = false
                     message = error.localizedDescription
-                    isWorking = false
-                }
-            }
-        }
-    }
-
-    private func iCloudBackupChanged(_ isOn: Bool) {
-        if !isOn {
-            if isRevertingToggle {
-                isRevertingToggle = false
-                return
-            }
-
-            message = String(localized: "iCloud backup is off. Local encrypted recovery stays available on this iPhone.")
-            return
-        }
-
-        guard services.cloudBackups.isAvailable else {
-            isRevertingToggle = true
-            iCloudBackupEnabled = false
-            message = ICloudBackupError.iCloudUnavailable.localizedDescription
-            return
-        }
-
-        lastICloudBackupStatus = services.cloudBackups.statusLine
-        message = String(localized: "iCloud backup is on. ChillMate saves encrypted backup files to your iCloud Drive.")
-    }
-
-    private func saveICloudBackup() {
-        guard iCloudBackupEnabled else {
-            message = String(localized: "Turn on iCloud backup first.")
-            return
-        }
-
-        isWorking = true
-        message = nil
-        Task {
-            do {
-                let date = try services.cloudBackups.saveLatestBackup(localContext: modelContext)
-                await MainActor.run {
-                    lastICloudBackupTimestamp = date.timeIntervalSince1970
-                    // The service already wrote the durable status line, translated.
-                    // Restating it here in an English literal is what overwrote that
-                    // translation, so the call site now sets only the transient
-                    // confirmation. Same rule in the restore and delete paths below.
-                    let stamp = date.formatted(date: .abbreviated, time: .shortened)
-                    message = String(localized: "Encrypted iCloud backup saved \(stamp).")
-                    isWorking = false
-                }
-            } catch {
-                await MainActor.run {
-                    // Do NOT write error to lastICloudBackupStatus. It is a shared key
-                    // shown across views and would propagate the error everywhere.
-                    message = String(localized: "Could not save to iCloud: \(error.localizedDescription)")
-                    isWorking = false
-                }
-            }
-        }
-    }
-
-    private func restoreICloudBackup() {
-        isWorking = true
-        message = nil
-        Task {
-            guard await confirmIdentity(reason: String(localized: "Confirm it is you before replacing your data")) else {
-                await MainActor.run { isWorking = false }
-                return
-            }
-            do {
-                let summary = try services.cloudBackups.restoreLatestBackup(into: modelContext)
-                await MainActor.run {
-                    message = String(localized: "Restored from iCloud. \(summary.displayText)")
-                    isWorking = false
-                }
-            } catch {
-                await MainActor.run {
-                    // Do NOT write error to lastICloudBackupStatus, keep errors local.
-                    message = String(localized: "Could not restore from iCloud: \(error.localizedDescription)")
-                    isWorking = false
-                }
-            }
-        }
-    }
-
-    private func deleteICloudBackups() {
-        isWorking = true
-        message = nil
-        Task {
-            do {
-                try services.cloudBackups.deleteBackups()
-                await MainActor.run {
-                    lastICloudBackupTimestamp = 0
-                    message = String(localized: "iCloud backups deleted.")
-                    isWorking = false
-                }
-            } catch {
-                await MainActor.run {
-                    message = String(localized: "Could not delete iCloud backups: \(error.localizedDescription)")
                     isWorking = false
                 }
             }
@@ -1037,7 +932,7 @@ struct SettingsView: View {
                         services.notifications.scheduleInactivityReminders()
                         services.notifications.scheduleDailyAffirmations()
                     }
-                    message = granted ? "Daily affirmations are on." : "Notification permission was not granted."
+                    message = granted ? String(localized: "Daily affirmations are on.") : String(localized: "Notification permission was not granted.")
                     isWorking = false
                 }
             } catch {

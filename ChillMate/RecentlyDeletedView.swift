@@ -56,7 +56,7 @@ private struct RecentlyDeletedRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(item.title).font(.headline).foregroundStyle(Color.chillText)
                 Text(item.detail).font(.caption.weight(.semibold)).foregroundStyle(Color.chillSecondary).fixedSize(horizontal: false, vertical: true)
-                Text("\(item.kind) • \(item.deletedAt.formatted(date: .abbreviated, time: .shortened))").font(.caption2.weight(.bold)).foregroundStyle(Color.chillTertiary)
+                Text("\(item.localizedKind) • \(item.deletedAt.formatted(date: .abbreviated, time: .shortened))").font(.caption2.weight(.bold)).foregroundStyle(Color.chillTertiary)
             }
             Spacer(minLength: 0)
         }

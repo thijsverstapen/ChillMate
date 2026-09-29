@@ -4,6 +4,12 @@ import ChillMateCore
 
 @Model
 final class UserProfile {
+    // Indexed because every descriptor that reads this type orders by it, and an
+    // unindexed sort is a full scan the store has to redo on each fetch. The cost
+    // lands on the people with the most history, which is exactly backwards.
+    // The profile lookup sorts by creation to pick the first one deterministically.
+    #Index<UserProfile>([\.createdAt])
+
     var id: UUID = UUID()
     var name: String = ""
     var age: Int = 18
@@ -83,7 +89,7 @@ struct ProfileMedication: Codable, Identifiable, Hashable {
     var effectiveHours: Double
 
     var timingSummary: String {
-        "\(dosage.isEmpty ? "No amount saved" : dosage) • \(takenAt.formatted(date: .omitted, time: .shortened)) • \(effectiveHours.formatted(.number.precision(.fractionLength(0...1)))) h"
+        "\(dosage.isEmpty ? String(localized: "No amount saved") : dosage) • \(takenAt.formatted(date: .omitted, time: .shortened)) • \(effectiveHours.formatted(.number.precision(.fractionLength(0...1)))) h"
     }
 }
 

@@ -314,11 +314,10 @@ enum AccountDataDeletion {
             errors.append(error)
         }
 
-        do {
-            try Services.live.cloudBackups.deleteBackups()
-        } catch {
-            errors.append(error)
-        }
+        // Backup files an earlier version saved to iCloud Drive, if the one-time
+        // cleanup has not reached them yet. Best effort, as the old delete was: no
+        // iCloud Drive means nothing of ChillMate's is in it to delete.
+        _ = try? LegacyICloudBackupFiles.removeAll()
 
         if let error = errors.first {
             throw error
@@ -335,11 +334,16 @@ enum AccountDataDeletion {
             "healthKitSleepReadWriteEnabled",
             "healthKitHeartRateReadEnabled",
             "healthKitHRVReadEnabled",
+            "healthKitMindfulWriteEnabled",
+            // No longer written; cleared so a reset leaves nothing behind from
+            // versions that had them.
             "healthKitWorkoutReadEnabled",
+            "healthKitVitalsReadEnabled",
             "notificationsEnabled",
             "dailyAffirmationsEnabled",
             "discreetNotifications",
             "notificationTone",
+            // The iCloud Drive backup's, removed in 5.1.0.
             "iCloudBackupEnabled",
             "lastICloudBackupStatus",
             "lastICloudBackupTimestamp",

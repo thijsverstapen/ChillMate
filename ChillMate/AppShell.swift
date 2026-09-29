@@ -16,9 +16,6 @@ struct AppHomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Query(ChillMateQueries.profile) private var profiles: [UserProfile]
     @AppStorage(DefaultsKey.lastOnDeviceRecoveryStatus) private var lastOnDeviceRecoveryStatus = ""
-    @AppStorage(DefaultsKey.iCloudBackupEnabled) private var iCloudBackupEnabled = false
-    @AppStorage(DefaultsKey.lastICloudBackupStatus) private var lastICloudBackupStatus = ""
-    @AppStorage(DefaultsKey.lastICloudBackupTimestamp) private var lastICloudBackupTimestamp = 0.0
     @AppStorage(DefaultsKey.hasShownFirstLaunchSplash) private var hasShownFirstLaunchSplash = false
     @State private var didAttemptRecoveryRestore = false
 
@@ -81,33 +78,12 @@ struct AppHomeView: View {
 
     @MainActor
     private func refreshOnDeviceRecoverySnapshot() async {
-        // The two backups fail independently. A shared catch used to blame the
-        // on-device snapshot whenever the iCloud save threw (e.g. iCloud Drive
-        // unavailable), surfacing a persistent, misleading error status on every
-        // backgrounding.
         do {
             if try services.encryptedBackups.refreshOnDeviceRecoverySnapshot(localContext: modelContext) {
                 lastOnDeviceRecoveryStatus = String(localized: "Encrypted on-device recovery backup updated.")
             }
         } catch {
             lastOnDeviceRecoveryStatus = String(localized: "Encrypted on-device recovery backup could not update.")
-        }
-
-        guard iCloudBackupEnabled else { return }
-        do {
-            let date = try services.cloudBackups.saveLatestBackup(localContext: modelContext)
-            lastICloudBackupTimestamp = date.timeIntervalSince1970
-            // saveLatestBackup already wrote a translated status line. This write
-            // is a deliberate refinement of it, not a restatement: an automatic
-            // background refresh is worth wording differently from a tap on "Back
-            // up now", so it goes through String(localized:) as well.
-            lastICloudBackupStatus = String(localized: "Encrypted iCloud backup updated.")
-        } catch {
-            // Signed out of iCloud is an expected state, not a failure worth an
-            // alarming banner; keep the wording calm and actionable.
-            lastICloudBackupStatus = services.cloudBackups.isAvailable
-                ? String(localized: "Encrypted iCloud backup could not update.")
-                : String(localized: "iCloud backup is paused. Sign in to iCloud with iCloud Drive on to resume.")
         }
     }
 }
@@ -126,7 +102,19 @@ private struct MainTabView: View {
     @AppStorage(DefaultsKey.pendingAppDestination) private var pendingAppDestination = ""
     @AppStorage(DefaultsKey.lastSelectedTab) private var lastSelectedTab = AppTab.home.rawValue
     @AppStorage(DefaultsKey.lastBackgroundedAt) private var lastBackgroundedAt = 0.0
+    @AppStorage(DefaultsKey.whatsNewSeenVersion) private var whatsNewSeenVersion: String?
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.appContentIsVisible) private var appContentIsVisible
+    @State private var whatsNew: WhatsNewRelease?
+    /// Set once a notification, a shortcut or Siri has taken somebody to a
+    /// page. What's New then waits for another launch rather than covering it.
+    @State private var wasSentSomewhere = false
+    /// Counts closings of What's New. `onDismiss` only bumps this; the work is
+    /// done in `onChange`, where `@AppStorage` reads are current. Read inside
+    /// `onDismiss`, `pendingAppDestination` still held what it was before the
+    /// destination arrived, so the destination was dropped and the page counted
+    /// as seen.
+    @State private var whatsNewClosings = 0
 
     /// After at least this long in the background, reopening the app returns to
     /// the Home tab instead of restoring whichever tab the user last viewed.
@@ -171,12 +159,21 @@ private struct MainTabView: View {
         .fullScreenCover(isPresented: $isShowingShortcutLog) {
             LogNightSheet()
         }
+        .sheet(item: $whatsNew, onDismiss: { whatsNewClosings += 1 }) { release in
+            WhatsNewView(release: release) { whatsNew = nil }
+        }
         .onAppear {
             restoreLastTabIfNeeded()
             applyPendingDestination()
         }
+        .onChange(of: appContentIsVisible, initial: true) { _, isVisible in
+            offerWhatsNewIfDue(isVisible: isVisible)
+        }
         .onChange(of: pendingAppDestination) { _, _ in
             applyPendingDestination()
+        }
+        .onChange(of: whatsNewClosings) { _, _ in
+            whatsNewDismissed()
         }
         .onChange(of: selectedTab) { _, tab in
             lastSelectedTab = tab.rawValue
@@ -195,6 +192,34 @@ private struct MainTabView: View {
                 break
             }
         }
+    }
+
+    /// Once per update, after the app is unlocked, and never in a launch that
+    /// took somebody somewhere: that page can wait for the next time the app is
+    /// opened.
+    ///
+    /// The destination is checked as well as the flag because the order of the
+    /// first `onAppear` and this is not promised: either can see it first.
+    private func offerWhatsNewIfDue(isVisible: Bool) {
+        guard isVisible, whatsNew == nil, !wasSentSomewhere, !hasDestinationWaiting, !isShowingShortcutLog else { return }
+        let version = WhatsNew.currentVersion
+        guard WhatsNew.shouldShow(currentVersion: version, lastSeenVersion: whatsNewSeenVersion) else { return }
+        whatsNew = WhatsNew.release(for: version)
+    }
+
+    /// Continue and swiping the page away both count: it is shown once. A page
+    /// closed to make way for a destination does not count, and the destination
+    /// is applied now that nothing covers it.
+    private func whatsNewDismissed() {
+        if hasDestinationWaiting {
+            applyPendingDestination()
+        } else {
+            whatsNewSeenVersion = WhatsNew.currentVersion
+        }
+    }
+
+    private var hasDestinationWaiting: Bool {
+        NotificationDestination(rawValue: pendingAppDestination) != nil
     }
 
     private func restoreLastTabIfNeeded() {
@@ -219,6 +244,16 @@ private struct MainTabView: View {
 
     private func applyPendingDestination() {
         guard let destination = NotificationDestination(rawValue: pendingAppDestination) else {
+            return
+        }
+
+        wasSentSomewhere = true
+        // Somebody tapping through to panic support should not land under a
+        // page of news, and the night log's full-screen cover cannot open over
+        // a sheet at all. Close it; once it has gone, `whatsNewDismissed`
+        // applies the destination.
+        if whatsNew != nil {
+            whatsNew = nil
             return
         }
 
@@ -262,8 +297,6 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
     case feedback = "Feedback"
     case safetyAutopilot = "Safety autopilot"
     case privacyReceipt = "Privacy"
-    case privacyTimeline = "Privacy timeline"
-    case securityHealth = "Security check"
     case helperBridge = "Helper summary"
     case recoveryMode = "Recovery mode"
     case privateInsights = "Private insights"
@@ -279,20 +312,17 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
 
     var id: String { rawValue }
 
-    static let visiblePages: [MoreHubPage] = [
-        .profile,
-        .settings,
-        .supportDeveloper,
-        .feedback,
-        .privacyReceipt,
-        .emergencyCard,
-        .supportDirectory
-    ]
+    static var visiblePages: [MoreHubPage] {
+        groupedSections.flatMap(\.pages)
+    }
 
     /// Compact grouping for the hub's default (non-searching) state. Search still
     /// spans every page, including the ones not surfaced here.
     static let groupedSections: [MoreHubSection] = [
         MoreHubSection(title: String(localized: "Your setup"), pages: [.profile, .settings, .privacyReceipt]),
+        // Five screens that could only be found by searching, and one of them —
+        // the full timeline — had no other way in at all.
+        MoreHubSection(title: String(localized: "Your data"), pages: [.unifiedTimeline, .privateInsights, .weeklyReflection, .helperBridge, .recentlyDeleted]),
         MoreHubSection(title: String(localized: "Help & safety"), pages: [.emergencyCard, .supportDirectory]),
         MoreHubSection(title: String(localized: "About the app"), pages: [.supportDeveloper, .feedback])
     ]
@@ -309,10 +339,6 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             String(localized: "Safety autopilot")
         case .privacyReceipt:
             String(localized: "Privacy")
-        case .privacyTimeline:
-            String(localized: "Privacy timeline")
-        case .securityHealth:
-            String(localized: "Security check")
         case .helperBridge:
             String(localized: "Helper summary")
         case .recoveryMode:
@@ -353,11 +379,7 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         case .safetyAutopilot:
             String(localized: "A calm next step when things feel busy")
         case .privacyReceipt:
-            String(localized: "What is saved, policies, and terms")
-        case .privacyTimeline:
-            String(localized: "Recent backup, restore, and lock activity")
-        case .securityHealth:
-            String(localized: "See which privacy options are on")
+            String(localized: "What is kept, where it goes, and what protects it")
         case .helperBridge:
             String(localized: "A simple summary for a GP or helper")
         case .recoveryMode:
@@ -373,7 +395,7 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
         case .emergencyCard:
             String(localized: "Important help info in one card")
         case .supportDirectory:
-            String(localized: "Dutch help lines and support")
+            String(localized: "Crisis lines and support where you live")
         case .privacyPolicy:
             String(localized: "How your private information is handled")
         case .termsOfUse:
@@ -399,10 +421,6 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             "sparkles.rectangle.stack.fill"
         case .privacyReceipt:
             "lock.shield.fill"
-        case .privacyTimeline:
-            "clock.badge.checkmark.fill"
-        case .securityHealth:
-            "checkmark.shield.fill"
         case .helperBridge:
             "doc.text.magnifyingglass"
         case .recoveryMode:
@@ -444,10 +462,6 @@ private enum MoreHubPage: String, Identifiable, CaseIterable {
             Color.chillSecondaryBlue
         case .privacyReceipt:
             Color.chillPrimary
-        case .privacyTimeline:
-            Color.chillIconTeal
-        case .securityHealth:
-            Color.chillMint
         case .helperBridge:
             Color.chillMint
         case .recoveryMode:
@@ -484,17 +498,67 @@ private struct MoreHubSection: Identifiable {
     var id: String { title }
 }
 
+private struct MoreHubRowLabel: View {
+    let title: String
+    let subtitle: String
+    let symbol: String
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 17, weight: .black))
+                .foregroundStyle(tint)
+                .frame(width: 36, height: 36)
+                .background(tint.opacity(0.14), in: Circle())
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(Color.chillText)
+                Text(subtitle)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Color.chillSecondary)
+                    .chillLineLimit(1, scale: 0.74)
+            }
+
+            Spacer(minLength: 0)
+
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Color.chillSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .contentShape(Rectangle())
+    }
+}
+
 private struct MoreHubView: View {
     @State private var searchText = ""
 
+    private var query: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private var filteredPages: [MoreHubPage] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else {
             return MoreHubPage.visiblePages
         }
 
         return MoreHubPage.allCases.filter {
             $0.title.localizedCaseInsensitiveContains(query) ||
+            $0.subtitle.localizedCaseInsensitiveContains(query)
+        }
+    }
+
+    /// Settings pages found by the same search. Searching More for "Face ID"
+    /// used to find nothing, because the page that has it lives one level down.
+    private var filteredSettings: [SettingsSectionPage] {
+        guard !query.isEmpty else { return [] }
+        return SettingsSectionPage.allCases.filter {
+            $0.localizedDisplayName.localizedCaseInsensitiveContains(query) ||
             $0.subtitle.localizedCaseInsensitiveContains(query)
         }
     }
@@ -513,24 +577,10 @@ private struct MoreHubView: View {
                         tint: Color.chillSecondaryBlue
                     )
 
-                    TextField("Search", text: $searchText)
-                        .textFieldStyle(.plain)
-                        .foregroundStyle(Color.chillText)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 11)
-                        .glassSurface(radius: 18, tint: .white.opacity(0.30), interactive: true)
+                    searchField
 
                     VStack(spacing: 8) {
-                        if filteredPages.isEmpty {
-                            Text("No results found.")
-                                .font(.callout.weight(.semibold))
-                                .foregroundStyle(Color.chillSecondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(16)
-                                .glassSurface(radius: 24, tint: .black.opacity(0.04))
-                        }
-
-                        if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        if query.isEmpty {
                             // Compact grouped layout for browsing; search stays flat.
                             ForEach(MoreHubPage.groupedSections) { section in
                                 Text(section.title)
@@ -545,9 +595,19 @@ private struct MoreHubView: View {
                                     moreHubRow(page)
                                 }
                             }
+                        } else if filteredPages.isEmpty && filteredSettings.isEmpty {
+                            Text("No results found.")
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(Color.chillSecondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(16)
+                                .glassSurface(radius: 24, tint: .black.opacity(0.04))
                         } else {
                             ForEach(filteredPages) { page in
                                 moreHubRow(page)
+                            }
+                            ForEach(filteredSettings) { page in
+                                settingsResultRow(page)
                             }
                         }
                     }
@@ -573,35 +633,55 @@ private struct MoreHubView: View {
         }
     }
 
+    private var searchField: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(Color.chillSecondary)
+                .accessibilityHidden(true)
+
+            TextField("Search", text: $searchText)
+                .textFieldStyle(.plain)
+                .foregroundStyle(Color.chillText)
+                .submitLabel(.search)
+
+            if !searchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(Color.chillSecondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Clear search"))
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .glassSurface(radius: 18, tint: .white.opacity(0.30), interactive: true)
+    }
+
+    /// A Settings page in the results, opened straight onto that page. A plain
+    /// destination link rather than a value, so it cannot collide with the
+    /// `SettingsSectionPage` destination Settings registers for its own list.
+    private func settingsResultRow(_ page: SettingsSectionPage) -> some View {
+        NavigationLink {
+            SettingsView(showsBackButton: false, openingPage: page)
+                .toolbar(.hidden, for: .tabBar)
+        } label: {
+            MoreHubRowLabel(
+                title: page.localizedDisplayName,
+                subtitle: String(localized: "Settings · \(page.subtitle)"),
+                symbol: page.symbol,
+                tint: Color.chillPrimary
+            )
+        }
+        .buttonStyle(ChillPlainButtonStyle())
+        .glassSurface(radius: 20, tint: Color.chillPrimary.opacity(0.07), interactive: true)
+    }
+
     private func moreHubRow(_ page: MoreHubPage) -> some View {
         NavigationLink(value: page) {
-            HStack(spacing: 12) {
-                Image(systemName: page.symbol)
-                    .font(.system(size: 17, weight: .black))
-                    .foregroundStyle(page.tint)
-                    .frame(width: 36, height: 36)
-                    .background(page.tint.opacity(0.14), in: Circle())
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(page.title)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Color.chillText)
-                    Text(page.subtitle)
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(Color.chillSecondary)
-                        .chillLineLimit(1, scale: 0.74)
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Color.chillSecondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 11)
-            .contentShape(Rectangle())
+            MoreHubRowLabel(title: page.title, subtitle: page.subtitle, symbol: page.symbol, tint: page.tint)
         }
         .buttonStyle(ChillPlainButtonStyle())
         .glassSurface(radius: 20, tint: page.tint.opacity(0.07), interactive: true)
@@ -625,10 +705,6 @@ private struct MoreHubView: View {
             SafetyAutopilotView()
         case .privacyReceipt:
             PrivacyReceiptView()
-        case .privacyTimeline:
-            PrivacyTimelineView()
-        case .securityHealth:
-            SecurityHealthCheckView()
         case .helperBridge:
             ProfessionalHelperBridgeView()
         case .recoveryMode:

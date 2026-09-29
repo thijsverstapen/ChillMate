@@ -261,6 +261,17 @@ def main(argv):
     if not PBXPROJ.is_file():
         raise SystemExit(f"no project file at {PBXPROJ}")
 
+    # A path is stored relative to its group, and the group already knows its
+    # own directory. Passing "ChillMate/JournalSearch.swift" for the app group
+    # therefore files it at ChillMate/ChillMate/JournalSearch.swift, and the
+    # build fails with "Build input file cannot be found" several minutes later,
+    # naming a path that exists nowhere. Strip the prefix here rather than making
+    # each caller remember which spelling this script wants.
+    group_directory = GROUPS.get(group, (None, None))[1]
+    if group_directory:
+        prefix = f"{group_directory}/"
+        names = [n[len(prefix):] if n.startswith(prefix) else n for n in names]
+
     original = PBXPROJ.read_text()
     text = original
     remove = "--remove" in argv
